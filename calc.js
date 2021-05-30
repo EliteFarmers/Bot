@@ -28,18 +28,6 @@ class PlayerHandler {
 
 	}
 
-	static async getUUID(playerName) {
-		await fetch(`https://api.mojang.com/users/profiles/minecraft/${playerName}`)
-			.then(response => response.json())
-			.then(result => {
-				console.log('Success:', result);
-				return result.id;
-			})
-			.catch(error => {
-				throw new Error(error);
-			});
-	}
-
 	static async getWeight(message, playerName, profileName = null) {
 		if (this.cachedPlayers.has(playerName.toLowerCase())) {
 			this.cachedPlayers.get(playerName.toLowerCase()).getWeight(message, profileName);
@@ -77,6 +65,7 @@ class Player {
 		this.playerName = playerName;
 		this.data = data;
 		this.latestProfile;
+		this.collections;
 
 		this.timestamp = Date.now();
 	}
@@ -91,24 +80,40 @@ class Player {
 		let { WHEAT, POTATO_ITEM, CARROT_ITEM, MUSHROOM_COLLECTION, PUMPKIN, MELON, SUGAR_CANE, CACTUS, NETHER_STALK } = profile.raw.collection;
 		let COCOA = profile.raw.collection["INK_SACK:3"];
 		
-		//Normalized collections
-		//Wheat, Pumpkin, and Mushroom are all 1
+		//Set potentially empty values to 0
 		if (!WHEAT) WHEAT = 0;
 		if (!PUMPKIN) PUMPKIN = 0;
 		if (!MUSHROOM_COLLECTION) MUSHROOM_COLLECTION = 0;
-		if (!CARROT_ITEM) CARROT_ITEM = 0; else CARROT_ITEM /= 3;
-		if (!POTATO_ITEM) POTATO_ITEM = 0; else POTATO_ITEM /= 3;
-		if (!MELON) MELON = 0; else MELON /= 5;
-		if (!COCOA) COCOA = 0; else COCOA /= 3;
-		if (!CACTUS) CACTUS = 0; else CACTUS /= 2;
-		if (!NETHER_STALK) NETHER_STALK = 0; else NETHER_STALK /= 2.5;
-		if (!SUGAR_CANE) SUGAR_CANE = 0; else SUGAR_CANE /= 2;
+		if (!CARROT_ITEM) CARROT_ITEM = 0;
+		if (!POTATO_ITEM) POTATO_ITEM = 0;
+		if (!MELON) MELON = 0;
+		if (!COCOA) COCOA = 0;
+		if (!CACTUS) CACTUS = 0;
+		if (!NETHER_STALK) NETHER_STALK = 0;
+		if (!SUGAR_CANE) SUGAR_CANE = 0;
+		
+		let col = this.latestProfile.raw.collection;
+		this.collections = new Map();
+		
+		//Normalize collections
+		this.collections.set('Wheat', Math.round(WHEAT / 100000));
+		this.collections.set('Carrot', Math.round(CARROT_ITEM / 3) / 100000);
+		this.collections.set('Potato', Math.round(POTATO_ITEM / 3) / 100000);
+		this.collections.set('Pumpkin', Math.round(PUMPKIN / 100000));
+		this.collections.set('Melon', Math.round(MELON / 5) / 100000);
+		this.collections.set('Mushroom', Math.round(MUSHROOM_COLLECTION / 100000));
+		this.collections.set('Cocoa', Math.round(col['INK_SACK:3'] / 3) / 100000);
+		this.collections.set('Cactus', Math.round(CACTUS) / 100000);
+		this.collections.set('Sugar Cane', Math.round(SUGAR_CANE / 2) / 100000);
+		this.collections.set('Nether Wart', Math.round(NETHER_STALK / 2.5) / 100000);
 
-		let collections = [WHEAT, PUMPKIN, MUSHROOM_COLLECTION, CARROT_ITEM, POTATO_ITEM, MELON, COCOA, CACTUS, NETHER_STALK, SUGAR_CANE];
+		let weight = 0;
 
-		let sum = (+WHEAT ?? 0) + (+POTATO_ITEM ?? 0) + (+CARROT_ITEM ?? 0) + (+MUSHROOM_COLLECTION ?? 0) + (+PUMPKIN ?? 0) + (+MELON ?? 0) + (+SUGAR_CANE ?? 0) + (+CACTUS ?? 0) + (+NETHER_STALK ?? 0) + (+COCOA ?? 0);		let weight = (sum < 10000) ? Math.round(sum * 100) / 10000000 : Math.round(sum / 1000) / 100;
+		this.collections.forEach(function(value, key) {
+			weight += value;
+		});
 
-		this.sendWeight(message, weight);
+		this.sendWeight(message, Math.floor(weight * 1000) / 1000);
 	}
 
 	sendWeight(message, weight) {
@@ -124,9 +129,10 @@ class Player {
 
 		const embed = new Discord.MessageEmbed()
 			.setColor('#03fc7b')
-			.setTitle(`Farming weight for ${this.latestProfile.data.display_name}`)
+			.setTitle(`Stats for ${this.latestProfile.data.display_name} on ${this.latestProfile.cute_name}`)
 			.setThumbnail(`https://crafatar.com/renders/head/${this.getUUID()}`)
 			.addField('Weight', result)
+			.addField('Breakdown', this.getBreakdown(weight))
 			.setFooter('Created by Kaeso#5346');
 
 		message.edit(embed);
@@ -150,6 +156,19 @@ class Player {
 		}
 
 		return this.latestProfile;
+	}
+
+	getBreakdown(weight) {
+		//Sort collections
+		const sortedCollections = new Map([...this.collections.entries()].sort((a, b) => b[1] - a[1]));
+		let breakdown = "";
+		
+		sortedCollections.forEach(function (value, key) {
+			let percent = Math.floor(value / weight * 100);
+			breakdown += (percent > 50) ? `\n${key}: ${value}  [${percent}%]\n` : (percent > 1) ? `${key}: ${value}  [${percent}%]\n` : '';
+		});
+
+		return breakdown;
 	}
 
 	getUUID() {
