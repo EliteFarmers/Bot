@@ -81,7 +81,7 @@ class Player {
 		if (profile.raw.collection === undefined) {
 			message.edit(new Discord.MessageEmbed()
 				.setColor('#03fc7b')
-				.setTitle(`This player doesn't have collections API enabled`)
+				.setTitle(`This player doesn't have collections API enabled on ${profile.cute_name}`)
 				.setFooter('Created by Kaeso#5346'));
 			return -1;
 		}
@@ -132,8 +132,10 @@ class Player {
 			result = weight.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 		} else if (weight === -1) {
 			result = 'This player has collection API off!';
+		} else if (weight === NaN) {
+			result = 0;
 		} else {
-			result = weight
+			result = weight;
 		}
 
 		const embed = new Discord.MessageEmbed()
