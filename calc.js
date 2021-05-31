@@ -34,6 +34,11 @@ class PlayerHandler {
 		} else {
 			await this.createPlayer(message, playerName).then(() => {
 				this.cachedPlayers.get(playerName.toLowerCase()).getWeight(message, profileName);
+			}).catch(() => {
+				message.edit(new Discord.MessageEmbed()
+					.setColor('#03fc7b')
+					.setTitle(`A skyblock profile account with the username of "${playerName}" does\'t exist or Sky Crypt\'s API is down.`)
+					.setFooter('Created by Kaeso#5346'))
 			})
 		}
 	}
@@ -42,7 +47,7 @@ class PlayerHandler {
 		await this.getProfiles(playerName).then(profiles => {
 			this.cachedPlayers.set(playerName.toLowerCase(), new Player(playerName.toLowerCase(), profiles));
 		}).catch(error => {
-			message.channel.send(`A skyblock profile account with the username of "${playerName}" does\'t exist or Sky Crypt\'s API is down.\n${error}`);
+			throw new Error(error);
 		});
 		let player = new Player(playerName)
 	}
@@ -74,6 +79,10 @@ class Player {
 		let profile = this.getProfile(profileName);
 
 		if (profile.raw.collection === undefined) {
+			message.edit(new Discord.MessageEmbed()
+				.setColor('#03fc7b')
+				.setTitle(`This player doesn't have collections API enabled`)
+				.setFooter('Created by Kaeso#5346'));
 			return -1;
 		}
 
