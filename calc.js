@@ -113,7 +113,7 @@ class Player {
 			weight += value;
 		});
 
-		this.sendWeight(message, Math.floor(weight * 1000) / 1000);
+		this.sendWeight(message, Math.floor(weight * 100) / 100);
 	}
 
 	sendWeight(message, weight) {
@@ -130,7 +130,7 @@ class Player {
 		const embed = new Discord.MessageEmbed()
 			.setColor('#03fc7b')
 			.setTitle(`Stats for ${this.latestProfile.data.display_name} on ${this.latestProfile.cute_name}`)
-			.setThumbnail(`https://crafatar.com/renders/head/${this.getUUID()}`)
+			.setThumbnail(`https://visage.surgeplay.com/bust/${this.getUUID()}`)
 			.addField('Weight', result)
 			.addField('Breakdown', this.getBreakdown(weight))
 			.setFooter('Created by Kaeso#5346');
@@ -168,7 +168,7 @@ class Player {
 			breakdown += (percent > 50) ? `\n${key}: ${value}  [${percent}%]\n` : (percent > 1) ? `${key}: ${value}  [${percent}%]\n` : '';
 		});
 
-		return breakdown;
+		return breakdown === "" ? "This player has no notable collections" : breakdown;
 	}
 
 	getUUID() {
