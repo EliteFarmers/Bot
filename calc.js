@@ -37,7 +37,7 @@ class PlayerHandler {
 			}).catch(() => {
 				message.edit(new Discord.MessageEmbed()
 					.setColor('#03fc7b')
-					.setTitle(`A skyblock profile account with the username of "${playerName}" does\'t exist or Sky Crypt\'s API is down.`)
+					.setTitle(`A skyblock profile with the username of "${playerName}" does\'t exist or Sky Crypt\'s API is down.`)
 					.setFooter('Created by Kaeso#5346'))
 			})
 		}
