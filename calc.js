@@ -132,8 +132,6 @@ class Player {
 			result = weight.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 		} else if (weight === -1) {
 			result = 'This player has collection API off!';
-		} else if (typeof weight === NaN) {
-			result = 0;
 		} else {
 			result = weight;
 		}
@@ -142,7 +140,7 @@ class Player {
 			.setColor('#03fc7b')
 			.setTitle(`Stats for ${this.latestProfile.data.display_name} on ${this.latestProfile.cute_name}`)
 			.setThumbnail(`https://visage.surgeplay.com/bust/${this.getUUID()}`)
-			.addField('Weight', result)
+			.addField('Weight', !result ? 0 : result)
 			.addField('Breakdown', this.getBreakdown(weight))
 			.setFooter('Created by Kaeso#5346');
 
