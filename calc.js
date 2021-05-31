@@ -140,7 +140,7 @@ class Player {
 			.setColor('#03fc7b')
 			.setTitle(`Stats for ${this.latestProfile.data.display_name} on ${this.latestProfile.cute_name}`)
 			.setThumbnail(`https://visage.surgeplay.com/bust/${this.getUUID()}`)
-			.addField('Weight', !result ? 0 : result)
+			.addField('Farming Weight', !result ? 0 : result)
 			.addField('Breakdown', this.getBreakdown(weight))
 			.setFooter('Created by Kaeso#5346');
 
