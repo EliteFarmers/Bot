@@ -132,7 +132,7 @@ class Player {
 			result = weight.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 		} else if (weight === -1) {
 			result = 'This player has collection API off!';
-		} else if (weight === NaN) {
+		} else if (typeof weight === NaN) {
 			result = 0;
 		} else {
 			result = weight;
