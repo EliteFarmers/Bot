@@ -53,9 +53,8 @@ client.on('message', async (message) => {
 	}
 });
 
-var minutes = 10, interval = minutes * 60 * 1000;
+var minutes = 15, interval = minutes * 60 * 1000;
 setInterval(function () {
-	console.log("Clearing Cache");
 	PlayerHandler.clearCache(minutes);
 }, interval);
  

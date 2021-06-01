@@ -16,7 +16,7 @@ module.exports = {
 			Carrot: 300,000
 			Potato: 300,000
 			Pumpkin: 100,000
-			Melon: 100,000
+			Melon: 500,000
 			Mushroom: 100,000
 			Cocoa Beans: 300,000
 			Cactus: 100,000
