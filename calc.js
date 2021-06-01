@@ -34,7 +34,9 @@ class PlayerHandler {
 		} else {
 			await this.createPlayer(message, playerName).then(() => {
 				this.cachedPlayers.get(playerName.toLowerCase()).getWeight(message, profileName);
-			}).catch(() => {
+			}).catch((error) => {
+				console.log(error);
+				this.cachedPlayers.delete(playerName.toLowerCase());
 				message.edit(new Discord.MessageEmbed()
 					.setColor('#03fc7b')
 					.setTitle(`A skyblock profile with the username of "${playerName}" does\'t exist`)
@@ -106,21 +108,21 @@ class Player {
 		this.collections = new Map();
 		
 		//Normalize collections
-		this.collections.set('Wheat', Math.round(WHEAT));
-		this.collections.set('Carrot', Math.round(CARROT_ITEM / 3));
-		this.collections.set('Potato', Math.round(POTATO_ITEM / 3));
-		this.collections.set('Pumpkin', Math.round(PUMPKIN));
-		this.collections.set('Melon', Math.round(MELON / 5));
-		this.collections.set('Mushroom', Math.round(MUSHROOM_COLLECTION));
-		this.collections.set('Cocoa', Math.round(col['INK_SACK:3'] / 3));
-		this.collections.set('Cactus', Math.round(CACTUS));
-		this.collections.set('Sugar Cane', Math.round(SUGAR_CANE / 2));
-		this.collections.set('Nether Wart', Math.round(NETHER_STALK / 2.5));
+		this.collections.set('Wheat', Math.round(WHEAT / 100000));
+		this.collections.set('Carrot', Math.round(CARROT_ITEM / 3) / 100000);
+		this.collections.set('Potato', Math.round(POTATO_ITEM / 3) / 100000);
+		this.collections.set('Pumpkin', Math.round(PUMPKIN) / 100000);
+		this.collections.set('Melon', Math.round(MELON / 5) / 100000);
+		this.collections.set('Mushroom', Math.round(MUSHROOM_COLLECTION) / 100000);
+		this.collections.set('Cocoa', Math.round(col['INK_SACK:3'] / 3) / 100000);
+		this.collections.set('Cactus', Math.round(CACTUS) / 100000);
+		this.collections.set('Sugar Cane', Math.round(SUGAR_CANE / 2) / 100000);
+		this.collections.set('Nether Wart', Math.round(NETHER_STALK / 2.5) / 100000);
 
 		let weight = 0;
 
-		this.collections.forEach(function(value, key) {
-			weight += value / 100000;
+		this.collections.forEach(function (value, key) {
+			weight += value;
 		});
 
 		this.sendWeight(message, Math.floor(weight * 100) / 100);
