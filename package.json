@@ -1,10 +1,14 @@
 {
   "dependencies": {
     "discord.js": "^12.5.3",
+    "dotenv": "^10.0.0",
     "https": "^1.0.0",
     "i": "^0.3.6",
     "node-fetch": "^2.6.1",
     "npm": "^7.14.0",
+    "pg": "^8.6.0",
+    "pg-hstore": "^2.3.3",
+    "sequelize": "^6.6.2",
     "throttled-queue": "^1.0.7"
   }
 }

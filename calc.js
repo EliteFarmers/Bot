@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 const throttledQueue = require('throttled-queue');
 const { hypixelApiKey } = require('./config.json');
 const throttle = throttledQueue(2, 1000);
-
+const playerController = require('./database/controllers').player
 class PlayerHandler {
 
 	constructor() {
@@ -76,7 +76,7 @@ class PlayerHandler {
 				throw error;
 			});
 		await this.getProfiles(uuid).then(profiles => {
-			this.cachedPlayers.set(playerName.toLowerCase(), new Player(properName, uuid, profiles));
+			this.cachedPlayers.set(playerName.toLowerCase(), new SBPlayer(properName, uuid, profiles));
 		}).catch(error => {
 			throw error;
 		});
@@ -94,7 +94,7 @@ class PlayerHandler {
 
 }
 
-class Player {
+class SBPlayer {
 
 	constructor(playerName, uuid, data) {
 		this.playerName = playerName;
@@ -197,6 +197,9 @@ class Player {
 		}
 
 		this.userData = this.latestProfile.members[this.uuid];
+
+		playerController.create(this.uuid, this.userData);
+
 		return this.latestProfile.members[this.uuid];
 	}
 
@@ -216,6 +219,6 @@ class Player {
 
 module.exports = {
 	PlayerHandler,
-	Player
+	SBPlayer
 }
 
