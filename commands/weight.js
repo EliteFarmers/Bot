@@ -6,7 +6,7 @@ module.exports = {
 	aliases: [ 'w' ],
 	description: 'Calculate a players Weight!',
 	usage: 'weight [username] (profile name)',
-	guildOnly: true,
+	guildOnly: false,
 	dmOnly: false,
 	execute(message, args) {
 		if (!(args[0] === null || args[0] === undefined)) {

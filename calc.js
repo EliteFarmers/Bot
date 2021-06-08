@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const fetch = require('node-fetch');
 const throttledQueue = require('throttled-queue');
 const { hypixelApiKey } = require('./config.json');
+const { DataHandler } = require('./database');
 const throttle = throttledQueue(2, 1000);
 
 class PlayerHandler {
@@ -76,7 +77,7 @@ class PlayerHandler {
 				throw error;
 			});
 		await this.getProfiles(uuid).then(profiles => {
-			this.cachedPlayers.set(playerName.toLowerCase(), new Player(properName, uuid, profiles));
+			this.cachedPlayers.set(playerName.toLowerCase(), new Player(message, properName, uuid, profiles));
 		}).catch(error => {
 			throw error;
 		});
@@ -96,7 +97,8 @@ class PlayerHandler {
 
 class Player {
 
-	constructor(playerName, uuid, data) {
+	constructor(message, playerName, uuid, data) {
+		this.message = message;
 		this.playerName = playerName;
 		this.uuid = uuid
 		this.data = data;
@@ -154,7 +156,10 @@ class Player {
 			weight += value;
 		});
 
-		this.sendWeight(message, Math.floor(weight * 100) / 100);
+		weight = Math.floor(weight * 100) / 100;
+
+		DataHandler.updatePlayer(this.uuid, this.playerName, weight);
+		this.sendWeight(message, weight);
 	}
 
 	sendWeight(message, weight) {
