@@ -55,7 +55,7 @@ class PlayerHandler {
 				await PlayerHandler.createPlayer(message, playerName).then(() => {
 					PlayerHandler.cachedPlayers.get(playerName.toLowerCase()).getWeight(message, profileName);
 				}).catch((error) => {
-					console.log(error);
+					//console.log(error);
 					PlayerHandler.cachedPlayers.delete(playerName.toLowerCase());
 					message.edit(new Discord.MessageEmbed()
 						.setColor('#03fc7b')
