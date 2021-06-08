@@ -88,7 +88,7 @@ class PlayerHandler {
 		let seconds = minutes * 60;
 		this.cachedPlayers.forEach(player => {
 			if (player.timestamp < time - seconds) {
-				this.cachedPlayers.delete(player.playerName);
+				this.cachedPlayers.delete(player.playerName.toLowerCase());
 			}
 		});
 	}
