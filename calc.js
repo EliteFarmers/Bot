@@ -105,13 +105,19 @@ class Player {
 		this.latestProfile;
 		this.userData;
 		this.collections;
+		this.rank;
 
 		this.timestamp = Date.now();
 	}
 
-	getWeight(message, profileName = null) {
+	async getWeight(message, profileName = null) {
 		let userData = this.getUserdata(profileName);
 
+		const player = await DataHandler.getPlayer(this.uuid);
+		if (player !== null) {
+			this.rank = player.dataValues.rank;
+		}
+			
 		if (userData.collection === undefined) {
 			message.edit(new Discord.MessageEmbed()
 				.setColor('#03fc7b')
@@ -180,6 +186,10 @@ class Player {
 			.addField('Farming Weight', !result ? 0 : result)
 			.addField('Breakdown', this.getBreakdown(weight))
 			.setFooter('Created by Kaeso#5346');
+
+		if (this.rank !== undefined && this.rank !== 0) {
+			embed.setDescription(`**${this.playerName}** is rank **#${this.rank}!**`)
+		}
 
 		message.edit(embed);
 	}
