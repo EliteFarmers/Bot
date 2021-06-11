@@ -10,39 +10,63 @@ module.exports = {
     dmOnly: false,
     async execute(message, args) {
         let playerName = args[0] ?? null;
+        let givenIndex = 0;
 
-        const embed = new Discord.MessageEmbed()
-            .setColor('#03fc7b')
-            .setTitle(`Farming Weight Leaderboard`)
-            .setDescription('More pages and searching coming soon')
-            .setFooter('Created by Kaeso#5346    Run the weight command to update/add players');
+        if (playerName !== null) {
+            const user = await DataHandler.getPlayerByName(playerName).then(player => {
+                givenIndex = player.dataValues.rank ?? 0;
+            });
+        }
 
-        await DataHandler.getLeaderboard(playerName).then(leaderboard => {
-            embed.fields = [];
+        const maxIndex = Math.floor((DataHandler.getLbLength() - 1) / 10) * 10;
 
-            for (let i = 0; i < 10; i++) {
-                if (leaderboard[i] === undefined) {
-                    break;
-                }
-                const player = leaderboard[i].dataValues;
-                embed.fields.push({
-                    name: `#${i + 1} – ${player.ign.replace(/\_/g, '\\_')}`,
-                    value: `[🔗](https://sky.shiiu.moe/stats/${player.uuid}) ${(player.weight / 100).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}`,
-                    inline: true
-                });
+        await DataHandler.sendLeaderboard(message, givenIndex, playerName).then(sentEmbed => {
 
-                if (i % 2 == 1) {
-                    embed.fields.push({
-                        name: "⠀",
-                        value: "⠀",
-                        inline: true
+
+            let index = Math.floor(givenIndex / 10) * 10;
+
+            const filter = (reaction, user) => {
+                return ['⏮️', '⏪', '⏩', '⏭️'].includes(reaction.emoji.name) && user.id === message.author.id;
+            };
+
+            sentEmbed.react('⏮️')
+                .then(() => sentEmbed.react('⏪'))
+                .then(() => sentEmbed.react('⏩'))
+                .then(() => sentEmbed.react('⏭️'))
+                .then(() => {
+                    const collector = sentEmbed.createReactionCollector(filter, { time: 60000 })
+                    let ranks = 0;
+
+                    collector.on('collect', (reaction, user) => {
+                        if (reaction.emoji.name === '⏮️') {
+                            index = 0;
+                            DataHandler.sendLeaderboard(sentEmbed, 0);
+                        } else if (reaction.emoji.name === '⏪') {
+                            if (index >= 10) {
+                                index -= 10;
+                                DataHandler.sendLeaderboard(sentEmbed, index);
+                            }
+                        } else if (reaction.emoji.name === '⏩') {
+                            if (index <= 990) {
+                                index += 10;
+                                DataHandler.sendLeaderboard(sentEmbed, index);
+                            }
+                        } else if (reaction.emoji.name === '⏭️') {
+                            if (index !== 990) {
+                                DataHandler.sendLeaderboard(sentEmbed, 990);
+                            }
+                        }
+                        reaction.users.remove(user.id).catch(() => { });
                     });
-                }
-            }
-
-            message.channel.send(embed);
+                    
+                    collector.on('end', collected => {
+                        collector.stop();
+                        sentEmbed.reactions.removeAll();
+                    }
+                    )
+                })
+                .catch(() => message.channel.send('I don\'t have permissions to add reactions! Check both role and channel permissions.'));
         });
-        
-    }
-};
+    },
+}
 

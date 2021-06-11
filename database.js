@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
-const Sequelize = require('sequelize');
+const { Sequelize, Op } = require('sequelize');
 const { dbUri, prefix } = require('./config.json');
+const fetch = require('node-fetch');
 const throttledQueue = require('throttled-queue');
 const throttle = throttledQueue(1, 60000);
 
@@ -56,9 +57,12 @@ class DataHandler {
         Prefixes.sync();
         Users.sync();
 
+        this.updateLeaderboard();
         //For wiping table
         //Prefixes.sync({ force: true })
     }
+
+    static leaderboard;
 
     //Validation should occur before calling
     static async setPrefix(message, guildId, newPrefix) {
@@ -91,11 +95,12 @@ class DataHandler {
         return await Users.findOne({ where: { uuid: playeruuid }});
     }
 
+    static async getPlayerByName(name) {
+        return await Users.findOne({ where: { ign: { [Op.iLike]: '%' + name } } });
+    }
+
     static async updatePlayer(playeruuid, playerName, nWeight) {
         let newWeight = Math.round(nWeight * 100);
-        if (newWeight < 500) {
-            return;
-        }
 
         try {
             const user = await this.getPlayer(playeruuid);
@@ -116,24 +121,83 @@ class DataHandler {
         }
     }
 
-    static async updateLeaderboard() {
-        throttle(async function () {
-            let leaderboard = await getLeaderboard();
+    static getLbLength() {
+        return this.leaderboardLength;
+    }
 
+    static async updateLeaderboard() {
+        return await this.getLeaderboard().then(leaderboard => {
+            this.leaderboard = leaderboard;
             for (let i = 0; i < leaderboard.length; i++) {
                 const player = leaderboard[i];
                 Users.update({ rank: i + 1 }, { where: { uuid: player.uuid } });
             }
-        })
+        });
     }
 
-    static async getLeaderboard(player = null) {
-        // if (player !== null) {
-        //     await this.updateLeaderboard()
-        // }
-        return await Users.findAll({ limit: 10, order: [['weight', 'DESC']] })
+    static async getLeaderboard() {
+        return await Users.findAll({ limit: 1000, order: [['weight', 'DESC']] })
     }
 
+    static async sendLeaderboard(message, from = 0, playerName = null) {
+        let startIndex = from;
+        let foundPlayer = false;
+        const leaderboard = this.leaderboard;
+
+        if (playerName !== null) {
+            
+            const user = await this.getPlayerByName(playerName);
+
+            if (user) {
+                foundPlayer = true;
+                startIndex = user.dataValues.rank;
+            } else {
+                startIndex = 0;
+            }
+        }
+
+        const embed = new Discord.MessageEmbed()
+            .setColor('#03fc7b')
+            .setTitle(`Farming Weight Leaderboard`)
+            .setFooter('Created by Kaeso#5346    Run the weight command to update/add players');
+        
+        const maxIndex = Math.floor((leaderboard.length - 1) / 10) * 10;
+
+        startIndex = Math.floor(startIndex / 10) * 10;
+        if (startIndex > maxIndex) {
+            startIndex = maxIndex;
+        }
+        
+        for (let i = startIndex; i < startIndex + 10; i++) {
+            if (leaderboard[i] === undefined) {
+                break;
+            }
+            const player = leaderboard[i].dataValues;
+
+            const isHighlightedPlayer = (foundPlayer && (playerName.toLowerCase() === player.ign.toLowerCase()));
+            const weightFormatted = (player.weight / 100).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+
+            if (isHighlightedPlayer) {
+                embed.setDescription(`**${player.ign}** is rank **#${i + 1}** with **${weightFormatted}** weight`);
+            }
+               
+            embed.fields.push({
+                name: `#${i + 1} – ${player.ign.replace(/\_/g, '\\_')}`,
+                value: `[🔗](https://sky.shiiyu.moe/stats/${player.uuid}) ${weightFormatted} ${(isHighlightedPlayer) ? '⭐' : ' '}`,
+                inline: true
+            });
+
+            if (i % 2 == 1) {
+                embed.fields.push({
+                    name: "⠀",
+                    value: "⠀",
+                    inline: true
+                });
+            }
+        }
+
+        return (message.author.bot) ? message.edit(embed) : message.channel.send(embed);
+    }
 }
 
 module.exports = {

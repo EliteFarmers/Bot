@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const fetch = require('node-fetch');
 const throttledQueue = require('throttled-queue');
 const { hypixelApiKey } = require('./config.json');
-const { DataHandler } = require('./database');
+const { DataHandler } = require('./database.js');
 const throttle = throttledQueue(2, 1000);
 
 class PlayerHandler {

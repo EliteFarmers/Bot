@@ -75,6 +75,10 @@ var minutes = 15, interval = minutes * 60 * 1000;
 setInterval(function () {
 	PlayerHandler.clearCache(minutes);
 }, interval);
+
+setInterval(function () {
+	DataHandler.updateLeaderboard();
+}, 60 * 1000);
  
 
 client.login(token);
