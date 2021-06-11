@@ -108,7 +108,7 @@ class DataHandler {
                 if (user.dataValues.weight > newWeight) {
                     return;
                 }
-                let updatedUser = await Users.update({ weight: newWeight }, { where: { uuid: playeruuid } });
+                let updatedUser = await Users.update({ weight: newWeight, name: playerName }, { where: { uuid: playeruuid } });
             } else {
                 const newerUser = await Users.create({
                     uuid: playeruuid,
