@@ -18,10 +18,9 @@ module.exports = {
             });
         }
 
-        const maxIndex = Math.floor((DataHandler.getLbLength() - 1) / 10) * 10;
+        const maxIndex = Math.floor((DataHandler.leaderboard.length - 1) / 10) * 10;
 
         await DataHandler.sendLeaderboard(message, givenIndex, playerName).then(sentEmbed => {
-
 
             let index = Math.floor(givenIndex / 10) * 10;
 
@@ -35,7 +34,6 @@ module.exports = {
                 .then(() => sentEmbed.react('⏭️'))
                 .then(() => {
                     const collector = sentEmbed.createReactionCollector(filter, { time: 60000 })
-                    let ranks = 0;
 
                     collector.on('collect', (reaction, user) => {
                         if (reaction.emoji.name === '⏮️') {
@@ -47,12 +45,13 @@ module.exports = {
                                 DataHandler.sendLeaderboard(sentEmbed, index);
                             }
                         } else if (reaction.emoji.name === '⏩') {
-                            if (index <= 990) {
+                            if (index < maxIndex) {
                                 index += 10;
                                 DataHandler.sendLeaderboard(sentEmbed, index);
                             }
                         } else if (reaction.emoji.name === '⏭️') {
                             if (index !== 990) {
+                                index = Math.floor((DataHandler.leaderboard.length - 1)/ 10) * 10;
                                 DataHandler.sendLeaderboard(sentEmbed, 990);
                             }
                         }
