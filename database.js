@@ -145,12 +145,11 @@ class DataHandler {
         const leaderboard = this.leaderboard;
 
         if (playerName !== null) {
-            
-            const user = await this.getPlayerByName(playerName);
+            const user = await this.getPlayerByName(playerName).catch(() => { return undefined; });
 
             if (user) {
                 foundPlayer = true;
-                startIndex = user.dataValues.rank;
+                startIndex = user.dataValues.rank - 1;
             } else {
                 startIndex = 0;
             }

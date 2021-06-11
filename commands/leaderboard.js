@@ -14,7 +14,9 @@ module.exports = {
 
         if (playerName !== null) {
             const user = await DataHandler.getPlayerByName(playerName).then(player => {
-                givenIndex = player.dataValues.rank ?? 0;
+                if (player) {
+                    givenIndex = player.dataValues.rank ?? 0;
+                }
             });
         }
 
