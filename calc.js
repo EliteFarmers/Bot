@@ -102,9 +102,13 @@ class Player {
 		this.playerName = playerName;
 		this.uuid = uuid
 		this.data = data;
+
 		this.latestProfile;
 		this.userData;
+
 		this.collections;
+		this.bonus;
+		this.bonusWeight = 0;
 		this.rank;
 
 		this.timestamp = Date.now();
@@ -155,8 +159,24 @@ class Player {
 		this.collections.set('Cactus', Math.round(CACTUS * 1.25551 / 1000) / 100);
 		this.collections.set('Sugar Cane', Math.round(SUGAR_CANE / 2000) / 100);
 		this.collections.set('Nether Wart', Math.round(NETHER_STALK / 2500) / 100);
+		
+		//Bonus sources
+		// this.bonus = new Map();
 
-		let weight = 0;
+		// if (userData.experience_skill_farming > 111672425) {
+		// 	this.bonus.set('Farming 60', 200);
+		// } else if (userData.experience_skill_farming > 55172425) {
+		// 	this.bonus.set('Farming 50', 100);
+		// }
+
+		let bWeight = 0;
+
+		// this.bonus.forEach(function (value, key) {
+		// 	bWeight += value;
+		// });
+		
+		this.bonusWeight = bWeight;
+		let weight = this.bonusWeight;
 
 		this.collections.forEach(function (value, key) {
 			weight += value;
@@ -164,7 +184,7 @@ class Player {
 
 		weight = Math.floor(weight * 100) / 100;
 
-		DataHandler.updatePlayer(this.uuid, this.playerName, weight);
+		DataHandler.updatePlayer(this.uuid, this.playerName, weight + this.bonusWeight);
 		this.sendWeight(message, weight);
 	}
 
@@ -174,7 +194,7 @@ class Player {
 		if (weight > 1) {
 			result = weight.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 		} else if (weight === -1) {
-			result = 'This player has collection API off!';
+			result = 'This player has collections API off!';
 		} else {
 			result = weight;
 		}
@@ -184,11 +204,19 @@ class Player {
 			.setTitle(`Stats for ${this.playerName} on ${this.latestProfile.cute_name}`)
 			.setThumbnail(`https://visage.surgeplay.com/bust/${this.uuid}`)
 			.addField('Farming Weight', !result ? 0 : result)
-			.addField('Breakdown', this.getBreakdown(weight))
+			.addField('Breakdown', this.getBreakdown(weight - this.bonusWeight))
 			.setFooter('Created by Kaeso#5346');
 
 		if (this.rank !== undefined && this.rank !== 0) {
 			embed.setDescription(`**${this.playerName}** is rank **#${this.rank}!**`)
+		}
+
+		// if (this.bonus.size > 0) {
+		// 	embed.addField('Bonus', this.getBonus());
+		// }
+
+		if (Object.keys(this.latestProfile.members).length > 1) {
+			embed.addField('Notes', 'This player has been or is a co op member');
 		}
 
 		message.edit(embed);
@@ -222,10 +250,22 @@ class Player {
 		
 		sortedCollections.forEach(function (value, key) {
 			let percent = Math.floor(value / weight * 100);
-			breakdown += (percent > 50) ? `\n${key}: ${value}  [${percent}%]\n` : (percent > 1) ? `${key}: ${value}  [${percent}%]\n` : '';
+			breakdown += (percent > 1) ? `${key}: ${value}  [${percent}%]\n` : (percent > 1) ? `${key}: ${value}  [${percent}%]\n` : '';
 		});
 
 		return breakdown === "" ? "This player has no notable collections" : breakdown;
+	}
+
+	getBonus() {
+		//Sort bonus
+		const sortedBounus = new Map([...this.bonus.entries()].sort((a, b) => b[1] - a[1]));
+		let bonusText = " ";
+
+		sortedBounus.forEach(function (value, key) {
+			bonusText += `\n${key}: ${value}\n`;
+		});
+
+		return bonusText;
 	}
 }
 
