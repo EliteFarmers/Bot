@@ -33,13 +33,13 @@ The last 5 crops have a different calculation in order to equalize their tools w
 Seeds are not included as they are simply a byproduct of wheat.
 If you have suggestions for tweaking these numbers contact me with your reason.
 		`)
-		} /*else if (arg === 'xp') {
+		} else if (arg === 'xp') {
 			embed.addField('What is up with farming xp?', `
 Well, it's complicated.
 
 Farming xp is rewarded to players along with item drops. Counting xp in a similar fashion would only buff everything excluding netherwart, while not really adding anything informative to the cacluation. While there are people with incredible amounts of farming xp which shows great dedication and effort in the ways of farming, the issuses are too hard to ignore. Consider this my official apology to people with obscene amounts of farming xp and the dreaded co op bug.
 
-For now, reaching 55m xp (lvl 50) rewards you with 100 weight, with 100 more after you reach 111m for farming 60.\n
+For now, reaching 55m xp (lvl 50) rewards you with 100 weight, with 150 more after you unlock farming 60.\n
 			`).addField('**F.A.Q:**', `
 **Q:** Why not just give one weight per [insert number] xp?
 **A:** Again, farming xp is just a byproduct and it differs between crops. Because the crops are balanced Pumpkin would give players the most weight unfairly.
@@ -56,11 +56,11 @@ For now, reaching 55m xp (lvl 50) rewards you with 100 weight, with 100 more aft
 **Q:** How does this benefit people with co op bug?
 **A:** Adding a source of farming weight that's unaffected slightly dilutes the pain of hundreds of millions of missing collection numbers.
 			`)
-		} */else {
+		} else {
 			embed.setDescription('Farming weight is based off of multiple different factors to provide a number for comparsion between all farmers.')
 				.addField('Crop Collections', 'All crops are factored off of relative drop rates in order to equalize time spent for each farming weight.\nRead more with **info crops**')
-				/*.addField('Farming XP', 'Farming xp is not a key contributer in weight because it is mostly a byproduct of farming. I have capped it at farming 60 as a result.\nRead more with **info xp**')
-				*/.addField('Jacob\'s Contests', 'If implemented later, the current idea is that you\'ll recieve 0.5 weight for a gold medal and 2 weight for top 5 in a given contest')
+				.addField('Farming XP', 'Farming xp is not a key contributer in weight because it is mostly a byproduct of farming. I have capped it at farming 60 as a result.\nRead more with **info xp**')
+				.addField('Jacob\'s Contests', 'For each milestone of 50 gold medals, you will receive 25 weight. 1,000 gold medals (500 weight) maximum')
 				.addField('Collection Bug', 'Co op members do not gain the proper amounts of collections in a signifgant way and the calculations suffer from it. You can fix this for the future by kicking all co op members, but nothing can be done about lost collection.')
 				.addField('Links', 'Source code - https://github.com/ptlthg/EliteDiscordBot\nFeedback - https://forms.gle/9XFNcj4ownZj23nM8');
 		}
