@@ -34,10 +34,14 @@ const Users = sequelize.define('users', {
         type: Sequelize.INTEGER,
         defaultValue: 0
     },
+    profile: {
+        type: Sequelize.STRING
+    },
     weight: {
         type: Sequelize.INTEGER
     }
 }, {
+    freezeTableName: true,
     indexes: [
         {
             name: "weight_index",
@@ -99,20 +103,21 @@ class DataHandler {
         return await Users.findOne({ where: { ign: { [Op.iLike]: '%' + name } } });
     }
 
-    static async updatePlayer(playeruuid, playerName, nWeight) {
+    static async updatePlayer(playeruuid, playerName, profileuuid, nWeight) {
         let newWeight = Math.round(nWeight * 100);
 
         try {
             const user = await this.getPlayer(playeruuid);
             if (user) {
-                if (user.dataValues.weight > newWeight) {
+                if (user.dataValues.weight > nWeight && user.dataValues.profile !== profileuuid) {
                     return;
                 }
-                let updatedUser = await Users.update({ weight: newWeight, name: playerName }, { where: { uuid: playeruuid } });
+                let updatedUser = await Users.update({ weight: newWeight, name: playerName, profile: profileuuid }, { where: { uuid: playeruuid } });
             } else {
                 const newerUser = await Users.create({
                     uuid: playeruuid,
                     ign: playerName,
+                    profile: profileuuid,
                     weight: newWeight,
                 });
             }
