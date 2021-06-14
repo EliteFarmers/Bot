@@ -104,9 +104,12 @@ class Player {
 		this.data = data;
 
 		this.latestProfile;
+		this.profileuuid;
+		this.mainProfileuuid;
 		this.userData;
 
 		this.collections;
+		this.weight = 0;
 		this.bonus;
 		this.bonusWeight = 0;
 		this.rank;
@@ -116,10 +119,14 @@ class Player {
 
 	async getWeight(message, profileName = null) {
 		let userData = this.getUserdata(profileName);
+		if (userData === null) {
+			return;
+		}
 
 		const player = await DataHandler.getPlayer(this.uuid);
 		if (player !== null) {
 			this.rank = player.dataValues.rank;
+			this.mainProfileuuid = player.dataValues.profile;
 		}
 			
 		if (userData.collection === undefined) {
@@ -144,8 +151,7 @@ class Player {
 		if (!CACTUS) CACTUS = 0;
 		if (!NETHER_STALK) NETHER_STALK = 0;
 		if (!SUGAR_CANE) SUGAR_CANE = 0;
-
-
+		
 		this.collections = new Map();
 		
 		//Normalize collections
@@ -161,22 +167,70 @@ class Player {
 		this.collections.set('Nether Wart', Math.round(NETHER_STALK / 2500) / 100);
 		
 		//Bonus sources
-		// this.bonus = new Map();
-
-		// if (userData.experience_skill_farming > 111672425) {
-		// 	this.bonus.set('Farming 60', 200);
-		// } else if (userData.experience_skill_farming > 55172425) {
-		// 	this.bonus.set('Farming 50', 100);
-		// }
+		this.bonus = new Map();
+		
+		//Farming level bonuses
+		let farmingCap = userData.jacob2.perks.farming_level_cap ?? 0;
+		if (userData.experience_skill_farming > 111672425 && farmingCap === 10) {
+			this.bonus.set('Farming Level 60', 250);
+		} else if (userData.experience_skill_farming > 55172425) {
+			this.bonus.set('Farming Level 50', 100);
+		}
+		
+		//Anita buff bonus
+		let anitaBuff = userData.jacob2.perks.double_drops ?? 0;
+		if (anitaBuff === 15) { //15 in API refers to 30 
+			this.bonus.set('Max Anita Buff', 30);
+		}
+		
+		//Calculate Amount of Gold medals won
+		let earnedGolds = 0;
+		let contests = userData.jacob2.contests;
+		for (let i = 0; i < Object.keys(contests).length; i++) {
+			let contest = contests[Object.keys(contests)[i]];
+			
+			let position = ('claimed_position' in contest) ? contest['claimed_position'] : -1;
+			let participants = ('claimed_participants' in contest) ? contest['claimed_participants'] : -1;
+			
+			if (position !== -1 && participants !== -1) {
+				earnedGolds += ((participants * 0.05) - 1 >= position) ? 1 : 0;
+			} else {
+				continue;
+			}
+			
+			if (earnedGolds > 1000) {
+				break;
+			}
+		}
+		if (earnedGolds > 1000) {
+			this.bonus.set('1,000 Gold Medals', 500);
+		} else {
+			let roundDown = Math.floor(earnedGolds / 50) * 50;
+			if (roundDown > 0) {
+				this.bonus.set(`${roundDown} Gold Medals`, roundDown / 2);
+			}
+		}
+		
+		//Tier 12 farming minions
+		let tier12s = ['WHEAT_12', 'CARROT_12', 'POTATO_12', 'PUMPKIN_12', 'MELON_12', 'MUSHROOM_12', 'COCOA_12', 'CACTUS_12', 'SUGAR_CANE_12', 'NETHER_WARTS_12'];
+		let obtained12s = 0;
+		if ('crafted_generators' in userData) {
+			let obtainedMinions = userData.crafted_generators;
+			tier12s.forEach(minion => {
+				obtained12s += (obtainedMinions.includes(minion)) ? 1 : 0;
+			});
+		}
+		if (obtained12s > 0) {
+			this.bonus.set(`${obtained12s}/10 Minions`, obtained12s * 5);
+		}
 
 		let bWeight = 0;
-
-		// this.bonus.forEach(function (value, key) {
-		// 	bWeight += value;
-		// });
+		this.bonus.forEach(function (value, key) {
+			bWeight += value;
+		});
 		
 		this.bonusWeight = bWeight;
-		let weight = this.bonusWeight;
+		let weight = 0;
 
 		this.collections.forEach(function (value, key) {
 			weight += value;
@@ -184,12 +238,13 @@ class Player {
 
 		weight = Math.floor(weight * 100) / 100;
 
-		DataHandler.updatePlayer(this.uuid, this.playerName, weight + this.bonusWeight);
+		DataHandler.updatePlayer(this.uuid, this.playerName, this.profileuuid, weight + this.bonusWeight);
 		this.sendWeight(message, weight);
 	}
 
 	sendWeight(message, weight) {
-		let result = "You should never see this";
+		let result = "Hey what's up?";
+		weight += this.bonusWeight ?? 0;
 
 		if (weight > 1) {
 			result = weight.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
@@ -207,13 +262,13 @@ class Player {
 			.addField('Breakdown', this.getBreakdown(weight - this.bonusWeight))
 			.setFooter('Created by Kaeso#5346');
 
-		if (this.rank !== undefined && this.rank !== 0) {
+		if (this.rank !== undefined && this.rank !== 0 && this.mainProfileuuid === this.profileuuid) {
 			embed.setDescription(`**${this.playerName}** is rank **#${this.rank}!**`)
 		}
 
-		// if (this.bonus.size > 0) {
-		// 	embed.addField('Bonus', this.getBonus());
-		// }
+		if (this.bonus.size > 0) {
+			embed.addField('Bonus', this.getBonus());
+		}
 
 		if (Object.keys(this.latestProfile.members).length > 1) {
 			embed.addField('Notes', 'This player has been or is a co op member');
@@ -223,19 +278,25 @@ class Player {
 	}
 
 	getUserdata(profileName = null) {
+		if (!this.data.profiles) {
+			return null;
+		}
 		let profiles = this.data.profiles;
 
 		for (let i = 0; i < Object.keys(profiles).length; i++) {
 			let key = Object.keys(profiles)[i];
 			let profile = profiles[key];
-
+			
 			if (profileName !== null && profile.cute_name.toLowerCase() === profileName.toLowerCase()) {
 				this.latestProfile = profile;
+				this.profileuuid = profile.profile_id;
+
 				return profile.members[this.uuid];
 			}
 			
 			if (this.latestProfile === undefined || profile.members[this.uuid].last_save > this.latestProfile.members[this.uuid].last_save) {
 				this.latestProfile = profile;
+				this.profileuuid = profile.profile_id;
 			}
 		}
 
@@ -262,7 +323,7 @@ class Player {
 		let bonusText = " ";
 
 		sortedBounus.forEach(function (value, key) {
-			bonusText += `\n${key}: ${value}\n`;
+			bonusText += `${key}: ${value}\n`;
 		});
 
 		return bonusText;
