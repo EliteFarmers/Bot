@@ -60,7 +60,7 @@ For now, reaching 55m xp (lvl 50) rewards you with 100 weight, with 150 more aft
 			embed.setDescription('Farming weight is based off of multiple different factors to provide a number for comparsion between all farmers.')
 				.addField('Crop Collections', 'All crops are factored off of relative drop rates in order to equalize time spent for each farming weight.\nRead more with **info crops**')
 				.addField('Farming XP', 'Farming xp is not a key contributer in weight because it is mostly a byproduct of farming. I have capped it at farming 60 as a result.\nRead more with **info xp**')
-				.addField('Jacob\'s Contests', 'For each milestone of 50 gold medals, you will receive 25 weight. 1,000 gold medals (500 weight) maximum')
+				.addField('Jacob\'s Contests', 'For each milestone of 50 gold medals, you will receive 25 weight. 1,000 gold medals (500 weight) maximum.')
 				.addField('Collection Bug', 'Co op members do not gain the proper amounts of collections in a signifgant way and the calculations suffer from it. You can fix this for the future by kicking all co op members, but nothing can be done about lost collection.')
 				.addField('Links', 'Source code - https://github.com/ptlthg/EliteDiscordBot\nFeedback - https://forms.gle/9XFNcj4ownZj23nM8');
 		}
