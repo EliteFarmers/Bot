@@ -244,7 +244,7 @@ class Player {
 
 	sendWeight(message, weight) {
 		let result = "Hey what's up?";
-		weight += this.bonusWeight ?? 0;
+		weight = Math.round((weight + this.bonusWeight) * 100) / 100;
 
 		if (weight > 1) {
 			result = weight.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
