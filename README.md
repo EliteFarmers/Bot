@@ -6,13 +6,13 @@ https://drive.google.com/file/d/16mZpN4OyRONEfrPdCrpuleVbZVwwT6_M/view?usp=shari
 Made for the Elite Skyblock Farmers discord, leaderboard coming soon.
 
 Requires a config.json file that looks like this:
-
+```
 {
 	"prefix": ".",
 	"token": "",
 	"hypixelApiKey": "",
 	"dbUri": ""
 }
-
+```
 
 Ignore this: HODG HOM SON
