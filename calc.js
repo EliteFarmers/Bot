@@ -257,7 +257,7 @@ class Player {
 		const embed = new Discord.MessageEmbed()
 			.setColor('#03fc7b')
 			.setTitle(`Stats for ${this.playerName} on ${this.latestProfile.cute_name}`)
-			.setThumbnail(`https://visage.surgeplay.com/bust/${this.uuid}`)
+			.setThumbnail(`https://mc-heads.net/head/${this.uuid}/left`)
 			.addField('Farming Weight', !result ? 0 : result)
 			.addField('Breakdown', this.getBreakdown(weight - this.bonusWeight))
 			.setFooter('Created by Kaeso#5346');
