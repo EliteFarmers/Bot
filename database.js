@@ -144,7 +144,7 @@ class DataHandler {
         return await Users.findAll({ limit: 1000, order: [['weight', 'DESC']] })
     }
 
-    static async sendLeaderboard(message, from = 0, playerName = null) {
+    static async getLeaderboardEmbed(from = 0, playerName = null) {
         let startIndex = from;
         let foundPlayer = false;
         const leaderboard = this.leaderboard;
@@ -163,6 +163,7 @@ class DataHandler {
         const embed = new Discord.MessageEmbed()
             .setColor('#03fc7b')
             .setTitle(`Farming Weight Leaderboard`)
+            .setDescription('**Note:** Not many players are currently on the leaderboard.')
             .setFooter('Created by Kaeso#5346    Run the weight command to update/add players');
         
         const maxIndex = Math.floor((leaderboard.length - 1) / 10) * 10;
@@ -199,8 +200,7 @@ class DataHandler {
                 });
             }
         }
-
-        return (message.author.bot) ? message.edit(embed) : message.channel.send(embed);
+        return embed;
     }
 }
 
