@@ -20,54 +20,101 @@ module.exports = {
             });
         }
 
-        const maxIndex = Math.floor((DataHandler.leaderboard.length - 1) / 10) * 10;
+        const leaderboardLength = await DataHandler.getLeaderboard().then(lb => { return lb.length; });
+        let index = Math.floor(givenIndex / 10) * 10;
+        const maxIndex = Math.floor((leaderboardLength - 1) / 10) * 10;
 
-        await DataHandler.sendLeaderboard(message, givenIndex, playerName).then(sentEmbed => {
+        let embed = await DataHandler.getLeaderboardEmbed(givenIndex, playerName);
 
-            let index = Math.floor(givenIndex / 10) * 10;
+        if (leaderboardLength <= 10) {
+            message.channel.send({ embeds: [embed] });
+            return;
+        }
 
-            const filter = (reaction, user) => {
-                return ['⏮️', '⏪', '⏩', '⏭️'].includes(reaction.emoji.name) && user.id === message.author.id;
-            };
+        const row = new Discord.MessageActionRow()
+            .addComponents(
+                new Discord.MessageButton()
+                    .setCustomID('first')
+                    .setLabel('First')
+                    .setStyle('PRIMARY')
+                    .setDisabled(index < 10),
+                new Discord.MessageButton()
+                    .setCustomID('back')
+                    .setLabel('Back')
+                    .setStyle('PRIMARY')
+                    .setDisabled(index < 10),
+                new Discord.MessageButton()
+                    .setCustomID('forward')
+                    .setLabel('Next')
+                    .setStyle('PRIMARY')
+                    .setDisabled(index + 10 > maxIndex),
+                new Discord.MessageButton()
+                    .setCustomID('last')
+                    .setLabel('Last')
+                    .setStyle('PRIMARY')
+                    .setDisabled(index + 10 > maxIndex),
+            );
 
-            sentEmbed.react('⏮️')
-                .then(() => sentEmbed.react('⏪'))
-                .then(() => sentEmbed.react('⏩'))
-                .then(() => sentEmbed.react('⏭️'))
-                .then(() => {
-                    const collector = sentEmbed.createReactionCollector(filter, { time: 60000 })
+        let sentMessage = await message.channel.send({ embeds: [embed], components: [row] });
 
-                    collector.on('collect', (reaction, user) => {
-                        if (reaction.emoji.name === '⏮️') {
-                            index = 0;
-                            DataHandler.sendLeaderboard(sentEmbed, 0);
-                        } else if (reaction.emoji.name === '⏪') {
-                            if (index >= 10) {
-                                index -= 10;
-                                DataHandler.sendLeaderboard(sentEmbed, index);
-                            }
-                        } else if (reaction.emoji.name === '⏩') {
-                            if (index < maxIndex) {
-                                index += 10;
-                                DataHandler.sendLeaderboard(sentEmbed, index);
-                            }
-                        } else if (reaction.emoji.name === '⏭️') {
-                            if (index !== 990) {
-                                index = Math.floor((DataHandler.leaderboard.length - 1)/ 10) * 10;
-                                DataHandler.sendLeaderboard(sentEmbed, 990);
-                            }
-                        }
-                        reaction.users.remove(user.id).catch(() => { });
-                    });
-                    
-                    collector.on('end', collected => {
-                        collector.stop();
-                        sentEmbed.reactions.removeAll();
-                    }
-                    )
-                })
-                .catch(() => message.channel.send('I don\'t have permissions to add reactions! Check both role and channel permissions.'));
+        const filter = i => {
+            return ['first', 'back', 'forward', 'last'].includes(i.customID) && i.user.id === message.author.id;
+        };
+
+        const collector = sentMessage.createMessageComponentInteractionCollector(filter, { time: 60000 });
+
+        collector.on('collect', async i => {
+            if (i.customID === 'first') {
+                index = 0;
+                embed = await DataHandler.getLeaderboardEmbed(0);
+            } else if (i.customID === 'back') {
+                if (index >= 10) {
+                    index -= 10;
+                    embed = await DataHandler.getLeaderboardEmbed(index);
+                }
+            } else if (i.customID === 'forward') {
+                if (index < maxIndex) {
+                    index += 10;
+                    embed = await DataHandler.getLeaderboardEmbed(index);
+                }
+            } else if (i.customID === 'last') {
+                if (index !== 990) {
+                    index = maxIndex;
+                    embed = await DataHandler.getLeaderboardEmbed(index);
+                }
+            }
+
+            const newRow = new Discord.MessageActionRow()
+                .addComponents(
+                    new Discord.MessageButton()
+                        .setCustomID('first')
+                        .setLabel('First')
+                        .setStyle('PRIMARY')
+                        .setDisabled(index < 10),
+                    new Discord.MessageButton()
+                        .setCustomID('back')
+                        .setLabel('Back')
+                        .setStyle('PRIMARY')
+                        .setDisabled(index < 10),
+                    new Discord.MessageButton()
+                        .setCustomID('forward')
+                        .setLabel('Next')
+                        .setStyle('PRIMARY')
+                        .setDisabled(index >= maxIndex),
+                    new Discord.MessageButton()
+                        .setCustomID('last')
+                        .setLabel('Last')
+                        .setStyle('PRIMARY')
+                        .setDisabled(index >= maxIndex),
+            );
+
+            i.update({ embeds: [embed], components: [newRow] });
         });
+        
+        collector.on('end', collected => {
+            collector.stop();
+            sentMessage.edit({ embeds: [embed], components: [] })
+        })
     },
 }
 
