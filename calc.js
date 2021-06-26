@@ -386,7 +386,9 @@ class Player {
 				ctx.restore();
 			}
 		
-			this.attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'weight.png');
+			// if (this.profileuuid === this.mainProfileuuid) {
+			// 	this.attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'weight.png');
+			// }
 		
 			message.reply({
 				files: [this.attachment],
