@@ -65,6 +65,6 @@ For now, reaching 55m xp (lvl 50) rewards you with 100 weight, with 150 more aft
 				.addField('Links', 'Source code - https://github.com/ptlthg/EliteDiscordBot\nFeedback - https://forms.gle/9XFNcj4ownZj23nM8');
 		}
 
-		message.channel.send(embed);
+		message.channel.send({ embeds: [embed] });
 	},
 };
