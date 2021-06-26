@@ -201,20 +201,22 @@ class Player {
 		//Calculate Amount of Gold medals won
 		let earnedGolds = 0;
 		let contests = userData.jacob2.contests;
-		for (let i = 0; i < Object.keys(contests).length; i++) {
-			let contest = contests[Object.keys(contests)[i]];
+		if (contests) {
+			for (let i = 0; i < Object.keys(contests).length; i++) {
+				let contest = contests[Object.keys(contests)[i]];
 			
-			let position = ('claimed_position' in contest) ? contest['claimed_position'] : -1;
-			let participants = ('claimed_participants' in contest) ? contest['claimed_participants'] : -1;
+				let position = ('claimed_position' in contest) ? contest['claimed_position'] : -1;
+				let participants = ('claimed_participants' in contest) ? contest['claimed_participants'] : -1;
 			
-			if (position !== -1 && participants !== -1) {
-				earnedGolds += ((participants * 0.05) - 1 >= position) ? 1 : 0;
-			} else {
-				continue;
-			}
+				if (position !== -1 && participants !== -1) {
+					earnedGolds += ((participants * 0.05) - 1 >= position) ? 1 : 0;
+				} else {
+					continue;
+				}
 			
-			if (earnedGolds > 1000) {
-				break;
+				if (earnedGolds > 1000) {
+					break;
+				}
 			}
 		}
 		if (earnedGolds > 1000) {
