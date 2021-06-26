@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const Canvas = require('canvas');
 const fetch = require('node-fetch');
 const throttledQueue = require('throttled-queue');
 const { hypixelApiKey } = require('./config.json');
@@ -47,21 +48,23 @@ class PlayerHandler {
 			return await response;
 	}
 
-	static async getWeight(message, playerName, profileName = null) {
+	static async getWeight(message, playerName, detailed = false, profileName = null) {
 		if (this.cachedPlayers.has(playerName.toLowerCase())) {
-			this.cachedPlayers.get(playerName.toLowerCase()).getWeight(message, profileName);
+			this.cachedPlayers.get(playerName.toLowerCase()).getWeight(message, detailed, profileName);
 		} else {
 			throttle(async function() {
 				await PlayerHandler.createPlayer(message, playerName).then(() => {
-					PlayerHandler.cachedPlayers.get(playerName.toLowerCase()).getWeight(message, profileName);
+					PlayerHandler.cachedPlayers.get(playerName.toLowerCase()).getWeight(message, detailed, profileName);
 				}).catch((error) => {
-					//console.log(error);
 					PlayerHandler.cachedPlayers.delete(playerName.toLowerCase());
-					message.edit(new Discord.MessageEmbed()
-						.setColor('#03fc7b')
-						.setTitle(`A skyblock profile with the username of "${playerName}" does\'t exist`)
-						.setDescription('Or Hypixel\'s API is down')
-						.setFooter('Created by Kaeso#5346'))
+					message.reply({
+						embeds: [new Discord.MessageEmbed()
+							.setColor('#03fc7b')
+							.setTitle(`A skyblock profile with the username of "${playerName}" does\'t exist`)
+							.setDescription('Or Hypixel\'s API is down')
+							.setFooter('Created by Kaeso#5346')],
+						allowedMentions: { repliedUser: true }
+					})
 				})
 			})
 		}
@@ -108,6 +111,8 @@ class Player {
 		this.mainProfileuuid;
 		this.userData;
 
+		this.attachment = null;
+
 		this.collections;
 		this.weight = 0;
 		this.bonus;
@@ -117,10 +122,17 @@ class Player {
 		this.timestamp = Date.now();
 	}
 
-	async getWeight(message, profileName = null) {
+	async getWeight(message, detailed, profileName = null) {
 		let userData = this.getUserdata(profileName);
 		if (userData === null) {
-			return;
+			message.reply({
+				embeds: [new Discord.MessageEmbed()
+					.setColor('#03fc7b')
+					.setTitle(`This player doesn't have a skyblock profile!`)
+					.setFooter('Created by Kaeso#5346')],
+				allowedMentions: { repliedUser: true }
+			});
+			return -1;
 		}
 
 		const player = await DataHandler.getPlayer(this.uuid);
@@ -130,10 +142,13 @@ class Player {
 		}
 			
 		if (userData.collection === undefined) {
-			message.edit(new Discord.MessageEmbed()
-				.setColor('#03fc7b')
-				.setTitle(`This player doesn't have collections API enabled on ${this.latestProfile.cute_name}`)
-				.setFooter('Created by Kaeso#5346'));
+			message.reply({
+				embeds: [new Discord.MessageEmbed()
+					.setColor('#03fc7b')
+					.setTitle(`This player doesn't have collections API enabled on ${this.latestProfile.cute_name}`)
+					.setFooter('Created by Kaeso#5346')],
+				allowedMentions: { repliedUser: true }
+			});
 			return -1;
 		}
 
@@ -239,10 +254,156 @@ class Player {
 		weight = Math.floor(weight * 100) / 100;
 
 		DataHandler.updatePlayer(this.uuid, this.playerName, this.profileuuid, weight + this.bonusWeight);
-		this.sendWeight(message, weight);
+		if (detailed) {
+			this.sendDetailedWeight(message, weight);
+		} else {
+			this.sendWeight(message, weight);
+		}
 	}
 
-	sendWeight(message, weight) {
+	async sendWeight(message, weight) {
+		const filter = i => i.customID === 'info' && i.user.id === message.author.id;
+		
+		const row = new Discord.MessageActionRow().addComponents(
+			new Discord.MessageButton()
+				.setCustomID('info')
+				.setLabel('More Info')
+				.setStyle('SUCCESS'),
+			new Discord.MessageButton()
+				.setLabel('SkyCrypt')
+				.setStyle('LINK')
+				.setURL(`https://sky.shiiyu.moe/stats/${this.uuid}`)
+		);
+
+		if (this.attachment !== null) {
+			message.reply({
+				files: [this.attachment],
+				components: [row],
+				allowedMentions: { repliedUser: false }
+			}).then(sentEmbed => {
+				sentEmbed.awaitMessageComponentInteraction(filter, { time: 15000 })
+					.then(i => {
+						this.sendDetailedWeight(i, weight, true);
+					})
+					.catch(error => {
+						sentEmbed.edit({ components: [], allowedMentions: { repliedUser: false } })
+					});
+			});
+		} else {
+			let result = "Hey what's up?";
+			weight = Math.round((weight + this.bonusWeight) * 100) / 100;
+
+			if (weight > 1) {
+				result = weight.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+			} else if (weight === -1) {
+				result = 'This player has collections API off!';
+			} else {
+				result = weight;
+			}
+
+
+			/*
+			The below code is not fun at all and just generally awful, but basically the only way to do all this so yeah.
+	
+			Different sections are commented but you sort of need to know what you're looking at already.
+			*/
+
+
+			//Get image relating to their top collection
+			const topCollection = new Map([...this.collections.entries()].sort((a, b) => b[1] - a[1])).entries().next().value[0];
+			let imagePath = `./images/${topCollection.toLowerCase().replace(' ', '_')}.png`;
+
+			const { registerFont, createCanvas } = require('canvas');
+			registerFont('./fonts/Raleway-Regular.ttf', { family: 'Raleway' });
+			let attachment;
+
+			//Load crop image and avatar
+			const background = await Canvas.loadImage(imagePath)
+			const avatar = await Canvas.loadImage(`https://mc-heads.net/head/${this.uuid}/left`).catch(collected => {
+				avatar = null;
+			});
+
+			//Create our canvas and draw the crop image
+			const canvas = createCanvas(background.width, background.height);
+			const ctx = canvas.getContext('2d');
+
+			ctx.drawImage(background, 750, 0, canvas.width, canvas.height);
+		
+			//Fill in the body and add green stripe
+			ctx.fillStyle = "#2f3136";
+			ctx.fillRect(0, 0, 1495, 400);
+			ctx.fillStyle = "#03fc7b";
+			ctx.fillRect(0, 0, 20, 400);
+		
+			//Add name and rank, then resize to fit
+			let name = this.playerName;
+			if (this.rank !== undefined && this.rank !== 0 && this.mainProfileuuid === this.profileuuid) {
+				name = (`${this.playerName} - #${this.rank}`);
+			}
+
+			ctx.font = '100px "Raleway"';
+			let fontSize = 100;
+			do {
+				fontSize--;
+				ctx.font = fontSize + 'px ' + "Raleway";
+			} while (ctx.measureText(name).width > canvas.width * 0.66);
+
+			const metrics = ctx.measureText(name);
+			let fontHeight = metrics.emHeightAscent + metrics.emHeightDescent;
+
+			ctx.fillStyle = '#dddddd';
+			ctx.fillText(name, 55, 90 - (90 - fontHeight) / 2);
+			ctx.save();
+
+			//Add weight and label, then resize to fit
+			ctx.font = '256px "Sans"';
+			fontSize = 256;
+
+			do {
+				fontSize--;
+				ctx.font = fontSize + 'px ' + "Sans";
+			} while (ctx.measureText(result).width > canvas.width * 0.66);
+			let weightWidth = ctx.measureText(result).width;
+
+			ctx.fillStyle = '#dddddd';
+			ctx.fillText(result, 50, canvas.height * 0.9);
+
+			ctx.font = '64px "Sans"';
+			fontSize = 64;
+
+			do {
+				fontSize--;
+				ctx.font = fontSize + 'px ' + "Sans";
+			} while (ctx.measureText('Weight').width + weightWidth > canvas.width - 505);
+
+			ctx.fillStyle = '#dddddd';
+			ctx.fillText('Weight', weightWidth + 50, canvas.height * 0.9);
+
+			//Draw avatar
+			if (avatar) {
+				ctx.drawImage(avatar, canvas.width - (canvas.height * 0.8) - 50, (canvas.height - canvas.height * 0.8) / 2, canvas.height * 0.8, canvas.height * 0.8);
+				ctx.restore();
+			}
+		
+			this.attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'weight.png');
+		
+			message.reply({
+				files: [this.attachment],
+				components: [row],
+				allowedMentions: { repliedUser: false }
+			}).then(sentEmbed => {
+				sentEmbed.awaitMessageComponentInteraction(filter, { time: 15000 })
+					.then(i => {
+						this.sendDetailedWeight(i, weight, true);
+					})
+					.catch(error => {
+						sentEmbed.edit({ components: [], allowedMentions: { repliedUser: false } })
+					});
+			});
+		}
+	}
+
+	sendDetailedWeight(message, weight, edit = false) {
 		let result = "Hey what's up?";
 		weight = Math.round((weight + this.bonusWeight) * 100) / 100;
 
@@ -274,7 +435,11 @@ class Player {
 			embed.addField('Notes', 'This player has been or is a co op member');
 		}
 
-		message.edit(embed);
+		if (!edit) {
+			message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+		} else {
+			message.update({ embeds: [embed], allowedMentions: { repliedUser: false }, files: [], components: [] });
+		}
 	}
 
 	getUserdata(profileName = null) {
