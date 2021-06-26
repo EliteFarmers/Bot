@@ -252,6 +252,7 @@ class Player {
 		});
 
 		weight = Math.floor(weight * 100) / 100;
+		this.weight = weight;
 
 		DataHandler.updatePlayer(this.uuid, this.playerName, this.profileuuid, weight + this.bonusWeight);
 		if (detailed) {
@@ -394,7 +395,7 @@ class Player {
 			}).then(sentEmbed => {
 				sentEmbed.awaitMessageComponentInteraction(filter, { time: 15000 })
 					.then(i => {
-						this.sendDetailedWeight(i, weight, true);
+						this.sendDetailedWeight(i, this.weight, true);
 					})
 					.catch(error => {
 						sentEmbed.edit({ components: [], allowedMentions: { repliedUser: false } })
