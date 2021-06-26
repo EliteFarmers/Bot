@@ -15,9 +15,9 @@ module.exports = {
 				.setTitle(`Calculating weight for ${args[0]}...`)
 				.setFooter('Created by Kaeso#5346');
 
-			message.channel.send(embed).then((sentEmbed) => {
-				PlayerHandler.getWeight(sentEmbed, args[0], args[1] ?? null);
-			});
+			//message.channel.send({ embeds: [embed] }).then((sentEmbed) => {
+				PlayerHandler.getWeight(message, args[0], args.includes('info'), args[1] ?? null);
+			//});
 		}
 	}
 };
