@@ -275,8 +275,9 @@ class Player {
 				.setStyle('LINK')
 				.setURL(`https://sky.shiiyu.moe/stats/${this.uuid}`)
 		);
-
-		if (this.attachment !== null) {
+		
+		if (false) {
+		// if (this.attachment !== null) {
 			message.reply({
 				files: [this.attachment],
 				components: [row],
