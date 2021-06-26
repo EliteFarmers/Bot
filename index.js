@@ -4,7 +4,7 @@ const { prefix, token } = require('./config.json');
 const { Player, PlayerHandler } = require('./calc.js');
 const { DataHandler } = require('./database.js')
 
-const client = new Discord.Client();
+const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES] });
 client.commands = new Discord.Collection();
 
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
@@ -14,13 +14,50 @@ for (const file of commandFiles) {
 	client.commands.set(command.name, command);
 }
 
-client.once('ready', () => {
+client.once('ready', async () => {
 	DataHandler.syncTables();
-	console.log('Ready!');
 	client.user.setActivity('skyblock players', { type: 'WATCHING' });
+
+	console.log('Ready!');
 });
 
 client.on('message', async (message) => {
+	/*
+	if (!client.application?.owner) await client.application?.fetch();
+
+	if (message.content.toLowerCase() === '!deploy' && message.author.id === client.application?.owner.id) {
+		const commandData = [
+			{
+				name: 'weight',
+				description: 'Get a Skyblock user\'s farming weight!',
+				options: [
+					{
+						name: 'playername',
+						type: 'STRING',
+						description: 'The player in question.',
+						required: true,
+					}
+				]
+			},
+			{
+				name: 'lb',
+				description: 'Get the farming weight leaderboard!',
+				options: [
+					{
+						name: 'player',
+						type: 'STRING',
+						description: 'Jump to a specific player!',
+						required: false,
+					}
+				]
+			}
+		];
+		//const commands = await client.application?.commands.set(commandData);
+		const commands = await client.guilds.cache.get('602004419571220500')?.commands.set(commandData);
+
+		console.log(commands);
+	}
+	*/
 	if (message.author.bot) return;
 
 	let customPrefix = prefix;
@@ -43,13 +80,13 @@ client.on('message', async (message) => {
 	if (!command) return;
 
 	if (command.dmOnly) {
-		return message.reply("I can't execute that command outside DMs!");
+		return message.reply({ content: 'I can\'t execute that command outside DMs!', allowedMentions: { repliedUser: true } });
 	}
 
 	if (command.permissions) {
 		const authorPerms = message.channel.permissionsFor(message.author);
 		if (!authorPerms || !authorPerms.has(command.permissions)) {
-			return message.reply('You don\'t have the required permissions for this command.');
+			return message.reply({ content: 'You don\'t have the required permissions for this command.', allowedMentions: { repliedUser: true } });
 		}
 	}
 
@@ -60,15 +97,21 @@ client.on('message', async (message) => {
 			reply += `\nThe proper usage would be: \`${customPrefix}${command.name} ${command.usage}\``;
 		}
 
-		return message.channel.send(reply);
+		return message.channel.send({ content: reply, allowedMentions: { repliedUser: true } });
 	}
 
 	try {
 		command.execute(message, args);
 	} catch (error) {
 		console.error(error);
-		message.reply('There was an error trying to execute that command!');
+		message.reply({ content: 'There was an error trying to execute that command!', allowedMentions: { repliedUser: true } });
 	}
+});
+
+client.on('interaction', async interaction => {
+	if (!interaction.isCommand()) return;
+
+	console.log(interaction);
 });
 
 var minutes = 15, interval = minutes * 60 * 1000;
