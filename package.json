@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "discord.js": "^12.5.3",
+    "canvas": "^2.8.0",
+    "discord.js": "^13.0.0-dev.4714a961b87746b0f85214c756614d276666f285",
     "https": "^1.0.0",
     "i": "^0.3.6",
     "node-fetch": "^2.6.1",
