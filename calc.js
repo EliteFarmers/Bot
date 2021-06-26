@@ -276,8 +276,7 @@ class Player {
 				.setURL(`https://sky.shiiyu.moe/stats/${this.uuid}`)
 		);
 		
-		if (false) {
-		// if (this.attachment !== null) {
+		if (this.attachment !== null) {
 			message.reply({
 				files: [this.attachment],
 				components: [row],
@@ -388,11 +387,11 @@ class Player {
 			}
 		
 			// if (this.profileuuid === this.mainProfileuuid) {
-			// 	this.attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'weight.png');
+			attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'weight.png');
 			// }
 		
 			message.reply({
-				files: [this.attachment],
+				files: [attachment],
 				components: [row],
 				allowedMentions: { repliedUser: false }
 			}).then(sentEmbed => {
