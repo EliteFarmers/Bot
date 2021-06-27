@@ -285,6 +285,7 @@ class Player {
 						}
 					} else {
 						bestData = data;
+						this.profileData = profile;
 					}
 				}
 			})
