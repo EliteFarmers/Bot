@@ -108,12 +108,12 @@ module.exports = {
                         .setDisabled(index >= maxIndex),
             );
 
-            i.update({ embeds: [embed], components: [newRow] });
+            i.update({ embeds: [embed], components: [newRow] }).catch(() => { });;
         });
         
         collector.on('end', collected => {
             collector.stop();
-            sentMessage.edit({ embeds: [embed], components: [] })
+            sentMessage.edit({ embeds: [embed], components: [] }).catch(() => { });
         })
     },
 }

@@ -339,9 +339,11 @@ class Player {
 						this.sendDetailedWeight(i, this.weight, true);
 					})
 					.catch(error => {
-						sentEmbed.edit({ components: [], allowedMentions: { repliedUser: false } })
+						try {
+							sentEmbed.edit({ components: [], allowedMentions: { repliedUser: false } })
+						} catch (error) { }
 					});
-			});
+			}).catch(error => { } );;
 		} else {
 			let result = "Hey what's up?";
 			let rWeight = Math.round((this.weight + this.bonusWeight) * 100) / 100;
@@ -372,7 +374,7 @@ class Player {
 			}
 
 			const { registerFont, createCanvas } = require('canvas');
-			registerFont('./fonts/Raleway-Regular.ttf', { family: 'Raleway' });
+			registerFont('./fonts/OpenSans-Regular.ttf', { family: 'Open Sans' });
 			let attachment;
 
 			//Load crop image and avatar
@@ -399,11 +401,11 @@ class Player {
 				name = (`${this.playerName} - #${this.rank}`);
 			}
 
-			ctx.font = '100px "Raleway"';
+			ctx.font = '100px "Open Sans"';
 			let fontSize = 100;
 			do {
 				fontSize--;
-				ctx.font = fontSize + 'px ' + "Raleway";
+				ctx.font = fontSize + 'px ' + "Open Sans";
 			} while (ctx.measureText(name).width > canvas.width * 0.66);
 
 			const metrics = ctx.measureText(name);
@@ -414,28 +416,30 @@ class Player {
 			ctx.save();
 
 			//Add weight and label, then resize to fit
-			ctx.font = '256px "Sans"';
+			ctx.font = '256px "Open Sans"';
 			fontSize = 256;
 
 			do {
 				fontSize--;
-				ctx.font = fontSize + 'px ' + "Sans";
+				ctx.font = fontSize + 'px ' + "Open Sans";
 			} while (ctx.measureText(result).width > canvas.width * 0.66);
 			let weightWidth = ctx.measureText(result).width;
 
 			ctx.fillStyle = '#dddddd';
 			ctx.fillText(result, 50, canvas.height * 0.9);
 
-			ctx.font = '64px "Sans"';
+			ctx.font = '64px "Open Sans"';
 			fontSize = 64;
 
 			do {
 				fontSize--;
-				ctx.font = fontSize + 'px ' + "Sans";
-			} while (ctx.measureText('Weight').width + weightWidth > canvas.width - 505);
+				ctx.font = fontSize + 'px ' + "Open Sans";
+			} while (ctx.measureText('Weight').width + weightWidth > canvas.width - 515);
 
 			ctx.fillStyle = '#dddddd';
-			ctx.fillText('Weight', weightWidth + 50, canvas.height * 0.9);
+			ctx.fillText('Weight', weightWidth + 75, canvas.height * 0.9);
+			let mes = ctx.measureText('Weight');
+			ctx.fillText('Farming', weightWidth + 75, canvas.height * 0.9 - (mes.emHeightAscent + mes.emHeightDescent));
 
 			//Draw avatar
 			if (avatar) {
@@ -457,10 +461,11 @@ class Player {
 						this.sendDetailedWeight(i, this.weight, true);
 					})
 					.catch(error => {
-						console.log(error)
-						sentEmbed.edit({ components: [], allowedMentions: { repliedUser: false } })
+						try {
+							sentEmbed.edit({ components: [], allowedMentions: { repliedUser: false } })
+						} catch (error) { }
 					});
-			});
+			}).catch(error => { });;
 		}
 	}
 
@@ -538,4 +543,3 @@ module.exports = {
 	PlayerHandler,
 	Player
 }
-
