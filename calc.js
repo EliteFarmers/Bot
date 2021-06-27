@@ -50,11 +50,11 @@ class PlayerHandler {
 
 	static async getWeight(message, playerName, detailed = false, profileName = null) {
 		if (this.cachedPlayers.has(playerName.toLowerCase())) {
-			this.cachedPlayers.get(playerName.toLowerCase()).getWeight(message, detailed, profileName);
+			this.cachedPlayers.get(playerName.toLowerCase()).sendWeight(message, profileName, detailed);
 		} else {
 			throttle(async function() {
 				await PlayerHandler.createPlayer(message, playerName).then(() => {
-					PlayerHandler.cachedPlayers.get(playerName.toLowerCase()).getWeight(message, detailed, profileName);
+					PlayerHandler.cachedPlayers.get(playerName.toLowerCase()).sendWeight(message, profileName, detailed);
 				}).catch((error) => {
 					PlayerHandler.cachedPlayers.delete(playerName.toLowerCase());
 					message.reply({
@@ -106,7 +106,8 @@ class Player {
 		this.uuid = uuid
 		this.data = data;
 
-		this.latestProfile;
+		this.bestProfile;
+		this.profileData;
 		this.profileuuid;
 		this.mainProfileuuid;
 		this.userData;
@@ -122,16 +123,8 @@ class Player {
 		this.timestamp = Date.now();
 	}
 
-	async getWeight(message, detailed, profileName = null) {
-		let userData = this.getUserdata(profileName);
+	async getWeight(userData) {
 		if (userData === null) {
-			message.reply({
-				embeds: [new Discord.MessageEmbed()
-					.setColor('#03fc7b')
-					.setTitle(`This player doesn't have a skyblock profile!`)
-					.setFooter('Created by Kaeso#5346')],
-				allowedMentions: { repliedUser: true }
-			});
 			return -1;
 		}
 
@@ -142,18 +135,15 @@ class Player {
 		}
 			
 		if (userData.collection === undefined) {
-			message.reply({
-				embeds: [new Discord.MessageEmbed()
-					.setColor('#03fc7b')
-					.setTitle(`This player doesn't have collections API enabled on ${this.latestProfile.cute_name}`)
-					.setFooter('Created by Kaeso#5346')],
-				allowedMentions: { repliedUser: true }
-			});
-			return -1;
+			// new Discord.MessageEmbed()
+			// 		.setColor('#03fc7b')
+			// 		.setTitle(`This player doesn't have collections API enabled on ${this.bestProfile.cute_name}`)
+			// 		.setFooter('Created by Kaeso#5346')
+			return -2;
 		}
 
 		let { WHEAT, POTATO_ITEM, CARROT_ITEM, MUSHROOM_COLLECTION, PUMPKIN, MELON, SUGAR_CANE, CACTUS, NETHER_STALK } = userData.collection;
-		let COCOA = userData.collection["INK_SACK:3"];
+		let COCOA = userData.collection["INK_SACK:3"]; //Dumb cocoa
 		
 		//Set potentially empty values to 0
 		if (!WHEAT) WHEAT = 0;
@@ -167,35 +157,35 @@ class Player {
 		if (!NETHER_STALK) NETHER_STALK = 0;
 		if (!SUGAR_CANE) SUGAR_CANE = 0;
 		
-		this.collections = new Map();
+		let collections = new Map();
 		
 		//Normalize collections
-		this.collections.set('Wheat', Math.round(WHEAT / 1000) / 100);
-		this.collections.set('Carrot', Math.round(CARROT_ITEM / 3000) / 100);
-		this.collections.set('Potato', Math.round(POTATO_ITEM / 3000) / 100);
-		this.collections.set('Pumpkin', Math.round(PUMPKIN * 1.41089 / 1000) / 100);
-		this.collections.set('Melon', Math.round(MELON * 1.41089 / 5000) / 100);
-		this.collections.set('Mushroom', Math.round(MUSHROOM_COLLECTION * 1.20763 / 1000) / 100);
-		this.collections.set('Cocoa', Math.round(COCOA * 1.36581 / 3000) / 100);
-		this.collections.set('Cactus', Math.round(CACTUS * 1.25551 / 1000) / 100);
-		this.collections.set('Sugar Cane', Math.round(SUGAR_CANE / 2000) / 100);
-		this.collections.set('Nether Wart', Math.round(NETHER_STALK / 2500) / 100);
+		collections.set('Wheat', Math.round(WHEAT / 1000) / 100);
+		collections.set('Carrot', Math.round(CARROT_ITEM / 3000) / 100);
+		collections.set('Potato', Math.round(POTATO_ITEM / 3000) / 100);
+		collections.set('Pumpkin', Math.round(PUMPKIN * 1.41089 / 1000) / 100);
+		collections.set('Melon', Math.round(MELON * 1.41089 / 5000) / 100);
+		collections.set('Mushroom', Math.round(MUSHROOM_COLLECTION * 1.20763 / 1000) / 100);
+		collections.set('Cocoa', Math.round(COCOA * 1.36581 / 3000) / 100);
+		collections.set('Cactus', Math.round(CACTUS * 1.25551 / 1000) / 100);
+		collections.set('Sugar Cane', Math.round(SUGAR_CANE / 2000) / 100);
+		collections.set('Nether Wart', Math.round(NETHER_STALK / 2500) / 100);
 		
 		//Bonus sources
-		this.bonus = new Map();
+		let bonus = new Map();
 		
 		//Farming level bonuses
 		let farmingCap = userData.jacob2.perks.farming_level_cap ?? 0;
 		if (userData.experience_skill_farming > 111672425 && farmingCap === 10) {
-			this.bonus.set('Farming Level 60', 250);
+			bonus.set('Farming Level 60', 250);
 		} else if (userData.experience_skill_farming > 55172425) {
-			this.bonus.set('Farming Level 50', 100);
+			bonus.set('Farming Level 50', 100);
 		}
 		
 		//Anita buff bonus
 		let anitaBuff = userData.jacob2.perks.double_drops ?? 0;
 		if (anitaBuff === 15) { //15 in API refers to 30 
-			this.bonus.set('Max Anita Buff', 30);
+			bonus.set('Max Anita Buff', 30);
 		}
 		
 		//Calculate Amount of Gold medals won
@@ -220,11 +210,11 @@ class Player {
 			}
 		}
 		if (earnedGolds > 1000) {
-			this.bonus.set('1,000 Gold Medals', 500);
+			bonus.set('1,000 Gold Medals', 500);
 		} else {
 			let roundDown = Math.floor(earnedGolds / 50) * 50;
 			if (roundDown > 0) {
-				this.bonus.set(`${roundDown} Gold Medals`, roundDown / 2);
+				bonus.set(`${roundDown} Gold Medals`, roundDown / 2);
 			}
 		}
 		
@@ -238,33 +228,92 @@ class Player {
 			});
 		}
 		if (obtained12s > 0) {
-			this.bonus.set(`${obtained12s}/10 Minions`, obtained12s * 5);
+			bonus.set(`${obtained12s}/10 Minions`, obtained12s * 5);
 		}
 
-		let bWeight = 0;
-		this.bonus.forEach(function (value, key) {
-			bWeight += value;
+		let bonusWeight = 0;
+		bonus.forEach(function (value, key) {
+			bonusWeight += value;
 		});
 		
-		this.bonusWeight = bWeight;
 		let weight = 0;
 
-		this.collections.forEach(function (value, key) {
+		collections.forEach(function (value, key) {
 			weight += value;
 		});
 
 		weight = Math.floor(weight * 100) / 100;
-		this.weight = weight;
 
-		DataHandler.updatePlayer(this.uuid, this.playerName, this.profileuuid, weight + this.bonusWeight);
-		if (detailed) {
-			this.sendDetailedWeight(message, weight);
-		} else {
-			this.sendWeight(message, weight);
-		}
+		return [
+			weight,
+			bonusWeight,
+			collections,
+			bonus,
+			userData
+		];
 	}
 
-	async sendWeight(message, weight) {
+	async getUserdata(profileName = null) {
+		if (!this.data.profiles) {
+			return null;
+		}
+		let profiles = this.data.profiles;
+		let bestData = null;
+		let best = false;
+
+		for (let i = 0; i < Object.keys(profiles).length; i++) {
+			let key = Object.keys(profiles)[i];
+			let profile = profiles[key];
+
+			if (profileName !== null && profile.cute_name.toLowerCase() === profileName.toLowerCase()) {
+				let calc = await this.getWeight(profile.members[this.uuid]).then(data => {
+					this.profileData = profile;
+					bestData = data;
+				});
+				break;
+			} else {
+				best = true;
+			}
+
+			let calc = await this.getWeight(profile.members[this.uuid]).then(data => {
+				if (data !== -1 && data !== -2) {
+					let weight = data[0] + data[1];
+					if (bestData) {
+						if (weight > (bestData[0] + bestData[1])) {
+							bestData = data;
+							this.profileData = profile;
+						}
+					} else {
+						bestData = data;
+					}
+				}
+			})
+		}
+
+		this.weight = bestData[0];
+		this.bonusWeight = bestData[1];
+		this.collections = bestData[2];
+		this.bonus = bestData[3];
+		this.bestProfile = bestData[4];
+
+		if (best) {
+			this.mainProfileuuid = this.bestProfile.uuid;
+		}
+
+		this.userData = this.bestProfile;
+		return this.bestProfile;
+	}
+
+	async sendWeight(message, profileName = null, detailed = false) {
+		let userData = await this.getUserdata(profileName).then(data => {
+			DataHandler.updatePlayer(this.uuid, this.playerName, this.profileuuid, this.weight + this.bonusWeight);
+		});
+
+		if (detailed) {
+			this.sendDetailedWeight(message, this.weight);
+			return;
+		}
+
 		const filter = i => i.customID === 'info' && i.user.id === message.author.id;
 		
 		const row = new Discord.MessageActionRow().addComponents(
@@ -284,9 +333,9 @@ class Player {
 				components: [row],
 				allowedMentions: { repliedUser: false }
 			}).then(sentEmbed => {
-				sentEmbed.awaitMessageComponentInteraction(filter, { time: 15000 })
+				sentEmbed.awaitMessageComponentInteraction(filter, { time: 30000 })
 					.then(i => {
-						this.sendDetailedWeight(i, weight, true);
+						this.sendDetailedWeight(i, this.weight, true);
 					})
 					.catch(error => {
 						sentEmbed.edit({ components: [], allowedMentions: { repliedUser: false } })
@@ -294,14 +343,14 @@ class Player {
 			});
 		} else {
 			let result = "Hey what's up?";
-			weight = Math.round((weight + this.bonusWeight) * 100) / 100;
+			let rWeight = Math.round((this.weight + this.bonusWeight) * 100) / 100;
 
-			if (weight > 1) {
-				result = weight.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-			} else if (weight === -1) {
+			if (rWeight > 1) {
+				result = rWeight.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+			} else if (rWeight === -1) {
 				result = 'This player has collections API off!';
 			} else {
-				result = weight;
+				result = rWeight;
 			}
 
 
@@ -313,8 +362,13 @@ class Player {
 
 
 			//Get image relating to their top collection
-			const topCollection = new Map([...this.collections.entries()].sort((a, b) => b[1] - a[1])).entries().next().value[0];
-			let imagePath = `./images/${topCollection.toLowerCase().replace(' ', '_')}.png`;
+			let imagePath;
+			if (this.collections) {
+				const topCollection = new Map([...this.collections.entries()].sort((a, b) => b[1] - a[1])).entries().next().value[0];
+				imagePath = `./images/${topCollection.toLowerCase().replace(' ', '_')}.png`;
+			} else {
+				imagePath = `./images/wheat.png`
+			}
 
 			const { registerFont, createCanvas } = require('canvas');
 			registerFont('./fonts/Raleway-Regular.ttf', { family: 'Raleway' });
@@ -397,11 +451,12 @@ class Player {
 				components: [row],
 				allowedMentions: { repliedUser: false }
 			}).then(sentEmbed => {
-				sentEmbed.awaitMessageComponentInteraction(filter, { time: 15000 })
+				sentEmbed.awaitMessageComponentInteraction(filter, { time: 30000 })
 					.then(i => {
 						this.sendDetailedWeight(i, this.weight, true);
 					})
 					.catch(error => {
+						console.log(error)
 						sentEmbed.edit({ components: [], allowedMentions: { repliedUser: false } })
 					});
 			});
@@ -422,22 +477,27 @@ class Player {
 
 		const embed = new Discord.MessageEmbed()
 			.setColor('#03fc7b')
-			.setTitle(`Stats for ${this.playerName} on ${this.latestProfile.cute_name}`)
-			.setThumbnail(`https://mc-heads.net/head/${this.uuid}/left`)
-			.addField('Farming Weight', !result ? 0 : result)
-			.addField('Breakdown', this.getBreakdown(weight - this.bonusWeight))
+			.setTitle(`Stats for ${this.playerName} on ${this.profileData.cute_name}`)
+			.addField('Farming Weight', !result ? '0 - Try some farming!' : result)
+			.addField('Breakdown', this.getBreakdown(weight - this.bonusWeight), edit)
 			.setFooter('Created by Kaeso#5346');
+		
+		if (!edit) {
+			embed.setThumbnail(`https://mc-heads.net/head/${this.uuid}/left`)
+		}
 
-		if (this.rank !== undefined && this.rank !== 0 && this.mainProfileuuid === this.profileuuid) {
+		if (this.rank !== undefined && this.rank !== 0 && this.mainProfileuuid === this.profileuuid && !edit) {
 			embed.setDescription(`**${this.playerName}** is rank **#${this.rank}!**`)
 		}
 
 		if (this.bonus.size > 0) {
-			embed.addField('Bonus', this.getBonus());
+			embed.addField('Bonus', this.getBonus(), edit);
 		}
 
-		if (Object.keys(this.latestProfile.members).length > 1) {
-			embed.addField('Notes', 'This player has been or is a co op member');
+		if (this.bestProfile.members) {
+			if (Object.keys(this.bestProfile.members).length > 1) {
+				embed.addField('Notes', 'This player has been or is a co op member');
+			}
 		}
 
 		if (!edit) {
@@ -447,56 +507,29 @@ class Player {
 		}
 	}
 
-	getUserdata(profileName = null) {
-		if (!this.data.profiles) {
-			return null;
-		}
-		let profiles = this.data.profiles;
-
-		for (let i = 0; i < Object.keys(profiles).length; i++) {
-			let key = Object.keys(profiles)[i];
-			let profile = profiles[key];
-			
-			if (profileName !== null && profile.cute_name.toLowerCase() === profileName.toLowerCase()) {
-				this.latestProfile = profile;
-				this.profileuuid = profile.profile_id;
-
-				return profile.members[this.uuid];
-			}
-			
-			if (this.latestProfile === undefined || profile.members[this.uuid].last_save > this.latestProfile.members[this.uuid].last_save) {
-				this.latestProfile = profile;
-				this.profileuuid = profile.profile_id;
-			}
-		}
-
-		this.userData = this.latestProfile.members[this.uuid];
-		return this.latestProfile.members[this.uuid];
-	}
-
 	getBreakdown(weight) {
 		//Sort collections
 		const sortedCollections = new Map([...this.collections.entries()].sort((a, b) => b[1] - a[1]));
-		let breakdown = "";
+		let breakdown = '';
 		
 		sortedCollections.forEach(function (value, key) {
 			let percent = Math.floor(value / weight * 100);
 			breakdown += (percent > 1) ? `${key}: ${value}  [${percent}%]\n` : (percent > 1) ? `${key}: ${value}  [${percent}%]\n` : '';
 		});
 
-		return breakdown === "" ? "This player has no notable collections" : breakdown;
+		return breakdown === '' ? "This player has no notable collections" : breakdown;
 	}
 
 	getBonus() {
 		//Sort bonus
 		const sortedBounus = new Map([...this.bonus.entries()].sort((a, b) => b[1] - a[1]));
-		let bonusText = " ";
+		let bonusText = '';
 
 		sortedBounus.forEach(function (value, key) {
 			bonusText += `${key}: ${value}\n`;
 		});
 
-		return bonusText;
+		return bonusText === '' ? 'No bonus points :(' : bonusText;
 	}
 }
 
