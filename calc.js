@@ -291,6 +291,12 @@ class Player {
 			})
 		}
 
+		if (!bestData) {
+			this.weight = 0
+			this.bonusWeight = 0
+			return null;
+		}
+
 		this.weight = bestData[0];
 		this.bonusWeight = bestData[1];
 		this.collections = bestData[2];
@@ -307,7 +313,7 @@ class Player {
 
 	async sendWeight(message, profileName = null, detailed = false) {
 		let userData = await this.getUserdata(profileName).then(data => {
-			DataHandler.updatePlayer(this.uuid, this.playerName, this.profileuuid, this.weight + this.bonusWeight);
+			if (data) DataHandler.updatePlayer(this.uuid, this.playerName, this.profileuuid, this.weight + this.bonusWeight);
 		});
 
 		if (detailed) {
@@ -343,7 +349,7 @@ class Player {
 							sentEmbed.edit({ components: [], allowedMentions: { repliedUser: false } })
 						} catch (error) { }
 					});
-			}).catch(error => { } );;
+			}).catch(error => { } );
 		} else {
 			let result = "Hey what's up?";
 			let rWeight = Math.round((this.weight + this.bonusWeight) * 100) / 100;
@@ -465,7 +471,7 @@ class Player {
 							sentEmbed.edit({ components: [], allowedMentions: { repliedUser: false } })
 						} catch (error) { }
 					});
-			}).catch(error => { });;
+			}).catch(error => { });
 		}
 	}
 
