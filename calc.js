@@ -175,13 +175,17 @@ class Player {
 		let bonus = new Map();
 		
 		//Farming level bonuses
-		let farmingCap = userData.jacob2.perks.farming_level_cap ?? 0;
-		if (userData.experience_skill_farming > 111672425 && farmingCap === 10) {
-			bonus.set('Farming Level 60', 250);
-		} else if (userData.experience_skill_farming > 55172425) {
-			bonus.set('Farming Level 50', 100);
+		if (userData.jacob2) {
+			try {
+				let farmingCap = userData.jacob2.perks.farming_level_cap ?? 0;
+				if (userData.experience_skill_farming > 111672425 && farmingCap === 10) {
+					bonus.set('Farming Level 60', 250);
+				} else if (userData.experience_skill_farming > 55172425) {
+					bonus.set('Farming Level 50', 100);
+				}
+			} catch (e) {}
 		}
-		
+
 		//Anita buff bonus
 		let anitaBuff = userData.jacob2.perks.double_drops ?? 0;
 		if (anitaBuff === 15) { //15 in API refers to 30 
