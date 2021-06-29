@@ -174,52 +174,52 @@ class Player {
 		//Bonus sources
 		let bonus = new Map();
 		
-		//Farming level bonuses
 		if (userData.jacob2) {
 			try {
+				//Farming level bonuses
 				let farmingCap = userData.jacob2.perks.farming_level_cap ?? 0;
 				if (userData.experience_skill_farming > 111672425 && farmingCap === 10) {
 					bonus.set('Farming Level 60', 250);
 				} else if (userData.experience_skill_farming > 55172425) {
 					bonus.set('Farming Level 50', 100);
 				}
-			} catch (e) {}
-		}
 
-		//Anita buff bonus
-		let anitaBuff = userData.jacob2.perks.double_drops ?? 0;
-		if (anitaBuff === 15) { //15 in API refers to 30 
-			bonus.set('Max Anita Buff', 30);
-		}
-		
-		//Calculate Amount of Gold medals won
-		let earnedGolds = 0;
-		let contests = userData.jacob2.contests;
-		if (contests) {
-			for (let i = 0; i < Object.keys(contests).length; i++) {
-				let contest = contests[Object.keys(contests)[i]];
-			
-				let position = ('claimed_position' in contest) ? contest['claimed_position'] : -1;
-				let participants = ('claimed_participants' in contest) ? contest['claimed_participants'] : -1;
-			
-				if (position !== -1 && participants !== -1) {
-					earnedGolds += ((participants * 0.05) - 1 >= position) ? 1 : 0;
-				} else {
-					continue;
+				//Anita buff bonus
+				let anitaBuff = userData.jacob2.perks.double_drops ?? 0;
+				if (anitaBuff === 15) { //15 in API refers to 30 
+					bonus.set('Max Anita Buff', 30);
 				}
-			
+
+				//Calculate Amount of Gold medals won
+				let earnedGolds = 0;
+				let contests = userData.jacob2.contests;
+				if (contests) {
+					for (let i = 0; i < Object.keys(contests).length; i++) {
+						let contest = contests[Object.keys(contests)[i]];
+
+						let position = ('claimed_position' in contest) ? contest['claimed_position'] : -1;
+						let participants = ('claimed_participants' in contest) ? contest['claimed_participants'] : -1;
+
+						if (position !== -1 && participants !== -1) {
+							earnedGolds += ((participants * 0.05) - 1 >= position) ? 1 : 0;
+						} else {
+							continue;
+						}
+
+						if (earnedGolds > 1000) {
+							break;
+						}
+					}
+				}
 				if (earnedGolds > 1000) {
-					break;
+					bonus.set('1,000 Gold Medals', 500);
+				} else {
+					let roundDown = Math.floor(earnedGolds / 50) * 50;
+					if (roundDown > 0) {
+						bonus.set(`${roundDown} Gold Medals`, roundDown / 2);
+					}
 				}
-			}
-		}
-		if (earnedGolds > 1000) {
-			bonus.set('1,000 Gold Medals', 500);
-		} else {
-			let roundDown = Math.floor(earnedGolds / 50) * 50;
-			if (roundDown > 0) {
-				bonus.set(`${roundDown} Gold Medals`, roundDown / 2);
-			}
+			} catch (e) {}
 		}
 		
 		//Tier 12 farming minions
@@ -510,8 +510,8 @@ class Player {
 			embed.addField('Bonus', this.getBonus(), edit);
 		}
 
-		if (this.bestProfile.members) {
-			if (Object.keys(this.bestProfile.members).length > 1) {
+		if (this.profileData.members) {
+			if (Object.keys(this.profileData.members).length > 1) {
 				embed.addField('Notes', 'This player has been or is a co op member');
 			}
 		}

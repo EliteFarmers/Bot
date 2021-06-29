@@ -22,11 +22,11 @@ client.once('ready', async () => {
 });
 
 client.on('message', async (message) => {
-	/*
 	if (!client.application?.owner) await client.application?.fetch();
 
-	if (message.content.toLowerCase() === '!deploy' && message.author.id === client.application?.owner.id) {
-		const commandData = [
+	if (message.content.toLowerCase() === 'it doesn\'t' && message.author.id === '174265140357627904') {
+		message.channel.send('I didn\'t');
+		/*const commandData = [
 			{
 				name: 'weight',
 				description: 'Get a Skyblock user\'s farming weight!',
@@ -56,8 +56,9 @@ client.on('message', async (message) => {
 		const commands = await client.guilds.cache.get('602004419571220500')?.commands.set(commandData);
 
 		console.log(commands);
+		*/
 	}
-	*/
+	
 	if (message.author.bot) return;
 
 	let customPrefix = prefix;
@@ -78,10 +79,6 @@ client.on('message', async (message) => {
 		client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
 
 	if (!command) return;
-
-	if (command.dmOnly) {
-		return message.reply({ content: 'I can\'t execute that command outside DMs!', allowedMentions: { repliedUser: true } });
-	}
 
 	if (command.permissions) {
 		const authorPerms = message.channel.permissionsFor(message.author);
