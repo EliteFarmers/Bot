@@ -3,8 +3,8 @@ const Discord = require('discord.js');
 module.exports = {
 	name: 'info',
 	aliases: ['i'],
-	description: 'Information',
-	usage: '[command name]',
+	description: 'Information about the bot',
+	usage: '(crops|xp)',
 	guildOnly: false,
 	execute(message, args) {
 		const arg = (args[0] !== undefined) ? args[0].toLowerCase() : 'nope';

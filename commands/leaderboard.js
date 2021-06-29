@@ -5,7 +5,7 @@ module.exports = {
     name: 'lb',
     aliases: ['leaderboard', 'lbs'],
     description: 'Get the farming weight leaderboard',
-    usage: '[username] (profile name)',
+    usage: '(username)',
     guildOnly: false,
     dmOnly: false,
     async execute(message, args) {
