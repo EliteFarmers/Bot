@@ -22,7 +22,7 @@ client.once('ready', async () => {
 });
 
 client.on('message', async (message) => {
-	if (!client.application?.owner) await client.application?.fetch();
+	//if (!client.application?.owner) await client.application?.fetch();
 
 	// if (message.content.toLowerCase() === 'it doesn\'t' && message.author.id === '174265140357627904') {
 	// 	message.channel.send('I didn\'t');
