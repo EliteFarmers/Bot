@@ -60,7 +60,7 @@ class PlayerHandler {
 					message.reply({
 						embeds: [new Discord.MessageEmbed()
 							.setColor('#03fc7b')
-							.setTitle(`A skyblock profile with the username of "${playerName}" does\'t exist`)
+							.setTitle(`A skyblock profile with the username of "${playerName}" doesn\'t exist`)
 							.setDescription('Or Hypixel\'s API is down')
 							.setFooter('Created by Kaeso#5346')],
 						allowedMentions: { repliedUser: true }
@@ -316,9 +316,22 @@ class Player {
 	}
 
 	async sendWeight(message, profileName = null, detailed = false) {
-		let userData = await this.getUserdata(profileName).then(data => {
-			if (data) DataHandler.updatePlayer(this.uuid, this.playerName, this.profileuuid, this.weight + this.bonusWeight);
-		});
+		let userData = await this.getUserdata(profileName)
+
+		console.log(userData);
+		if (!userData) {
+			const embed = new Discord.MessageEmbed()
+			.setColor('#03fc7b')
+			.setTitle(`Stats for ${this.playerName} on ${this.profileData.cute_name}`)
+			.addField('Farming Weight', 'Zero! - Try some farming!')
+			.setFooter('Created by Kaeso#5346')
+			.setThumbnail(`https://mc-heads.net/head/${this.uuid}/left`)
+
+			message.reply({embeds: [embed]})
+			return;
+		}
+
+		DataHandler.updatePlayer(this.uuid, this.playerName, this.profileuuid, this.weight + this.bonusWeight);
 
 		if (detailed) {
 			this.sendDetailedWeight(message, this.weight);
