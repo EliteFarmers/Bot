@@ -318,11 +318,10 @@ class Player {
 	async sendWeight(message, profileName = null, detailed = false) {
 		let userData = await this.getUserdata(profileName)
 
-		console.log(userData);
 		if (!userData) {
 			const embed = new Discord.MessageEmbed()
 			.setColor('#03fc7b')
-			.setTitle(`Stats for ${this.playerName} on ${this.profileData.cute_name}`)
+			.setTitle(`Stats for ${this.playerName}`)
 			.addField('Farming Weight', 'Zero! - Try some farming!')
 			.setFooter('Created by Kaeso#5346')
 			.setThumbnail(`https://mc-heads.net/head/${this.uuid}/left`)
