@@ -165,7 +165,7 @@ class Player {
 		collections.set('Potato', Math.round(POTATO_ITEM / 3000) / 100);
 		collections.set('Pumpkin', Math.round(PUMPKIN * 1.41089 / 1000) / 100);
 		collections.set('Melon', Math.round(MELON * 1.41089 / 5000) / 100);
-		collections.set('Mushroom', Math.round(MUSHROOM_COLLECTION * 1.20763 / 1000) / 100);
+		collections.set('Mushroom', Math.round(MUSHROOM_COLLECTION * 1.20763 / 664) / 100);
 		collections.set('Cocoa', Math.round(COCOA * 1.36581 / 3000) / 100);
 		collections.set('Cactus', Math.round(CACTUS * 1.25551 / 1000) / 100);
 		collections.set('Sugar Cane', Math.round(SUGAR_CANE / 2000) / 100);

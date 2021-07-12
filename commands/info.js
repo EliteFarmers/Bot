@@ -24,7 +24,7 @@ Sugar Cane: 200,000
 Nether Wart: 250,000
 Pumpkin: 71,000
 Melon: 355,000
-Mushroom: 83,000
+Mushroom: 55,000
 Cocoa Beans: 220,000
 Cactus: 79,000
 
