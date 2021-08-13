@@ -34,22 +34,22 @@ module.exports = {
         const row = new Discord.MessageActionRow()
             .addComponents(
                 new Discord.MessageButton()
-                    .setCustomID('first')
+                    .setCustomId('first')
                     .setLabel('First')
                     .setStyle('PRIMARY')
                     .setDisabled(index < 10),
                 new Discord.MessageButton()
-                    .setCustomID('back')
+                    .setCustomId('back')
                     .setLabel('Back')
                     .setStyle('PRIMARY')
                     .setDisabled(index < 10),
                 new Discord.MessageButton()
-                    .setCustomID('forward')
+                    .setCustomId('forward')
                     .setLabel('Next')
                     .setStyle('PRIMARY')
                     .setDisabled(index + 10 > maxIndex),
                 new Discord.MessageButton()
-                    .setCustomID('last')
+                    .setCustomId('last')
                     .setLabel('Last')
                     .setStyle('PRIMARY')
                     .setDisabled(index + 10 > maxIndex),
@@ -61,60 +61,64 @@ module.exports = {
             return ['first', 'back', 'forward', 'last'].includes(i.customID) && i.user.id === message.author.id;
         };
 
-        const collector = sentMessage.createMessageComponentInteractionCollector(filter, { time: 60000 });
+        const collector = sentMessage.createMessageComponentCollector({ componentType: 'BUTTON', time: 15000 });
 
         collector.on('collect', async i => {
-            if (i.customID === 'first') {
-                index = 0;
-                embed = await DataHandler.getLeaderboardEmbed(0);
-            } else if (i.customID === 'back') {
-                if (index >= 10) {
-                    index -= 10;
-                    embed = await DataHandler.getLeaderboardEmbed(index);
+            if (i.user.id === message.author.id) {
+                if (i.customId === 'first') {
+                    index = 0;
+                } else if (i.customId === 'back') {
+                    if (index >= 10) {
+                        index -= 10;
+                    }
+                } else if (i.customId === 'forward') {
+                    if (index < maxIndex) {
+                        index += 10;
+                    }
+                } else if (i.customId === 'last') {
+                    if (index !== 990) {
+                        index = maxIndex; 
+                    }
                 }
-            } else if (i.customID === 'forward') {
-                if (index < maxIndex) {
-                    index += 10;
-                    embed = await DataHandler.getLeaderboardEmbed(index);
-                }
-            } else if (i.customID === 'last') {
-                if (index !== 990) {
-                    index = maxIndex;
-                    embed = await DataHandler.getLeaderboardEmbed(index);
-                }
+
+                embed = await DataHandler.getLeaderboardEmbed(index).then(embed => {
+                    const newRow = new Discord.MessageActionRow()
+                    .addComponents(
+                        new Discord.MessageButton()
+                            .setCustomId('first')
+                            .setLabel('First')
+                            .setStyle('PRIMARY')
+                            .setDisabled(index < 10),
+                        new Discord.MessageButton()
+                            .setCustomId('back')
+                            .setLabel('Back')
+                            .setStyle('PRIMARY')
+                            .setDisabled(index < 10),
+                        new Discord.MessageButton()
+                            .setCustomId('forward')
+                            .setLabel('Next')
+                            .setStyle('PRIMARY')
+                            .setDisabled(index >= maxIndex),
+                        new Discord.MessageButton()
+                            .setCustomId('last')
+                            .setLabel('Last')
+                            .setStyle('PRIMARY')
+                            .setDisabled(index >= maxIndex),
+                    );
+    
+                    i.update({ embeds: [embed], components: [newRow] }).catch(error => { console.log(error) });;
+                });
+            } else {
+                i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
             }
-
-            const newRow = new Discord.MessageActionRow()
-                .addComponents(
-                    new Discord.MessageButton()
-                        .setCustomID('first')
-                        .setLabel('First')
-                        .setStyle('PRIMARY')
-                        .setDisabled(index < 10),
-                    new Discord.MessageButton()
-                        .setCustomID('back')
-                        .setLabel('Back')
-                        .setStyle('PRIMARY')
-                        .setDisabled(index < 10),
-                    new Discord.MessageButton()
-                        .setCustomID('forward')
-                        .setLabel('Next')
-                        .setStyle('PRIMARY')
-                        .setDisabled(index >= maxIndex),
-                    new Discord.MessageButton()
-                        .setCustomID('last')
-                        .setLabel('Last')
-                        .setStyle('PRIMARY')
-                        .setDisabled(index >= maxIndex),
-            );
-
-            i.update({ embeds: [embed], components: [newRow] }).catch(() => { });;
         });
-        
+
         collector.on('end', collected => {
             collector.stop();
-            sentMessage.edit({ embeds: [embed], components: [] }).catch(() => { });
-        })
+            try {
+                //sentMessage.edit({ embeds: [embed], components: [] })
+            } catch (error) { console.log(error) }
+        });
     },
 }
 
