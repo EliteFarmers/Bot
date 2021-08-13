@@ -21,7 +21,7 @@ client.once('ready', async () => {
 	console.log('Ready!');
 });
 
-client.on('message', async (message) => {
+client.on('messageCreate', async (message) => {
 	//if (!client.application?.owner) await client.application?.fetch();
 
 	// if (message.content.toLowerCase() === 'it doesn\'t' && message.author.id === '174265140357627904') {
@@ -105,7 +105,7 @@ client.on('message', async (message) => {
 	}
 });
 
-client.on('interaction', async interaction => {
+client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
 
 	console.log(interaction);

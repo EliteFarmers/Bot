@@ -337,11 +337,11 @@ class Player {
 			return;
 		}
 
-		const filter = i => i.customID === 'info' && i.user.id === message.author.id;
+		const filter = i => i.customId === 'info' && i.user.id === message.author.id;
 		
 		const row = new Discord.MessageActionRow().addComponents(
 			new Discord.MessageButton()
-				.setCustomID('info')
+				.setCustomId('info')
 				.setLabel('More Info')
 				.setStyle('SUCCESS'),
 			new Discord.MessageButton()
@@ -356,16 +356,23 @@ class Player {
 				components: [row],
 				allowedMentions: { repliedUser: false }
 			}).then(sentEmbed => {
-				sentEmbed.awaitMessageComponentInteraction(filter, { time: 30000 })
-					.then(i => {
+				const collector = sentEmbed.createMessageComponentCollector({ componentType: 'BUTTON', time: 15000 });
+
+				collector.on('collect', i => {
+					if (i.user.id === message.author.id) {
 						this.sendDetailedWeight(i, this.weight, true);
-					})
-					.catch(error => {
-						try {
-							sentEmbed.edit({ components: [], allowedMentions: { repliedUser: false } })
-						} catch (error) { }
-					});
-			}).catch(error => { } );
+						collector.stop();
+					} else {
+						i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
+					}
+				});
+
+				collector.on('end', collected => {
+					try {
+						sentEmbed.edit({ components: [], allowedMentions: { repliedUser: false } })
+					} catch (error) { console.log(error) }
+				});
+			}).catch(error => { console.log(error) });
 		} else {
 			let result = "Hey what's up?";
 			let rWeight = Math.round((this.weight + this.bonusWeight) * 100) / 100;
@@ -478,16 +485,23 @@ class Player {
 				components: [row],
 				allowedMentions: { repliedUser: false }
 			}).then(sentEmbed => {
-				sentEmbed.awaitMessageComponentInteraction(filter, { time: 30000 })
-					.then(i => {
+				const collector = sentEmbed.createMessageComponentCollector({ componentType: 'BUTTON', time: 15000 });
+
+				collector.on('collect', i => {
+					if (i.user.id === message.author.id) {
 						this.sendDetailedWeight(i, this.weight, true);
-					})
-					.catch(error => {
-						try {
-							sentEmbed.edit({ components: [], allowedMentions: { repliedUser: false } })
-						} catch (error) { }
-					});
-			}).catch(error => { });
+						collector.stop();
+					} else {
+						i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
+					}
+				});
+
+				collector.on('end', collected => {
+					try {
+						sentEmbed.edit({ components: [], allowedMentions: { repliedUser: false } })
+					} catch (error) { console.log(error) }
+				});
+			}).catch(error => { console.log(error) });
 		}
 	}
 

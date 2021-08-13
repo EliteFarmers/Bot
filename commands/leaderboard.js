@@ -57,10 +57,6 @@ module.exports = {
 
         let sentMessage = await message.channel.send({ embeds: [embed], components: [row] });
 
-        const filter = i => {
-            return ['first', 'back', 'forward', 'last'].includes(i.customID) && i.user.id === message.author.id;
-        };
-
         const collector = sentMessage.createMessageComponentCollector({ componentType: 'BUTTON', time: 15000 });
 
         collector.on('collect', async i => {
@@ -113,11 +109,12 @@ module.exports = {
             }
         });
 
-        collector.on('end', collected => {
-            collector.stop();
-            try {
-                //sentMessage.edit({ embeds: [embed], components: [] })
-            } catch (error) { console.log(error) }
+        collector.on('end', async collected => {
+            await DataHandler.getLeaderboardEmbed(index).then(embed => { 
+                sentMessage.edit({ embeds: [embed], components: [] })
+            }).catch(error => {
+                console.log(error);
+            })
         });
     },
 }

@@ -20,6 +20,9 @@ const Prefixes = sequelize.define('prefixes', {
         defaultValue: prefix,
         allowNull: false,
     }
+}, {
+    tableName: 'prefixes',
+    freezeTableName: true
 });
 
 const Users = sequelize.define('users', {
@@ -41,6 +44,7 @@ const Users = sequelize.define('users', {
         type: Sequelize.INTEGER
     }
 }, {
+    tableName: 'users',
     freezeTableName: true,
     indexes: [
         {
@@ -57,9 +61,9 @@ class DataHandler {
 
     }
 
-    static syncTables() {
-        Prefixes.sync();
-        Users.sync();
+    static async syncTables() {
+        await Prefixes.sync();
+        await Users.sync();
 
         this.updateLeaderboard();
         //For wiping table
