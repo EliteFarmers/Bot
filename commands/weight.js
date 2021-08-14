@@ -5,7 +5,7 @@ module.exports = {
 	name: 'weight',
 	aliases: [ 'w' ],
 	description: 'Calculate a players farming weight',
-	usage: '[username] (profile name) (info)',
+	usage: '[username] (profile name)',
 	guildOnly: false,
 	dmOnly: false,
 	execute(interaction) {

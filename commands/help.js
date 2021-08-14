@@ -5,7 +5,7 @@ module.exports = {
 	name: 'help',
 	aliases: ['h', 'commands'],
 	description: 'All commands',
-	usage: '[command name]',
+	usage: '(command name)',
 	guildOnly: false,
 	async execute(interaction) {
 
@@ -18,14 +18,14 @@ module.exports = {
 
 		if (!hCommand) {
 			helpMenu = getHelpEmbed();
-			return interaction.reply({ embeds: [helpMenu], allowedMentions: { repliedUser: false } });
+			return interaction.reply({ embeds: [helpMenu], allowedMentions: { repliedUser: false }, ephemeral: true  });
 		} else {
 			const name = hCommand.toLowerCase();
 			const command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
 
 			if (!command) {
 				let embed = getHelpEmbed()
-				return interaction.reply({ content: 'That\'s not a valid command! Here\'s the menu instead.', embeds: [embed], allowedMentions: { repliedUser: false }});
+				return interaction.reply({ content: 'That\'s not a valid command! Here\'s the menu instead.', embeds: [embed], allowedMentions: { repliedUser: false }, ephemeral: true });
 			}
 
 			let embed = new Discord.MessageEmbed()
@@ -35,7 +35,6 @@ module.exports = {
 			let data = [];
 			data.push(`**Name:** ${command.name}`);
 
-			if (command.aliases) data.push(`**Aliases:** ${command.aliases.join(', ')}`);
 			if (command.description) data.push(`**Description:** ${command.description}`);
 			if (command.usage) data.push(`**Usage:** ${newPrefix}${command.name} ${command.usage}`);
 
@@ -45,7 +44,7 @@ module.exports = {
 				inline: false
 			})
 
-			return interaction.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+			return interaction.reply({ embeds: [embed], allowedMentions: { repliedUser: false }, ephemeral: true  });
 		}
 
 		function getHelpEmbed() {
@@ -55,13 +54,13 @@ module.exports = {
 
 			commands.forEach(command => {
 				helpMenu.fields.push({
-					name: `${newPrefix}${command.name} (${command.aliases.join(', ')})`,
-					value: `${command.description}\n${newPrefix}${command.name} ${command.usage}`,
+					name: `${newPrefix}${command.name}`,
+					value: `${command.description}\nUsage: ${newPrefix}${command.name} ${command.usage}`,
 					inline: false
 				});
 			});
 
-			helpMenu.setFooter(`\nYou can send \`${newPrefix ?? prefix}help [command name]\` to get info on a specific command!`);
+			helpMenu.setFooter(`\nYou can send \"/help [command name]\" to get info on a specific command!`);
 			return helpMenu;
 		}
 	}

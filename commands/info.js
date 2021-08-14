@@ -4,7 +4,7 @@ module.exports = {
 	name: 'info',
 	aliases: ['i'],
 	description: 'Information about the bot',
-	usage: '(crops|xp)',
+	usage: '',
 	guildOnly: false,
 	async execute(interaction) {
 		const embed = new Discord.MessageEmbed()
