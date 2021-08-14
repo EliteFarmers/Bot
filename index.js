@@ -1,10 +1,10 @@
 const fs = require('fs');
 const Discord = require('discord.js');
-const { prefix, token } = require('./config.json');
+const { token, adminid } = require('./config.json');
 const { Player, PlayerHandler } = require('./calc.js');
 const { DataHandler } = require('./database.js')
 
-const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES] });
+const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.DIRECT_MESSAGES] });
 client.commands = new Discord.Collection();
 
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
@@ -21,94 +21,99 @@ client.once('ready', async () => {
 	console.log('Ready!');
 });
 
-client.on('messageCreate', async (message) => {
-	//if (!client.application?.owner) await client.application?.fetch();
+client.on('interactionCreate', async (interaction) => {	
+	if (!interaction.isCommand()) return;
+	if (!client.commands.has(interaction.commandName)) return;
 
-	// if (message.content.toLowerCase() === 'it doesn\'t' && message.author.id === '174265140357627904') {
-	// 	message.channel.send('I didn\'t');
-		/*const commandData = [
-			{
-				name: 'weight',
-				description: 'Get a Skyblock user\'s farming weight!',
-				options: [
-					{
-						name: 'playername',
-						type: 'STRING',
-						description: 'The player in question.',
-						required: true,
-					}
-				]
-			},
-			{
-				name: 'lb',
-				description: 'Get the farming weight leaderboard!',
-				options: [
-					{
-						name: 'player',
-						type: 'STRING',
-						description: 'Jump to a specific player!',
-						required: false,
-					}
-				]
-			}
-		];
-		//const commands = await client.application?.commands.set(commandData);
-		const commands = await client.guilds.cache.get('602004419571220500')?.commands.set(commandData);
-
-		console.log(commands);
-		*/
-	// }
-	
-	if (message.author.bot) return;
-
-	let customPrefix = prefix;
-	if (message.guild !== null) {
-		let customPrefixObj = await DataHandler.getPrefix(message.guild.id);
-		if (customPrefixObj !== null) {
-			customPrefix = customPrefixObj.dataValues.prefix;
-		}
+	let command;
+	try {
+		command = await client.commands.get(interaction.commandName);
+	} catch (error) {
+		console.log(error);
 	}
 
-	if (!message.content.startsWith(customPrefix)) return;
-
-	const args = message.content.slice(customPrefix.length).split(/ +/);
-	const commandName = args.shift().toLowerCase();
-
-	const command =
-		client.commands.get(commandName) ||
-		client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
-
-	if (!command) return;
-
 	if (command.permissions) {
-		const authorPerms = message.channel.permissionsFor(message.author);
-		if (!authorPerms || !authorPerms.has(command.permissions)) {
-			return message.reply({ content: 'You don\'t have the required permissions for this command.', allowedMentions: { repliedUser: true } });
+		if (!interaction.member.permissions.has(command.permissions)) {
+			return await interaction.reply({ content: 'You don\'t have the required permissions for this command.', allowedMentions: { repliedUser: true }, ephemeral: true });
 		}
 	}
 
 	if (command.args && !args.length) {
-		let reply = `You didn't provide any arguments, ${message.author}!`;
+		let reply = `You didn't provide any arguments, ${interaction.user.username}!`;
 
 		if (command.usage) {
-			reply += `\nThe proper usage would be: \`${customPrefix}${command.name} ${command.usage}\``;
+			reply += `\nThe proper usage would be: \`/${command.name} ${command.usage}\``;
 		}
 
-		return message.channel.send({ content: reply, allowedMentions: { repliedUser: true } });
+		return await interaction.reply({ content: reply, allowedMentions: { repliedUser: true }, ephemeral: true });
 	}
 
 	try {
-		command.execute(message, args);
+		await client.commands.get(interaction.commandName).execute(interaction);
 	} catch (error) {
-		console.error(error);
-		message.reply({ content: 'There was an error trying to execute that command!', allowedMentions: { repliedUser: true } });
+		console.log(error);
+		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
 });
 
-client.on('interactionCreate', async interaction => {
-	if (!interaction.isCommand()) return;
+client.on('messageCreate', async message => {
+	if (!client.application?.owner) await client.application?.fetch();
 
-	console.log(interaction);
+	if (message.content.toLowerCase() === '!deploy' && message.author.id === client.application?.owner.id) {
+		const data = [
+			{
+				name: 'weight',
+				description: 'Get a players farming weight!',
+				options: [
+					{
+						name: 'player',
+						type: 'STRING',
+						description: 'The player in question.',
+						required: true
+					},
+					{
+						name: 'profile',
+						type: 'STRING',
+						description: 'Optionally specify a profile!',
+						required: false
+					}
+				]
+			},
+			{
+				name: 'leaderboard',
+				description: 'Get the farming weight leaderboard!',
+				options: [{
+					name: 'player',
+					type: 'STRING',
+					description: 'Jump to a specific player!',
+					required: false
+				}]
+			}, 
+			{
+				name: 'help',
+				description: 'Get the help menu!',
+				options: [{
+					name: 'command',
+					type: 'STRING',
+					description: 'Specify a command for more info.',
+					required: false
+				}]
+			},
+			{
+				name: 'info',
+				description: 'Get bot information!'
+			}
+		];
+
+		const commands = await client.application?.commands.create(data);
+
+		// const guild = await client.guilds.fetch('602004419571220500');
+		// const commands = guild.commands;
+		// commands.set([]);
+
+		//const commands = await client.application?.commands.set(data);
+		console.log(commands);
+	}
 });
 
 var minutes = 15, interval = minutes * 60 * 1000;

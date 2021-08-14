@@ -8,16 +8,19 @@ module.exports = {
 	usage: '[username] (profile name) (info)',
 	guildOnly: false,
 	dmOnly: false,
-	execute(message, args) {
-		if (!(args[0] === null || args[0] === undefined)) {
-			const embed = new Discord.MessageEmbed()
-				.setColor('#03fc7b')
-				.setTitle(`Calculating weight for ${args[0]}...`)
-				.setFooter('Created by Kaeso#5346');
+	execute(interaction) {
+		const options = interaction?.options?._hoistedOptions;
 
-			//message.channel.send({ embeds: [embed] }).then((sentEmbed) => {
-				PlayerHandler.getWeight(message, args[0], args.includes('info'), args[1] ?? null);
-			//});
+		const playerName = options[0]?.value;
+		const profileName = options[1]?.value;
+
+		if (playerName) {
+			const embed = new Discord.MessageEmbed()
+			.setColor('#03fc7b')
+			.setTitle(`Calculating weight for ${playerName}...`)
+			.setFooter('Created by Kaeso#5346');
+
+			PlayerHandler.getWeight(interaction, playerName, profileName ?? null);
 		}
 	}
 };

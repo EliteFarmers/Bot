@@ -48,16 +48,17 @@ class PlayerHandler {
 			return await response;
 	}
 
-	static async getWeight(message, playerName, detailed = false, profileName = null) {
+	static async getWeight(interaction, playerName, profileName = null) {
 		if (this.cachedPlayers.has(playerName.toLowerCase())) {
-			this.cachedPlayers.get(playerName.toLowerCase()).sendWeight(message, profileName, detailed);
+			this.cachedPlayers.get(playerName.toLowerCase()).sendWeight(interaction, profileName);
 		} else {
 			throttle(async function() {
-				await PlayerHandler.createPlayer(message, playerName).then(() => {
-					PlayerHandler.cachedPlayers.get(playerName.toLowerCase()).sendWeight(message, profileName, detailed);
+				await PlayerHandler.createPlayer(interaction, playerName).then(() => {
+					PlayerHandler.cachedPlayers.get(playerName.toLowerCase()).sendWeight(interaction, profileName);
 				}).catch((error) => {
+					console.log(error);
 					PlayerHandler.cachedPlayers.delete(playerName.toLowerCase());
-					message.reply({
+					interaction.reply({
 						embeds: [new Discord.MessageEmbed()
 							.setColor('#03fc7b')
 							.setTitle(`A skyblock profile with the username of "${playerName}" doesn\'t exist`)
@@ -70,7 +71,7 @@ class PlayerHandler {
 		}
 	}
 
-	static async createPlayer(message, playerName) {
+	static async createPlayer(interaction, playerName) {
 		let properName = playerName;
 		const uuid = await this.getUUID(playerName)
 			.then(response => {
@@ -80,7 +81,7 @@ class PlayerHandler {
 				throw error;
 			});
 		await this.getProfiles(uuid).then(profiles => {
-			this.cachedPlayers.set(playerName.toLowerCase(), new Player(message, properName, uuid, profiles));
+			this.cachedPlayers.set(playerName.toLowerCase(), new Player(interaction, properName, uuid, profiles));
 		}).catch(error => {
 			throw error;
 		});
@@ -100,8 +101,8 @@ class PlayerHandler {
 
 class Player {
 
-	constructor(message, playerName, uuid, data) {
-		this.message = message;
+	constructor(interaction, playerName, uuid, data) {
+		this.interaction = interaction;
 		this.playerName = playerName;
 		this.uuid = uuid
 		this.data = data;
@@ -315,7 +316,7 @@ class Player {
 		return this.bestProfile;
 	}
 
-	async sendWeight(message, profileName = null, detailed = false) {
+	async sendWeight(interaction, profileName = null) {
 		let userData = await this.getUserdata(profileName)
 
 		if (!userData) {
@@ -326,18 +327,11 @@ class Player {
 			.setFooter('Created by Kaeso#5346')
 			.setThumbnail(`https://mc-heads.net/head/${this.uuid}/left`)
 
-			message.reply({embeds: [embed]})
+			interaction.reply({embeds: [embed]})
 			return;
 		}
 
 		DataHandler.updatePlayer(this.uuid, this.playerName, this.profileuuid, this.weight + this.bonusWeight);
-
-		if (detailed) {
-			this.sendDetailedWeight(message, this.weight);
-			return;
-		}
-
-		const filter = i => i.customId === 'info' && i.user.id === message.author.id;
 		
 		const row = new Discord.MessageActionRow().addComponents(
 			new Discord.MessageButton()
@@ -347,165 +341,145 @@ class Player {
 			new Discord.MessageButton()
 				.setLabel('SkyCrypt')
 				.setStyle('LINK')
-				.setURL(`https://sky.shiiyu.moe/stats/${this.uuid}`)
+				.setURL(`https://sky.shiiyu.moe/stats/${this.playerName}/${this.profileData.cute_name}`),
+			new Discord.MessageButton()
+				.setLabel('Plancke')
+				.setStyle('LINK')
+				.setURL(`https://plancke.io/hypixel/player/stats/${this.playerName}`)
 		);
 		
-		if (this.attachment !== null) {
-			message.reply({
-				files: [this.attachment],
-				components: [row],
-				allowedMentions: { repliedUser: false }
-			}).then(sentEmbed => {
-				const collector = sentEmbed.createMessageComponentCollector({ componentType: 'BUTTON', time: 15000 });
+		let result = "Hey what's up?";
+		let rWeight = Math.round((this.weight + this.bonusWeight) * 100) / 100;
 
-				collector.on('collect', i => {
-					if (i.user.id === message.author.id) {
-						this.sendDetailedWeight(i, this.weight, true);
-						collector.stop();
-					} else {
-						i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
-					}
-				});
-
-				collector.on('end', collected => {
-					try {
-						sentEmbed.edit({ components: [], allowedMentions: { repliedUser: false } })
-					} catch (error) { console.log(error) }
-				});
-			}).catch(error => { console.log(error) });
+		if (rWeight > 1) {
+			result = rWeight.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+		} else if (rWeight === -1) {
+			result = 'This player has collections API off!';
 		} else {
-			let result = "Hey what's up?";
-			let rWeight = Math.round((this.weight + this.bonusWeight) * 100) / 100;
-
-			if (rWeight > 1) {
-				result = rWeight.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-			} else if (rWeight === -1) {
-				result = 'This player has collections API off!';
-			} else {
-				result = rWeight;
-			}
+			result = rWeight;
+		}
 
 
-			/*
-			The below code is not fun at all and just generally awful, but basically the only way to do all this so yeah.
+		/*
+		The below code is not fun at all and just generally awful, but basically the only way to do all this so yeah.
+
+		Different sections are commented but you sort of need to know what you're looking at already.
+		*/
+
+
+		//Get image relating to their top collection
+		let imagePath;
+		if (this.collections) {
+			const topCollection = new Map([...this.collections.entries()].sort((a, b) => b[1] - a[1])).entries().next().value[0];
+			imagePath = `./images/${topCollection.toLowerCase().replace(' ', '_')}.png`;
+		} else {
+			imagePath = `./images/wheat.png`
+		}
+
+		const { registerFont, createCanvas } = require('canvas');
+		registerFont('./fonts/OpenSans-Regular.ttf', { family: 'Open Sans' });
+		let attachment;
+
+		//Load crop image and avatar
+		const background = await Canvas.loadImage(imagePath)
+		const avatar = await Canvas.loadImage(`https://mc-heads.net/head/${this.uuid}/left`).catch(collected => {
+			avatar = null;
+		});
+
+		//Create our canvas and draw the crop image
+		const canvas = createCanvas(background.width, background.height);
+		const ctx = canvas.getContext('2d');
+
+		ctx.drawImage(background, 750, 0, canvas.width, canvas.height);
 	
-			Different sections are commented but you sort of need to know what you're looking at already.
-			*/
+		//Fill in the body and add green stripe
+		ctx.fillStyle = "#2f3136";
+		ctx.fillRect(0, 0, 1495, 400);
+		ctx.fillStyle = "#03fc7b";
+		ctx.fillRect(0, 0, 20, 400);
+	
+		//Add name and rank, then resize to fit
+		let name = this.playerName;
+		if (this.rank !== undefined && this.rank !== 0 && this.mainProfileuuid === this.profileuuid) {
+			name = (`${this.playerName} - #${this.rank}`);
+		}
 
+		ctx.font = '100px "Open Sans"';
+		let fontSize = 100;
+		do {
+			fontSize--;
+			ctx.font = fontSize + 'px ' + "Open Sans";
+		} while (ctx.measureText(name).width > canvas.width * 0.66);
 
-			//Get image relating to their top collection
-			let imagePath;
-			if (this.collections) {
-				const topCollection = new Map([...this.collections.entries()].sort((a, b) => b[1] - a[1])).entries().next().value[0];
-				imagePath = `./images/${topCollection.toLowerCase().replace(' ', '_')}.png`;
-			} else {
-				imagePath = `./images/wheat.png`
-			}
+		const metrics = ctx.measureText(name);
+		let fontHeight = metrics.emHeightAscent + metrics.emHeightDescent;
 
-			const { registerFont, createCanvas } = require('canvas');
-			registerFont('./fonts/OpenSans-Regular.ttf', { family: 'Open Sans' });
-			let attachment;
+		ctx.fillStyle = '#dddddd';
+		ctx.fillText(name, 55, 90 - (90 - fontHeight) / 2);
+		ctx.save();
 
-			//Load crop image and avatar
-			const background = await Canvas.loadImage(imagePath)
-			const avatar = await Canvas.loadImage(`https://mc-heads.net/head/${this.uuid}/left`).catch(collected => {
-				avatar = null;
+		//Add weight and label, then resize to fit
+		ctx.font = '256px "Open Sans"';
+		fontSize = 256;
+
+		do {
+			fontSize--;
+			ctx.font = fontSize + 'px ' + "Open Sans";
+		} while (ctx.measureText(result).width > canvas.width * 0.66);
+		let weightWidth = ctx.measureText(result).width;
+
+		ctx.fillStyle = '#dddddd';
+		ctx.fillText(result, 50, canvas.height * 0.9);
+
+		ctx.font = '64px "Open Sans"';
+		fontSize = 64;
+
+		do {
+			fontSize--;
+			ctx.font = fontSize + 'px ' + "Open Sans";
+		} while (ctx.measureText('Weight').width + weightWidth > canvas.width - 515);
+
+		ctx.fillStyle = '#dddddd';
+		ctx.fillText('Weight', weightWidth + 75, canvas.height * 0.9);
+		let mes = ctx.measureText('Weight');
+		ctx.fillText('Farming', weightWidth + 75, canvas.height * 0.9 - (mes.emHeightAscent + mes.emHeightDescent));
+
+		//Draw avatar
+		if (avatar) {
+			ctx.drawImage(avatar, canvas.width - (canvas.height * 0.8) - 50, (canvas.height - canvas.height * 0.8) / 2, canvas.height * 0.8, canvas.height * 0.8);
+			ctx.restore();
+		}
+	
+		// if (this.profileuuid === this.mainProfileuuid) {
+		attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'weight.png');
+		// }
+	
+		interaction.reply({
+			files: [attachment],
+			components: [row],
+			allowedMentions: { repliedUser: false }
+		}).then(async () => {
+			let reply = await interaction.fetchReply();
+			const collector = reply.createMessageComponentCollector({ componentType: 'BUTTON', time: 30000 });
+
+			collector.on('collect', i => {
+				if (i.user.id === interaction.user.id) {
+					this.sendDetailedWeight(i, this.weight, true);
+					collector.stop();
+				} else {
+					i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
+				}
 			});
 
-			//Create our canvas and draw the crop image
-			const canvas = createCanvas(background.width, background.height);
-			const ctx = canvas.getContext('2d');
-
-			ctx.drawImage(background, 750, 0, canvas.width, canvas.height);
-		
-			//Fill in the body and add green stripe
-			ctx.fillStyle = "#2f3136";
-			ctx.fillRect(0, 0, 1495, 400);
-			ctx.fillStyle = "#03fc7b";
-			ctx.fillRect(0, 0, 20, 400);
-		
-			//Add name and rank, then resize to fit
-			let name = this.playerName;
-			if (this.rank !== undefined && this.rank !== 0 && this.mainProfileuuid === this.profileuuid) {
-				name = (`${this.playerName} - #${this.rank}`);
-			}
-
-			ctx.font = '100px "Open Sans"';
-			let fontSize = 100;
-			do {
-				fontSize--;
-				ctx.font = fontSize + 'px ' + "Open Sans";
-			} while (ctx.measureText(name).width > canvas.width * 0.66);
-
-			const metrics = ctx.measureText(name);
-			let fontHeight = metrics.emHeightAscent + metrics.emHeightDescent;
-
-			ctx.fillStyle = '#dddddd';
-			ctx.fillText(name, 55, 90 - (90 - fontHeight) / 2);
-			ctx.save();
-
-			//Add weight and label, then resize to fit
-			ctx.font = '256px "Open Sans"';
-			fontSize = 256;
-
-			do {
-				fontSize--;
-				ctx.font = fontSize + 'px ' + "Open Sans";
-			} while (ctx.measureText(result).width > canvas.width * 0.66);
-			let weightWidth = ctx.measureText(result).width;
-
-			ctx.fillStyle = '#dddddd';
-			ctx.fillText(result, 50, canvas.height * 0.9);
-
-			ctx.font = '64px "Open Sans"';
-			fontSize = 64;
-
-			do {
-				fontSize--;
-				ctx.font = fontSize + 'px ' + "Open Sans";
-			} while (ctx.measureText('Weight').width + weightWidth > canvas.width - 515);
-
-			ctx.fillStyle = '#dddddd';
-			ctx.fillText('Weight', weightWidth + 75, canvas.height * 0.9);
-			let mes = ctx.measureText('Weight');
-			ctx.fillText('Farming', weightWidth + 75, canvas.height * 0.9 - (mes.emHeightAscent + mes.emHeightDescent));
-
-			//Draw avatar
-			if (avatar) {
-				ctx.drawImage(avatar, canvas.width - (canvas.height * 0.8) - 50, (canvas.height - canvas.height * 0.8) / 2, canvas.height * 0.8, canvas.height * 0.8);
-				ctx.restore();
-			}
-		
-			// if (this.profileuuid === this.mainProfileuuid) {
-			attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'weight.png');
-			// }
-		
-			message.reply({
-				files: [attachment],
-				components: [row],
-				allowedMentions: { repliedUser: false }
-			}).then(sentEmbed => {
-				const collector = sentEmbed.createMessageComponentCollector({ componentType: 'BUTTON', time: 15000 });
-
-				collector.on('collect', i => {
-					if (i.user.id === message.author.id) {
-						this.sendDetailedWeight(i, this.weight, true);
-						collector.stop();
-					} else {
-						i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
-					}
-				});
-
-				collector.on('end', collected => {
-					try {
-						sentEmbed.edit({ components: [], allowedMentions: { repliedUser: false } })
-					} catch (error) { console.log(error) }
-				});
-			}).catch(error => { console.log(error) });
-		}
+			collector.on('end', collected => {
+				try {
+					reply.edit({ components: [], allowedMentions: { repliedUser: false } })
+				} catch (error) { console.log(error) }
+			});
+		}).catch(error => { console.log(error) });
 	}
 
-	sendDetailedWeight(message, weight, edit = false) {
+	sendDetailedWeight(interaction, weight, edit = false) {
 		let result = "Hey what's up?";
 		weight = Math.round((weight + this.bonusWeight) * 100) / 100;
 
@@ -543,9 +517,19 @@ class Player {
 		}
 
 		if (!edit) {
-			message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+			interaction.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
 		} else {
-			message.update({ embeds: [embed], allowedMentions: { repliedUser: false }, files: [], components: [] });
+			const row = new Discord.MessageActionRow().addComponents(
+				new Discord.MessageButton()
+					.setLabel('SkyCrypt')
+					.setStyle('LINK')
+					.setURL(`https://sky.shiiyu.moe/stats/${this.playerName}/${this.profileData.cute_name}`),
+				new Discord.MessageButton()
+					.setLabel('Plancke')
+					.setStyle('LINK')
+					.setURL(`https://plancke.io/hypixel/player/stats/${this.playerName}`)
+			);
+			interaction.update({ embeds: [embed], allowedMentions: { repliedUser: false }, files: [], components: [row] });
 		}
 	}
 

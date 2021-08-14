@@ -7,25 +7,25 @@ module.exports = {
 	description: 'All commands',
 	usage: '[command name]',
 	guildOnly: false,
-	async execute(message, args) {
+	async execute(interaction) {
+
+		const options = interaction?.options?._hoistedOptions;
+		const hCommand = options[0]?.value;
+
 		const data = [];
-		const { commands } = message.client;
-		if (message.guild !== null) {
-			newPrefix = await DataHandler.getPrefix(message.guild.id).then(obj => { return (obj !== null) ? obj.dataValues.prefix : prefix});
-		} else {
-			newPrefix = prefix;
-		}
-		if (!args.length) {
+		const { commands } = interaction.client;
+		let newPrefix = '/';
+
+		if (!hCommand) {
 			helpMenu = getHelpEmbed();
-			return message.reply({ embeds: [helpMenu], allowedMentions: { repliedUser: false } });
-		}
-		if (args[0] !== undefined) {
-			const name = args[0].toLowerCase();
+			return interaction.reply({ embeds: [helpMenu], allowedMentions: { repliedUser: false } });
+		} else {
+			const name = hCommand.toLowerCase();
 			const command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
 
 			if (!command) {
 				let embed = getHelpEmbed()
-				return message.reply({ content: 'That\'s not a valid command! Here\'s the menu instead.', embeds: [embed], allowedMentions: { repliedUser: false }});
+				return interaction.reply({ content: 'That\'s not a valid command! Here\'s the menu instead.', embeds: [embed], allowedMentions: { repliedUser: false }});
 			}
 
 			let embed = new Discord.MessageEmbed()
@@ -45,7 +45,7 @@ module.exports = {
 				inline: false
 			})
 
-			return message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+			return interaction.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
 		}
 
 		function getHelpEmbed() {

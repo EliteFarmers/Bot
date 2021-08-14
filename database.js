@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const { Sequelize, Op } = require('sequelize');
-const { dbUri, prefix } = require('./config.json');
+const { dbUri } = require('./config.json');
 const fetch = require('node-fetch');
 const throttledQueue = require('throttled-queue');
 const throttle = throttledQueue(1, 60000);
@@ -8,21 +8,6 @@ const throttle = throttledQueue(1, 60000);
 const sequelize = new Sequelize(dbUri, {
     dialect: 'postgres',
     logging: false,
-});
-
-const Prefixes = sequelize.define('prefixes', {
-    guild: {
-        type: Sequelize.STRING,
-        unique: true,
-    },
-    prefix: {
-        type: Sequelize.STRING,
-        defaultValue: prefix,
-        allowNull: false,
-    }
-}, {
-    tableName: 'prefixes',
-    freezeTableName: true
 });
 
 const Users = sequelize.define('users', {
@@ -62,42 +47,14 @@ class DataHandler {
     }
 
     static async syncTables() {
-        await Prefixes.sync();
         await Users.sync();
 
         this.updateLeaderboard();
         //For wiping table
-        //Prefixes.sync({ force: true })
+        //Users.sync({ force: true })
     }
 
     static leaderboard;
-
-    //Validation should occur before calling
-    static async setPrefix(message, guildId, newPrefix) {
-        try {
-            const prefix = await this.getPrefix(guildId);
-            if (prefix) {
-                let updatedPrefix = await Prefixes.update({ prefix: newPrefix }, { where: { guild: guildId } });
-                return message.reply(`The prefix for this server has been set to \"${newPrefix}\"`);
-            } else {
-                const newerPrefix = await Prefixes.create({
-                    guild: guildId,
-                    prefix: newPrefix,
-                });
-                return message.reply(`The prefix for this server has been changed to \"${newPrefix}\"`);
-            }
-        } catch (e) {
-            if (e.name === 'SequelizeUniqueConstraintError') {
-                return message.reply('That prefix already exists.');
-            }
-            console.log(e);
-            return message.reply('Something went wrong with changing that prefix.');
-        }
-    }
-
-    static async getPrefix(guildId) {
-        return await Prefixes.findOne({ where: { guild: guildId } });
-    }
 
     static async getPlayer(playeruuid) {
         return await Users.findOne({ where: { uuid: playeruuid }});
