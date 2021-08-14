@@ -105,7 +105,7 @@ client.on('messageCreate', async message => {
 			}
 		];
 
-		const commands = await client.application?.commands.create(data);
+		const commands = await client.application?.commands.set(data);
 
 		// const guild = await client.guilds.fetch('602004419571220500');
 		// const commands = guild.commands;
