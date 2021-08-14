@@ -476,7 +476,7 @@ class Player {
 					reply.edit({ components: [], allowedMentions: { repliedUser: false } })
 				} catch (error) { console.log(error) }
 			});
-		}).catch(error => { console.log(error) });
+		}).catch(error => { /*console.log(error)*/ });
 	}
 
 	sendDetailedWeight(interaction, weight, edit = false) {

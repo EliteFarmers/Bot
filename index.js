@@ -1,10 +1,10 @@
 const fs = require('fs');
 const Discord = require('discord.js');
-const { token, adminid } = require('./config.json');
+const { token } = require('./config.json');
 const { Player, PlayerHandler } = require('./calc.js');
 const { DataHandler } = require('./database.js')
 
-const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.DIRECT_MESSAGES] });
+const client = new Discord.Client({ partials: ['CHANNEL'], intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.DIRECT_MESSAGES] });
 client.commands = new Discord.Collection();
 
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
@@ -56,65 +56,65 @@ client.on('interactionCreate', async (interaction) => {
 	}
 });
 
-client.on('messageCreate', async message => {
-	if (!client.application?.owner) await client.application?.fetch();
+// client.on('messageCreate', async message => {
+// 	if (!client.application?.owner) await client.application?.fetch();
 
-	if (message.content.toLowerCase() === '!deploy' && message.author.id === client.application?.owner.id) {
-		const data = [
-			{
-				name: 'weight',
-				description: 'Get a players farming weight!',
-				options: [
-					{
-						name: 'player',
-						type: 'STRING',
-						description: 'The player in question.',
-						required: true
-					},
-					{
-						name: 'profile',
-						type: 'STRING',
-						description: 'Optionally specify a profile!',
-						required: false
-					}
-				]
-			},
-			{
-				name: 'leaderboard',
-				description: 'Get the farming weight leaderboard!',
-				options: [{
-					name: 'player',
-					type: 'STRING',
-					description: 'Jump to a specific player!',
-					required: false
-				}]
-			}, 
-			{
-				name: 'help',
-				description: 'Get the help menu!',
-				options: [{
-					name: 'command',
-					type: 'STRING',
-					description: 'Specify a command for more info.',
-					required: false
-				}]
-			},
-			{
-				name: 'info',
-				description: 'Get bot information!'
-			}
-		];
+// 	if (message.content.toLowerCase() === '!deploy' && message.author.id === client.application?.owner.id) {
+// 		const data = [
+// 			{
+// 				name: 'weight',
+// 				description: 'Get a players farming weight!',
+// 				options: [
+// 					{
+// 						name: 'player',
+// 						type: 'STRING',
+// 						description: 'The player in question.',
+// 						required: true
+// 					},
+// 					{
+// 						name: 'profile',
+// 						type: 'STRING',
+// 						description: 'Optionally specify a profile!',
+// 						required: false
+// 					}
+// 				]
+// 			},
+// 			{
+// 				name: 'leaderboard',
+// 				description: 'Get the farming weight leaderboard!',
+// 				options: [{
+// 					name: 'player',
+// 					type: 'STRING',
+// 					description: 'Jump to a specific player!',
+// 					required: false
+// 				}]
+// 			}, 
+// 			{
+// 				name: 'help',
+// 				description: 'Get the help menu!',
+// 				options: [{
+// 					name: 'command',
+// 					type: 'STRING',
+// 					description: 'Specify a command for more info.',
+// 					required: false
+// 				}]
+// 			},
+// 			{
+// 				name: 'info',
+// 				description: 'Get bot information!'
+// 			}
+// 		];
 
-		const commands = await client.application?.commands.set(data);
+// 		const commands = await client.application?.commands.set(data);
 
-		// const guild = await client.guilds.fetch('602004419571220500');
-		// const commands = guild.commands;
-		// commands.set([]);
+// 		// const guild = await client.guilds.fetch('602004419571220500');
+// 		// const commands = guild.commands;
+// 		// commands.set([]);
 
-		//const commands = await client.application?.commands.set(data);
-		console.log(commands);
-	}
-});
+// 		//const commands = await client.application?.commands.set(data);
+// 		console.log(commands);
+// 	}
+// });
 
 var minutes = 15, interval = minutes * 60 * 1000;
 setInterval(function () {
