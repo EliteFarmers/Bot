@@ -11,8 +11,8 @@ module.exports = {
 	execute(interaction) {
 		const options = interaction?.options?._hoistedOptions;
 
-		const playerName = options[0]?.value;
-		const profileName = options[1]?.value;
+		const playerName = options[0]?.value.trim();
+		const profileName = options[1]?.value.trim();
 
 		if (playerName) {
 			const embed = new Discord.MessageEmbed()
