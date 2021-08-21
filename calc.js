@@ -187,8 +187,8 @@ class Player {
 
 				//Anita buff bonus
 				let anitaBuff = userData.jacob2.perks.double_drops ?? 0;
-				if (anitaBuff === 15) { //15 in API refers to 30 
-					bonus.set('Max Anita Buff', 30);
+				if (anitaBuff > 0) {
+					bonus.set(`${anitaBuff * 2} Anita Buff`, anitaBuff * 2);
 				}
 
 				//Calculate Amount of Gold medals won
