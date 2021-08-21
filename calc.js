@@ -146,17 +146,17 @@ class Player {
 		let { WHEAT, POTATO_ITEM, CARROT_ITEM, MUSHROOM_COLLECTION, PUMPKIN, MELON, SUGAR_CANE, CACTUS, NETHER_STALK } = userData.collection;
 		let COCOA = userData.collection["INK_SACK:3"]; //Dumb cocoa
 		
-		//Set potentially empty values to 0
-		if (!WHEAT) WHEAT = 0;
-		if (!PUMPKIN) PUMPKIN = 0;
-		if (!MUSHROOM_COLLECTION) MUSHROOM_COLLECTION = 0;
-		if (!CARROT_ITEM) CARROT_ITEM = 0;
-		if (!POTATO_ITEM) POTATO_ITEM = 0;
-		if (!MELON) MELON = 0;
-		if (!COCOA) COCOA = 0;
-		if (!CACTUS) CACTUS = 0;
-		if (!NETHER_STALK) NETHER_STALK = 0;
-		if (!SUGAR_CANE) SUGAR_CANE = 0;
+		//Set potentially empty values to 0, and fix overflow
+		if (!WHEAT) { WHEAT = 0; } else if (WHEAT < 0) { WHEAT += 4294967294; };
+		if (!PUMPKIN) { PUMPKIN = 0; } else if (PUMPKIN < 0) { PUMPKIN += 4294967294; };
+		if (!MUSHROOM_COLLECTION) { MUSHROOM_COLLECTION = 0; } else if (MUSHROOM_COLLECTION < 0) { MUSHROOM_COLLECTION += 4294967294; };
+		if (!CARROT_ITEM) { CARROT_ITEM = 0; } else if (CARROT_ITEM < 0) { CARROT_ITEM += 4294967294; };
+		if (!POTATO_ITEM) { POTATO_ITEM = 0; } else if (POTATO_ITEM < 0) { POTATO_ITEM += 4294967294; };
+		if (!MELON) { MELON = 0; } else if (MELON < 0) { MELON += 4294967294; };
+		if (!COCOA) { COCOA = 0; } else if (COCOA < 0) { COCOA += 4294967294; };
+		if (!CACTUS) { CACTUS = 0; } else if (CACTUS < 0) { CACTUS += 4294967294; };
+		if (!NETHER_STALK) { NETHER_STALK = 0; } else if (NETHER_STALK < 0) { NETHER_STALK += 4294967294; };
+		if (!SUGAR_CANE) { SUGAR_CANE = 0; } else if (SUGAR_CANE < 0) { SUGAR_CANE += 4294967294; };
 		
 		let collections = new Map();
 		
@@ -188,7 +188,7 @@ class Player {
 				//Anita buff bonus
 				let anitaBuff = userData.jacob2.perks.double_drops ?? 0;
 				if (anitaBuff > 0) {
-					bonus.set(`${anitaBuff * 2} Anita Buff`, anitaBuff * 2);
+					bonus.set(`${anitaBuff * 2}% Anita Buff`, anitaBuff * 2);
 				}
 
 				//Calculate Amount of Gold medals won
