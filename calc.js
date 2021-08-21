@@ -62,7 +62,7 @@ class PlayerHandler {
 						embeds: [new Discord.MessageEmbed()
 							.setColor('#03fc7b')
 							.setTitle(`A skyblock profile with the username of "${playerName}" doesn\'t exist`)
-							.setDescription('Or Hypixel\'s API is down')
+							.setDescription('Their API might also be turned off, or Hypixel\'s API is down')
 							.setFooter('Created by Kaeso#5346')],
 						allowedMentions: { repliedUser: true }
 					})
