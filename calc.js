@@ -383,7 +383,7 @@ class Player {
 		//Load crop image and avatar
 		const background = await Canvas.loadImage(imagePath)
 		const avatar = await Canvas.loadImage(`https://mc-heads.net/head/${this.uuid}/left`).catch(collected => {
-			avatar = null;
+			return null;
 		});
 
 		//Create our canvas and draw the crop image
@@ -476,7 +476,7 @@ class Player {
 					reply.edit({ components: [], allowedMentions: { repliedUser: false } })
 				} catch (error) { console.log(error) }
 			});
-		}).catch(error => { /*console.log(error)*/ });
+		}).catch(error => { console.log(error) });
 	}
 
 	sendDetailedWeight(interaction, weight, edit = false) {
