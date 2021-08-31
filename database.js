@@ -105,34 +105,38 @@ class DataHandler {
         return await Users.findAll({ limit: 1000, order: [['weight', 'DESC']] })
     }
 
-    static async getLeaderboardEmbed(from = 0, playerName = null) {
+    static async getLeaderboardEmbed(from = 0, playerName = null, firstCall = false) {
         let startIndex = from;
         let foundPlayer = false;
         const leaderboard = this.leaderboard;
-
-        if (playerName !== null) {
-            const user = await this.getPlayerByName(playerName).catch(() => { return undefined; });
-
-            if (user) {
-                foundPlayer = true;
-                startIndex = user.dataValues.rank - 1;
-            } else {
-                startIndex = 0;
-            }
-        }
 
         const embed = new Discord.MessageEmbed()
             .setColor('#03fc7b')
             .setTitle(`Farming Weight Leaderboard`)
             .setDescription('**Note:** Not many players are currently on the leaderboard.')
             .setFooter('Created by Kaeso#5346    Run the weight command to update/add players');
-        
+
+        if (playerName !== null) {
+            const user = await this.getPlayerByName(playerName).catch(() => { return undefined; });
+
+            if (user) {
+                foundPlayer = true;
+                startIndex = (firstCall) ? user.dataValues.rank - 1 : startIndex;
+                const weightFormatted = (user.dataValues.weight / 100).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+                embed.setDescription(`**${user.dataValues.ign}** is rank **#${user.dataValues.rank}** with **${weightFormatted}** weight`)
+            } else {
+                startIndex = 0;
+            }
+        }
+
         const maxIndex = Math.floor((leaderboard.length - 1) / 10) * 10;
 
         startIndex = Math.floor(startIndex / 10) * 10;
         if (startIndex > maxIndex) {
             startIndex = maxIndex;
         }
+
+        let topMessage = '';
         
         for (let i = startIndex; i < startIndex + 10; i++) {
             if (leaderboard[i] === undefined) {
@@ -143,10 +147,6 @@ class DataHandler {
             const isHighlightedPlayer = (foundPlayer && (playerName.toLowerCase() === player.ign.toLowerCase()));
             const weightFormatted = (player.weight / 100).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 
-            if (isHighlightedPlayer) {
-                embed.setDescription(`**${player.ign}** is rank **#${i + 1}** with **${weightFormatted}** weight`);
-            }
-               
             embed.fields.push({
                 name: `#${i + 1} – ${player.ign.replace(/\_/g, '\\_')}`,
                 value: `[🔗](https://sky.shiiyu.moe/stats/${player.uuid}) ${weightFormatted} ${(isHighlightedPlayer) ? '⭐' : ' '}`,
@@ -161,6 +161,7 @@ class DataHandler {
                 });
             }
         }
+
         return embed;
     }
 }

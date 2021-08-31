@@ -11,7 +11,7 @@ module.exports = {
     async execute(interaction) {
         const options = interaction?.options?._hoistedOptions;
 
-		const playerName = options[0]?.value;
+		const playerName = options[0]?.value ?? null;
         let givenIndex = 0;
 
         if (playerName !== null) {
@@ -26,7 +26,7 @@ module.exports = {
         let index = Math.floor(givenIndex / 10) * 10;
         const maxIndex = Math.floor((leaderboardLength - 1) / 10) * 10;
 
-        let embed = await DataHandler.getLeaderboardEmbed(givenIndex, playerName);
+        let embed = await DataHandler.getLeaderboardEmbed(givenIndex, playerName, true);
 
         if (leaderboardLength <= 10) {
             interaction.reply({ embeds: [embed] });
@@ -79,7 +79,7 @@ module.exports = {
                         }
                     }
     
-                    embed = await DataHandler.getLeaderboardEmbed(index).then(embed => {
+                    embed = await DataHandler.getLeaderboardEmbed(index, playerName).then(embed => {
                         const newRow = new Discord.MessageActionRow()
                         .addComponents(
                             new Discord.MessageButton()
@@ -112,7 +112,7 @@ module.exports = {
             });
     
             collector.on('end', async collected => {
-                await DataHandler.getLeaderboardEmbed(index).then(embed => { 
+                await DataHandler.getLeaderboardEmbed(index, playerName).then(embed => { 
                     interaction.editReply({ embeds: [embed], components: [] })
                 }).catch(error => {
                     console.log(error);
