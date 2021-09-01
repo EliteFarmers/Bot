@@ -107,7 +107,7 @@ module.exports = {
                         i.update({ embeds: [embed], components: [newRow] }).catch(error => { console.log(error) });;
                     });
                 } else {
-                    i.update({ content: `These buttons aren't for you!`, ephemeral: true });
+                    i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
                 }
             });
     

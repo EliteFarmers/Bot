@@ -58,7 +58,7 @@ class PlayerHandler {
 				}).catch((error) => {
 					console.log(error);
 					PlayerHandler.cachedPlayers.delete(playerName.toLowerCase());
-					interaction.reply({
+					interaction.editReply({
 						embeds: [new Discord.MessageEmbed()
 							.setColor('#03fc7b')
 							.setTitle(`A skyblock profile with the username of "${playerName}" doesn\'t exist`)
@@ -78,11 +78,13 @@ class PlayerHandler {
 				properName = response.name;
 				return response.id;
 			}).catch(error => {
+				console.log(error);
 				throw error;
 			});
 		await this.getProfiles(uuid).then(profiles => {
 			this.cachedPlayers.set(playerName.toLowerCase(), new Player(interaction, properName, uuid, profiles));
 		}).catch(error => {
+			console.log(error);
 			throw error;
 		});
 	}
@@ -327,7 +329,7 @@ class Player {
 			.setFooter('Created by Kaeso#5346')
 			.setThumbnail(`https://mc-heads.net/head/${this.uuid}/left`)
 
-			interaction.reply({embeds: [embed]})
+			interaction.editReply({embeds: [embed]})
 			return;
 		}
 
@@ -383,6 +385,7 @@ class Player {
 		//Load crop image and avatar
 		const background = await Canvas.loadImage(imagePath)
 		const avatar = await Canvas.loadImage(`https://mc-heads.net/head/${this.uuid}/left`).catch(collected => {
+			console.log("Couldn't load image")
 			return null;
 		});
 
@@ -454,7 +457,7 @@ class Player {
 		attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'weight.png');
 		// }
 	
-		interaction.reply({
+		interaction.editReply({
 			files: [attachment],
 			components: [row],
 			allowedMentions: { repliedUser: false }
@@ -517,7 +520,7 @@ class Player {
 		}
 
 		if (!edit) {
-			interaction.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+			interaction.editReply({ embeds: [embed], allowedMentions: { repliedUser: false } });
 		} else {
 			const row = new Discord.MessageActionRow().addComponents(
 				new Discord.MessageButton()

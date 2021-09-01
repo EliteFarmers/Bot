@@ -15,11 +15,7 @@ module.exports = {
 		const profileName = options[1]?.value.trim();
 
 		if (playerName) {
-			const embed = new Discord.MessageEmbed()
-			.setColor('#03fc7b')
-			.setTitle(`Calculating weight for ${playerName}...`)
-			.setFooter('Created by Kaeso#5346');
-
+			interaction.deferReply();
 			PlayerHandler.getWeight(interaction, playerName, profileName ?? null);
 		}
 	}

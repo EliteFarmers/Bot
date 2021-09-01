@@ -1,11 +1,12 @@
 {
   "dependencies": {
     "canvas": "^2.8.0",
-    "discord.js": "^13.0.0-dev.4714a961b87746b0f85214c756614d276666f285",
+    "discord.js": "^13.2.0-dev.1628899443.615afab",
     "https": "^1.0.0",
     "i": "^0.3.6",
     "node-fetch": "^2.6.1",
     "npm": "^7.14.0",
+    "nvm": "0.0.4",
     "pg": "^8.6.0",
     "sequelize": "^6.6.2",
     "throttled-queue": "^1.0.7"
