@@ -472,7 +472,17 @@ class Player {
 
 			collector.on('end', collected => {
 				try {
-					reply.edit({ components: [], allowedMentions: { repliedUser: false } })
+					const linkRow = new Discord.MessageActionRow().addComponents(
+						new Discord.MessageButton()
+							.setLabel('SkyCrypt')
+							.setStyle('LINK')
+							.setURL(`https://sky.shiiyu.moe/stats/${this.playerName}/${this.profileData.cute_name}`),
+						new Discord.MessageButton()
+							.setLabel('Plancke')
+							.setStyle('LINK')
+							.setURL(`https://plancke.io/hypixel/player/stats/${this.playerName}`)
+					);
+					reply.edit({ components: [linkRow], allowedMentions: { repliedUser: false } })
 				} catch (error) { console.log(error) }
 			});
 		}).catch(error => { console.log(error) });
