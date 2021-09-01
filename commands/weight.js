@@ -8,14 +8,14 @@ module.exports = {
 	usage: '[username] (profile name)',
 	guildOnly: false,
 	dmOnly: false,
-	execute(interaction) {
+	async execute(interaction) {
 		const options = interaction?.options?._hoistedOptions;
 
 		const playerName = options[0]?.value.trim();
 		const profileName = options[1]?.value.trim();
 
 		if (playerName) {
-			interaction.deferReply();
+			await interaction.deferReply();
 			PlayerHandler.getWeight(interaction, playerName, profileName ?? null);
 		}
 	}
