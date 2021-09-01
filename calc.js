@@ -78,8 +78,10 @@ class PlayerHandler {
 				properName = response.name;
 				return response.id;
 			}).catch(error => {
-				console.log(error);
-				throw error;
+				if (typeof error !== fetch.FetchError) {
+					console.log(error);
+					throw error;
+				}
 			});
 		await this.getProfiles(uuid).then(profiles => {
 			this.cachedPlayers.set(playerName.toLowerCase(), new Player(interaction, properName, uuid, profiles));
@@ -393,13 +395,7 @@ class Player {
 		const canvas = createCanvas(background.width, background.height);
 		const ctx = canvas.getContext('2d');
 
-		ctx.drawImage(background, 750, 0, canvas.width, canvas.height);
-	
-		//Fill in the body and add green stripe
-		ctx.fillStyle = "#2f3136";
-		ctx.fillRect(0, 0, 1495, 400);
-		ctx.fillStyle = "#03fc7b";
-		ctx.fillRect(0, 0, 20, 400);
+		ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 	
 		//Add name and rank, then resize to fit
 		let name = this.playerName;
