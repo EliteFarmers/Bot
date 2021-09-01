@@ -327,7 +327,7 @@ class Player {
 			const embed = new Discord.MessageEmbed()
 			.setColor('#03fc7b')
 			.setTitle(`Stats for ${this.playerName}`)
-			.addField('Farming Weight', 'Zero! - Try some farming!')
+			.addField('Farming Weight', 'Zero! - Try some farming!\nOr turn on API access and help make Skyblock a better place.')
 			.setFooter('Created by Kaeso#5346')
 			.setThumbnail(`https://mc-heads.net/head/${this.uuid}/left`)
 
