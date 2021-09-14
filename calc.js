@@ -311,9 +311,10 @@ class Player {
 		this.collections = bestData[2];
 		this.bonus = bestData[3];
 		this.bestProfile = bestData[4];
+		this.profileuuid = this.profileData.profile_id;
 
 		if (best) {
-			this.mainProfileuuid = this.bestProfile.uuid;
+			this.mainProfileuuid = this.bestProfile.profile_id;
 		}
 
 		this.userData = this.bestProfile;
@@ -526,7 +527,9 @@ class Player {
 		}
 
 		if (!edit) {
-			interaction.editReply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+			interaction.editReply({ embeds: [embed], allowedMentions: { repliedUser: false } }).catch(error => {
+				console.log(error);
+			});
 		} else {
 			const row = new Discord.MessageActionRow().addComponents(
 				new Discord.MessageButton()

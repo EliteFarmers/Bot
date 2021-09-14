@@ -71,6 +71,9 @@ class DataHandler {
             const user = await this.getPlayer(playeruuid);
             if (user) {
                 if (user.dataValues.weight > newWeight && user.dataValues.profile !== profileuuid) {
+                    if (user.dataValues.profile === null) {
+                        let updatedUser = await Users.update({ name: playerName, profile: profileuuid }, { where: { uuid: playeruuid } });
+                    }
                     return;
                 }
                 let updatedUser = await Users.update({ weight: newWeight, name: playerName, profile: profileuuid }, { where: { uuid: playeruuid } });
