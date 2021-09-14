@@ -172,7 +172,7 @@ class Player {
 		collections.set('Melon', Math.round(MELON * 1.41089 / 5000) / 100);
 		collections.set('Mushroom', Math.round(MUSHROOM_COLLECTION * 1.20763 / 664) / 100);
 		collections.set('Cocoa', Math.round(COCOA * 1.36581 / 3000) / 100);
-		collections.set('Cactus', Math.round(CACTUS * 1.25551 / 1000) / 100);
+		collections.set('Cactus', Math.round(CACTUS * 1.25551 / 2000) / 100);
 		collections.set('Sugar Cane', Math.round(SUGAR_CANE / 2000) / 100);
 		collections.set('Nether Wart', Math.round(NETHER_STALK / 2500) / 100);
 		

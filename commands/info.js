@@ -58,7 +58,7 @@ Pumpkin: 71,000
 Melon: 355,000
 Mushroom: 55,000
 Cocoa Beans: 220,000
-Cactus: 79,000
+Cactus: 158,000
 
 The last 5 crops have a different calculation in order to equalize their tools with mathematical hoes provided by Bankhier (Only rounded number shown)
 
