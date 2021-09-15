@@ -313,10 +313,6 @@ class Player {
 		this.bestProfile = bestData[4];
 		this.profileuuid = this.profileData.profile_id;
 
-		if (best) {
-			this.mainProfileuuid = this.bestProfile.profile_id;
-		}
-
 		this.userData = this.bestProfile;
 		return this.bestProfile;
 	}
