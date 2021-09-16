@@ -456,11 +456,14 @@ class Player {
 			allowedMentions: { repliedUser: false }
 		}).then(async () => {
 			let reply = await interaction.fetchReply();
+			let infoClicked = false;
+
 			const collector = reply.createMessageComponentCollector({ componentType: 'BUTTON', time: 30000 });
 
 			collector.on('collect', i => {
 				if (i.user.id === interaction.user.id) {
 					this.sendDetailedWeight(i, this.weight, true);
+					infoClicked = true;
 					collector.stop();
 				} else {
 					i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
@@ -468,6 +471,7 @@ class Player {
 			});
 
 			collector.on('end', collected => {
+				if (infoClicked) return;
 				try {
 					const linkRow = new Discord.MessageActionRow().addComponents(
 						new Discord.MessageButton()
