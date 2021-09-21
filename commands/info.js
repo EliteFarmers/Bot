@@ -37,10 +37,12 @@ module.exports = {
 			allowedMentions: { repliedUser: false }
 		}).then(async () => {
 			let reply = await interaction.fetchReply();
-			const collector = reply.createMessageComponentCollector({ componentType: 'BUTTON', time: 60000 });
+			const collector = reply.createMessageComponentCollector({ componentType: 'BUTTON', time: 30000 });
 
 			collector.on('collect', i => {
 				if (i.user.id === interaction.user.id) {
+					collector.resetTimer({time: 15000});
+
 					let newEmbed = new Discord.MessageEmbed()
 						.setColor('#03fc7b')
 						.setFooter('Created by Kaeso#5346');

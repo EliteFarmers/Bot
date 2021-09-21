@@ -59,10 +59,12 @@ module.exports = {
 
         let sentMessage = await interaction.reply({ embeds: [embed], components: [row] }).then(async () => {
             const reply = await interaction.fetchReply();
-            const collector = reply.createMessageComponentCollector({ componentType: 'BUTTON', time: 15000 });
+            const collector = reply.createMessageComponentCollector({ componentType: 'BUTTON', time: 30000 });
     
             collector.on('collect', async i => {
                 if (i.user.id === interaction.user.id) {
+                    collector.resetTimer({time: 15000});
+
                     if (i.customId === 'first') {
                         index = 0;
                     } else if (i.customId === 'back') {
