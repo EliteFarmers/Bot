@@ -506,7 +506,7 @@ class Player {
 			.setTitle(`Stats for ${this.playerName} on ${this.profileData.cute_name}`)
 			.addField('Farming Weight', !result ? '0 - Try some farming!' : result)
 			.addField('Breakdown', this.getBreakdown(weight - this.bonusWeight), edit)
-			.setFooter('Created by Kaeso#5346');
+			.setFooter('Created by Kaeso#5346    Questions? Use /info');
 		
 		if (!edit) {
 			embed.setThumbnail(`https://mc-heads.net/head/${this.uuid}/left`)
