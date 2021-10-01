@@ -216,7 +216,7 @@ class Player {
 						}
 					}
 				}
-				if (earnedGolds > 1000) {
+				if (earnedGolds >= 1000) {
 					bonus.set('1,000 Gold Medals', 500);
 				} else {
 					let roundDown = Math.floor(earnedGolds / 50) * 50;
