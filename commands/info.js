@@ -80,7 +80,7 @@ If you have suggestions for tweaking these numbers contact me with your reason.
 							.addField('Explanation', `
 Well, it's complicated.
 
-Farming xp is rewarded to players along with item drops. Counting xp in a similar fashion would only buff everything excluding netherwart, while not really adding anything informative to the cacluation. While there are people with incredible amounts of farming xp which shows great dedication and effort in the ways of farming, the issuses are too hard to ignore. Consider this my official apology to people with obscene amounts of farming xp and the dreaded co op bug.
+Farming xp is rewarded to players along with item drops. Counting xp in a similar fashion would only buff everything excluding netherwart, while not really adding anything informative to the calcuation. While there are people with incredible amounts of farming xp which shows great dedication and effort in the ways of farming, the issuses are too hard to ignore. Consider this my official apology to people with obscene amounts of farming xp and the dreaded co op bug.
 
 For now, reaching 55m xp (lvl 50) rewards you with 100 weight, with 150 more after you unlock farming 60.\n
 									`)
