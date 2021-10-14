@@ -197,6 +197,7 @@ const slashCommandsData = [
 if (args[0] === 'deploy') {
 	if (args[1] === 'global') {
 		setTimeout(async function() {
+			await client.application?.commands.set([]);
 			await client.application?.commands.set(slashCommandsData);
 			console.log('Probably updated slash commands globally');
 		}, 5000);
