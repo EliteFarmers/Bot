@@ -3,6 +3,7 @@ const Discord = require('discord.js');
 const { token } = require('./config.json');
 const { Player, PlayerHandler } = require('./calc.js');
 const { DataHandler } = require('./database.js')
+const args = process.argv.slice(2);
 
 const client = new Discord.Client({ partials: ['CHANNEL'], intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.DIRECT_MESSAGES] });
 client.commands = new Discord.Collection();
@@ -127,3 +128,78 @@ setInterval(function () {
  
 
 client.login(token);
+
+/*
+*  ===================================================================
+*	Command arguments on startup of script to do one-time operations
+*
+*		"deploy global" 	 - updates slash commands globally
+*		"deploy <server id>" - updates slash commands in that server
+*		Append "clear" to remove slash commands from a server
+*  ===================================================================
+*/
+
+const slashCommandsData = [
+	{
+		name: 'weight',
+		description: 'Get a players farming weight!',
+		options: [
+			{
+				name: 'player',
+				type: 'STRING',
+				description: 'The player in question.',
+				required: true
+			},
+			{
+				name: 'profile',
+				type: 'STRING',
+				description: 'Optionally specify a profile!',
+				required: false
+			}
+		]
+	},
+	{
+		name: 'leaderboard',
+		description: 'Get the farming weight leaderboard!',
+		options: [{
+			name: 'player',
+			type: 'STRING',
+			description: 'Jump to a specific player!',
+			required: false
+		}]
+	}, 
+	{
+		name: 'help',
+		description: 'Get the help menu!',
+		options: [{
+			name: 'command',
+			type: 'STRING',
+			description: 'Specify a command for more info.',
+			required: false
+		}]
+	},
+	{
+		name: 'info',
+		description: 'Get bot information!'
+	}
+];
+
+if (args[0] === 'deploy') {
+	if (args[1] === 'global') {
+		setTimeout(async function() {
+			await client.application?.commands.set(slashCommandsData);
+			console.log('Probably updated slash commands globally');
+		}, 5000);
+	} else if (args[1]) {
+		setTimeout(async function() {
+			const guild = await client.guilds.fetch('' + args[1]);
+			const commands = guild.commands;
+			if (args[2] !== 'clear') {
+				commands.set(slashCommandsData);
+			} else {
+				commands.set([]);
+			}
+			console.log('Probably updated slash commands on that server');
+		}, 5000);
+	}
+}
