@@ -26,12 +26,19 @@ class DataHandler {
 
     static leaderboard;
 
-    static async getPlayer(playeruuid) {
-        return await Users.findOne({ where: { uuid: playeruuid }});
+    static async getPlayer(playeruuid, where = null) {
+        if (!where) {
+            where = { uuid: playeruuid };
+        }
+        return await Users.findOne({ where: where });
     }
 
     static async getPlayerByName(name) {
         return await Users.findOne({ where: { ign: { [Op.iLike]: '%' + name } } });
+    }
+
+    static async update(changes, where) {
+        return await Users.update(changes, { where: where });
     }
 
     static async updatePlayer(playeruuid, playerName, profileuuid, nWeight) {

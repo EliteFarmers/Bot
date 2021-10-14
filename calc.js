@@ -48,6 +48,44 @@ class PlayerHandler {
 			return await response;
 	}
 
+	static async getOverview(uuid) {
+		const response = await fetch(`https://api.hypixel.net/player?uuid=${uuid}&key=${hypixelApiKey}`)
+			.then(async respon => {
+				return await respon.json();
+			})
+			.then(result => {
+				if (result.success === true) {
+					return result;
+				} else {
+					throw new Error(result.error);
+				}
+			})
+			.catch(error => {
+				throw error;
+			});
+			return await response;
+	}
+
+	//WORK ON THIS
+	static async getDiscord(uuid) {
+		return new Promise((resolve, reject) => {
+			throttle(async function() {
+				await PlayerHandler.getOverview(uuid).then(data => {
+					if (!data.success) { return null; }
+					let discord = data?.player?.socialMedia?.links?.DISCORD;
+					if (discord) {
+						resolve(discord);
+					} else {
+						resolve(undefined);
+					}
+				}).catch(error => {
+					console.log(error);
+					resolve(undefined);
+				});
+			});
+		});
+	}
+
 	static async getWeight(interaction, playerName, profileName = null) {
 		if (this.cachedPlayers.has(playerName.toLowerCase())) {
 			this.cachedPlayers.get(playerName.toLowerCase()).sendWeight(interaction, profileName);

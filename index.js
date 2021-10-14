@@ -148,7 +148,7 @@ const slashCommandsData = [
 				name: 'player',
 				type: 'STRING',
 				description: 'The player in question.',
-				required: true
+				required: false
 			},
 			{
 				name: 'profile',
@@ -181,7 +181,17 @@ const slashCommandsData = [
 	{
 		name: 'info',
 		description: 'Get bot information!'
-	}
+	},
+	{
+		name: 'verify',
+		description: 'Link your Minecraft account!',
+		options: [{
+			name: 'player',
+			type: 'STRING',
+			description: 'Your minecraft account name.',
+			required: true
+		}]
+	},
 ];
 
 if (args[0] === 'deploy') {
