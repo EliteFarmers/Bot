@@ -37,7 +37,6 @@ module.exports = {
 				interaction.editReply({embeds: [embed]});
 				return;
 			}
-			console.log(discordTag);
 
 			let userTag = interaction.user.username + '#' + interaction.user.discriminator;
 			if (userTag !== discordTag) {
