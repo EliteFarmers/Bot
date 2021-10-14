@@ -35,9 +35,6 @@ module.exports = (sequelize, DataTypes) => {
     profiledata: {
         type: DataTypes.JSON
     },
-    cheatingdata: {
-        type: DataTypes.JSON
-    },
     styledata: {
         type: DataTypes.JSON
     }
