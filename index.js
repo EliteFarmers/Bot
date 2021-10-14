@@ -57,66 +57,6 @@ client.on('interactionCreate', async (interaction) => {
 	}
 });
 
-// client.on('messageCreate', async message => {
-// 	if (!client.application?.owner) await client.application?.fetch();
-
-// 	if (message.content.toLowerCase() === '!deploy' && message.author.id === client.application?.owner.id) {
-// 		const data = [
-// 			{
-// 				name: 'weight',
-// 				description: 'Get a players farming weight!',
-// 				options: [
-// 					{
-// 						name: 'player',
-// 						type: 'STRING',
-// 						description: 'The player in question.',
-// 						required: true
-// 					},
-// 					{
-// 						name: 'profile',
-// 						type: 'STRING',
-// 						description: 'Optionally specify a profile!',
-// 						required: false
-// 					}
-// 				]
-// 			},
-// 			{
-// 				name: 'leaderboard',
-// 				description: 'Get the farming weight leaderboard!',
-// 				options: [{
-// 					name: 'player',
-// 					type: 'STRING',
-// 					description: 'Jump to a specific player!',
-// 					required: false
-// 				}]
-// 			}, 
-// 			{
-// 				name: 'help',
-// 				description: 'Get the help menu!',
-// 				options: [{
-// 					name: 'command',
-// 					type: 'STRING',
-// 					description: 'Specify a command for more info.',
-// 					required: false
-// 				}]
-// 			},
-// 			{
-// 				name: 'info',
-// 				description: 'Get bot information!'
-// 			}
-// 		];
-
-// 		const commands = await client.application?.commands.set(data);
-
-// 		// const guild = await client.guilds.fetch('602004419571220500');
-// 		// const commands = guild.commands;
-// 		// commands.set([]);
-
-// 		//const commands = await client.application?.commands.set(data);
-// 		console.log(commands);
-// 	}
-// });
-
 var minutes = 15, interval = minutes * 60 * 1000;
 setInterval(function () {
 	PlayerHandler.clearCache(minutes);
