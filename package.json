@@ -4,11 +4,13 @@
     "discord.js": "^13.2.0-dev.1628899443.615afab",
     "https": "^1.0.0",
     "i": "^0.3.6",
+    "mysql2": "^2.3.0",
     "node-fetch": "^2.6.1",
     "npm": "^7.14.0",
     "nvm": "0.0.4",
     "pg": "^8.6.0",
-    "sequelize": "^6.6.2",
+    "sequelize": "^6.7.0",
+    "sequelize-cli": "^5.0.0",
     "throttled-queue": "^1.0.7"
   }
 }

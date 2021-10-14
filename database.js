@@ -5,40 +5,10 @@ const fetch = require('node-fetch');
 const throttledQueue = require('throttled-queue');
 const throttle = throttledQueue(1, 60000);
 
-const sequelize = new Sequelize(dbUri, {
+const Users = require('./models/users.js')(new Sequelize(dbUri, {
     dialect: 'postgres',
     logging: false,
-});
-
-const Users = sequelize.define('users', {
-    uuid: {
-        type: Sequelize.STRING,
-        unique: true
-    },
-    ign: {
-        type: Sequelize.STRING
-    },
-    rank: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0
-    },
-    profile: {
-        type: Sequelize.STRING
-    },
-    weight: {
-        type: Sequelize.INTEGER
-    }
-}, {
-    tableName: 'users',
-    freezeTableName: true,
-    indexes: [
-        {
-            name: "weight_index",
-            using: 'BTREE',
-            fields: ['weight']
-        }
-    ]
-});
+}), Sequelize);
 
 class DataHandler {
 
