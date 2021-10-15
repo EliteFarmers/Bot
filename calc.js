@@ -121,12 +121,78 @@ class PlayerHandler {
 					throw error;
 				}
 			});
-		await this.getProfiles(uuid).then(profiles => {
-			this.cachedPlayers.set(playerName.toLowerCase(), new Player(interaction, properName, uuid, profiles));
+		await this.getProfiles(uuid).then(async profiles => {
+			let stripped = await this.stripData(profiles, uuid);
+			this.cachedPlayers.set(playerName.toLowerCase(), new Player(interaction, properName, uuid, stripped));
 		}).catch(error => {
 			console.log(error);
 			throw error;
 		});
+	}
+
+	static async saveData(player) {
+		const user = await DataHandler.getPlayer(player.uuid);
+		if (user?.dataValues?.profiledata) {
+			let oldData = user.dataValues.profiledata;
+			oldData.data = player.data;
+
+			const jsonData = JSON.stringify(oldData);
+			return await DataHandler.update({ profiledata: jsonData }, { uuid: player.uuid });
+		}
+		const data = {
+			data: player.data,
+			cheating: {
+				cheating: false,
+				evidence: null
+			}
+		};
+		const jsonData = JSON.stringify(data);
+		return await DataHandler.update({ profiledata: jsonData }, { uuid: player.uuid });
+	}
+
+	static async stripData(data, uuid) {
+		let stripped = {
+			success: data.success,
+			profiles: []
+		}
+
+		for (let i = 0; i < Object.keys(data.profiles).length; i++) {
+			let key = Object.keys(data.profiles)[i];
+			let profile = data.profiles[key];
+			let user = profile.members[uuid];
+
+			let addedProfile = {
+				profile_id: profile.profile_id,
+				cute_name: profile.cute_name,
+				members: {}
+			}
+			if (Object.keys(profile.members).length > 1) {
+				addedProfile.members = {
+					[uuid]: {
+						experience_skill_farming: user.experience_skill_farming,
+						collection: user.collection,
+						crafted_generators: user.crafted_generators,
+						jacob2: user.jacob2
+					},
+					lamecoop: {
+						sad: null
+					}
+				}
+			} else {
+				addedProfile.members = {
+					[uuid]: {
+						experience_skill_farming: user.experience_skill_farming,
+						collection: user.collection,
+						crafted_generators: user.crafted_generators,
+						jacob2: user.jacob2
+					}
+				}
+			}
+
+			stripped.profiles.push(addedProfile);
+		}
+
+		return stripped;
 	}
 
 	static clearCache(minutes) {
@@ -164,6 +230,8 @@ class Player {
 		this.rank;
 
 		this.timestamp = Date.now();
+
+		PlayerHandler.saveData(this);
 	}
 
 	async getWeight(userData) {
