@@ -146,7 +146,7 @@ class Player {
 	constructor(interaction, playerName, uuid, data) {
 		this.interaction = interaction;
 		this.playerName = playerName;
-		this.uuid = uuid
+		this.uuid = uuid;
 		this.data = data;
 
 		this.bestProfile;
