@@ -133,11 +133,12 @@ class PlayerHandler {
 	static async saveData(player) {
 		const user = await DataHandler.getPlayer(player.uuid);
 		if (user?.dataValues?.profiledata) {
-			let oldData = user.dataValues.profiledata;
-			oldData.data = player.data;
+			try {
+				let oldData = user.dataValues.profiledata;
+				oldData.data = player.data;
 
-			const jsonData = JSON.stringify(oldData);
-			return await DataHandler.update({ profiledata: jsonData }, { uuid: player.uuid });
+				return await DataHandler.update({ profiledata: oldData }, { uuid: player.uuid });
+			} catch (e) {}
 		}
 		const data = {
 			data: player.data,
@@ -146,8 +147,7 @@ class PlayerHandler {
 				evidence: null
 			}
 		};
-		const jsonData = JSON.stringify(data);
-		return await DataHandler.update({ profiledata: jsonData }, { uuid: player.uuid });
+		return await DataHandler.update({ profiledata: data }, { uuid: player.uuid });
 	}
 
 	static async stripData(data, uuid) {
