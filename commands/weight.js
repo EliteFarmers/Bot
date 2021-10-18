@@ -25,7 +25,7 @@ module.exports = {
 		}
 
 		await interaction.deferReply();
-		if (playerName) {
+		if (playerName && false) {
 			PlayerHandler.getWeight(interaction, playerName, profileName ?? null);
 		} else {
 			let user = await DataHandler.getPlayer(null, { discordid: interaction.user.id });
@@ -35,7 +35,8 @@ module.exports = {
 				const embed = new Discord.MessageEmbed()
 					.setColor('#03fc7b')
 					.setTitle('Error: Specify a Username!')
-					.setDescription('Checking for yourself? You must use \`/verify (account name)\` before using this shortcut!')
+					.addField('Proper Usage:', '`/weight` `player:`(player name)')
+					.setDescription('Checking for yourself?\nYou must use \`/verify (account name)\` before using this shortcut!')
 					.setFooter('Created by Kaeso#5346');
 				interaction.editReply({ embeds: [embed] })
 			}
