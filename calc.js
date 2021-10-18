@@ -86,6 +86,15 @@ class PlayerHandler {
 		});
 	}
 
+	static async tryAgain(interaction, playerName, profileName = null) {
+		const user = await DataHandler.getPlayerByName(playerName.toLowerCase());
+		if (user?.dataValues?.profiledata && user?.dataValues?.ign && user?.dataValues?.uuid) {
+			PlayerHandler.cachedPlayers.set(playerName.toLowerCase(), new Player(interaction, user.dataValues.ign, user.dataValues.uuid, user.dataValues.profiledata.data, true, profileName, false));
+			return true;
+		}
+		return false;
+	}
+
 	static async getWeight(interaction, playerName, profileName = null) {
 		if (this.cachedPlayers.has(playerName.toLowerCase())) {
 			this.cachedPlayers.get(playerName.toLowerCase()).sendWeight(interaction, profileName);
@@ -93,17 +102,20 @@ class PlayerHandler {
 			throttle(async function() {
 				await PlayerHandler.createPlayer(interaction, playerName).then(() => {
 					PlayerHandler.cachedPlayers.get(playerName.toLowerCase()).sendWeight(interaction, profileName);
-				}).catch((error) => {
+				}).catch(async (error) => {
 					console.log(error);
 					PlayerHandler.cachedPlayers.delete(playerName.toLowerCase());
-					interaction.editReply({
-						embeds: [new Discord.MessageEmbed()
-							.setColor('#03fc7b')
-							.setTitle(`A skyblock profile with the username of "${playerName}" doesn\'t exist`)
-							.setDescription('Their API might also be turned off, or Hypixel\'s API is down')
-							.setFooter('Created by Kaeso#5346')],
-						allowedMentions: { repliedUser: true }
-					})
+
+					if (!await PlayerHandler.tryAgain(interaction, playerName, profileName)) {
+						interaction.editReply({
+							embeds: [new Discord.MessageEmbed()
+								.setColor('#03fc7b')
+								.setTitle(`A skyblock profile with the username of "${playerName}" doesn\'t exist`)
+								.setDescription('Their API might also be turned off, or Hypixel\'s API is down')
+								.setFooter('Created by Kaeso#5346')],
+							allowedMentions: { repliedUser: true }
+						});
+					};
 				})
 			})
 		}
@@ -122,8 +134,12 @@ class PlayerHandler {
 				}
 			});
 		await this.getProfiles(uuid).then(async profiles => {
-			let stripped = await this.stripData(profiles, uuid);
-			this.cachedPlayers.set(playerName.toLowerCase(), new Player(interaction, properName, uuid, stripped));
+			let data = await this.stripData(profiles, uuid);
+			const user = await DataHandler.getPlayer(uuid);
+			if (user?.dataValues?.profiledata?.data) {
+				data = await PlayerHandler.getBestData(user.dataValues.profiledata.data, data); 
+			}
+			this.cachedPlayers.set(playerName.toLowerCase(), new Player(interaction, properName, uuid, data));
 		}).catch(error => {
 			console.log(error);
 			throw error;
@@ -135,7 +151,7 @@ class PlayerHandler {
 		if (user?.dataValues?.profiledata) {
 			try {
 				let oldData = user.dataValues.profiledata;
-				oldData.data = player.data;
+				oldData.data = await getBestData(oldData.data, player.data);
 
 				return await DataHandler.update({ profiledata: oldData }, { uuid: player.uuid });
 			} catch (e) {}
@@ -195,6 +211,51 @@ class PlayerHandler {
 		return stripped;
 	}
 
+	static async getBestData(saved, fresh, uuid) {
+		try {
+			const newData = {
+				success: true,
+				profiles: []
+			}
+
+			let length = Math.min(Object.keys(saved.profiles).length, Object.keys(fresh.profiles).length);
+			for (let i = 0; i < length; i++) {
+				const savedProfile = saved.profiles[Object.keys(saved.profiles)[i]];
+				const freshProfile = fresh.profiles[Object.keys(fresh.profiles)[i]];
+
+				if (freshProfile.members[Object.keys(freshProfile.members)[0]].collection) {
+					newData.profiles.push({
+						profile_id: freshProfile.profile_id,
+						cute_name: freshProfile.cute_name,
+						members: freshProfile.members
+					});
+				} else {
+					newData.profiles.push({
+						profile_id: savedProfile.profile_id,
+						cute_name: savedProfile.cute_name,
+						api: false,
+						members: savedProfile.members
+					});
+				}
+			}
+			if (length < Object.keys(fresh.profiles).length) {
+				for (let i = length; i < Object.keys(fresh.profiles).length; i++) {
+					const profile = fresh.profiles[Object.keys(fresh.profiles)[i]];
+
+					newData.profiles.push({
+						profile_id: profile.profile_id,
+						cute_name: profile.cute_name,
+						members: profile.members
+					});
+				}
+			}
+			return newData;
+		} catch (e) {
+			console.log(e);
+			return fresh;
+		}
+	}
+
 	static clearCache(minutes) {
 		let time = Date.now();
 		let seconds = minutes * 60;
@@ -209,7 +270,7 @@ class PlayerHandler {
 
 class Player {
 
-	constructor(interaction, playerName, uuid, data) {
+	constructor(interaction, playerName, uuid, data, send = false, profileName = null, api = true) {
 		this.interaction = interaction;
 		this.playerName = playerName;
 		this.uuid = uuid;
@@ -230,19 +291,18 @@ class Player {
 		this.rank;
 
 		this.timestamp = Date.now();
+		this.api = api;
 
 		PlayerHandler.saveData(this);
+
+		if (send) {
+			this.sendWeight(interaction, profileName);
+		}
 	}
 
 	async getWeight(userData) {
 		if (userData === null) {
 			return -1;
-		}
-
-		const player = await DataHandler.getPlayer(this.uuid);
-		if (player !== null) {
-			this.rank = player.dataValues.rank;
-			this.mainProfileuuid = player.dataValues.profile;
 		}
 			
 		if (userData.collection === undefined) {
@@ -372,6 +432,14 @@ class Player {
 		if (!this.data.profiles) {
 			return null;
 		}
+
+		const user = await DataHandler.getPlayer(this.uuid);
+		if (user !== null) {
+			this.rank = user.dataValues.rank;
+			this.mainProfileuuid = user.dataValues.profile;
+		}
+
+		// let data = await PlayerHandler.getBestData(user.dataValues.profiledata.data, this.data, this.uuid);
 		let profiles = this.data.profiles;
 		let bestData = null;
 		let best = false;
@@ -420,21 +488,22 @@ class Player {
 		this.profileuuid = this.profileData.profile_id;
 
 		this.userData = this.bestProfile;
+		this.api = this.profileData?.api ?? true;
 		return this.bestProfile;
 	}
 
 	async sendWeight(interaction, profileName = null) {
-		let userData = await this.getUserdata(profileName)
+		let userData = await this.getUserdata(profileName);
 
-		if (!userData) {
+		if (!userData && !await PlayerHandler.tryAgain(interaction, this.playerName, profileName)) {
 			const embed = new Discord.MessageEmbed()
-			.setColor('#03fc7b')
-			.setTitle(`Stats for ${this.playerName}`)
-			.addField('Farming Weight', 'Zero! - Try some farming!\nOr turn on API access and help make Skyblock a better place.')
-			.setFooter('Created by Kaeso#5346')
-			.setThumbnail(`https://mc-heads.net/head/${this.uuid}/left`)
+				.setColor('#03fc7b')
+				.setTitle(`Stats for ${this.playerName}`)
+				.addField('Farming Weight', 'Zero! - Try some farming!\nOr turn on API access and help make Skyblock a better place.')
+				.setFooter('Created by Kaeso#5346')
+				.setThumbnail(`https://mc-heads.net/head/${this.uuid}/left`);
 
-			interaction.editReply({embeds: [embed]})
+			interaction.editReply({embeds: [embed]});
 			return;
 		}
 
@@ -552,15 +621,29 @@ class Player {
 			ctx.restore();
 		}
 	
-		// if (this.profileuuid === this.mainProfileuuid) {
 		attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'weight.png');
-		// }
-	
-		interaction.editReply({
-			files: [attachment],
-			components: [row],
-			allowedMentions: { repliedUser: false }
-		}).then(async () => {
+
+		let reply;
+
+		if (this.api) {
+			reply = {
+				files: [attachment],
+				components: [row],
+				allowedMentions: { repliedUser: false }
+			}
+		} else {
+			const embed = new Discord.MessageEmbed()
+				.setColor('#03fc7b')
+				.setTitle(`This data is outdated! ${this.playerName} turned off their api access.`);
+			reply = {
+				files: [attachment],
+				components: [row],
+				embeds: [embed],
+				allowedMentions: { repliedUser: false }
+			}
+		}
+
+		interaction.editReply(reply).then(async () => {
 			let reply = await interaction.fetchReply();
 			let infoClicked = false;
 
@@ -610,7 +693,7 @@ class Player {
 		const embed = new Discord.MessageEmbed()
 			.setColor('#03fc7b')
 			.setTitle(`Stats for ${this.playerName} on ${this.profileData.cute_name}`)
-			.addField('Farming Weight', !result ? '0 - Try some farming!' : result)
+			.addField('Farming Weight', !result ? '0 - Try some farming!' : result + ' ')
 			.addField('Breakdown', this.getBreakdown(weight - this.bonusWeight), edit)
 			.setFooter('Created by Kaeso#5346    Questions? Use /info');
 		
@@ -626,10 +709,19 @@ class Player {
 			embed.addField('Bonus', this.getBonus(), edit);
 		}
 
+		let notes = '';
 		if (this.profileData.members) {
 			if (Object.keys(this.profileData.members).length > 1) {
-				embed.addField('Notes', 'This player has been or is a co op member');
+				notes += 'This player has been or is a co op member';
 			}
+		}
+
+		if (!this.api) {
+			notes += `\n**This data is outdated! ${this.playerName} turned off their api access.**`;
+		}
+
+		if (notes !== '') {
+			embed.addField('Notes', notes);
 		}
 
 		if (!edit) {

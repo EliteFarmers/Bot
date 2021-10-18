@@ -12,8 +12,17 @@ module.exports = {
 	async execute(interaction) {
 		const options = interaction?.options?._hoistedOptions;
 
-		const playerName = options[0]?.value.trim();
-		const profileName = options[1]?.value.trim();
+		let playerName = undefined;
+		let profileName = undefined;
+
+		for (let i = 0; i < Object.keys(options).length; i++) {
+			let option = options[Object.keys(options)[i]];
+			if (option.name === 'player') {
+				playerName = option.value.trim();
+			} else if (option.name === 'profile') {
+				profileName = option.value.trim();
+			}
+		}
 
 		await interaction.deferReply();
 		if (playerName) {
