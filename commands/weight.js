@@ -25,7 +25,7 @@ module.exports = {
 		}
 
 		await interaction.deferReply();
-		if (playerName && false) {
+		if (playerName) {
 			PlayerHandler.getWeight(interaction, playerName, profileName ?? null);
 		} else {
 			let user = await DataHandler.getPlayer(null, { discordid: interaction.user.id });
