@@ -88,7 +88,7 @@ class PlayerHandler {
 
 	static async tryAgain(interaction, playerName, profileName = null) {
 		const user = await DataHandler.getPlayerByName(playerName.toLowerCase());
-		if (user?.dataValues?.profiledata && user?.dataValues?.ign && user?.dataValues?.uuid) {
+		if (user && user.dataValues?.profiledata && user.dataValues?.ign && user.dataValues?.uuid) {
 			PlayerHandler.cachedPlayers.set(playerName.toLowerCase(), new Player(interaction, user.dataValues.ign, user.dataValues.uuid, user.dataValues.profiledata.data, true, profileName, false));
 			return true;
 		}
@@ -136,7 +136,7 @@ class PlayerHandler {
 		await this.getProfiles(uuid).then(async profiles => {
 			let data = await this.stripData(profiles, uuid);
 			const user = await DataHandler.getPlayer(uuid);
-			if (user?.dataValues?.profiledata?.data) {
+			if (user && user.dataValues?.profiledata?.data) {
 				data = await PlayerHandler.getBestData(user.dataValues.profiledata.data, data); 
 			}
 			this.cachedPlayers.set(playerName.toLowerCase(), new Player(interaction, properName, uuid, data));
