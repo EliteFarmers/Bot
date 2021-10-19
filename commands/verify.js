@@ -20,19 +20,25 @@ module.exports = {
 			const uuid = await PlayerHandler.getUUID(playerName).then(response => {
 				return response.id;
 			}).catch(error => {
-				if (typeof error !== fetch.FetchError) {
-					console.log(error);
-					return undefined;
-				}
+				console.log(error);
+				return undefined;
 			});
 
-			let discordTag = await PlayerHandler.getDiscord(uuid);
+			let discordTag = (uuid) ? await PlayerHandler.getDiscord(uuid) : null;
 
-			if (!discordTag) {
+			if (discordTag === undefined) {
 				const embed = new Discord.MessageEmbed()
 					.setColor('#03fc7b')
 					.setTitle('Error: No Discord Linked!')
 					.setDescription('Link this discord account to your Minecraft account on Hypixel first!')
+					.setFooter('Created by Kaeso#5346');
+				interaction.editReply({embeds: [embed]});
+				return;
+			} else if (!discordTag) {
+				const embed = new Discord.MessageEmbed()
+					.setColor('#03fc7b')
+					.setTitle('Error: Invalid Username!')
+					.setDescription(`"${playerName}" doesn't play skyblock! Double check your spelling.`)
 					.setFooter('Created by Kaeso#5346');
 				interaction.editReply({embeds: [embed]});
 				return;
