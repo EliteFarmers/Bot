@@ -43,6 +43,7 @@ class DataHandler {
 
     static async updatePlayer(playeruuid, playerName, profileuuid, nWeight) {
         let newWeight = Math.round(nWeight * 100);
+        if (typeof newWeight !== Number) { return; }
 
         try {
             const user = await this.getPlayer(playeruuid);

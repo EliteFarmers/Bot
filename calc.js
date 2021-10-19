@@ -211,7 +211,7 @@ class PlayerHandler {
 		return stripped;
 	}
 
-	static async getBestData(saved, fresh, uuid) {
+	static async getBestData(saved, fresh) {
 		try {
 			const newData = {
 				success: true,
@@ -495,7 +495,7 @@ class Player {
 	async sendWeight(interaction, profileName = null) {
 		let userData = await this.getUserdata(profileName);
 
-		if (!userData && !await PlayerHandler.tryAgain(interaction, this.playerName, profileName)) {
+		if (!userData /*&& !await PlayerHandler.tryAgain(interaction, this.playerName, profileName)*/) {
 			const embed = new Discord.MessageEmbed()
 				.setColor('#03fc7b')
 				.setTitle(`Stats for ${this.playerName}`)
@@ -507,7 +507,12 @@ class Player {
 			return;
 		}
 
-		DataHandler.updatePlayer(this.uuid, this.playerName, this.profileuuid, this.weight + this.bonusWeight);
+		if (typeof (this.weight + this.bonusWeight) === NaN) {
+			console.log(this.weight + this.bonusWeight);
+			this.weight = 0;
+			this.bonusWeight = 0;
+		}
+		DataHandler.updatePlayer(this.uuid, this.playerName, this.profileuuid, (+this.weight) + (+this.bonusWeight));
 		
 		const row = new Discord.MessageActionRow().addComponents(
 			new Discord.MessageButton()
