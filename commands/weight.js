@@ -29,7 +29,7 @@ module.exports = {
 			PlayerHandler.getWeight(interaction, playerName, profileName ?? null);
 		} else {
 			let user = await DataHandler.getPlayer(null, { discordid: interaction.user.id });
-			if (user.dataValues?.ign) {
+			if (user?.dataValues?.ign) {
 				PlayerHandler.getWeight(interaction, user.dataValues.ign, profileName ?? null);
 			} else {
 				const embed = new Discord.MessageEmbed()
