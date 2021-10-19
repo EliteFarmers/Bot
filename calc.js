@@ -396,7 +396,7 @@ class Player {
 		//Tier 12 farming minions
 		let tier12s = ['WHEAT_12', 'CARROT_12', 'POTATO_12', 'PUMPKIN_12', 'MELON_12', 'MUSHROOM_12', 'COCOA_12', 'CACTUS_12', 'SUGAR_CANE_12', 'NETHER_WARTS_12'];
 		let obtained12s = 0;
-		if ('crafted_generators' in userData) {
+		if (userData.crafted_generators) {
 			let obtainedMinions = userData.crafted_generators;
 			tier12s.forEach(minion => {
 				obtained12s += (obtainedMinions.includes(minion)) ? 1 : 0;
