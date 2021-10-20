@@ -110,7 +110,7 @@ class PlayerHandler {
 						interaction.editReply({
 							embeds: [new Discord.MessageEmbed()
 								.setColor('#03fc7b')
-								.setTitle(`A skyblock profile with the username of "${playerName}" doesn\'t exist`)
+								.setTitle(`A skyblock profile with the username of "${playerName.replace(/\_/g, '\\_')}" doesn\'t exist`)
 								.setDescription('Their API might also be turned off, or Hypixel\'s API is down')
 								.setFooter('Created by Kaeso#5346')],
 							allowedMentions: { repliedUser: true }
@@ -498,7 +498,7 @@ class Player {
 		if (!userData /*&& !await PlayerHandler.tryAgain(interaction, this.playerName, profileName)*/) {
 			const embed = new Discord.MessageEmbed()
 				.setColor('#03fc7b')
-				.setTitle(`Stats for ${this.playerName}`)
+				.setTitle(`Stats for ${this.playerName.replace(/\_/g, '\\_')}`)
 				.addField('Farming Weight', 'Zero! - Try some farming!\nOr turn on API access and help make Skyblock a better place.')
 				.setFooter('Created by Kaeso#5346')
 				.setThumbnail(`https://mc-heads.net/head/${this.uuid}/left`);
@@ -577,7 +577,7 @@ class Player {
 		//Add name and rank, then resize to fit
 		let name = this.playerName;
 		if (this.rank !== undefined && this.rank !== 0 && this.mainProfileuuid === this.profileuuid) {
-			name = (`${this.playerName} - #${this.rank}`);
+			name = (`${this.playerName.replace(/\_/g, '\\_')} - #${this.rank}`);
 		}
 
 		ctx.font = '100px "Open Sans"';
@@ -639,7 +639,7 @@ class Player {
 		} else {
 			const embed = new Discord.MessageEmbed()
 				.setColor('#03fc7b')
-				.setTitle(`This data is outdated! ${this.playerName} turned off their api access.`);
+				.setTitle(`This data is outdated! ${this.playerName.replace(/\_/g, '\\_')} turned off their api access.`);
 			reply = {
 				files: [attachment],
 				components: [row],
@@ -697,7 +697,7 @@ class Player {
 
 		const embed = new Discord.MessageEmbed()
 			.setColor('#03fc7b')
-			.setTitle(`Stats for ${this.playerName} on ${this.profileData.cute_name}`)
+			.setTitle(`Stats for ${this.playerName.replace(/\_/g, '\\_')} on ${this.profileData.cute_name}`)
 			.addField('Farming Weight', !result ? '0 - Try some farming!' : result + ' ')
 			.addField('Breakdown', this.getBreakdown(weight - this.bonusWeight), edit)
 			.setFooter('Created by Kaeso#5346    Questions? Use /info');
@@ -707,7 +707,7 @@ class Player {
 		}
 
 		if (this.rank !== undefined && this.rank !== 0 && this.mainProfileuuid === this.profileuuid && !edit) {
-			embed.setDescription(`**${this.playerName}** is rank **#${this.rank}!**`)
+			embed.setDescription(`**${this.playerName.replace(/\_/g, '\\_')}** is rank **#${this.rank}!**`)
 		}
 
 		if (this.bonus.size > 0) {
@@ -722,7 +722,7 @@ class Player {
 		}
 
 		if (!this.api) {
-			notes += `\n**This data is outdated! ${this.playerName} turned off their api access.**`;
+			notes += `\n**This data is outdated! ${this.playerName.replace(/\_/g, '\\_')} turned off their api access.**`;
 		}
 
 		if (notes !== '') {
