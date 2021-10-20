@@ -577,7 +577,7 @@ class Player {
 		//Add name and rank, then resize to fit
 		let name = this.playerName;
 		if (this.rank !== undefined && this.rank !== 0 && this.mainProfileuuid === this.profileuuid) {
-			name = (`${this.playerName.replace(/\_/g, '\\_')} - #${this.rank}`);
+			name = (`${this.playerName} - #${this.rank}`);
 		}
 
 		ctx.font = '100px "Open Sans"';
