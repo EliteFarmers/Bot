@@ -129,7 +129,7 @@ class DataHandler {
             const weightFormatted = (player.weight / 100).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 
             if (player.ign) {
-                embed.fields.push({
+            embed.fields.push({
                     name: `#${i + 1} – ${player.ign.replace(/\_/g, '\\_')}`,
                     value: `[🔗](https://sky.shiiyu.moe/stats/${player.uuid}) ${weightFormatted} ${(isHighlightedPlayer) ? '⭐' : ' '}`,
                     inline: true
