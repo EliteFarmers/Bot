@@ -130,10 +130,10 @@ class DataHandler {
 
             if (player.ign) {
             embed.fields.push({
-                    name: `#${i + 1} – ${player.ign.replace(/\_/g, '\\_')}`,
-                    value: `[🔗](https://sky.shiiyu.moe/stats/${player.uuid}) ${weightFormatted} ${(isHighlightedPlayer) ? '⭐' : ' '}`,
-                    inline: true
-                });
+                name: `#${i + 1} – ${player.ign ? player.ign.replace(/\_/g, '\\_') : 'N/A'}`,
+                value: `[🔗](https://sky.shiiyu.moe/stats/${player.uuid}) ${weightFormatted} ${(isHighlightedPlayer) ? '⭐' : ' '}`,
+                inline: true
+            });
             }
 
             if (i % 2 == 1) {
