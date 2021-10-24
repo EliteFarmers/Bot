@@ -38,7 +38,10 @@ class DataHandler {
     }
 
     static async update(changes, where) {
-        return await Users.update(changes, { where: where });
+        const user = await Users.findOne({ where: where });
+        if (user) {
+            return await Users.update(changes, { where: where });
+        }
     }
 
     static async updatePlayer(playeruuid, playerName, profileuuid, nWeight) {
