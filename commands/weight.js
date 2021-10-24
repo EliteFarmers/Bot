@@ -36,7 +36,7 @@ module.exports = {
 					.setColor('#03fc7b')
 					.setTitle('Error: Specify a Username!')
 					.addField('Proper Usage:', '`/weight` `player:`(player name)')
-					.setDescription('Checking for yourself?\nYou must use \`/verify `player:`(account name)\` before using this shortcut!')
+					.setDescription('Checking for yourself?\nYou must use \`/verify\` \`player:\`(account name) before using this shortcut!')
 					.setFooter('Created by Kaeso#5346');
 				interaction.editReply({ embeds: [embed] })
 			}
