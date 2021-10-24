@@ -4,6 +4,7 @@ const fetch = require('node-fetch');
 const throttledQueue = require('throttled-queue');
 const { hypixelApiKey } = require('./config.json');
 const { DataHandler } = require('./database.js');
+const { DataFormatter } = require('./data.js');
 const throttle = throttledQueue(2, 1000);
 
 class PlayerHandler {
@@ -66,7 +67,6 @@ class PlayerHandler {
 			return await response;
 	}
 
-	//WORK ON THIS
 	static async getDiscord(uuid) {
 		return new Promise((resolve, reject) => {
 			throttle(async function() {
@@ -134,10 +134,10 @@ class PlayerHandler {
 				}
 			});
 		await this.getProfiles(uuid).then(async profiles => {
-			let data = await this.stripData(profiles, uuid);
+			let data = await DataFormatter.stripData(profiles, uuid);
 			const user = await DataHandler.getPlayer(uuid);
 			if (user && user.dataValues?.profiledata?.data) {
-				data = await PlayerHandler.getBestData(user.dataValues.profiledata.data, data); 
+				data = await DataFormatter.getBestData(user.dataValues.profiledata.data, data); 
 			}
 			this.cachedPlayers.set(playerName.toLowerCase(), new Player(interaction, properName, uuid, data));
 		}).catch(error => {
@@ -151,9 +151,10 @@ class PlayerHandler {
 		if (user?.dataValues?.profiledata) {
 			try {
 				let oldData = user.dataValues.profiledata;
-				oldData.data = await getBestData(oldData.data, player.data);
+				oldData.data = await DataFormatter.getBestData(oldData.data, player.data);
+				const jacob = await DataFormatter.getBestContests(oldData.data);
 
-				return await DataHandler.update({ profiledata: oldData }, { uuid: player.uuid });
+				return await DataHandler.update({ profiledata: oldData, contestdata: jacob }, { uuid: player.uuid });
 			} catch (e) {}
 		}
 		const data = {
@@ -163,97 +164,8 @@ class PlayerHandler {
 				evidence: null
 			}
 		};
-		return await DataHandler.update({ profiledata: data }, { uuid: player.uuid });
-	}
-
-	static async stripData(data, uuid) {
-		let stripped = {
-			success: data.success,
-			profiles: []
-		}
-
-		for (let i = 0; i < Object.keys(data.profiles).length; i++) {
-			let key = Object.keys(data.profiles)[i];
-			let profile = data.profiles[key];
-			let user = profile.members[uuid];
-
-			let addedProfile = {
-				profile_id: profile.profile_id,
-				cute_name: profile.cute_name,
-				members: {}
-			}
-			if (Object.keys(profile.members).length > 1) {
-				addedProfile.members = {
-					[uuid]: {
-						experience_skill_farming: user.experience_skill_farming,
-						collection: user.collection,
-						crafted_generators: user.crafted_generators,
-						jacob2: user.jacob2
-					},
-					lamecoop: {
-						sad: null
-					}
-				}
-			} else {
-				addedProfile.members = {
-					[uuid]: {
-						experience_skill_farming: user.experience_skill_farming,
-						collection: user.collection,
-						crafted_generators: user.crafted_generators,
-						jacob2: user.jacob2
-					}
-				}
-			}
-
-			stripped.profiles.push(addedProfile);
-		}
-
-		return stripped;
-	}
-
-	static async getBestData(saved, fresh) {
-		try {
-			const newData = {
-				success: true,
-				profiles: []
-			}
-
-			let length = Math.min(Object.keys(saved.profiles).length, Object.keys(fresh.profiles).length);
-			for (let i = 0; i < length; i++) {
-				const savedProfile = saved.profiles[Object.keys(saved.profiles)[i]];
-				const freshProfile = fresh.profiles[Object.keys(fresh.profiles)[i]];
-
-				if (freshProfile.members[Object.keys(freshProfile.members)[0]].collection) {
-					newData.profiles.push({
-						profile_id: freshProfile.profile_id,
-						cute_name: freshProfile.cute_name,
-						members: freshProfile.members
-					});
-				} else {
-					newData.profiles.push({
-						profile_id: savedProfile.profile_id,
-						cute_name: savedProfile.cute_name,
-						api: false,
-						members: savedProfile.members
-					});
-				}
-			}
-			if (length < Object.keys(fresh.profiles).length) {
-				for (let i = length; i < Object.keys(fresh.profiles).length; i++) {
-					const profile = fresh.profiles[Object.keys(fresh.profiles)[i]];
-
-					newData.profiles.push({
-						profile_id: profile.profile_id,
-						cute_name: profile.cute_name,
-						members: profile.members
-					});
-				}
-			}
-			return newData;
-		} catch (e) {
-			console.log(e);
-			return fresh;
-		}
+		const jacob = await DataFormatter.getBestContests(player.data);
+		return await DataHandler.update({ profiledata: data, contestdata: jacob }, { uuid: player.uuid });
 	}
 
 	static clearCache(minutes) {
@@ -345,7 +257,31 @@ class Player {
 		//Bonus sources
 		let bonus = new Map();
 		
-		if (userData.jacob2) {
+		if (userData.jacob) {				
+			//Farming level bonuses
+			let farmingCap = userData.jacob.perks.farming_level_cap ?? 0;
+			if (userData.experience_skill_farming > 111672425 && farmingCap === 10) {
+				bonus.set('Farming Level 60', 250);
+			} else if (userData.experience_skill_farming > 55172425) {
+				bonus.set('Farming Level 50', 100);
+			}
+
+			//Anita buff bonus
+			let anitaBuff = userData.jacob.perks.double_drops ?? 0;
+			if (anitaBuff > 0) {
+				bonus.set(`${anitaBuff * 2}% Anita Buff`, anitaBuff * 2);
+			}
+
+			const earnedGolds = userData.jacob.totalmedals.gold;
+			if (earnedGolds >= 1000) {
+				bonus.set('1,000 Gold Medals', 500);
+			} else {
+				let roundDown = Math.floor(earnedGolds / 50) * 50;
+				if (roundDown > 0) {
+					bonus.set(`${roundDown} Gold Medals`, roundDown / 2);
+				}
+			}
+		} else if (userData.jacob2) {
 			try {
 				//Farming level bonuses
 				let farmingCap = userData.jacob2.perks.farming_level_cap ?? 0;
@@ -439,7 +375,6 @@ class Player {
 			this.mainProfileuuid = user.dataValues.profile;
 		}
 
-		// let data = await PlayerHandler.getBestData(user.dataValues.profiledata.data, this.data, this.uuid);
 		let profiles = this.data.profiles;
 		let bestData = null;
 		let best = false;
@@ -508,7 +443,6 @@ class Player {
 		}
 
 		if (typeof (this.weight + this.bonusWeight) === NaN) {
-			console.log(this.weight + this.bonusWeight);
 			this.weight = 0;
 			this.bonusWeight = 0;
 		}
