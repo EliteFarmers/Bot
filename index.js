@@ -132,6 +132,24 @@ const slashCommandsData = [
 			required: true
 		}]
 	},
+	{
+		name: 'jacob',
+		description: 'Get jacob\'s high scores or leaderboard!',
+		options: [
+			{
+				name: 'player',
+				type: 'STRING',
+				description: 'The player in question.',
+				required: false
+			},
+			{
+				name: 'profile',
+				type: 'STRING',
+				description: 'Optionally specify a profile!',
+				required: false
+			}
+		]
+	},
 ];
 
 if (args[0] === 'deploy') {
