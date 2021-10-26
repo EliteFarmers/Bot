@@ -40,6 +40,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     styledata: {
         type: DataTypes.JSON
+    },
+    cheating: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     }
 }, {
     sequelize: sequelize,
