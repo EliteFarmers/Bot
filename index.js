@@ -171,4 +171,13 @@ if (args[0] === 'deploy') {
 			console.log('Probably updated slash commands on that server');
 		}, 5000);
 	}
+} else if (args[0] === 'cheating') {
+	setTimeout(async function() {
+		const user = await DataHandler.getPlayer(args[1]);
+		if (user) {
+			await DataHandler.update({ cheating: args[2] });
+			console.log(`Set ${user.dataValues?.ign}'s cheating status to ${args[2]}'`);
+			console.log(await DataHandler.getPlayer(args[1]).dataValues.profiledata);
+		}
+	}, 5000);
 }
