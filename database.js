@@ -86,7 +86,12 @@ class DataHandler {
     }
 
     static async getLeaderboard() {
-        return await Users.findAll({ limit: 1000, order: [['weight', 'DESC']] })
+        return await Users.findAll({ limit: 1000, order: [['weight', 'DESC']], where: { cheating: false } });
+    }
+
+    static async getJacobLB(crop) {
+        const lb = await Users.findAll({ limit: 1000, order: [[[Sequelize.json(`contestdata.scores.${crop}`), `${crop}`], 'DESC']] });
+        return lb;
     }
 
     static async getLeaderboardEmbed(from = 0, playerName = null, firstCall = false) {

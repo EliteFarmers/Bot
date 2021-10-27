@@ -254,7 +254,7 @@ ${details}
         }
 
         function getJacobData(user, profileName) {
-            const profiles = user.dataValues?.profiledata?.data?.profiles;
+            const profiles = user.dataValues?.profiledata?.profiles;
 
             for (let i = 0; i < Object.keys(profiles).length; i++) {
                 let key = Object.keys(profiles)[i];
