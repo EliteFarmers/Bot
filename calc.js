@@ -417,7 +417,7 @@ class Player {
 		this.profileuuid = this.profileData.profile_id;
 
 		this.userData = this.bestProfile;
-		this.api = this.apiFullyOff ? false : this.profileData?.api ?? false;
+		this.api = this.apiFullyOff ? false : this.profileData?.api ?? true;
 		return this.bestProfile;
 	}
 
@@ -661,7 +661,7 @@ class Player {
 		}
 
 		if (this.cheating) { 
-			notes += `\n**This player is a __cheater__.** ${this.api ? ` They also turned off their api access.` : ``}`;
+			notes += `\n**This player is a __cheater__.** ${!this.api ? ` They also turned off their api access.` : ``}`;
 		} else if (!this.api) {
 			notes += `\n**This data is outdated! ${this.playerName.replace(/\_/g, '\\_')} turned off their api access.**`;
 		}
