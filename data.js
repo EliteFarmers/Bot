@@ -131,6 +131,8 @@ class DataFormatter {
 
     static async getBestData(saved, fresh) {
 		try {
+			if (saved?.data) { saved = saved.data; }
+			
 			const newData = {
 				success: true,
 				profiles: []
@@ -145,14 +147,15 @@ class DataFormatter {
 					newData.profiles.push({
 						profile_id: freshProfile.profile_id,
 						cute_name: freshProfile.cute_name,
-						members: freshProfile.members
+						members: freshProfile.members,
+						api: true
 					});
 				} else {
 					newData.profiles.push({
 						profile_id: savedProfile.profile_id,
 						cute_name: savedProfile.cute_name,
-						api: false,
-						members: savedProfile.members
+						members: savedProfile.members,
+						api: false
 					});
 				}
 			}
