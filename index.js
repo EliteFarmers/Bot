@@ -175,9 +175,11 @@ if (args[0] === 'deploy') {
 	setTimeout(async function() {
 		const user = await DataHandler.getPlayer(args[1]);
 		if (user) {
-			await DataHandler.update({ cheating: args[2] });
-			console.log(`Set ${user.dataValues?.ign}'s cheating status to ${args[2]}'`);
-			console.log(await DataHandler.getPlayer(args[1]).dataValues.profiledata);
+			await DataHandler.update({ cheating: args[2], rank: 0 }, { uuid: args[1] });
+			console.log(`Set ${user.dataValues?.ign}'s cheating status to ${args[2]}`);
+			await DataHandler.getPlayer(args[1]).then(user => {
+				console.log(user.dataValues);
+			});
 		}
 	}, 5000);
 }
