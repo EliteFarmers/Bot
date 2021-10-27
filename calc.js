@@ -79,7 +79,6 @@ class PlayerHandler {
 						resolve(undefined);
 					}
 				}).catch(error => {
-					console.log(error);
 					resolve(undefined);
 				});
 			});
@@ -89,7 +88,7 @@ class PlayerHandler {
 	static async tryAgain(interaction, playerName, profileName = null) {
 		const user = await DataHandler.getPlayerByName(playerName.toLowerCase());
 		if (user && user.dataValues?.profiledata && user.dataValues?.ign && user.dataValues?.uuid) {
-			PlayerHandler.cachedPlayers.set(playerName.toLowerCase(), new Player(interaction, user.dataValues.ign, user.dataValues.uuid, user.dataValues.profiledata, true, profileName, false));
+			PlayerHandler.cachedPlayers.set(playerName.toLowerCase(), new Player(interaction, user.dataValues.ign, user.dataValues.uuid, user.dataValues.profiledata, user.dataValues.cheating, true, profileName, true));
 			return true;
 		}
 		return false;
@@ -101,9 +100,9 @@ class PlayerHandler {
 		} else {
 			throttle(async function() {
 				await PlayerHandler.createPlayer(interaction, playerName).then(() => {
-					PlayerHandler.cachedPlayers.get(playerName.toLowerCase()).sendWeight(interaction, profileName);
+					PlayerHandler.cachedPlayers.get(playerName.toLowerCase())?.sendWeight(interaction, profileName);
 				}).catch(async (error) => {
-					console.log(error);
+					//console.log(error);
 					PlayerHandler.cachedPlayers.delete(playerName.toLowerCase());
 
 					if (!await PlayerHandler.tryAgain(interaction, playerName, profileName)) {
@@ -137,11 +136,10 @@ class PlayerHandler {
 			let data = await DataFormatter.stripData(profiles, uuid);
 			const user = await DataHandler.getPlayer(uuid);
 			if (user && user.dataValues?.profiledata) {
-				data = await DataFormatter.getBestData(user.dataValues.profiledata, data); 
+				data = await DataFormatter.getBestData(user.dataValues.profiledata, data);
 			}
-			this.cachedPlayers.set(playerName.toLowerCase(), new Player(interaction, properName, uuid, data));
+			this.cachedPlayers.set(playerName.toLowerCase(), new Player(interaction, properName, uuid, data, user?.dataValues?.cheating ?? false));
 		}).catch(error => {
-			console.log(error);
 			throw error;
 		});
 	}
@@ -175,7 +173,7 @@ class PlayerHandler {
 
 class Player {
 
-	constructor(interaction, playerName, uuid, data, send = false, profileName = null, api = true) {
+	constructor(interaction, playerName, uuid, data, cheating = false, send = false, profileName = null, apiOff = false) {
 		this.interaction = interaction;
 		this.playerName = playerName;
 		this.uuid = uuid;
@@ -196,7 +194,10 @@ class Player {
 		this.rank;
 
 		this.timestamp = Date.now();
-		this.api = api;
+		this.apiFullyOff = apiOff;
+		this.api = true;
+
+		this.cheating = cheating;
 
 		PlayerHandler.saveData(this);
 
@@ -416,7 +417,7 @@ class Player {
 		this.profileuuid = this.profileData.profile_id;
 
 		this.userData = this.bestProfile;
-		this.api = this.profileData?.api ?? true;
+		this.api = this.apiFullyOff ? false : this.profileData?.api ?? false;
 		return this.bestProfile;
 	}
 
@@ -557,7 +558,18 @@ class Player {
 
 		let reply;
 
-		if (this.api) {
+		if (this.cheating) {
+			const embed = new Discord.MessageEmbed()
+				.setColor('#03fc7b')
+				.setDescription(`**This player is a __cheater__.** ${!this.api ? ` They also turned off their api access.` : ``}`)
+				.setFooter('Players are only marked as cheating when it\'s proven beyond a reasonable doubt.\nThey hold no position in any leaderboards.');
+			reply = {
+				files: [attachment],
+				components: [row],
+				embeds: [embed],
+				allowedMentions: { repliedUser: false }
+			}
+		} else if (this.api) {
 			reply = {
 				files: [attachment],
 				components: [row],
@@ -566,7 +578,7 @@ class Player {
 		} else {
 			const embed = new Discord.MessageEmbed()
 				.setColor('#03fc7b')
-				.setTitle(`This data is outdated! ${this.playerName.replace(/\_/g, '\\_')} turned off their api access.`);
+				.setDescription(`**This data is outdated!** ${this.playerName.replace(/\_/g, '\\_')} turned off their api access.`);
 			reply = {
 				files: [attachment],
 				components: [row],
@@ -648,7 +660,9 @@ class Player {
 			}
 		}
 
-		if (!this.api) {
+		if (this.cheating) { 
+			notes += `\n**This player is a __cheater__.** ${this.api ? ` They also turned off their api access.` : ``}`;
+		} else if (!this.api) {
 			notes += `\n**This data is outdated! ${this.playerName.replace(/\_/g, '\\_')} turned off their api access.**`;
 		}
 
