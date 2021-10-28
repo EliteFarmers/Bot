@@ -150,6 +150,18 @@ const slashCommandsData = [
 			}
 		]
 	},
+	{
+		name: 'admin',
+		description: 'Get the admin panel!',
+		options: [
+			{
+				name: 'token',
+				type: 'STRING',
+				description: '2-Factor authentication code.',
+				required: true
+			}
+		]
+	},
 ];
 
 if (args[0] === 'deploy') {
