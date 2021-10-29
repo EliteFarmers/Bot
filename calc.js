@@ -219,34 +219,34 @@ class Player {
 			return -2;
 		}
 
-		let { WHEAT, POTATO_ITEM, CARROT_ITEM, MUSHROOM_COLLECTION, PUMPKIN, MELON, SUGAR_CANE, CACTUS, NETHER_STALK } = userData.collection;
+		let { WHEAT, POTATO_ITEM: POTATO, CARROT_ITEM: CARROT, MUSHROOM_COLLECTION: MUSHROOM, PUMPKIN, MELON, SUGAR_CANE: CANE, CACTUS, NETHER_STALK: WART } = userData.collection;
 		let COCOA = userData.collection["INK_SACK:3"]; //Dumb cocoa
 		
 		//Set potentially empty values to 0, and fix overflow
 		if (!WHEAT) { WHEAT = 0; } else if (WHEAT < 0) { WHEAT += 4294967294; };
 		if (!PUMPKIN) { PUMPKIN = 0; } else if (PUMPKIN < 0) { PUMPKIN += 4294967294; };
-		if (!MUSHROOM_COLLECTION) { MUSHROOM_COLLECTION = 0; } else if (MUSHROOM_COLLECTION < 0) { MUSHROOM_COLLECTION += 4294967294; };
-		if (!CARROT_ITEM) { CARROT_ITEM = 0; } else if (CARROT_ITEM < 0) { CARROT_ITEM += 4294967294; };
-		if (!POTATO_ITEM) { POTATO_ITEM = 0; } else if (POTATO_ITEM < 0) { POTATO_ITEM += 4294967294; };
+		if (!MUSHROOM) { MUSHROOM = 0; } else if (MUSHROOM < 0) { MUSHROOM += 4294967294; };
+		if (!CARROT) { CARROT = 0; } else if (CARROT < 0) { CARROT += 4294967294; };
+		if (!POTATO) { POTATO = 0; } else if (POTATO < 0) { POTATO += 4294967294; };
 		if (!MELON) { MELON = 0; } else if (MELON < 0) { MELON += 4294967294; };
 		if (!COCOA) { COCOA = 0; } else if (COCOA < 0) { COCOA += 4294967294; };
 		if (!CACTUS) { CACTUS = 0; } else if (CACTUS < 0) { CACTUS += 4294967294; };
-		if (!NETHER_STALK) { NETHER_STALK = 0; } else if (NETHER_STALK < 0) { NETHER_STALK += 4294967294; };
-		if (!SUGAR_CANE) { SUGAR_CANE = 0; } else if (SUGAR_CANE < 0) { SUGAR_CANE += 4294967294; };
+		if (!WART) { WART = 0; } else if (WART < 0) { WART += 4294967294; };
+		if (!CANE) { CANE = 0; } else if (CANE < 0) { CANE += 4294967294; };
 		
 		let collections = new Map();
 		
 		//Normalize collections
 		collections.set('Wheat', Math.round(WHEAT / 1000) / 100);
-		collections.set('Carrot', Math.round(CARROT_ITEM / 3000) / 100);
-		collections.set('Potato', Math.round(POTATO_ITEM / 3000) / 100);
+		collections.set('Carrot', Math.round(CARROT / 3000) / 100);
+		collections.set('Potato', Math.round(POTATO / 3000) / 100);
 		collections.set('Pumpkin', Math.round(PUMPKIN * 1.41089 / 1000) / 100);
 		collections.set('Melon', Math.round(MELON * 1.41089 / 5000) / 100);
-		collections.set('Mushroom', Math.round(MUSHROOM_COLLECTION * 1.20763 / 664) / 100);
+		collections.set('Mushroom', Math.round(MUSHROOM * 1.20763 / 664) / 100);
 		collections.set('Cocoa', Math.round(COCOA * 1.36581 / 3000) / 100);
 		collections.set('Cactus', Math.round(CACTUS * 1.25551 / 2000) / 100);
-		collections.set('Sugar Cane', Math.round(SUGAR_CANE / 2000) / 100);
-		collections.set('Nether Wart', Math.round(NETHER_STALK / 2500) / 100);
+		collections.set('Sugar Cane', Math.round(CANE / 2000) / 100);
+		collections.set('Nether Wart', Math.round(WART / 2500) / 100);
 		
 		//Bonus sources
 		let bonus = new Map();
