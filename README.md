@@ -13,9 +13,16 @@ Requires a config.json file that looks like this:
 	"prefix": ".",
 	"token": "",
 	"hypixelApiKey": "",
-	"dbUri": ""
+	"dbUri": "",
+	"secret": "",
+	"superusers": [
+		"",
+	]
 }
 ```
+The secret can be generated from running generateSecret in auth.js and inputted into Google authenticator.
+Superusers is a list of discord ids
+
 The database is postgres based.
 
 Ignore this: HODG HOM SON
