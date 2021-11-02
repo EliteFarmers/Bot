@@ -150,6 +150,10 @@ const slashCommandsData = [
 			}
 		]
 	},
+	{
+		name: 'admin',
+		description: 'Get the admin panel!'
+	},
 ];
 
 if (args[0] === 'deploy') {
