@@ -13,10 +13,15 @@ module.exports = {
 			.setFooter('Created by Kaeso#5346')
 			.setDescription('Farming weight is based off of multiple different factors to provide a number for comparsion between all farmers.')
 			.addField('Crop Collections', 'All crops are factored off of relative drop rates in order to equalize time spent for each farming weight.')
-			.addField('Collection Bug', 'Co op members do not gain the proper amounts of collections in a significant way and the calculations suffer from it. You can fix this for the future by kicking all co op members, but nothing can be done about lost collection.')
+			.addField('Collection Bug', 'Co op members used to not gain the proper amounts of collections in a significant (and random) way. This has been patched as of **November 2nd, 2021**, but nothing can be done about lost collection.')
 			.addField('Links', 'Source code - https://github.com/ptlthg/EliteDiscordBot\nFeedback - https://forms.gle/9XFNcj4ownZj23nM8');
 
 		const row = new Discord.MessageActionRow().addComponents(
+			new Discord.MessageButton()
+				.setCustomId('maininfo')
+				.setLabel('Main Info')
+				.setStyle('PRIMARY')
+				.setDisabled(true),
 			new Discord.MessageButton()
 				.setCustomId('crops')
 				.setLabel('Crop Info')
@@ -50,19 +55,11 @@ module.exports = {
 					if (i.customId === 'crops') {
 						newEmbed
 							.setTitle('Crop Weight Breakdown')
-							.addField('Amount of each crop per 1 farming weight', `
-Wheat: 100,000
-Carrot: 300,000
-Potato: 300,000
-Sugar Cane: 200,000
-Nether Wart: 250,000
-Pumpkin: 71,000
-Melon: 355,000
-Mushroom: 55,000
-Cocoa Beans: 220,000
-Cactus: 158,000
-
-The last 5 crops have a different calculation in order to equalize their tools with mathematical hoes provided by Bankhier (Only rounded number shown)
+							.setDescription('Amount of each crop per 1 farming weight')
+							.addField('Mathematical Hoes', `Wheat: 100,000\nCarrot: 300,000\nPotato: 300,000\nSugar Cane: 200,000\nNether Wart: 250,000`, true)
+							.addField(`Specific Tools`, `Pumpkin: 71,000\nMelon: 355,000\nMushroom: 55,000\nCocoa Beans: 220,000\nCactus: 158,000`, true)
+							.addField('Infomation', `
+The crops with specific tools have a different calculation in order to equalize their tools with mathematical hoes provided by Bankhier (Only rounded number shown)
 
 Seeds are not included as they are simply a byproduct of wheat.
 If you have suggestions for tweaking these numbers contact me with your reason.
@@ -80,7 +77,9 @@ If you have suggestions for tweaking these numbers contact me with your reason.
 							.addField('Explanation', `
 Well, it's complicated.
 
-Farming xp is rewarded to players along with item drops. Counting xp in a similar fashion would only buff everything excluding netherwart, while not really adding anything informative to the calcuation. While there are people with incredible amounts of farming xp which shows great dedication and effort in the ways of farming, the issuses are too hard to ignore. Consider this my official apology to people with obscene amounts of farming xp and the dreaded co op bug.
+Farming xp is rewarded to players along with item drops. Counting xp in a similar fashion would only buff everything excluding netherwart, while not really adding anything informative to the calcuation.
+
+**Simply put, if all the xp was counted in the weight there would be no way to balance the weight from different crops.**
 
 For now, reaching 55m xp (lvl 50) rewards you with 100 weight, with 150 more after you unlock farming 60.\n
 									`)
