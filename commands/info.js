@@ -14,7 +14,7 @@ module.exports = {
 			.setDescription('Farming weight is based off of multiple different factors to provide a number for comparsion between all farmers.')
 			.addField('Crop Collections', 'All crops are factored off of relative drop rates in order to equalize time spent for each farming weight.')
 			.addField('Collection Bug', 'Co op members used to not gain the proper amounts of collections in a significant (and random) way. This has been patched as of **November 2nd, 2021**, but nothing can be done about lost collection.')
-			.addField('Links', 'Source code - https://github.com/ptlthg/EliteDiscordBot\nFeedback - https://forms.gle/9XFNcj4ownZj23nM8');
+			.addField('Links', '[Bot Invite Link](https://discord.com/oauth2/authorize?client_id=845065148997566486&scope=applications.commands%20bot&permissions=2214718528)⠀⠀  [Source code](https://github.com/ptlthg/EliteDiscordBot)⠀ ⠀ [Feedback](https://forms.gle/9XFNcj4ownZj23nM8)');
 
 		const row = new Discord.MessageActionRow().addComponents(
 			new Discord.MessageButton()
