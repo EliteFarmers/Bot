@@ -40,7 +40,7 @@ module.exports = {
 		if (!message) { return; }
 
 		const fakeFilter = () => { return true; };
-		message.channel.awaitMessages({ fakeFilter, max: 1, time: 30000, errors: ['time'] })
+		message.channel.awaitMessages({ fakeFilter, max: 1, time: 60000, errors: ['time'] })
 		.then(async collected => {
 			const code = +(collected.first().content.trim());
 			if (Auth.verifyTOTP(code)) {
@@ -88,16 +88,16 @@ module.exports = {
 			);
 
 			i.user.send({ embeds: [embed], components: [row], fetchReply: true }).then(reply => {
-				const collector = reply.createMessageComponentCollector({ componentType: 'BUTTON', time: 30000 });
+				const collector = reply.createMessageComponentCollector({ componentType: 'BUTTON', time: 120000 });
     
 				collector.on('collect', async inter => {
 					if (inter.user.id === interaction.user.id) {
-						collector.resetTimer({ time: 30000 });
+						collector.resetTimer({ time: 120000 });
 	
 						if (inter.customId === 'flagcheater') {
 							const filt = () => { return true; };
 							await inter.reply({ content: 'Specify a minecraft uuid or ign.', fetchReply: true }).then(message => {
-								message.channel.awaitMessages({ filt, max: 1, time: 30000, errors: ['time'] })
+								message.channel.awaitMessages({ filt, max: 1, time: 60000, errors: ['time'] })
 								.then(async collected => {
 									const response = collected.first().content.trim();
 									const user = (response.length === 32) ? await DataHandler.getPlayer(response) : await DataHandler.getPlayerByName(response);
