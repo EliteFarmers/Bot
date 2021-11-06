@@ -59,7 +59,17 @@ module.exports = {
 			if (user) {
 				let oldUser = await DataHandler.getPlayer(null, { discordid: interaction.user.id });
 				if (oldUser) {
-					await DataHandler.update({ discordid: 'none' }, { discordid: interaction.user.id });
+					await DataHandler.update({ discordid: null }, { discordid: interaction.user.id });
+
+					if (oldUser.dataValues.uuid === uuid) {
+						const embed = new Discord.MessageEmbed()
+						.setColor('#03fc7b')
+							.setTitle('Unlinked!')
+							.setDescription(`Your discord account was already linked with \"${playerName}\"\nIt has now been unlinked.`)
+							.setFooter('Created by Kaeso#5346');
+						interaction.editReply({embeds: [embed]});
+						return;
+					}
 				}
 
 				await DataHandler.update({ discordid: interaction.user.id }, { uuid: uuid });
