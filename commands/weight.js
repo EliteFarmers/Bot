@@ -24,12 +24,13 @@ module.exports = {
 			}
 		}
 
-		await interaction.deferReply();
 		if (playerName) {
+			await interaction.deferReply();
 			PlayerHandler.getWeight(interaction, playerName, profileName ?? null);
 		} else {
 			let user = await DataHandler.getPlayer(null, { discordid: interaction.user.id });
 			if (user && user.dataValues?.ign) {
+				await interaction.deferReply();
 				PlayerHandler.getWeight(interaction, user.dataValues.ign, profileName ?? null);
 			} else {
 				const embed = new Discord.MessageEmbed()
@@ -38,7 +39,7 @@ module.exports = {
 					.addField('Proper Usage:', '`/weight` `player:`(player name)')
 					.setDescription('Checking for yourself?\nYou must use \`/verify\` \`player:\`(account name) before using this shortcut!')
 					.setFooter('Created by Kaeso#5346');
-				interaction.editReply({ embeds: [embed] })
+				interaction.reply({ embeds: [embed], ephemeral: true })
 			}
 		}
 	}
