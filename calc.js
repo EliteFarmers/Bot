@@ -4,7 +4,7 @@ const fetch = require('node-fetch');
 const throttledQueue = require('throttled-queue');
 const { hypixelApiKey } = require('./config.json');
 const { DataHandler } = require('./database.js');
-const { DataFormatter } = require('./data.js');
+const { Data } = require('./data.js');
 const throttle = throttledQueue(2, 1000);
 
 class PlayerHandler {
@@ -133,10 +133,10 @@ class PlayerHandler {
 				}
 			});
 		await this.getProfiles(uuid).then(async profiles => {
-			let data = await DataFormatter.stripData(profiles, uuid);
+			let data = await Data.stripData(profiles, uuid);
 			const user = await DataHandler.getPlayer(uuid);
 			if (user && user.dataValues?.profiledata) {
-				data = await DataFormatter.getBestData(user.dataValues.profiledata, data);
+				data = await Data.getBestData(user.dataValues.profiledata, data);
 			}
 			this.cachedPlayers.set(playerName.toLowerCase(), new Player(interaction, properName, uuid, data, user?.dataValues?.cheating ?? false));
 		}).catch(error => {
@@ -149,13 +149,13 @@ class PlayerHandler {
 		if (user?.dataValues?.profiledata) {
 			try {
 				let oldData = user.dataValues.profiledata;
-				oldData = await DataFormatter.getBestData(oldData, player.data);
-				const jacob = await DataFormatter.getBestContests(oldData);
+				oldData = await Data.getBestData(oldData, player.data);
+				const jacob = await Data.getBestContests(oldData);
 
 				return await DataHandler.update({ profiledata: oldData, contestdata: jacob }, { uuid: player.uuid });
 			} catch (e) {}
 		}
-		const jacob = await DataFormatter.getBestContests(player.data);
+		const jacob = await Data.getBestContests(player.data);
 		return await DataHandler.update({ profiledata: player.data, contestdata: jacob }, { uuid: player.uuid });
 	}
 

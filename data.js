@@ -1,4 +1,4 @@
-class DataFormatter {
+class Data {
     
     constructor() { }
 
@@ -334,5 +334,5 @@ class DataFormatter {
 }
 
 module.exports = {
-    DataFormatter
+    Data
 }
