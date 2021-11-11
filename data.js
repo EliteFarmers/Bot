@@ -1,8 +1,89 @@
+const throttledQueue = require('throttled-queue');
+const { hypixelApiKey } = require('./config.json');
+const throttle = throttledQueue(2, 1000);
+const fetch = require('node-fetch');
 class Data {
     
     constructor() { }
 
 	static CUTOFFDATE = '1590824';
+
+	static async getUUID(playerName) {
+		const uuid = await fetch(`https://api.mojang.com/users/profiles/minecraft/${playerName}`)
+			.then(response => response.json())
+			.then(result => {
+				if (result.success === false) {
+					throw new Error("That minecraft player doesn't exist");
+				} else {
+					return result;
+				}
+			})
+			.catch(error => {
+				throw error;
+			});
+		return uuid.id;
+	}
+	
+	static async getProfiles(uuid) {
+		return new Promise(async (resolve, reject) => {
+			throttle(async function() {
+				const response = await fetch(`https://api.hypixel.net/skyblock/profiles?uuid=${uuid}&key=${hypixelApiKey}`)
+					.then(response => {
+						return response.json();
+					}).then(result => {
+						if (result.success) {
+							return result;
+						}
+						reject(undefined);
+					}).catch(error => {
+						reject(undefined);
+					});
+				resolve(await response);
+			});
+		});
+	}
+
+	static async getStrippedProfiles(uuid) {
+		const profileData = await Data.getProfiles(uuid);
+		return await Data.stripData(profileData, uuid);
+	}
+
+	static async getOverview(uuid) {
+		return new Promise(async (resolve, reject) => {
+			throttle(async function() {
+				const response = await fetch(`https://api.hypixel.net/player?uuid=${uuid}&key=${hypixelApiKey}`)
+					.then(response => {
+						return response.json();
+					}).then(result => {
+						if (result.success) {
+							return result;
+						}
+						reject(undefined);
+					}).catch(error => {
+						reject(undefined);
+					});
+				resolve(await response);
+			});
+		});
+	}
+
+	static async getDiscord(uuid) {
+		return new Promise((resolve, reject) => {
+			throttle(async function() {
+				await Data.getOverview(uuid).then(data => {
+					if (!data.success) { return null; }
+					let discord = data?.player?.socialMedia?.links?.DISCORD;
+					if (discord) {
+						resolve(discord);
+					} else {
+						resolve(undefined);
+					}
+				}).catch(error => {
+					resolve(undefined);
+				});
+			});
+		});
+	}
 
     static async stripData(data, uuid) {
 		let stripped = {
@@ -44,6 +125,26 @@ class Data {
 					}
 				}
 			}
+			// Future Migration
+
+			// const key = Object.keys(data.profiles)[i];
+			// const profile = data.profiles[key];
+			// const player = profile.members[uuid];
+
+			// let addedProfile = {
+			// 	profile_id: profile.profile_id,
+			// 	cute_name: profile.cute_name,
+			// 	user: {
+			// 		experience_skill_farming: player.experience_skill_farming,
+			// 		collection: player.collection,
+			// 		crafted_generators: player.crafted_generators,
+			// 		jacob: await this.stripContests(player.jacob2),
+			// 		coop: false
+			// 	}
+			// }
+			// if (Object.keys(profile.members).length > 1) {
+			// 	addedProfile.user.coop = true;
+			// }
 
 			stripped.profiles.push(addedProfile);
 		}
@@ -129,7 +230,8 @@ class Data {
 		return formattedData;
 	}
 
-    static async getBestData(saved, fresh) {
+    static async getBestData(saved) {
+		const fresh = await Data.getStrippedProfiles(uuid);
 		try {
 			if (saved?.data) { saved = saved.data; }
 			
