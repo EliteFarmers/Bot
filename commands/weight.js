@@ -19,16 +19,14 @@ module.exports = {
 		for (let i = 0; i < Object.keys(options).length; i++) {
 			let option = options[Object.keys(options)[i]];
 			if (option.name === 'player') {
-				_profileName = option.value.trim();
+				playerName = option.value.trim();
 			} else if (option.name === 'profile') {
 				_profileName = option.value.trim();
 			}
 		}
 
-		const uuid = await Data.getUUID(playerName);
-		const user = await DataHandler.getPlayer(uuid);
-
 		if (!playerName) {
+			let user = await DataHandler.getPlayer(null, { discordid: interaction.user.id });
 			if (!user || !user.dataValues?.ign) {
 				const embed = new Discord.MessageEmbed()
 					.setColor('#03fc7b')
@@ -39,16 +37,58 @@ module.exports = {
 				interaction.reply({ embeds: [embed], ephemeral: true });
 				return;
 			}
+			
 			playerName = user.dataValues.ign;
 		}
 
+		const uuid = await Data.getUUID(playerName).then(result => {
+			playerName = result.name;
+			return result.id;
+		}).catch(() => {
+			return undefined;
+		});
+		if (!uuid) {
+			const embed = new Discord.MessageEmbed()
+				.setColor('#03fc7b')
+				.setTitle('Error: Invalid Username!')
+				.addField('Proper Usage:', '`/weight` `player:`(player name)')
+				.setFooter('Created by Kaeso#5346');
+			interaction.reply({ embeds: [embed], ephemeral: true });
+			return;
+		}
+
+		const user = await DataHandler.getPlayer(uuid);
+
 		await interaction.deferReply();
 
-		const fullData = await Data.getBestData(uuid);
-		const requestedData = getUserdata(fullData, _profileName);
-		let apiEnabled = true;
+		const fullData = await Data.getBestData(user?.dataValues?.profiledata, uuid);
 		let mainProfileuuid;
-		let mainProfile;
+		let mainCollections;
+		let mainBonus;
+		let mainWeight = 0;
+		let mainBWeight = 0;
+		const profile = await getUserdata(fullData, _profileName);
+
+		if (!profile) {
+			const embed = new Discord.MessageEmbed()
+				.setColor('#03fc7b')
+				.setTitle(`Stats for ${playerName.replace(/\_/g, '\\_')}`)
+				.addField('Farming Weight', 'Zero! - Try some farming!\nOr turn on collections API access and help make Skyblock a more transparent place!')
+				.setFooter('This could also mean that Hypixel\'s API is down.\nCreated by Kaeso#5346')
+				.setThumbnail(`https://mc-heads.net/head/${uuid}/left`);
+
+			interaction.editReply({embeds: [embed]});
+			return;
+		}
+
+		if (typeof (mainWeight + mainBWeight) === NaN) {
+			mainWeight = 0;
+			mainBWeight = 0;
+		}
+		DataHandler.updatePlayer(uuid, playerName, mainProfileuuid, mainWeight + mainBWeight);
+
+
+		interaction.editReply({content: `${mainWeight + mainBWeight}`});
 
 		async function getUserdata(data, profileName = null) {
 			// if (!this.data.profiles) {
@@ -69,52 +109,48 @@ module.exports = {
 				const key = Object.keys(profiles)[i];
 				const profile = profiles[key];
 
+				let tempCollections = await calcCollections(profile.members[uuid]);
+				let weight = await computeWeight(tempCollections);
+				let tempBonus = await calcBonus(profile.members[uuid]);
+				let bonus = await computeBonusWeight(tempBonus);
+
 				if (profileName !== null && profile.cute_name.toLowerCase() === profileName.toLowerCase()) {
 					bestProfile = profile;
-					best = false;
+					mainCollections = tempCollections;
+					mainBonus = tempBonus;
+					mainWeight = weight;
+					mainBWeight = bonus;
+
 					break;
 				}
 
-				let weight = await computeWeight(profile.members[this.uuid]);
-				let bonus = await computeBonusWeight(profile.members[this.uuid]);
-
 				if (weight) {
 					let total = weight + bonus;
-					if (bestProfile) {
-						if (total > bestWeight) {
-							bestProfile = profile;
-							bestWeight = total;
-						}
-					} else {
+					if (!bestProfile || total > bestWeight) {		
 						bestProfile = profile;
+						mainCollections = tempCollections;
+						mainBonus = tempBonus;
+						mainProfileuuid = profile.profile_id;
+						mainWeight = weight;
+						mainBWeight = bonus;
+
 						bestWeight = total;
 					}
 				}
 			}
 
-			if (!bestProfile) {
-				bestData = 0
-				return undefined;
-			}
-			//LEFT OFF HERE
-			this.weight = bestData[0];
-			this.bonusWeight = bestData[1];
-			this.collections = bestData[2];
-			this.bonus = bestData[3];
-			this.bestProfile = bestData[4];
-			this.profileuuid = this.profileData.profile_id;
-
-			this.userData = this.bestProfile;
-			this.api = this.apiFullyOff ? false : this.profileData?.api ?? true;
-			return this.bestProfile;
+			return bestProfile ?? undefined;
 		}
 
-		async function computeWeight(userData) {
-			if (!userData.collection) {
-				return undefined;
-			}
+		async function calcCollections(userData) {
+			if (!userData.collection) return undefined;
+			
+			let { 
+				WHEAT, POTATO_ITEM: POTATO, CARROT_ITEM: CARROT, 
+				MUSHROOM_COLLECTION: MUSHROOM, PUMPKIN, MELON, 
+				SUGAR_CANE: CANE, CACTUS, NETHER_STALK: WART 
+			} = userData.collection;
 
-			let { WHEAT, POTATO_ITEM: POTATO, CARROT_ITEM: CARROT, MUSHROOM_COLLECTION: MUSHROOM, PUMPKIN, MELON, SUGAR_CANE: CANE, CACTUS, NETHER_STALK: WART } = userData.collection;
 			let COCOA = userData.collection["INK_SACK:3"]; //Dumb cocoa
 
 			//Set potentially empty values to 0, and fix overflow
@@ -143,18 +179,22 @@ module.exports = {
 			collections.set('Sugar Cane', Math.round(CANE / 2000) / 100);
 			collections.set('Nether Wart', Math.round(WART / 2500) / 100);
 
-			let weight = 0;
+			return collections;
+		}
 
+		async function computeWeight(collections) {
+			if (!collections) return undefined;
+
+			let weight = 0;
 			collections.forEach(function (value, key) {
 				weight += value;
 			});
-
 			weight = Math.floor(weight * 100) / 100;
 
 			return weight;
 		}
 
-		async function computeBonusWeight(userData) {
+		async function calcBonus(userData) {
 			//Bonus sources
 			let bonus = new Map();
 
@@ -183,6 +223,7 @@ module.exports = {
 					}
 				}
 			} else if (userData.jacob2) {
+				console.log("this should never happen");
 				try {
 					//Farming level bonuses
 					let farmingCap = userData.jacob2.perks.farming_level_cap ?? 0;
@@ -231,7 +272,12 @@ module.exports = {
 			}
 
 			//Tier 12 farming minions
-			let tier12s = ['WHEAT_12', 'CARROT_12', 'POTATO_12', 'PUMPKIN_12', 'MELON_12', 'MUSHROOM_12', 'COCOA_12', 'CACTUS_12', 'SUGAR_CANE_12', 'NETHER_WARTS_12'];
+			let tier12s = [
+				'WHEAT_12', 'CARROT_12', 'POTATO_12', 
+				'PUMPKIN_12', 'MELON_12', 'MUSHROOM_12', 
+				'COCOA_12', 'CACTUS_12', 'SUGAR_CANE_12', 
+				'NETHER_WARTS_12'
+			];
 			let obtained12s = 0;
 			if (userData.crafted_generators) {
 				let obtainedMinions = userData.crafted_generators;
@@ -243,8 +289,14 @@ module.exports = {
 				bonus.set(`${obtained12s}/10 Minions`, obtained12s * 5);
 			}
 
+			return bonus;
+		}
+
+		async function computeBonusWeight(bonus) {
+			if (!bonus) return undefined;
+
 			let bonusWeight = 0;
-			bonus.forEach(function (value, key) {
+			bonus?.forEach(function (value, key) {
 				bonusWeight += value;
 			});
 

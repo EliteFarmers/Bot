@@ -21,7 +21,7 @@ class Data {
 			.catch(error => {
 				throw error;
 			});
-		return uuid.id;
+		return uuid;
 	}
 	
 	static async getProfiles(uuid) {
@@ -31,7 +31,7 @@ class Data {
 					.then(response => {
 						return response.json();
 					}).then(result => {
-						if (result.success) {
+						if (result.success === true) {
 							return result;
 						}
 						reject(undefined);
@@ -45,7 +45,7 @@ class Data {
 
 	static async getStrippedProfiles(uuid) {
 		const profileData = await Data.getProfiles(uuid);
-		return await Data.stripData(profileData, uuid);
+		return (profileData) ? await Data.stripData(profileData, uuid) : undefined;
 	}
 
 	static async getOverview(uuid) {
@@ -86,11 +86,13 @@ class Data {
 	}
 
     static async stripData(data, uuid) {
+		if (!data) return undefined;
+
 		let stripped = {
 			success: data.success,
 			profiles: []
 		}
-
+		
 		for (let i = 0; i < Object.keys(data.profiles).length; i++) {
 			let key = Object.keys(data.profiles)[i];
 			let profile = data.profiles[key];
@@ -230,8 +232,11 @@ class Data {
 		return formattedData;
 	}
 
-    static async getBestData(saved) {
+    static async getBestData(saved, uuid) {
 		const fresh = await Data.getStrippedProfiles(uuid);
+		if (!saved && fresh) {
+			return await this.stripData(fresh);
+		}
 		try {
 			if (saved?.data) { saved = saved.data; }
 			
