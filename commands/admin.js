@@ -1,6 +1,5 @@
 const Discord = require('discord.js');
 const { Auth } = require('../auth.js');
-const { PlayerHandler } = require('../calc.js');
 const { superusers } = require('../config.json');
 const { DataHandler } = require('../database.js');
 
@@ -103,14 +102,11 @@ module.exports = {
 									const user = (response.length === 32) ? await DataHandler.getPlayer(response) : await DataHandler.getPlayerByName(response);
 									if (user) {
 										const toggle = !user.dataValues.cheating;
-										await DataHandler.update({ cheating: toggle, rank: 0 }, { uuid: user.dataValues.uuid });
+										await DataHandler.update({ cheating: toggle, rank: 0, updatedat: Date.now() - (600000) }, { uuid: user.dataValues.uuid });
 										console.log(`Set ${user.dataValues?.ign}'s cheating status to ${toggle}`);
 										await DataHandler.getPlayer(user.dataValues.uuid).then(user => {
 											collected.first().reply({ content: `${user.dataValues.ign} has been labled as ${toggle ? 'cheating.' : 'legit.'}` });
 										});
-										if (PlayerHandler.cachedPlayers.has(user.dataValues?.ign.toLowerCase())) {
-											PlayerHandler.cachedPlayers.delete(user.dataValues?.ign.toLowerCase());
-										}
 										throw new Error();
 									} else {
 										collected.first().reply({ content: 'Specify a valid uuid next time.' })

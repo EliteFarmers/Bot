@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { PlayerHandler } = require('../calc.js');
+const Canvas = require('canvas');
 const { Data } = require('../data.js');
 const { DataHandler } = require('../database.js');
 
@@ -57,11 +57,19 @@ module.exports = {
 			return;
 		}
 
+		let grabnewdata = true;
 		const user = await DataHandler.getPlayer(uuid);
+		if (user && user.dataValues?.updatedat) {
+			grabnewdata = !(+user.dataValues?.updatedat < Date.now() - (10 * 60 * 1000));
+		}
 
 		await interaction.deferReply();
 
-		const fullData = await Data.getBestData(user?.dataValues?.profiledata, uuid);
+		console.log(grabnewdata);
+		const fullData = (grabnewdata) 
+			? await Data.getBestData(user?.dataValues?.profiledata, uuid) 
+			: user?.dataValues?.profiledata;
+
 		let mainProfileuuid;
 		let mainCollections;
 		let mainBonus;
@@ -85,20 +93,17 @@ module.exports = {
 			mainWeight = 0;
 			mainBWeight = 0;
 		}
-		DataHandler.updatePlayer(uuid, playerName, mainProfileuuid, mainWeight + mainBWeight);
+
+		if (grabnewdata) await DataHandler.updatePlayer(uuid, playerName, mainProfileuuid, mainWeight + mainBWeight);
+		
+		const sent = await sendWeight();
 
 
-		interaction.editReply({content: `${mainWeight + mainBWeight}`});
 
 		async function getUserdata(data, profileName = null) {
-			// if (!this.data.profiles) {
-			// 	return null;
-			// }
-
-			// if (user !== null) {
-			// 	this.rank = user.dataValues.rank;
-			// 	this.mainProfileuuid = user.dataValues.profile;
-			// }
+			if (!data || !data?.profiles) {
+				return undefined;
+			}
 
 			let profiles = data.profiles;
 			let bestProfile = null;
@@ -301,6 +306,289 @@ module.exports = {
 			});
 
 			return bonusWeight;
+		}
+
+		async function sendWeight() {
+			if (!profile) {
+				const embed = new Discord.MessageEmbed()
+					.setColor('#03fc7b')
+					.setTitle(`Stats for ${this.playerName.replace(/\_/g, '\\_')}`)
+					.addField('Farming Weight', 'Zero! - Try some farming!\nOr turn on API access and help make Skyblock a better place.')
+					.setFooter('Created by Kaeso#5346')
+					.setThumbnail(`https://mc-heads.net/head/${this.uuid}/left`);
+	
+				interaction.editReply({embeds: [embed]});
+				return;
+			}
+			
+			const row = new Discord.MessageActionRow().addComponents(
+				new Discord.MessageButton()
+					.setCustomId('info')
+					.setLabel('More Info')
+					.setStyle('SUCCESS'),
+				new Discord.MessageButton()
+					.setLabel('SkyCrypt')
+					.setStyle('LINK')
+					.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${profile.cute_name}`),
+				new Discord.MessageButton()
+					.setLabel('Plancke')
+					.setStyle('LINK')
+					.setURL(`https://plancke.io/hypixel/player/stats/${playerName}`)
+			);
+			
+			let result = "Hey what's up?";
+			let rWeight = Math.round((mainWeight + mainBWeight) * 100) / 100;
+	
+			if (rWeight > 1) {
+				result = rWeight.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+			} else if (rWeight === -1) {
+				result = 'This player has collections API off!';
+			} else {
+				result = rWeight;
+			}
+	
+	
+			/*
+			The below code is not fun at all and just generally awful, but basically the only way to do all this so yeah.
+	
+			Different sections are commented but you sort of need to know what you're looking at already.
+			*/
+	
+	
+			//Get image relating to their top collection
+			let imagePath;
+			if (mainCollections) {
+				const topCollection = new Map([...mainCollections.entries()].sort((a, b) => b[1] - a[1])).entries().next().value[0];
+				imagePath = `./images/${topCollection.toLowerCase().replace(' ', '_')}.png`;
+			} else {
+				imagePath = `./images/wheat.png`
+			}
+	
+			const { registerFont, createCanvas } = require('canvas');
+			registerFont('./fonts/OpenSans-Regular.ttf', { family: 'Open Sans' });
+			let attachment;
+	
+			//Load crop image and avatar
+			const background = await Canvas.loadImage(imagePath)
+			const avatar = await Canvas.loadImage(`https://mc-heads.net/head/${uuid}/left`).catch(collected => {
+				console.log("Couldn't load image")
+				return null;
+			});
+	
+			//Create our canvas and draw the crop image
+			const canvas = createCanvas(background.width, background.height);
+			const ctx = canvas.getContext('2d');
+	
+			ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+		
+			//Add name and rank, then resize to fit
+			let name = playerName;
+			if (user?.dataValues && user?.dataValues?.rank !== 0 && mainProfileuuid === profile.profile_id) {
+				name = (`${playerName} - #${user.dataValues?.rank}`);
+			}
+	
+			ctx.font = '100px "Open Sans"';
+			let fontSize = 100;
+			do {
+				fontSize--;
+				ctx.font = fontSize + 'px ' + "Open Sans";
+			} while (ctx.measureText(name).width > canvas.width * 0.66);
+	
+			const metrics = ctx.measureText(name);
+			let fontHeight = metrics.emHeightAscent + metrics.emHeightDescent;
+	
+			ctx.fillStyle = '#dddddd';
+			ctx.fillText(name, 55, 90 - (90 - fontHeight) / 2);
+			ctx.save();
+	
+			//Add weight and label, then resize to fit
+			ctx.font = '256px "Open Sans"';
+			fontSize = 256;
+	
+			do {
+				fontSize--;
+				ctx.font = fontSize + 'px ' + "Open Sans";
+			} while (ctx.measureText(result).width > canvas.width * 0.66);
+			let weightWidth = ctx.measureText(result).width;
+	
+			ctx.fillStyle = '#dddddd';
+			ctx.fillText(result, 50, canvas.height * 0.9);
+	
+			ctx.font = '64px "Open Sans"';
+			fontSize = 64;
+	
+			do {
+				fontSize--;
+				ctx.font = fontSize + 'px ' + "Open Sans";
+			} while (ctx.measureText('Weight').width + weightWidth > canvas.width - 515);
+	
+			ctx.fillStyle = '#dddddd';
+			ctx.fillText('Weight', weightWidth + 75, canvas.height * 0.9);
+			let mes = ctx.measureText('Weight');
+			ctx.fillText('Farming', weightWidth + 75, canvas.height * 0.9 - (mes.emHeightAscent + mes.emHeightDescent));
+	
+			//Draw avatar
+			if (avatar) {
+				ctx.drawImage(avatar, canvas.width - (canvas.height * 0.8) - 50, (canvas.height - canvas.height * 0.8) / 2, canvas.height * 0.8, canvas.height * 0.8);
+				ctx.restore();
+			}
+		
+			attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'weight.png');
+	
+			let reply;
+	
+			if (user?.dataValues?.cheating) {
+				const embed = new Discord.MessageEmbed()
+					.setColor('#03fc7b')
+					.setDescription(`**This player is a __cheater__.** ${!profile.api ? ` They also turned off their api access.` : ``}`)
+					.setFooter('Players are only marked as cheating when it\'s proven beyond a reasonable doubt.\nThey hold no position in any leaderboards.');
+				reply = {
+					files: [attachment],
+					components: [row],
+					embeds: [embed],
+					allowedMentions: { repliedUser: false }
+				}
+			} else if (profile.api) {
+				reply = {
+					files: [attachment],
+					components: [row],
+					allowedMentions: { repliedUser: false }
+				}
+			} else {
+				const embed = new Discord.MessageEmbed()
+					.setColor('#03fc7b')
+					.setDescription(`**This data is outdated!** ${playerName.replace(/\_/g, '\\_')} turned off their api access.`);
+				reply = {
+					files: [attachment],
+					components: [row],
+					embeds: [embed],
+					allowedMentions: { repliedUser: false }
+				}
+			}
+	
+			interaction.editReply(reply).then(async () => {
+				let reply = await interaction.fetchReply();
+				let infoClicked = false;
+	
+				const collector = reply.createMessageComponentCollector({ componentType: 'BUTTON', time: 30000 });
+	
+				collector.on('collect', i => {
+					if (i.user.id === interaction.user.id) {
+						sendDetailedWeight(i, mainWeight, true);
+						infoClicked = true;
+						collector.stop();
+					} else {
+						i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
+					}
+				});
+	
+				collector.on('end', collected => {
+					if (infoClicked) return;
+					try {
+						const linkRow = new Discord.MessageActionRow().addComponents(
+							new Discord.MessageButton()
+								.setLabel('SkyCrypt')
+								.setStyle('LINK')
+								.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${profile.cute_name}`),
+							new Discord.MessageButton()
+								.setLabel('Plancke')
+								.setStyle('LINK')
+								.setURL(`https://plancke.io/hypixel/player/stats/${playerName}`)
+						);
+						reply.edit({ components: [linkRow], allowedMentions: { repliedUser: false } })
+					} catch (error) { console.log(error) }
+				});
+			}).catch(error => { console.log(error) });
+		}
+	
+		async function sendDetailedWeight(interaction, weight, edit = false) {
+			let result = "Hey what's up?";
+			weight = Math.round((weight + mainBWeight) * 100) / 100;
+	
+			if (weight > 1) {
+				result = weight.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+			} else if (weight === -1) {
+				result = 'This player has collections API off!';
+			} else {
+				result = weight;
+			}
+	
+			const embed = new Discord.MessageEmbed()
+				.setColor('#03fc7b')
+				.setTitle(`Stats for ${playerName.replace(/\_/g, '\\_')} on ${profile.cute_name}`)
+				.addField('Farming Weight', !result ? '0 - Try some farming!' : result + ' ')
+				.addField('Breakdown', getBreakdown(), edit)
+				.setFooter('Created by Kaeso#5346    Questions? Use /info');
+			
+			if (!edit) {
+				embed.setThumbnail(`https://mc-heads.net/head/${uuid}/left`)
+			}
+	
+			if (user?.dataValues?.rank !== undefined && user?.dataValues?.rank !== 0 && mainProfileuuid === profile.profile_id && !edit) {
+				embed.setDescription(`**${playerName.replace(/\_/g, '\\_')}** is rank **#${user?.dataValues?.rank}!**`)
+			}
+	
+			if (mainBonus.size > 0) {
+				embed.addField('Bonus', getBonus(), edit);
+			}
+	
+			let notes = '';
+			if (Object.keys(profile.members).length > 1) {
+				notes += 'This player has been or is a co op member';
+			}
+	
+			if (user?.dataValues?.cheating) { 
+				notes += `\n**This player is a __cheater__.** ${!profile.api ? ` They also turned off their api access.` : ``}`;
+			} else if (!profile.api) {
+				notes += `\n**This data is outdated! ${playerName.replace(/\_/g, '\\_')} turned off their api access.**`;
+			}
+	
+			if (notes !== '') {
+				embed.addField('Notes', notes);
+			}
+	
+			if (!edit) {
+				interaction.editReply({ embeds: [embed], allowedMentions: { repliedUser: false } }).catch(error => {
+					console.log(error);
+				});
+			} else {
+				const row = new Discord.MessageActionRow().addComponents(
+					new Discord.MessageButton()
+						.setLabel('SkyCrypt')
+						.setStyle('LINK')
+						.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${profile.cute_name}`),
+					new Discord.MessageButton()
+						.setLabel('Plancke')
+						.setStyle('LINK')
+						.setURL(`https://plancke.io/hypixel/player/stats/${playerName}`)
+				);
+				interaction.update({ embeds: [embed], allowedMentions: { repliedUser: false }, files: [], components: [row] });
+			}
+		}
+	
+		function getBreakdown() {
+			//Sort collections
+			const sortedCollections = new Map([...mainCollections.entries()].sort((a, b) => b[1] - a[1]));
+			let breakdown = '';
+			
+			sortedCollections.forEach(function (value, key) {
+				let percent = Math.floor(value / mainWeight * 100);
+				breakdown += (percent > 1) ? `${key}: ${value}  [${percent}%]\n` : (percent > 1) ? `${key}: ${value}  [${percent}%]\n` : '';
+			});
+	
+			return breakdown === '' ? "This player has no notable collections" : breakdown;
+		}
+	
+		function getBonus() {
+			//Sort bonus
+			const sortedBounus = new Map([...mainBonus.entries()].sort((a, b) => b[1] - a[1]));
+			let bonusText = '';
+	
+			sortedBounus.forEach(function (value, key) {
+				bonusText += `${key}: ${value}\n`;
+			});
+	
+			return bonusText === '' ? 'No bonus points :(' : bonusText;
 		}
 	}
 };

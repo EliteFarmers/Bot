@@ -86,7 +86,7 @@ class Data {
 	}
 
     static async stripData(data, uuid) {
-		if (!data) return undefined;
+		if (!data || !data?.profiles) return undefined;
 
 		let stripped = {
 			success: data.success,
@@ -101,7 +101,8 @@ class Data {
 			let addedProfile = {
 				profile_id: profile.profile_id,
 				cute_name: profile.cute_name,
-				members: {}
+				members: {},
+				api: true
 			}
 			if (Object.keys(profile.members).length > 1) {
 				addedProfile.members = {
@@ -235,7 +236,9 @@ class Data {
     static async getBestData(saved, uuid) {
 		const fresh = await Data.getStrippedProfiles(uuid);
 		if (!saved && fresh) {
-			return await this.stripData(fresh);
+			return await Data.stripData(fresh, uuid);
+		} else if (!saved && !fresh) {
+			return undefined;
 		}
 		try {
 			if (saved?.data) { saved = saved.data; }

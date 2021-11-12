@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { PlayerHandler } = require('../calc.js');
+const { Data } = require('../data.js');
 const { DataHandler } = require('../database.js');
 
 module.exports = {
@@ -17,14 +17,14 @@ module.exports = {
 
         await interaction.deferReply().then(async () => {
 
-			const uuid = await PlayerHandler.getUUID(playerName).then(response => {
+			const uuid = await Data.getUUID(playerName).then(response => {
 				return response.id;
 			}).catch(error => {
 				console.log(error);
 				return undefined;
 			});
 
-			let discordTag = (uuid) ? await PlayerHandler.getDiscord(uuid) : null;
+			let discordTag = (uuid) ? await Data.getDiscord(uuid) : null;
 
 			if (discordTag === undefined) {
 				const embed = new Discord.MessageEmbed()
