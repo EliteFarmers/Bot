@@ -53,11 +53,11 @@ class DataHandler {
             if (user) {
                 if (user.dataValues.weight > newWeight && user.dataValues.profile !== profileuuid) {
                     if (!user.dataValues.profile) {
-                        let updatedUser = await Users.update({ name: playerName, profile: profileuuid }, { where: { uuid: playeruuid } });
+                        let updatedUser = await Users.update({ name: playerName, profile: profileuuid, updatedat: Date.now().toString() }, { where: { uuid: playeruuid } });
                     }
                     return;
                 }
-                let updatedUser = await Users.update({ weight: newWeight, name: playerName, profile: profileuuid }, { where: { uuid: playeruuid } });
+                let updatedUser = await Users.update({ weight: newWeight, name: playerName, profile: profileuuid, updatedat: Date.now().toString() }, { where: { uuid: playeruuid } });
             } else {
                 const newerUser = await Users.create({
                     uuid: playeruuid,

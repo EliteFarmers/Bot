@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { PlayerHandler } = require('../calc.js');
+const { Data } = require('../data.js');
 const { DataHandler } = require('../database.js');
 
 module.exports = {
@@ -17,18 +17,18 @@ module.exports = {
 
         await interaction.deferReply().then(async () => {
 
-			const uuid = await PlayerHandler.getUUID(playerName).then(response => {
+			const uuid = await Data.getUUID(playerName).then(response => {
 				return response.id;
 			}).catch(error => {
 				console.log(error);
 				return undefined;
 			});
 
-			let discordTag = (uuid) ? await PlayerHandler.getDiscord(uuid) : null;
+			let discordTag = (uuid) ? await Data.getDiscord(uuid) : null;
 
 			if (discordTag === undefined) {
 				const embed = new Discord.MessageEmbed()
-					.setColor('#03fc7b')
+					.setColor('#CB152B')
 					.setTitle('Error: No Discord Linked!')
 					.setDescription('Link this discord account to your Minecraft account on Hypixel first!')
 					.setFooter('Created by Kaeso#5346');
@@ -36,7 +36,7 @@ module.exports = {
 				return;
 			} else if (!discordTag) {
 				const embed = new Discord.MessageEmbed()
-					.setColor('#03fc7b')
+					.setColor('#CB152B')
 					.setTitle('Error: Invalid Username!')
 					.setDescription(`"${playerName}" doesn't play skyblock! Double check your spelling.`)
 					.setFooter('Created by Kaeso#5346');
@@ -47,7 +47,7 @@ module.exports = {
 			let userTag = interaction.user.username + '#' + interaction.user.discriminator;
 			if (userTag !== discordTag) {
 				const embed = new Discord.MessageEmbed()
-					.setColor('#03fc7b')
+					.setColor('#CB152B')
 					.setTitle('Error: Account Mismatch!')
 					.setDescription(`Your discord account does not match the one linked with \"${playerName}\"`)
 					.setFooter('Created by Kaeso#5346');

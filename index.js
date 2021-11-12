@@ -1,7 +1,6 @@
 const fs = require('fs');
 const Discord = require('discord.js');
 const { token } = require('./config.json');
-const { Player, PlayerHandler } = require('./calc.js');
 const { DataHandler } = require('./database.js')
 const args = process.argv.slice(2);
 
@@ -56,11 +55,6 @@ client.on('interactionCreate', async (interaction) => {
 		await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => {});
 	}
 });
-
-var minutes = 15, interval = minutes * 60 * 1000;
-setInterval(function () {
-	PlayerHandler.clearCache(minutes);
-}, interval);
 
 setInterval(function () {
 	DataHandler.updateLeaderboard();

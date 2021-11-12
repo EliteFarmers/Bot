@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER
     },
     discordid: {
-        type: DataTypes.JSON
+        type: DataTypes.STRING
     },
     profiledata: {
         type: DataTypes.JSON
@@ -44,6 +44,10 @@ module.exports = (sequelize, DataTypes) => {
     cheating: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
+    },
+    updatedat: {
+        type: DataTypes.STRING,
+        defaultValue: Date.now().toString()
     }
 }, {
     sequelize: sequelize,
