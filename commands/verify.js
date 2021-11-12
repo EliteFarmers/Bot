@@ -28,7 +28,7 @@ module.exports = {
 
 			if (discordTag === undefined) {
 				const embed = new Discord.MessageEmbed()
-					.setColor('#03fc7b')
+					.setColor('#CB152B')
 					.setTitle('Error: No Discord Linked!')
 					.setDescription('Link this discord account to your Minecraft account on Hypixel first!')
 					.setFooter('Created by Kaeso#5346');
@@ -36,7 +36,7 @@ module.exports = {
 				return;
 			} else if (!discordTag) {
 				const embed = new Discord.MessageEmbed()
-					.setColor('#03fc7b')
+					.setColor('#CB152B')
 					.setTitle('Error: Invalid Username!')
 					.setDescription(`"${playerName}" doesn't play skyblock! Double check your spelling.`)
 					.setFooter('Created by Kaeso#5346');
@@ -47,7 +47,7 @@ module.exports = {
 			let userTag = interaction.user.username + '#' + interaction.user.discriminator;
 			if (userTag !== discordTag) {
 				const embed = new Discord.MessageEmbed()
-					.setColor('#03fc7b')
+					.setColor('#CB152B')
 					.setTitle('Error: Account Mismatch!')
 					.setDescription(`Your discord account does not match the one linked with \"${playerName}\"`)
 					.setFooter('Created by Kaeso#5346');

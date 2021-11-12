@@ -233,13 +233,7 @@ class Data {
 		return formattedData;
 	}
 
-    static async getBestData(saved, uuid) {
-		const fresh = await Data.getStrippedProfiles(uuid);
-		if (!saved && fresh) {
-			return await Data.stripData(fresh, uuid);
-		} else if (!saved && !fresh) {
-			return undefined;
-		}
+	static async takeNewestData(saved, fresh) {
 		try {
 			if (saved?.data) { saved = saved.data; }
 			
@@ -285,6 +279,16 @@ class Data {
 			console.log(e);
 			return fresh;
 		}
+	}
+
+    static async getBestData(saved, uuid) {
+		const fresh = await Data.getStrippedProfiles(uuid);
+		if (!saved && fresh) {
+			return await Data.stripData(fresh, uuid);
+		} else if (!saved && !fresh) {
+			return undefined;
+		}
+		return await Data.takeNewestData(saved, fresh);
 	}
 
     static async getBestContests(data) {

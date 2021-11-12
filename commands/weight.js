@@ -29,10 +29,10 @@ module.exports = {
 			let user = await DataHandler.getPlayer(null, { discordid: interaction.user.id });
 			if (!user || !user.dataValues?.ign) {
 				const embed = new Discord.MessageEmbed()
-					.setColor('#03fc7b')
+					.setColor('#CB152B')
 					.setTitle('Error: Specify a Username!')
 					.addField('Proper Usage:', '`/weight` `player:`(player name)')
-					.setDescription('Checking for yourself?\nYou must use \`/verify\` \`player:\`(account name) before using this shortcut!')
+					.setDescription('Checking for yourself?\nYou must use \`/verify\` \`player:\`(account name) before using this shortcut!\n**Please verify again if you were already, this data had to be reset**')
 					.setFooter('Created by Kaeso#5346');
 				interaction.reply({ embeds: [embed], ephemeral: true });
 				return;
@@ -49,8 +49,9 @@ module.exports = {
 		});
 		if (!uuid) {
 			const embed = new Discord.MessageEmbed()
-				.setColor('#03fc7b')
+				.setColor('#CB152B')
 				.setTitle('Error: Invalid Username!')
+				.setDescription(`Player "${playerName}" does not exist.`)
 				.addField('Proper Usage:', '`/weight` `player:`(player name)')
 				.setFooter('Created by Kaeso#5346');
 			interaction.reply({ embeds: [embed], ephemeral: true });
@@ -60,12 +61,11 @@ module.exports = {
 		let grabnewdata = true;
 		const user = await DataHandler.getPlayer(uuid);
 		if (user && user.dataValues?.updatedat) {
-			grabnewdata = !(+user.dataValues?.updatedat < Date.now() - (10 * 60 * 1000));
+			grabnewdata = (+(user.dataValues?.updatedat ?? 0) < +(Date.now() - (10 * 60 * 1000)));
 		}
 
 		await interaction.deferReply();
 
-		console.log(grabnewdata);
 		const fullData = (grabnewdata) 
 			? await Data.getBestData(user?.dataValues?.profiledata, uuid) 
 			: user?.dataValues?.profiledata;
@@ -79,7 +79,7 @@ module.exports = {
 
 		if (!profile) {
 			const embed = new Discord.MessageEmbed()
-				.setColor('#03fc7b')
+				.setColor('#CB152B')
 				.setTitle(`Stats for ${playerName.replace(/\_/g, '\\_')}`)
 				.addField('Farming Weight', 'Zero! - Try some farming!\nOr turn on collections API access and help make Skyblock a more transparent place!')
 				.setFooter('This could also mean that Hypixel\'s API is down.\nCreated by Kaeso#5346')
@@ -96,9 +96,13 @@ module.exports = {
 
 		if (grabnewdata) await DataHandler.updatePlayer(uuid, playerName, mainProfileuuid, mainWeight + mainBWeight);
 		
-		const sent = await sendWeight();
+		await sendWeight();
+		await saveData();
 
-
+		async function saveData() {
+			const jacob = await Data.getBestContests(fullData);
+			return await DataHandler.update({ profiledata: fullData, contestdata: jacob }, { uuid: uuid });
+		}
 
 		async function getUserdata(data, profileName = null) {
 			if (!data || !data?.profiles) {
@@ -227,53 +231,6 @@ module.exports = {
 						bonus.set(`${roundDown} Gold Medals`, roundDown / 2);
 					}
 				}
-			} else if (userData.jacob2) {
-				console.log("this should never happen");
-				try {
-					//Farming level bonuses
-					let farmingCap = userData.jacob2.perks.farming_level_cap ?? 0;
-					if (userData.experience_skill_farming > 111672425 && farmingCap === 10) {
-						bonus.set('Farming Level 60', 250);
-					} else if (userData.experience_skill_farming > 55172425) {
-						bonus.set('Farming Level 50', 100);
-					}
-
-					//Anita buff bonus
-					let anitaBuff = userData.jacob2.perks.double_drops ?? 0;
-					if (anitaBuff > 0) {
-						bonus.set(`${anitaBuff * 2}% Anita Buff`, anitaBuff * 2);
-					}
-
-					//Calculate Amount of Gold medals won
-					let earnedGolds = 0;
-					let contests = userData.jacob2.contests;
-					if (contests) {
-						for (let i = 0; i < Object.keys(contests).length; i++) {
-							let contest = contests[Object.keys(contests)[i]];
-
-							let position = ('claimed_position' in contest) ? contest['claimed_position'] : -1;
-							let participants = ('claimed_participants' in contest) ? contest['claimed_participants'] : -1;
-
-							if (position !== -1 && participants !== -1) {
-								earnedGolds += ((participants * 0.05) - 1 >= position) ? 1 : 0;
-							} else {
-								continue;
-							}
-
-							if (earnedGolds > 1000) {
-								break;
-							}
-						}
-					}
-					if (earnedGolds >= 1000) {
-						bonus.set('1,000 Gold Medals', 500);
-					} else {
-						let roundDown = Math.floor(earnedGolds / 50) * 50;
-						if (roundDown > 0) {
-							bonus.set(`${roundDown} Gold Medals`, roundDown / 2);
-						}
-					}
-				} catch (e) { }
 			}
 
 			//Tier 12 farming minions
@@ -439,7 +396,7 @@ module.exports = {
 	
 			if (user?.dataValues?.cheating) {
 				const embed = new Discord.MessageEmbed()
-					.setColor('#03fc7b')
+					.setColor('#FF8600')
 					.setDescription(`**This player is a __cheater__.** ${!profile.api ? ` They also turned off their api access.` : ``}`)
 					.setFooter('Players are only marked as cheating when it\'s proven beyond a reasonable doubt.\nThey hold no position in any leaderboards.');
 				reply = {
@@ -456,7 +413,7 @@ module.exports = {
 				}
 			} else {
 				const embed = new Discord.MessageEmbed()
-					.setColor('#03fc7b')
+					.setColor('#FF8600')
 					.setDescription(`**This data is outdated!** ${playerName.replace(/\_/g, '\\_')} turned off their api access.`);
 				reply = {
 					files: [attachment],
