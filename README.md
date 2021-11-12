@@ -3,7 +3,7 @@
 Elite is a discord bot made for Hypixel Skyblock farmers, providing a custom weight system to compare stats. 
 *Originally made for the Elite Skyblock Farmers discord.*
 
-The bot calculates farming weight by using a player's collections[^1] and a few sources of bonus points listed below. Farming XP couldn't be used as the main metric due to XP being different per crop, and just not being useful in the sense of farming weight. If you'd like to see the top farmers by XP there's plenty of places to see that. 
+The bot calculates farming weight by computing a player's collections[^1] from the api and a few sources of bonus points listed below. Farming XP couldn't be used as the main metric due to XP being different per crop, and just not being useful in the sense of farming weight. If you'd like to see the top farmers by XP there's plenty of places to see that. 
 
 Farming weight shows a more accurate number that represents total time spent farming, as peak farming only averages around 7 weight per hour no matter which crop.
 
@@ -55,7 +55,7 @@ For all your questions!
 
 ---
 ### /verify
-Link your Minecraft account so you no longer need to specify your player name!
+Link your Minecraft account so you no longer need to specify your player name! In order for this to work you must have your discord linked on Hypixel. Run the same command again to remove the link.
 
 **Usage:** `/verify` `[playerName]: <ign>`
 
