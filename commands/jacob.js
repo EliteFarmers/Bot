@@ -61,9 +61,9 @@ module.exports = {
 
         let grabnewdata = true;
 		const user = await DataHandler.getPlayer(uuid);
-		// if (user && user.dataValues?.updatedat) {
-		// 	grabnewdata = (+(user.dataValues?.updatedat ?? 0) < +(Date.now() - (10 * 60 * 1000)));
-		// }
+		if (user && user.dataValues?.updatedat) {
+			grabnewdata = (+(user.dataValues?.updatedat ?? 0) < +(Date.now() - (10 * 60 * 1000)));
+		}
 
 		await interaction.deferReply();
 
@@ -254,7 +254,7 @@ module.exports = {
             const newEmbed = new Discord.MessageEmbed()
                 .setColor('#03fc7b')
                 .setTitle(`Recent ${selectedCrop ? Data.getReadableCropName(selectedCrop) : 'Jacob\'s'} Contests for ${user?.dataValues?.ign ? user?.dataValues?.ign.replace(/\_/g, '\\_') : playerName}${profileName ? ` on ${profileName}` : ``}`)
-                .setFooter(`Note: Highscores only valid after ${Data.getReadableDate(Data.CUTOFFDATE)}\nCreated by Kaeso#5346    Run the weight command to update a player!`);
+                .setFooter(`Note: Highscores only valid after ${Data.getReadableDate(Data.CUTOFFDATE)}\nCreated by Kaeso#5346    Can take up to 10 minutes to update`);
 
             const contests = (selectedCrop) ? contestData.recents[selectedCrop] : contestData.recents.overall;
 
@@ -312,7 +312,7 @@ module.exports = {
             const embed = new Discord.MessageEmbed()
                 .setColor('#03fc7b')
                 .setTitle(`${!profileName || allcrops ? `Overall ` : ``}Jacob's High Scores for ${user?.dataValues?.ign ? user?.dataValues?.ign.replace(/\_/g, '\\_') : playerName.replace(/\_/g, '\\_') }${profileName ? ` on ${profileName}` : ``}`)
-                .setFooter(`Note: Scores only valid after ${Data.getReadableDate(Data.CUTOFFDATE)}\nCreated by Kaeso#5346    Run the weight command to update a player!`)
+                .setFooter(`Note: Scores only valid after ${Data.getReadableDate(Data.CUTOFFDATE)}\nCreated by Kaeso#5346    Can take up to 10 minutes to update`)
                 .setDescription(`
 🥇 ${cMedals.gold} / **${tMedals.gold}** 🥈 ${cMedals.silver} / **${tMedals.silver}** 🥉 ${cMedals.bronze} / **${tMedals.bronze}**
 
