@@ -21,7 +21,19 @@ client.once('ready', async () => {
 	console.log('Ready!');
 });
 
-client.on('interactionCreate', async (interaction) => {	
+client.on('interactionCreate', async (interaction) => {
+	if (interaction.isButton()) {
+		if (interaction.customId.includes('jacob')) {
+			try {
+				await client.commands.get('jacob').execute(interaction, interaction.customId.split('_')[1]);
+			} catch (error) {
+				console.log(error);
+				await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => {});
+			}
+		} else {
+			return;
+		}
+	}
 	if (!interaction.isCommand()) return;
 	if (!client.commands.has(interaction.commandName)) return;
 

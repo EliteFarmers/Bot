@@ -288,9 +288,9 @@ module.exports = {
 					.setStyle('LINK')
 					.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${profile.cute_name}`),
 				new Discord.MessageButton()
-					.setLabel('Plancke')
-					.setStyle('LINK')
-					.setURL(`https://plancke.io/hypixel/player/stats/${playerName}`)
+					.setCustomId(`jacob_${playerName}`)
+					.setLabel('Jacob\'s Stats')
+					.setStyle('DANGER')
 			);
 			
 			let result = "Hey what's up?";
@@ -431,9 +431,11 @@ module.exports = {
 	
 				collector.on('collect', i => {
 					if (i.user.id === interaction.user.id) {
-						sendDetailedWeight(i, mainWeight, true);
-						infoClicked = true;
-						collector.stop();
+						if (i.customId === 'info') {
+							sendDetailedWeight(i, mainWeight, true);
+							infoClicked = true;
+							collector.stop();
+						}
 					} else {
 						i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
 					}
