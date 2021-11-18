@@ -81,7 +81,7 @@ module.exports = {
 			const embed = new Discord.MessageEmbed()
 				.setColor('#03fc7b')
 				.setTitle('Success!')
-				.setDescription(`Your minecraft account ${user.dataValues.ign} has been linked! Try \`/weight\` with no arguments!`)
+				.setDescription(`Your minecraft account \`${await DataHandler.getPlayer(uuid).then(user => user.dataValues.ign)}\` has been linked! Try \`/weight\` with no arguments!`)
 				.setFooter('Created by Kaeso#5346');
 			interaction.editReply({embeds: [embed]});
 		});		
