@@ -10,7 +10,7 @@ The bot calculates farming weight by computing a player's collections[^1] from t
 
 Farming weight shows a more accurate number that represents total time spent farming, as peak farming only averages around 7 weight per hour no matter which crop.
 
-### [Bot Invite Link](https://discord.com/oauth2/authorize?client_id=845065148997566486&scope=applications.commands%20bot&permissions=2214718528)
+### [Bot Invite Link](https://discord.com/api/oauth2/authorize?client_id=845065148997566486&permissions=277092550656&scope=applications.commands%20bot)
 
 ## Commands
 
