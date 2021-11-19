@@ -24,9 +24,10 @@ The heart and soul of the bot.
 
 **Usage:** `/weight` `(playerName): <ign>` `(profile): <name>`
 
-![weight](https://user-images.githubusercontent.com/24925519/141417392-bd4ec50f-6e88-482f-9032-220080806d41.png)
+![weight](https://user-images.githubusercontent.com/24925519/142559076-5d6febfd-0a53-428d-b337-42cb3b4a4aca.png)
 
 Clicking "More Info" reveals a specific breakdown of where your weight comes from.
+Clicking "Jacob's Stats" does the same as `/jacob`
 
 ---
 ### /leaderboard
@@ -34,7 +35,7 @@ The fantastic flex, and largest letdown.
 
 **Usage:** `/leaderboard` `(playerName): <ign>`
 
-![leaderboard](https://user-images.githubusercontent.com/24925519/141417369-183d77c4-91a7-4dde-9377-d638a648e29d.png)
+![leaderboard](https://user-images.githubusercontent.com/24925519/142559144-c2ffa8be-02a0-45e5-b63c-2afb20b2416c.png)
 
 Specifying a player name will jump to their location on the leaderboard. Please note that scores may take up to 1 minute to update.
 
@@ -44,9 +45,15 @@ Check out your Jacob's contest stats! *Note: Still in development, features will
 
 **Usage:** `/jacob` `(playerName): <ign>` `(profile): <name>`
 
-![jacob](https://user-images.githubusercontent.com/24925519/141417352-36eb900c-b5f5-44da-87ac-a4e4a28c7f59.png)
+![jacob](https://user-images.githubusercontent.com/24925519/142559175-9cdce23d-0ffb-4265-b323-2821cd827675.png)
 
 **Scores only valid after Autumn 24th, Year 160** because that was the date of the last nerf to farming. "All Crops" will show your highscore since the cutoff in each crop.
+
+**Recent Contests:**
+
+![Contests](https://user-images.githubusercontent.com/24925519/142559214-212b7987-e1bb-4952-a827-171f81f76918.png)
+
+You can filter by crop and show up to 10 per.
 
 ---
 ### /info
@@ -54,7 +61,7 @@ For all your questions!
 
 **Usage:** `/info`
 
-![info](https://user-images.githubusercontent.com/24925519/141417324-7897b082-5970-40c9-9795-2c2820009c7d.png)
+![info](https://user-images.githubusercontent.com/24925519/142559256-1ffc3d17-1bc3-488e-b872-a62954b408f2.png)
 
 ---
 ### /verify
@@ -62,7 +69,7 @@ Link your Minecraft account so you no longer need to specify your player name! I
 
 **Usage:** `/verify` `[playerName]: <ign>`
 
-![verify](https://user-images.githubusercontent.com/24925519/141417282-8fbff27c-8955-448b-a599-db1d3a20973f.png)
+![verify](https://user-images.githubusercontent.com/24925519/142559304-3b211f68-19f8-4cf3-be4e-935126e304d0.png)
 
 ---
 ## Setup
