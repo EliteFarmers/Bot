@@ -68,19 +68,12 @@ class Data {
 	}
 
 	static async getDiscord(uuid) {
-		return new Promise((resolve, reject) => {
-			throttle(async function() {
-				await Data.getOverview(uuid).then(data => {
-					if (!data.success) { return null; }
-					let discord = data?.player?.socialMedia?.links?.DISCORD;
-					if (discord) {
-						resolve(discord);
-					} else {
-						resolve(undefined);
-					}
-				}).catch(error => {
-					resolve(undefined);
-				});
+		return new Promise(async (resolve, reject) => {
+			await throttle(async function() {
+				const data = await Data.getOverview(uuid);
+				if (data === undefined || !data?.success) resolve(undefined);
+				
+				resolve(data?.player?.socialMedia?.links?.DISCORD);
 			});
 		});
 	}
