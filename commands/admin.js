@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const { Auth } = require('../auth.js');
 const { superusers } = require('../config.json');
 const { DataHandler } = require('../database.js');
+const { Util } = require('../util.js');
 
 module.exports = {
 	name: 'admin',
@@ -11,6 +12,11 @@ module.exports = {
 	guildOnly: false,
 	dmOnly: false,
 	async execute(interaction) {
+		if (!interaction.member) {
+			interaction.reply({ content: '**Error!**\nUse this command in a server only.', ephemeral: true }); 
+			return; 
+		}
+
 		const server = await DataHandler.getServer(interaction.member.guild.id) ?? await DataHandler.createServer(interaction.member.guild.id);
 
 		if (!server) {
@@ -199,7 +205,7 @@ module.exports = {
 			const collector = message.createMessageComponentCollector({ componentType: 'BUTTON', time: 120000 });
     
 			collector.on('collect', async inter => {
-				//Hopefully not possible to ever happen but sure I guess?
+				// Hopefully not possible to ever happen but sure I guess?
 				if (inter.user.id !== interaction.user.id) {
 					inter.reply({ content: 'These aren\'t your buttons! Begone!', ephemeral: true });
 					return;
@@ -208,9 +214,65 @@ module.exports = {
 				collector.resetTimer({ time: 120000 });
 
 				if (inter.customId === 'verifyreq') {
-					
+					const reqEmbed = new Discord.MessageEmbed().setColor('#03fc7b')
+						.setTitle('How much weight do users need?')
+						.setDescription(`Please respond with a valid number from 0-100000\n0 will result in all linked users (\`/verify\`) to be given the role`)
+						.setFooter('Waiting for a number...');
+
+					const reply = await inter.reply({ embeds: [reqEmbed], fetchReply: true }).catch();
+
+					const response = await Util.waitForMessage(reply.channel, (message) => true, 60000);
+					let number = response?.content;
+
+					if (isNumeric(number) && number !== undefined) {
+						number = Math.round(+number);
+						console.log(number);
+
+						if (0 <= number && number <= 100000) {
+							console.log(number);
+							await DataHandler.updateServer({ verifyreq: number }, server.dataValues.guildid);
+						} else {
+							inter.channel.send({ content: 'Invalid input! Try again with the button.' }).catch();
+							return;
+						}
+					} else {
+						inter.channel.send({ content: 'Invalid input! Try again with the button.' }).catch();
+						return;
+					}
+
+					const roleEmbed = new Discord.MessageEmbed().setColor('#03fc7b')
+						.setTitle('What role should be rewarded?')
+						.setDescription(`Please respond with **only** a valid role ID`)
+						.setFooter('Waiting for an ID...');
+
+					const reply2 = await inter.channel.send({ embeds: [roleEmbed], fetchReply: true }).catch();
+					const response2 = await Util.waitForMessage(reply2.channel, (message) => true, 60000);
+
+					const roleID = response2?.content?.trim();
+
+					if (/^\d+$/.test(roleID) && roleID !== undefined) {
+						await DataHandler.updateServer({ verifyrole: roleID }, server.dataValues.guildid);
+						inter.channel.send({ content: 'Success!' }).catch();
+					} else {
+						inter.channel.send({ content: 'Invalid input! Try again with the button.' }).catch();
+					}	
 				} else if (inter.customId === 'adminrole') {
-					
+					const roleEmbed = new Discord.MessageEmbed().setColor('#03fc7b')
+					.setTitle('What role should have access to these settings?')
+					.setDescription(`Please respond with **only** a valid role ID`)
+					.setFooter('Waiting for an ID...');
+
+					const reply = await inter.channel.send({ embeds: [roleEmbed], fetchReply: true }).catch();
+					const response = await Util.waitForMessage(reply.channel, (message) => true, 60000);
+
+					const roleID = response?.content?.trim();
+
+					if (/^\d+$/.test(roleID) && roleID !== undefined) {
+						await DataHandler.updateServer({ adminrole: roleID }, server.dataValues.guildid);
+						inter.channel.send({ content: 'Success!' }).catch();
+					} else {
+						inter.channel.send({ content: 'Invalid input! Try again with the button.' }).catch();
+					}	
 				} else if (inter.customId === 'advanced') {
 
 					collector.stop();
@@ -341,3 +403,8 @@ module.exports = {
 	}
 };
 
+function isNumeric(str) {
+	if (typeof str != "string") return false // we only process strings!  
+	return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+		   !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
+}
