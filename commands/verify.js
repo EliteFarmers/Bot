@@ -12,19 +12,20 @@ module.exports = {
 	async execute(interaction) {
 		const options = interaction?.options?._hoistedOptions;
 
-		const playerName = options[0]?.value.trim();
+		let playerName = options[0]?.value.trim();
 		if (!playerName) { return; }
 
         await interaction.deferReply().then(async () => {
 
 			const uuid = await Data.getUUID(playerName).then(response => {
+				playerName = response.name;
 				return response.id;
 			}).catch(error => {
 				console.log(error);
 				return undefined;
 			});
-
-			let discordTag = (uuid) ? await Data.getDiscord(uuid) : null;
+			
+			const discordTag = (uuid) ? await Data.getDiscord(uuid) : null;
 
 			if (discordTag === undefined) {
 				const embed = new Discord.MessageEmbed()
@@ -59,7 +60,7 @@ module.exports = {
 			if (user) {
 				let oldUser = await DataHandler.getPlayer(null, { discordid: interaction.user.id });
 				if (oldUser) {
-					await DataHandler.update({ discordid: null }, { discordid: interaction.user.id });
+					await DataHandler.update({ discordid: null, ign: playerName }, { discordid: interaction.user.id });
 
 					if (oldUser.dataValues.uuid === uuid) {
 						const embed = new Discord.MessageEmbed()
@@ -72,16 +73,16 @@ module.exports = {
 					}
 				}
 
-				await DataHandler.update({ discordid: interaction.user.id }, { uuid: uuid });
+				await DataHandler.update({ discordid: interaction.user.id, ign: playerName }, { uuid: uuid });
 			} else {
-				await DataHandler.updatePlayer(uuid, null, null, null);
-				await DataHandler.update({ discordid: interaction.user.id }, { uuid: uuid });
+				await DataHandler.updatePlayer(uuid, playerName, null, null);
+				await DataHandler.update({ discordid: interaction.user.id, ign: playerName }, { uuid: uuid });
 			}
 
 			const embed = new Discord.MessageEmbed()
 				.setColor('#03fc7b')
 				.setTitle('Success!')
-				.setDescription(`Your minecraft account \`${await DataHandler.getPlayer(uuid).then(user => user.dataValues.ign)}\` has been linked! Try \`/weight\` with no arguments!`)
+				.setDescription(`Your minecraft account \`${playerName}\` has been linked! Try \`/weight\` with no arguments!`)
 				.setFooter('Created by Kaeso#5346');
 			interaction.editReply({embeds: [embed]});
 		});		
