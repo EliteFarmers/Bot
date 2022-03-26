@@ -201,7 +201,7 @@ const slashCommandData = {
 				name: 'role',
 				description: 'What role should be required to be placed the leaderboard?',
 				type: 8,
-				required: true
+				required: false
 			}]
 		}, {
 			name: 'leaderboard-notifs',
