@@ -80,7 +80,7 @@ module.exports = {
 			}
 			case 'cut-off-date': {
 				const date = interaction.options.getInteger('date', false) ?? undefined;
-				if (!date || ('' + date).length < 7) return interaction.reply({ content: '**Error!** Date must be a positive number with at least 7 digits', ephemeral: true }).catch(() => { });
+				if (!date || date.toString().length < 7) return interaction.reply({ content: '**Error!** Date must be a positive number with at least 7 digits', ephemeral: true }).catch(() => { });
 				
 				await DataHandler.updateServer({ lbcutoff: date }, guildId);
 				interaction.reply({ embeds: [
@@ -103,6 +103,7 @@ module.exports = {
 					clearedSettings(interaction);
 					break;
 				}
+				createLeaderboard(server, interaction);
 				break;
 			}
 			case 'leaderboard-notifs': {
@@ -271,4 +272,25 @@ async function setWeightRole(server, interaction) {
 		.setFooter('Created by Kaeso#5346');
 
 	interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => { });
+}
+
+async function createLeaderboard(server, interaction) {
+	const channelId = interaction.options.getChannel('channel', false)?.id;
+	if (!channelId) return interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch(() => { });
+
+	const roleId = interaction.options.getRole('role', false)?.id;
+
+	await DataHandler.updateServer({ 
+		lbchannel: channelId, 
+		lbrolereq: roleId ?? server.lbrolereq, 
+	}, server.guildid);
+
+	const embed = new Discord.MessageEmbed().setColor('#03fc7b')
+		.setTitle('Success!')
+		.setDescription(`Leaderboard Channel: <#${channelId}>\nRole Requirement: ${roleId ? `<@&${roleId}>` : 'Not set'}`)
+		.setFooter('Created by Kaeso#5346');
+
+	interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => { });
+
+	//TODO: Send the empty leaderboard
 }
