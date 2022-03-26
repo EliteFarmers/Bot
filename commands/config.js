@@ -79,7 +79,16 @@ module.exports = {
 				break;
 			}
 			case 'cut-off-date': {
+				const date = interaction.options.getInteger('date', false) ?? undefined;
+				if (!date || ('' + date).length < 7) return interaction.reply({ content: '**Error!** Date must be a positive number with at least 7 digits', ephemeral: true }).catch(() => { });
 				
+				await DataHandler.updateServer({ lbcutoff: date }, guildId);
+				interaction.reply({ embeds: [
+					new Discord.MessageEmbed().setColor('#03fc7b')
+						.setTitle('Success!')
+						.setDescription(`New Cutoff Date: ${Data.getReadableDate(date)}`)
+						.setFooter('Created by Kaeso#5346')
+				], ephemeral: true }).catch(() => { });
 				break;
 			}
 			case 'leaderboard': {
