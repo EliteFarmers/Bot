@@ -16,21 +16,20 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         unique: true
     },
-    adminrole: {
-        type: DataTypes.STRING,
-    },
-    channels: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
-    },
-    verifyreq: {
-        type: DataTypes.INTEGER
-    },
-    verifyrole: {
-        type: DataTypes.STRING
-    },
-    jacobchannel: {
-        type: DataTypes.STRING
-    },
+    adminrole: DataTypes.STRING,
+    channels: DataTypes.ARRAY(DataTypes.STRING),
+
+    weightreq: DataTypes.INTEGER,
+    weightrole: DataTypes.STRING,
+	weightchannel: DataTypes.STRING,
+
+	lbchannel: DataTypes.STRING,
+	lbcutoff: DataTypes.STRING,
+	lbrolereq: DataTypes.STRING,
+	lbupdatechannel: DataTypes.STRING,
+	lbroleping: DataTypes.STRING,
+    
+    configshowedat: DataTypes.STRING,
 }, {
     sequelize: sequelize,
     tableName: 'servers',
