@@ -39,8 +39,8 @@ client.on('interactionCreate', async (interaction) => {
 
 	const server = await DataHandler.getServer(interaction.guildId);
 
-	if (server && interaction.commandName !== 'admin') {
-		const channels = server.dataValues?.channels ?? [];
+	if (server && server?.channels && !['admin', 'config'].includes(interaction.commandName)) {
+		const channels = server.channels;
 		if (!channels.includes(interaction.channelId)) {
 			let content = '';
 			channels.forEach(channel => { content += `<#${channel}> `; });
@@ -48,7 +48,7 @@ client.on('interactionCreate', async (interaction) => {
 			const embed = new Discord.MessageEmbed().setColor('#FF0000')
 				.setTitle('Commands are disabled in this channel!')
 				.setDescription('Please use the channels that this server whitelisted.')
-				.addField(`Available Channel${channels.length > 1 ? 's' : ''}`, content.trim());
+				.addField(`Available Channel${channels.length > 1 ? 's' : ''}`, content.trim() === '' ? '**Something went wrong**' : content.trim());
 
 			interaction.reply({ embeds: [embed], ephemeral: true}).catch(() => { });
 			return;
