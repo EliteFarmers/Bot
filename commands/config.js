@@ -353,7 +353,7 @@ async function setCutoffDate(server, interaction) {
 	interaction.reply({ embeds: [
 		new MessageEmbed().setColor('#03fc7b')
 			.setTitle('Success!')
-			.setDescription(`New Cutoff Date: **${Data.getReadableDate(date)}**\nScores that are on or after this date will be counted!`)
+			.setDescription(`New Cutoff Date: **${Data.getReadableDate(date)}**\nOnly scores that are on or after this date will be counted!`)
 			.setFooter('Created by Kaeso#5346')
 	], ephemeral: true }).catch(() => { });
 }
