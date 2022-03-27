@@ -121,6 +121,11 @@ const slashCommandData = {
 			description: 'What role should be required to be placed the leaderboard?',
 			type: 8,
 			required: false
+		}, {
+			name: 'clear',
+			description: 'Should the leaderboard be reset?',
+			type: 5,
+			required: false
 		}]
 	}, {
 		name: 'leaderboard-notifs',

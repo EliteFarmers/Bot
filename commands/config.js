@@ -263,11 +263,13 @@ async function createLeaderboard(server, interaction) {
 	if (!channel) return interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch(() => { });
 
 	const roleId = interaction.options.getRole('role', false)?.id;
+	const clearScores = interaction.options.getBoolean('clear', false) ?? false;
 
 	await DataHandler.updateServer({ 
 		lbchannel: channel.id, 
 		lbrolereq: roleId ?? server.lbrolereq, 
-		scores: {}
+		lbactiveid: interaction.id,
+		scores: clearScores ? {} : server.scores
 	}, server.guildid);
 
 	interaction.reply({ embeds: [
