@@ -22,6 +22,8 @@ class ServerLB {
 			return await interaction.reply({ content: `**Error!** You need the <@&${server.lbrolereq}> role first!`, ephemeral: true });
 		}
 
+		await interaction.deferUpdate();
+
 		const contestData = await Data.getLatestContestData(user);
 		if (!contestData) {
 			const embed = new MessageEmbed()
@@ -30,7 +32,8 @@ class ServerLB {
 				.addField('Proper Usage:', '`/jacob` `player:`(player name)')
 				.setDescription('This could mean that my code is bad, or well, that my code is bad.\n`*(API could be down)*')
 				.setFooter('Created by Kaeso#5346');
-			return await interaction.reply({ embeds: [embed] });
+			await interaction.editReply();
+			return await interaction.followUp({ embeds: [embed] });
 		}
 
 		const channel = (server.lbupdatechannel) ? interaction.guild.channels.cache.get(server.lbupdatechannel) 
@@ -61,7 +64,8 @@ class ServerLB {
 			if (+(user.updatedat ?? 0) > +(Date.now() - (10 * 60 * 1000))) {
 				content += `\nThis could be because fetching your profile is on cooldown, try again <t:${Math.floor((+(user.updatedat ?? 0) + (10 * 60 * 1000)) / 1000)}:R>`;
 			}
-			return await interaction.reply({ content: content, ephemeral: true });
+			await interaction.editReply();
+			return await interaction.followUp({ content: content, ephemeral: true });
 		}
 
 		const updatedScores = {...server.scores, ...newScores};
@@ -83,12 +87,12 @@ class ServerLB {
 
 			embed.fields.push({
 				name: `${Data.getReadableCropName(crop)} - ${contest.ign}`,
-				value: `<@${contest.user}> - **${contest.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**\n ${details}\n${Data.getReadableDate(contest.obtained)}`,
+				value: `<@${contest.user}> - **${contest.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**⠀⠀${details}\n${Data.getReadableDate(contest.obtained)}`,
 			});
 		}
 		
-		await interaction.update({ content: '⠀', embeds: [embed] }).catch(async () => {
-			await interaction.update({ embeds: [embed] });
+		await interaction.editReply({ content: '⠀', embeds: [embed] }).catch(async () => {
+			await interaction.editReply({ embeds: [embed] });
 		});
 		await interaction.followUp({ content: 'Success! Check the leaderboard now!', ephemeral: true }).catch();
 
