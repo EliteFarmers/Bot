@@ -30,14 +30,14 @@ client.on('interactionCreate', async (interaction) => {
 			} catch (e) {
 				error();
 			}
-		} else if (interaction.customId === 'LBROLETOGGLE') {
+		} else if (interaction.customId.startsWith('LBROLETOGGLE')) {
 			try {
 				ServerLB.toggleRole(interaction);
 			} catch (e) {
 				error(e);
 			}
 			return;
-		} else if (interaction.customId === 'LBSUBMIT') {
+		} else if (interaction.customId.startsWith('LBSUBMIT')) {
 			try {
 				ServerLB.submitScores(interaction);
 			} catch (e) {
