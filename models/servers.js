@@ -21,13 +21,13 @@ module.exports = (sequelize, DataTypes) => {
 
     weightreq: DataTypes.INTEGER,
     weightrole: DataTypes.STRING,
-	weightchannel: DataTypes.STRING,
+    weightchannel: DataTypes.STRING,
 
-	lbchannel: DataTypes.STRING,
-	lbcutoff: DataTypes.STRING,
-	lbrolereq: DataTypes.STRING,
-	lbupdatechannel: DataTypes.STRING,
-	lbroleping: DataTypes.STRING,
+    lbchannel: DataTypes.STRING,
+    lbcutoff: DataTypes.STRING,
+    lbrolereq: DataTypes.STRING,
+    lbupdatechannel: DataTypes.STRING,
+    lbroleping: DataTypes.STRING,
     
     configshowedat: DataTypes.STRING,
 }, {
