@@ -28,7 +28,8 @@ module.exports = (sequelize, DataTypes) => {
     lbrolereq: DataTypes.STRING,
     lbupdatechannel: DataTypes.STRING,
     lbroleping: DataTypes.STRING,
-	scores: DataTypes.JSON,
+    lbactiveid: DataTypes.STRING,
+	  scores: DataTypes.JSON,
     
     configshowedat: DataTypes.STRING,
 }, {
