@@ -15,6 +15,18 @@ class ServerLB {
 			return await interaction.reply({ content: 'This feature was turned off! This may be intentional, so don\'t bother the server admins about it.', ephemeral: true });
 		}
 
+		if (!interaction.customId.includes(server.lbactiveid)) {
+			const embed = interaction?.message?.embeds[0];
+			if (!embed) {
+				await interaction.update({ embeds: [], components: [] })
+			} else {
+				embed.footer.text = 'This leaderboard no longer accepts updates\n' + embed.footer.text;
+				embed.description = 'These highscores were set by your fellow server members!';
+				await interaction.update({ embeds: [embed], components: [] });
+			}
+			return await interaction.followUp({ content: 'This leaderboard was turned off! This may be intentional, so don\'t bother the server admins about it.', ephemeral: true });
+		}
+
 		if (server.lbrolereq && !interaction.member.roles.cache.has(server.lbrolereq)) {
 			if (server.lbrolereq === server.weightrole && server.weightreq >= 0) {
 				return await interaction.reply({ content: `**Error!** You need the <@&${server.lbrolereq}> role first!\nThis is a reward for reaching **${server.weightreq}** total farming weight! Check your weight with \`/weight\`.`, ephemeral: true });
