@@ -98,128 +98,108 @@ const slashCommandData = {
 	name: 'config',
 	description: 'Configure your server settings!',
 	options: [{
-		name: 'set',
-		description: 'Change settings directly!',
-		type: 2,
+		name: 'whitelist',
+		description: 'Whitelist this current channel, or a specified one!',
+		type: 1,
 		options: [{
-			name: 'whitelist',
-			description: 'Whitelist this current channel, or a specified one!',
-			type: 1,
-			options: [{
-				name: 'channel',
-				description: 'Choose a channel to whitelist!',
-				type: 7,
-				required: false
-			}]
-		}, {
-			name: 'leaderboard-channel',
-			description: 'Set this channel as the place to keep the leaderboard, or a specified one!',
-			type: 1,
-			options: [{
-				name: 'channel',
-				description: 'Choose a channel to set as the leaderboard channel!',
-				type: 7,
-				required: false
-			}]
-		}, {
-			name: 'admin-role',
-			description: 'Allow one specified role access to these settings!',
-			type: 1,
-			options: [{
-				name: 'role',
-				description: 'Choose a trusted role to grant it access!',
-				type: 8,
-				required: true
-			}]
-		}, {
-			name: 'weight-role',
-			description: 'Automatically give users in this server a role for a weight amount!',
-			type: 1,
-			options: [{
-				name: 'weight',
-				description: 'How much farming weight is required?',
-				type: 4,
-				required: true,
-				choices: [
-					{ name: 'Allow Any Linked User', value: 0 }, 
-					{ name: '10 Weight', value: 10 }, 
-					{ name: '50 Weight', value: 50 }, 
-					{ name: '100 Weight', value: 100 }, 
-					{ name: '250 Weight', value: 250 }, 
-					{ name: '500 Weight', value: 500 }, 
-					{ name: '750 Weight', value: 750 }, 
-					{ name: '1000 Weight', value: 1000 }, 
-					{ name: '1250 Weight', value: 1250 }, 
-					{ name: '1500 Weight', value: 1500 }, 
-					{ name: '1750 Weight', value: 1750 }, 
-					{ name: '2000 Weight', value: 2000 }, 
-					{ name: '2250 Weight', value: 2250 }, 
-					{ name: '2500 Weight', value: 2500 }, 
-					{ name: '2750 Weight', value: 2750 },
-					{ name: '3000 Weight', value: 3000 },
-					{ name: '3500 Weight', value: 3500 },
-					{ name: '4000 Weight', value: 4000 },
-					{ name: '4500 Weight', value: 4500 },
-					{ name: '5000 Weight', value: 5000 }
-				]
-			}, {
-				name: 'role',
-				description: 'What role should be given as a reward?',
-				type: 8,
-				required: true
-			}, {
-				name: 'channel',
-				description: 'If you\'d like, specify a channel to announce this user obtaining the role.',
-				type: 7,
-				required: false
-			}]
-		}, {
-			name: 'cut-off-date',
-			description: 'Please read about this command in /help before using this.',
-			type: 1,
-			options: [{
-				name: 'date',
-				description: 'Specify the date in which scores are valid after.',
-				type: 4,
-				required: true
-			}],
+			name: 'channel',
+			description: 'Choose a channel to whitelist!',
+			type: 7,
+			required: false
 		}]
 	}, {
-		name: 'create',
-		description: 'Create various features!',
-		type: 2,
+		name: 'leaderboard',
+		description: 'Set up your server\'s auto-updating Jacob leaderboard!',
+		type: 1,
 		options: [{
-			name: 'leaderboard',
-			description: 'Set up your server\'s auto-updating Jacob leaderboard!',
-			type: 1,
-			options: [{
-				name: 'channel',
-				description: 'Where should the leaderboard be sent in?',
-				type: 7,
-				required: true
-			}, {
-				name: 'role',
-				description: 'What role should be required to be placed the leaderboard?',
-				type: 8,
-				required: false
-			}]
+			name: 'channel',
+			description: 'Where should the leaderboard be sent in?',
+			type: 7,
+			required: true
 		}, {
-			name: 'leaderboard-notifs',
-			description: 'Setup notifications for leaderboard movements!',
-			type: 1,
-			options: [{
-				name: 'channel',
-				description: 'Where should those pings be sent?',
-				type: 7,
-				required: true
-			}, {
-				name: 'role',
-				description: 'What role should be pinged when there\'s a new placement on the leaderboard?',
-				type: 8,
-				required: false
-			}]
+			name: 'role',
+			description: 'What role should be required to be placed the leaderboard?',
+			type: 8,
+			required: false
 		}]
 	}, {
+		name: 'leaderboard-notifs',
+		description: 'Setup notifications for leaderboard movements!',
+		type: 1,
+		options: [{
+			name: 'channel',
+			description: 'Where should those pings be sent?',
+			type: 7,
+			required: true
+		}, {
+			name: 'role',
+			description: 'What role should be pinged when there\'s a new placement on the leaderboard?',
+			type: 8,
+			required: false
+		}]
+	}, {
+		name: 'admin-role',
+		description: 'Allow one specified role access to these settings!',
+		type: 1,
+		options: [{
+			name: 'role',
+			description: 'Choose a trusted role to grant it access!',
+			type: 8,
+			required: true
+		}]
+	}, {
+		name: 'weight-role',
+		description: 'Automatically give users in this server a role for a weight amount!',
+		type: 1,
+		options: [{
+			name: 'weight',
+			description: 'How much farming weight is required?',
+			type: 4,
+			required: true,
+			choices: [
+				{ name: 'Allow Any Linked User', value: 0 }, 
+				{ name: '10 Weight', value: 10 }, 
+				{ name: '50 Weight', value: 50 }, 
+				{ name: '100 Weight', value: 100 }, 
+				{ name: '250 Weight', value: 250 }, 
+				{ name: '500 Weight', value: 500 }, 
+				{ name: '750 Weight', value: 750 }, 
+				{ name: '1000 Weight', value: 1000 }, 
+				{ name: '1250 Weight', value: 1250 }, 
+				{ name: '1500 Weight', value: 1500 }, 
+				{ name: '1750 Weight', value: 1750 }, 
+				{ name: '2000 Weight', value: 2000 }, 
+				{ name: '2250 Weight', value: 2250 }, 
+				{ name: '2500 Weight', value: 2500 }, 
+				{ name: '2750 Weight', value: 2750 },
+				{ name: '3000 Weight', value: 3000 },
+				{ name: '3500 Weight', value: 3500 },
+				{ name: '4000 Weight', value: 4000 },
+				{ name: '4500 Weight', value: 4500 },
+				{ name: '5000 Weight', value: 5000 }
+			]
+		}, {
+			name: 'role',
+			description: 'What role should be given as a reward?',
+			type: 8,
+			required: true
+		}, {
+			name: 'channel',
+			description: 'If you\'d like, specify a channel to announce this user obtaining the role.',
+			type: 7,
+			required: false
+		}]
+	}/*, { // TODO: Add functionality for this
+		name: 'cut-off-date',
+		description: 'Please read about this command in /help before using this.',
+		type: 1,
+		options: [{
+			name: 'date',
+			description: 'Specify the date in which scores are valid after.',
+			type: 4,
+			required: true
+		}]
+	}*/, {
 		name: 'clear',
 		description: 'Clear various settings.',
 		type: 2,
