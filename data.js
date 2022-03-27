@@ -416,6 +416,20 @@ class Data {
 		return await Data.takeNewestData(saved, fresh);
 	}
 
+	static async getLatestContestData(user) {
+		return new Promise(async (resolve, reject) => {
+			if (grabnewdata || !user?.contestdata || !user?.contestdata?.recents) {
+				let fullData = await Data.getBestData(user?.profiledata, user?.uuid);
+				let data = await Data.getBestContests(fullData, user?.uuid);
+				resolve(data);
+			} else {
+				let data = user?.contestdata;
+				resolve(data);
+			}
+			reject(undefined);
+		});
+	}
+
     static getDateFromContest(split) {
         let day = split[1].split('_')[1];
         day = (+day < 10) ? `0${day}` : day;
