@@ -199,8 +199,32 @@ const slashCommandData = {
 		description: 'Please read about this command in "/config view" before using this.',
 		type: 1,
 		options: [{
-			name: 'date',
-			description: 'Specify the date in which scores are valid after.',
+			name: 'day',
+			description: 'Set the day of the cutoff date! [1-31] (inclusive)',
+			type: 4,
+			required: true,
+		}, {
+			name: 'month',
+			description: 'Set the month of the cutoff date!',
+			type: 4,
+			required: true,
+			choices: [
+				{ name: 'Early Spring', value: 1 }, 
+				{ name: 'Spring', value: 2 }, 
+				{ name: 'Late Spring', value: 3 }, 
+				{ name: 'Early Summer', value: 4 }, 
+				{ name: 'Summer', value: 5 }, 
+				{ name: 'Late Summer', value: 6 }, 
+				{ name: 'Early Autumn', value: 7 }, 
+				{ name: 'Autumn', value: 8 }, 
+				{ name: 'Late Autumn', value: 9 }, 
+				{ name: 'Early Winter', value: 10 }, 
+				{ name: 'Winter', value: 11 }, 
+				{ name: 'Late Winter', value: 12 }
+			]
+		}, {
+			name: 'year',
+			description: 'Set the year of the cutoff date! Must be greater than 159.',
 			type: 4,
 			required: true
 		}]
