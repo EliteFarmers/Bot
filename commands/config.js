@@ -92,15 +92,16 @@ module.exports = {
 				setWeightRole(server, interaction);
 				break;
 			}
-			case 'cut-off-date': {
+			case 'cutoff-date': {
 				const date = interaction.options.getInteger('date', false) ?? undefined;
 				if (!date || date.toString().length < 7) return interaction.reply({ content: '**Error!** Date must be a positive number with at least 7 digits', ephemeral: true }).catch(() => { });
-				
+				if (date < +Data.CUTOFFDATE) return interaction.reply({ content: `**Error!** Dates before **${Data.getReadableDate(Data.CUTOFFDATE)}** are currently unsupported.`, ephemeral: true }).catch(() => { });
+
 				await DataHandler.updateServer({ lbcutoff: date }, guildId);
 				interaction.reply({ embeds: [
 					new MessageEmbed().setColor('#03fc7b')
 						.setTitle('Success!')
-						.setDescription(`New Cutoff Date: ${Data.getReadableDate(date)}`)
+						.setDescription(`New Cutoff Date: ${Data.getReadableDate(date)}\nScores that are on or after this date will be counted!`)
 						.setFooter('Created by Kaeso#5346')
 				], ephemeral: true }).catch(() => { });
 				break;
@@ -149,8 +150,8 @@ async function viewSettings(s, interaction) {
 - Role Requirement: ${s.lbrolereq ? `<@&${s.lbrolereq}>` : 'Not set'}
 - Annoucement Channel: ${s.lbupdatechannel ? `<#${s.lbupdatechannel}>` : 'Not set'}
 - Annoucement Ping: ${s.lbroleping ? `<@&${s.lbroleping}>` : 'Not set'}
+- Custom Cutoff Date: ${s.lbcutoff ? Data.getReadableDate(s.lbcutoff) : 'Not set'}
 	`;
-//- Custom Cutoff Date: ${s.lbcutoff ? Data.getReadableDate(s.lbcutoff) : 'Not set'}
 
 	let channels = '';
 	s.channels?.forEach(channel => {
@@ -159,7 +160,7 @@ async function viewSettings(s, interaction) {
 	
 	const embed = new MessageEmbed().setColor('#03fc7b')
 		.setTitle('Your Server Settings')
-		.setDescription('Use \`/config\` and its subcommands to change these!')
+		.setDescription('Use \`/config\` and its subcommands to change these!\n(Show/hide `\/config\` with `\/admin\`)')
 		.addField('Current Settings', content)
 		.addField('Whitelisted Channels', channels.length > 0 ? channels : 'No channels set')
 		.setFooter('Created by Kaeso#5346');

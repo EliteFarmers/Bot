@@ -41,7 +41,7 @@ module.exports = {
 			.setTitle('Server Admin Panel')
 			.setDescription('Configure your server specific settings!')
 			.addField('Warning', 'Role settings require the \`Manage Roles\` permission.\nSetting channels requires the \`Read Messages\` permission.\n__This is only to view channels, the bot still **CANNOT** read messages.__\n⠀\nYou can change permissions manually, or **[click here](https://discord.com/api/oauth2/authorize?client_id=845065148997566486&permissions=277361249280&scope=bot%20applications.commands)** to reinvite the bot.')
-			.addField('How?', 'Please click the buttons below in order to register the slash commands that you\'ll need in order to configure these settings. Use `/help` to find further info on all the commands. To prevent command clutter, you can remove these commands when you\'re finished and enable them when you need them.')
+			.addField('How?', 'Please click the buttons below in order to register the slash commands that you\'ll need in order to configure these settings. To prevent command clutter, you can remove these commands when you\'re finished and enable them when you need them.')
 			.setFooter('Instead of "Read Messages" you can give the bot view access to specific channels\nCreated by Kaeso#5346')
 
 		if (onCooldown) {
@@ -194,9 +194,9 @@ const slashCommandData = {
 			type: 7,
 			required: false
 		}]
-	}/*, { // TODO: Add functionality for this
-		name: 'cut-off-date',
-		description: 'Please read about this command in /help before using this.',
+	}, {
+		name: 'cutoff-date',
+		description: 'Please read about this command in "/config view" before using this.',
 		type: 1,
 		options: [{
 			name: 'date',
@@ -204,7 +204,7 @@ const slashCommandData = {
 			type: 4,
 			required: true
 		}]
-	}*/, {
+	}, {
 		name: 'clear',
 		description: 'Clear various settings.',
 		type: 2,
