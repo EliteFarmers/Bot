@@ -277,12 +277,29 @@ async function createLeaderboard(server, interaction) {
 			.setFooter('Created by Kaeso#5346')
 		], ephemeral: true }).catch();
 
-	//TODO: Send the empty leaderboard
-
 	const embed = new MessageEmbed().setColor('#03fc7b')
 		.setTitle('Jacob\'s Contest Leaderboard')
 		.setDescription('These are the highscores set by your fellow server members!')
+		.setFooter(`Highscores only valid after ${Data.getReadableDate(Data.CUTOFFDATE)}⠀⠀Created by Kaeso#5346`);
 		
+	if (!clearScores && Object.keys(server.scores)?.length > 0) {
+		for (const crop of Object.keys(server.scores)) {
+			const contest = server.scores[crop];
+
+			const details = (contest.par) 
+				? `\`#${(contest.pos + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${contest.par.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` on \`${contest.profilename}\`!` 
+				: `Contest Still Unclaimed!`;
+
+			if (!contest.value) continue;
+
+			embed.fields.push({
+				name: `${Data.getReadableCropName(crop)} - ${contest.ign}`,
+				value: `<@${contest.user}> - **${contest.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**⠀⠀${details}\n${Data.getReadableDate(contest.obtained)}⠀[\🔗](https://sky.shiiyu.moe/stats/${contest.ign}/${contest.profilename})`,
+			});
+		}
+	} else {
+		embed.addField('Nothing Yet', 'Be the first to submit your scores!');
+	}
 
 	const row = new MessageActionRow().addComponents(
 		{ label: 'Submit Scores', customId: 'LBSUBMIT', style: 'SECONDARY', type: 'BUTTON' },
