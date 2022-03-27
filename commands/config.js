@@ -93,17 +93,7 @@ module.exports = {
 				break;
 			}
 			case 'cutoff-date': {
-				const date = interaction.options.getInteger('date', false) ?? undefined;
-				if (!date || date.toString().length < 7) return interaction.reply({ content: '**Error!** Date must be a positive number with at least 7 digits', ephemeral: true }).catch(() => { });
-				if (date < +Data.CUTOFFDATE) return interaction.reply({ content: `**Error!** Dates before **${Data.getReadableDate(Data.CUTOFFDATE)}** are currently unsupported.`, ephemeral: true }).catch(() => { });
-
-				await DataHandler.updateServer({ lbcutoff: date }, guildId);
-				interaction.reply({ embeds: [
-					new MessageEmbed().setColor('#03fc7b')
-						.setTitle('Success!')
-						.setDescription(`New Cutoff Date: **${Data.getReadableDate(date)}**\nScores that are on or after this date will be counted!`)
-						.setFooter('Created by Kaeso#5346')
-				], ephemeral: true }).catch(() => { });
+				setCutoffDate(server, interaction);
 				break;
 			}
 			case 'all': {
@@ -331,4 +321,39 @@ async function createLeaderboardNotifs(server, interaction) {
 		.setFooter('Created by Kaeso#5346');
 
 	interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => { });
+}
+
+async function setCutoffDate(server, interaction) {
+	const day = interaction.options.getInteger('day', false) ?? undefined;
+	const month = interaction.options.getInteger('month', false) ?? undefined;
+	let year = interaction.options.getInteger('year', false) ?? undefined;
+
+	if (!day || !month || !year) {
+		return interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch(() => { });
+	}
+
+	// Jacob's contests have their years starting at 0
+	year--;
+
+	if (day < 1 || day > 31) {
+		return interaction.reply({ content: '**Error!** Day must be a number [1-31] (inclusive)', ephemeral: true }).catch(() => { });
+	}
+
+	const date = `${year}${month <= 9 ? `0${month}` : month}${day <= 9 ? `0${day}` : day}`;
+
+	if (year < 159 || date < +Data.CUTOFFDATE) {
+		return interaction.reply({ content: `**Error!** Overall date must be after **${Data.getReadableDate(Data.CUTOFFDATE)}**, dates before this are currently unsupported.`, ephemeral: true }).catch(() => { });
+	}
+
+	if (year > 9999) {
+		return interaction.reply({ content: `**Error!** You really think Hypixel will exist still?`, ephemeral: true }).catch(() => { });
+	}
+
+	await DataHandler.updateServer({ lbcutoff: date }, server.guildid);
+	interaction.reply({ embeds: [
+		new MessageEmbed().setColor('#03fc7b')
+			.setTitle('Success!')
+			.setDescription(`New Cutoff Date: **${Data.getReadableDate(date)}**\nScores that are on or after this date will be counted!`)
+			.setFooter('Created by Kaeso#5346')
+	], ephemeral: true }).catch(() => { });
 }
