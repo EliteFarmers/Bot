@@ -68,6 +68,7 @@ module.exports = {
 		await interaction.deferReply();
 
         const contestData = await Data.getLatestContestData(user, grabnewdata);
+		if (grabnewdata) DataHandler.update({ updatedat: Date.now().toString() }, { discordid: user.discordid }).catch();
 
         if (!contestData) {
             const embed = new Discord.MessageEmbed()
