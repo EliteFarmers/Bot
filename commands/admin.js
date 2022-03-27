@@ -208,15 +208,15 @@ const slashCommandData = {
 			description: 'Setup notifications for leaderboard movements!',
 			type: 1,
 			options: [{
-				name: 'notif-role',
-				description: 'What role should be pinged when there\'s a new placement on the leaderboard?',
-				type: 8,
-				required: true
-			}, {
-				name: 'notif-channel',
+				name: 'channel',
 				description: 'Where should those pings be sent?',
 				type: 7,
 				required: true
+			}, {
+				name: 'role',
+				description: 'What role should be pinged when there\'s a new placement on the leaderboard?',
+				type: 8,
+				required: false
 			}]
 		}]
 	}, {
