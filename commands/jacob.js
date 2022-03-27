@@ -67,7 +67,7 @@ module.exports = {
 
 		await interaction.deferReply();
 
-        const contestData = await Data.getLatestContestData(user);
+        const contestData = await Data.getLatestContestData(user, grabnewdata);
 
         if (!contestData) {
             const embed = new Discord.MessageEmbed()
