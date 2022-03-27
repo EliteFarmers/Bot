@@ -100,14 +100,16 @@ class DataHandler {
 
     static async getServer(guild, where = null) {
         if (!where) { where = { guildid: guild }; }
-        return await Servers.findOne({ where: where });
+        const server = await Servers.findOne({ where: where });
+        return (server) ? server : await this.createServer(guild, true);
     }
 
-    static async createServer(guildid) {
+    static async createServer(guildid, skipfind = false) {
         try {
-            const server = await this.getServer(guildid);
+            const server = (skipfind) ? undefined : await this.getServer(guildid);
             if (!server) { 
-                return await Servers.create({ guildid: guildid }); 
+                await Servers.create({ guildid: guildid });
+                return await Servers.findOne({ where: where }) ?? undefined;
             }
             return undefined;
         } catch (e) {
