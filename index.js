@@ -2,6 +2,7 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const { token } = require('./config.json');
 const { DataHandler } = require('./database.js')
+const { ServerLB } = require('./serverlb.js');
 const args = process.argv.slice(2);
 
 const client = new Discord.Client({ partials: ['CHANNEL'], intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.DIRECT_MESSAGES] });
@@ -26,12 +27,29 @@ client.on('interactionCreate', async (interaction) => {
 		if (interaction.customId.includes('jacob')) {
 			try {
 				await client.commands.get('jacob').execute(interaction, interaction.customId.split('_')[1]);
-			} catch (error) {
-				console.log(error);
-				await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => {});
+			} catch (e) {
+				error();
 			}
-		} else {
+		} else if (interaction.customId === 'LBROLETOGGLE') {
+			try {
+				ServerLB.toggleRole(interaction);
+			} catch (e) {
+				error(e);
+			}
 			return;
+		} else if (interaction.customId === 'LBSUBMIT') {
+			try {
+				ServerLB.submitScores(interaction);
+			} catch (e) {
+				error(e);
+			}
+		} else return;
+
+		async function error(error) {
+			console.log(error);
+			await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => {
+				interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true }).catch()
+			});
 		}
 	}
 	if (!interaction.isCommand()) return;
