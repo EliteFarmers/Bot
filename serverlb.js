@@ -24,7 +24,10 @@ class ServerLB {
 
 		await interaction.deferUpdate();
 
-		const contestData = await Data.getLatestContestData(user);
+		const onCooldown = +(user.updatedat ?? 0) > +(Date.now() - (10 * 60 * 1000));
+		const contestData = await Data.getLatestContestData(user, !onCooldown).catch(e => console.log(e));
+		if (!onCooldown) DataHandler.update({ updatedat: Date.now().toString() }, { discordid: user.discordid }).catch();
+
 		if (!contestData) {
 			const embed = new MessageEmbed()
 				.setColor('#CB152B')
