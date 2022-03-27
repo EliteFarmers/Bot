@@ -29,14 +29,12 @@ class ServerLB {
 		if (!onCooldown) DataHandler.update({ updatedat: Date.now().toString() }, { discordid: user.discordid }).catch();
 
 		if (!contestData) {
-			const embed = new MessageEmbed()
-				.setColor('#CB152B')
+			const embed = new MessageEmbed().setColor('#CB152B')
 				.setTitle('Error: No Contest Data!')
-				.addField('Proper Usage:', '`/jacob` `player:`(player name)')
 				.setDescription('This could mean that my code is bad, or well, that my code is bad.\n`*(API could be down)*')
 				.setFooter('Created by Kaeso#5346');
 			await interaction.editReply();
-			return await interaction.followUp({ embeds: [embed] });
+			return await interaction.followUp({ embeds: [embed], ephemeral: true });
 		}
 
 		const channel = (server.lbupdatechannel) ? interaction.guild.channels.cache.get(server.lbupdatechannel) 
