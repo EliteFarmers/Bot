@@ -63,12 +63,16 @@ class ServerLB {
 		}
 
 		if (Object.keys(newScores).length <= 0) {
-			let content = 'You don\'t have any scores that would beat these records!\nIf this isn\'t true please contact Kaeso#5346';
-			if (+(user.updatedat ?? 0) > +(Date.now() - (10 * 60 * 1000))) {
-				content += `\nThis could be because fetching your profile is on cooldown, try again <t:${Math.floor((+(user.updatedat ?? 0) + (10 * 60 * 1000)) / 1000)}:R>`;
+			const embed = new MessageEmbed().setColor('#FF8600')
+				.setTitle('Sorry! No New Records')
+				.setDescription(`You don\'t have any jacob\'s scores that would beat these records!\nKeep in mind that scores are only valid starting on **${Data.getReadableDate(Data.CUTOFFDATE)}**\n(The first contest after the last nerf to farming)`)
+				.setFooter('If you\'re positive that this isn\'t true please contact Kaeso#5346');
+
+			if (onCooldown) {
+				embed.description += `\n⠀\nThis could be because fetching your profile is on cooldown, try again <t:${Math.floor((+(user.updatedat ?? 0) + (10 * 60 * 1000)) / 1000)}:R>`;
 			}
-			await interaction.editReply();
-			return await interaction.followUp({ content: content, ephemeral: true });
+			await interaction.editReply().catch((e) => console.log(e));
+			return await interaction.followUp({ embeds: [embed], ephemeral: true }).catch((e) => console.log(e));
 		}
 
 		const updatedScores = {...server.scores, ...newScores};
