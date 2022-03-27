@@ -107,7 +107,8 @@ module.exports = {
 				break;
 			}
 			case 'leaderboard-notifs': {
-
+				createLeaderboardNotifs(server, interaction);
+				break;
 			}
 			case 'all': {
 				await DataHandler.updateServer({
@@ -293,4 +294,23 @@ async function createLeaderboard(server, interaction) {
 	interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => { });
 
 	//TODO: Send the empty leaderboard
+}
+
+async function createLeaderboardNotifs(server, interaction) {
+	const channelId = interaction.options.getChannel('channel', false)?.id;
+	if (!channelId) return interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch(() => { });
+
+	const roleId = interaction.options.getRole('role', false)?.id;
+
+	await DataHandler.updateServer({ 
+		lbupdatechannel: channelId, 
+		lbroleping: roleId ?? server.lbrolereq, 
+	}, server.guildid);
+
+	const embed = new Discord.MessageEmbed().setColor('#03fc7b')
+		.setTitle('Success!')
+		.setDescription(`Annoucement Channel: <#${channelId}>\nRole That\'s Pinged: ${roleId ? `<@&${roleId}>` : 'Not set'}`)
+		.setFooter('Created by Kaeso#5346');
+
+	interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => { });
 }
