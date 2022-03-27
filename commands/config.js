@@ -267,6 +267,7 @@ async function createLeaderboard(server, interaction) {
 	await DataHandler.updateServer({ 
 		lbchannel: channel.id, 
 		lbrolereq: roleId ?? server.lbrolereq, 
+		scores: {}
 	}, server.guildid);
 
 	interaction.reply({ embeds: [
