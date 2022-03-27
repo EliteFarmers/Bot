@@ -109,7 +109,7 @@ class DataHandler {
             const server = (skipfind) ? undefined : await this.getServer(guildid);
             if (!server) { 
                 await Servers.create({ guildid: guildid });
-                return await Servers.findOne({ where: where }) ?? undefined;
+                return await Servers.findOne({ where: { guildid: guildid } }) ?? undefined;
             }
             return undefined;
         } catch (e) {
