@@ -304,10 +304,9 @@ async function createLeaderboard(server, interaction) {
 	}
 
 	const row = new MessageActionRow().addComponents(
-		{ label: 'Submit Scores', customId: 'LBSUBMIT', style: 'SECONDARY', type: 'BUTTON' },
-		{ label: 'Toggle Notifications', customId: 'LBROLETOGGLE', style: 'SECONDARY', type: 'BUTTON' }
+		{ label: 'Submit Scores', customId: `LBSUBMIT|${interaction.id}`, style: 'SECONDARY', type: 'BUTTON' },
+		{ label: 'Toggle Notifications', customId: `LBROLETOGGLE|${interaction.id}`, style: 'SECONDARY', type: 'BUTTON' }
 	);
-	
 
 	channel.send({ embeds: [embed], components: [row] }).catch(() => {
 		interaction.followUp({ content: `**Error!** I don\'t have permission to send messages in ${channel.id}. Please fix this and rerun the command.`, ephemeral: true });
