@@ -62,8 +62,7 @@ class ServerLB {
 			const userScore = userScores[crop];
 			const serverScore = serverScores[crop];
 
-			//TODO: Add support for custom cutoff dates
-			if (!userScore) continue;
+			if (!userScore || (+server.lbcutoff > +userScore.obtained)) continue;
 			const nowClaimed = (serverScore?.value && serverScore?.obtained === userScore?.obtained && serverScore?.user === interaction.user.id && !serverScore?.par && userScore?.par);
 
 			if ((!serverScore && userScore.value) || userScore.value > (serverScore?.value ?? 0) || nowClaimed) {
@@ -75,7 +74,7 @@ class ServerLB {
 		if (Object.keys(newScores).length <= 0) {
 			const embed = new MessageEmbed().setColor('#FF8600')
 				.setTitle('Sorry! No New Records')
-				.setDescription(`You don\'t have any jacob\'s scores that would beat these records!\nKeep in mind that scores are only valid starting on **${Data.getReadableDate(Data.CUTOFFDATE)}**\n(The first contest after the last nerf to farming)`)
+				.setDescription(`You don\'t have any jacob\'s scores that would beat these records!\nKeep in mind that scores are only valid starting on ${server.lbcutoff ? `**${Data.getReadableDate(server.lbcutoff)}**\n(The custom cutoff date for this leaderboard)` : `**${Data.getReadableDate(Data.CUTOFFDATE)}**\n(The first contest after the last nerf to farming)`}`)
 				.setFooter('If you\'re positive that this isn\'t true please contact Kaeso#5346');
 
 			if (onCooldown) {
@@ -91,7 +90,7 @@ class ServerLB {
 		const embed = new MessageEmbed().setColor('#03fc7b')
 			.setTitle('Jacob\'s Contest Leaderboard')
 			.setDescription('These are the highscores set by your fellow server members!')
-			.setFooter(`Highscores only valid after ${Data.getReadableDate(Data.CUTOFFDATE)}⠀⠀Created by Kaeso#5346`);
+			.setFooter(`Highscores only valid after ${Data.getReadableDate(server.lbcutoff ?? Data.CUTOFFDATE)}⠀⠀Created by Kaeso#5346`);
 
 		for (const crop of Object.keys(updatedScores)) {
 			const contest = updatedScores[crop];
