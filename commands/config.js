@@ -126,12 +126,16 @@ module.exports = {
 				
 				break;
 			}
+			case 'scores': {
+				await DataHandler.updateServer({ scores: {} }, guildId);
+				interaction.reply({ content: 'Success! The scores have been cleared.', ephemeral: true });
+				break;
+			}
 			default: {
 				interaction.reply({ content: 'Command not found!', ephemeral: true});
 				break;
 			}
 		}
-		// setTimeout(() => viewSettings(server, interaction), 100);
 	}
 }
 

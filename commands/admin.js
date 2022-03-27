@@ -212,6 +212,10 @@ const slashCommandData = {
 			description: 'Clear your leaderboard settings',
 			type: 1,
 		}, {
+			name: 'scores',
+			description: 'Clear your leaderboard scores, but keep the settings!',
+			type: 1,
+		}, {
 			name: 'user-score',
 			description: 'Remove a user from the leaderboard',
 			type: 1,
