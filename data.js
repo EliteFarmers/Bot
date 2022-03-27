@@ -34,9 +34,9 @@ class Data {
 						if (result.success === true) {
 							return result;
 						}
-						reject(undefined);
+						resolve(undefined);
 					}).catch(error => {
-						reject(undefined);
+						resolve(undefined);
 					});
 				resolve(await response);
 			});
@@ -58,9 +58,9 @@ class Data {
 						if (result.success) {
 							return result;
 						}
-						reject(undefined);
+						resolve(undefined);
 					}).catch(error => {
-						reject(undefined);
+						resolve(undefined);
 					});
 				resolve(await response);
 			});
@@ -426,7 +426,7 @@ class Data {
 				let data = user?.contestdata;
 				resolve(data);
 			}
-			reject(undefined);
+			resolve(undefined);
 		});
 	}
 
