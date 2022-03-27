@@ -1,4 +1,4 @@
-const Discord = require('discord.js');
+const { MessageEmbed, MessageActionRow } = require('discord.js');
 const { DataHandler } = require('../database.js');
 const { Data } = require('../data.js')
 
@@ -28,17 +28,15 @@ module.exports = {
 		}
 
 		const command = interaction.options.getSubcommand();
-
-		if (command === 'view') {
-			viewSettings(server, interaction);
-			return;
-		}
-
-		const group = interaction.options.getSubcommandGroup();
+		const group = interaction.options.getSubcommandGroup(false);
 		const guildId = interaction.guild.id;
 		const superUser = interaction.member.permissions.has('ADMINISTRATOR');
 		
 		switch (command) {
+			case 'view': {
+				viewSettings(server, interaction);
+				break;
+			}
 			case 'whitelist': {
 				if (group === 'clear') {
 					await DataHandler.updateServer({ channels: null }, guildId);
@@ -48,8 +46,24 @@ module.exports = {
 				whitelist(server, interaction);
 				break;
 			}
-			case 'leaderboard-channel': {
-				setLBChannel(server, interaction);
+			case 'leaderboard': {
+				if (group === 'clear') {
+					await DataHandler.updateServer({ 
+						lbchannel: null,
+						lbcutoff: null,
+						lbrolereq: null,
+						lbupdatechannel: null,
+						lbroleping: null,
+						scores: {},
+					}, guildId);
+					clearedSettings(interaction);
+					break;
+				}
+				createLeaderboard(server, interaction);
+				break;
+			}
+			case 'leaderboard-notifs': {
+				createLeaderboardNotifs(server, interaction);
 				break;
 			}
 			case 'admin-role': {
@@ -84,30 +98,11 @@ module.exports = {
 				
 				await DataHandler.updateServer({ lbcutoff: date }, guildId);
 				interaction.reply({ embeds: [
-					new Discord.MessageEmbed().setColor('#03fc7b')
+					new MessageEmbed().setColor('#03fc7b')
 						.setTitle('Success!')
 						.setDescription(`New Cutoff Date: ${Data.getReadableDate(date)}`)
 						.setFooter('Created by Kaeso#5346')
 				], ephemeral: true }).catch(() => { });
-				break;
-			}
-			case 'leaderboard': {
-				if (group === 'clear') {
-					await DataHandler.updateServer({ 
-						lbchannel: null,
-						lbcutoff: null,
-						lbrolereq: null,
-						lbupdatechannel: null,
-						lbroleping: null
-					}, guildId);
-					clearedSettings(interaction);
-					break;
-				}
-				createLeaderboard(server, interaction);
-				break;
-			}
-			case 'leaderboard-notifs': {
-				createLeaderboardNotifs(server, interaction);
 				break;
 			}
 			case 'all': {
@@ -121,7 +116,8 @@ module.exports = {
 					lbcutoff: null,
 					lbrolereq: null,
 					lbupdatechannel: null,
-					lbroleping: null
+					lbroleping: null,
+					scores: {}
 				}, guildId);
 				clearedSettings(interaction, superUser);
 				break;
@@ -135,6 +131,7 @@ module.exports = {
 				break;
 			}
 		}
+		// setTimeout(() => viewSettings(server, interaction), 100);
 	}
 }
 
@@ -148,22 +145,22 @@ async function viewSettings(s, interaction) {
 - Role Requirement: ${s.lbrolereq ? `<@&${s.lbrolereq}>` : 'Not set'}
 - Annoucement Channel: ${s.lbupdatechannel ? `<#${s.lbupdatechannel}>` : 'Not set'}
 - Annoucement Ping: ${s.lbroleping ? `<@&${s.lbroleping}>` : 'Not set'}
-- Custom Cutoff Date: ${s.lbcutoff ? Data.getReadableDate(s.lbcutoff) : 'Not set'}
 	`;
+//- Custom Cutoff Date: ${s.lbcutoff ? Data.getReadableDate(s.lbcutoff) : 'Not set'}
 
 	let channels = '';
 	s.channels?.forEach(channel => {
 		channels += `<#${channel}> `;
 	});
 	
-	const embed = new Discord.MessageEmbed().setColor('#03fc7b')
+	const embed = new MessageEmbed().setColor('#03fc7b')
 		.setTitle('Your Server Settings')
 		.setDescription('Use \`/config\` and its subcommands to change these!')
 		.addField('Current Settings', content)
 		.addField('Whitelisted Channels', channels.length > 0 ? channels : 'No channels set')
 		.setFooter('Created by Kaeso#5346');
 
-	await interaction.reply({ embeds: [embed], ephemeral: true });
+	await interaction.reply({ embeds: [embed], ephemeral: true }).catch();
 }
 
 async function clearedSettings(interaction, superUser = true) {
@@ -180,7 +177,7 @@ async function whitelist(server, interaction) {
 	const channelId = interaction.options.getChannel('channel', false)?.id ?? interaction.channelId;
 	const channels = [];
 
-	const embed = new Discord.MessageEmbed().setColor('#03fc7b')
+	const embed = new MessageEmbed().setColor('#03fc7b')
 		.setTitle('Success!')
 		.setFooter('Created by Kaeso#5346');
 
@@ -205,25 +202,7 @@ async function whitelist(server, interaction) {
 		embed.setDescription('No channels are whitelisted.');
 	}
 
-	if (server.lbchannel) {
-		embed.addField('Jacob LB Channel', `<#${server.dataValues.lbchannel}>`);
-	}
-
-	server.dataValues.channels = channels;
 	await DataHandler.updateServer({ channels: channels.length === 0 ? null : channels }, server.guildid);
-
-	interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => { });
-}
-
-async function setLBChannel(server, interaction) {
-	const channelId = interaction.options.getChannel('channel', false)?.id ?? interaction.channelId;
-
-	await DataHandler.updateServer({ lbchannel: channelId }, server.guildid);
-
-	const embed = new Discord.MessageEmbed().setColor('#03fc7b')
-		.setTitle('Success!')
-		.setDescription(`Leaderboard Channel: <#${channelId}>`)
-		.setFooter('Created by Kaeso#5346');
 
 	interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => { });
 }
@@ -243,7 +222,7 @@ async function setAdminRole(server, interaction) {
 
 	await DataHandler.updateServer({ adminrole: roleId }, server.guildid);
 
-	const embed = new Discord.MessageEmbed().setColor('#03fc7b')
+	const embed = new MessageEmbed().setColor('#03fc7b')
 		.setTitle('Success!')
 		.setDescription(`Admin Role: <@&${roleId}>`)
 		.setFooter('Created by Kaeso#5346');
@@ -267,7 +246,7 @@ async function setWeightRole(server, interaction) {
 		weightchannel: channelId ?? server.weightchannel
 	}, server.guildid);
 
-	const embed = new Discord.MessageEmbed().setColor('#03fc7b')
+	const embed = new MessageEmbed().setColor('#03fc7b')
 		.setTitle('Success!')
 		.setDescription(`Required Weight: **${weight === 0 ? 'N/A (All verified users qualify)' : weight}**\nReward Role: <@&${roleId}>${channelId ? `\nAnnouncement Channel: <#${channelId}>` : ''}`)
 		.setFooter('Created by Kaeso#5346');
@@ -276,24 +255,39 @@ async function setWeightRole(server, interaction) {
 }
 
 async function createLeaderboard(server, interaction) {
-	const channelId = interaction.options.getChannel('channel', false)?.id;
-	if (!channelId) return interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch(() => { });
+	const channel = interaction.options.getChannel('channel', false);
+	if (!channel) return interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch(() => { });
 
 	const roleId = interaction.options.getRole('role', false)?.id;
 
 	await DataHandler.updateServer({ 
-		lbchannel: channelId, 
+		lbchannel: channel.id, 
 		lbrolereq: roleId ?? server.lbrolereq, 
 	}, server.guildid);
 
-	const embed = new Discord.MessageEmbed().setColor('#03fc7b')
-		.setTitle('Success!')
-		.setDescription(`Leaderboard Channel: <#${channelId}>\nRole Requirement: ${roleId ? `<@&${roleId}>` : 'Not set'}`)
-		.setFooter('Created by Kaeso#5346');
-
-	interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => { });
+	interaction.reply({ embeds: [
+		new MessageEmbed().setColor('#03fc7b')
+			.setTitle('Success!')
+			.setDescription(`Leaderboard Channel: <#${channel.id}>\nRole Requirement: ${roleId ? `<@&${roleId}>` : 'Not set'}`)
+			.setFooter('Created by Kaeso#5346')
+		], ephemeral: true }).catch();
 
 	//TODO: Send the empty leaderboard
+
+	const embed = new MessageEmbed().setColor('#03fc7b')
+		.setTitle('Jacob\'s Contest Leaderboard')
+		.setDescription('These are the highscores set by your fellow server members!')
+		
+
+	const row = new MessageActionRow().addComponents(
+		{ label: 'Submit Scores', customId: 'LBSUBMIT', style: 'SECONDARY', type: 'BUTTON' },
+		{ label: 'Toggle Notifications', customId: 'LBROLETOGGLE', style: 'SECONDARY', type: 'BUTTON' }
+	);
+	
+
+	channel.send({ embeds: [embed], components: [row] }).catch(() => {
+		interaction.followUp({ content: `**Error!** I don\'t have permission to send messages in ${channel.id}. Please fix this and rerun the command.`, ephemeral: true });
+	});
 }
 
 async function createLeaderboardNotifs(server, interaction) {
@@ -307,7 +301,7 @@ async function createLeaderboardNotifs(server, interaction) {
 		lbroleping: roleId ?? server.lbrolereq, 
 	}, server.guildid);
 
-	const embed = new Discord.MessageEmbed().setColor('#03fc7b')
+	const embed = new MessageEmbed().setColor('#03fc7b')
 		.setTitle('Success!')
 		.setDescription(`Annoucement Channel: <#${channelId}>\nRole That\'s Pinged: ${roleId ? `<@&${roleId}>` : 'Not set'}`)
 		.setFooter('Created by Kaeso#5346');
