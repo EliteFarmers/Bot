@@ -1,7 +1,8 @@
 const Discord = require('discord.js');
 const { Data } = require('../data.js');
 const { DataHandler } = require('../database.js');
-const { eliteserverid, verifiedroleid } = require('../config.json');
+const { ServerUtil } = require('../serverutil.js');
+// const { eliteserverid, verifiedroleid } = require('../config.json');
 
 module.exports = {
 	name: 'verify',
@@ -60,7 +61,7 @@ module.exports = {
 			if (user) {
 				let oldUser = await DataHandler.getPlayer(null, { discordid: interaction.user.id });
 				if (oldUser) {
-					await DataHandler.update({ discordid: null }, { discordid: interaction.user.id });
+					await DataHandler.update({ discordid: null, ign: playerName }, { discordid: interaction.user.id });
 
 					if (oldUser.dataValues.uuid === uuid) {
 						const embed = new Discord.MessageEmbed()
@@ -72,24 +73,27 @@ module.exports = {
 						return;
 					}
 				}
+
+				await DataHandler.update({ discordid: interaction.user.id, ign: playerName }, { uuid: uuid });
 			} else {
-				await DataHandler.updatePlayer(uuid, null, null, null);
+				await DataHandler.updatePlayer(uuid, playerName, null, null);
+				await DataHandler.update({ discordid: interaction.user.id, ign: playerName }, { uuid: uuid });
 			}
 
-			const isEliteFarmer = (interaction.guild.id === eliteserverid && interaction.member.roles.cache.some(role => role.id === verifiedroleid));
-			if (isEliteFarmer) {
-				let styledata = { elitefarmer: true }
+			// const isEliteFarmer = (interaction.guild.id === eliteserverid && interaction.member.roles.cache.some(role => role.id === verifiedroleid));
+			// if (isEliteFarmer) {
+			// 	let styledata = { elitefarmer: true }
 
-				if (user && user.dataValues?.styledata) {
-					const old = user.dataValues?.styledata;
-					old.elitefarmer = true;
-					styledata = old;
-				}
+			// 	if (user && user.dataValues?.styledata) {
+			// 		const old = user.dataValues?.styledata;
+			// 		old.elitefarmer = true;
+			// 		styledata = old;
+			// 	}
 
-				await DataHandler.update({ discordid: interaction.user.id, styledata: styledata }, { uuid: uuid });
-			} else {
-				await DataHandler.update({ discordid: interaction.user.id }, { uuid: uuid });
-			}
+			// 	await DataHandler.update({ discordid: interaction.user.id, styledata: styledata }, { uuid: uuid });
+			// } else {
+			// 	await DataHandler.update({ discordid: interaction.user.id }, { uuid: uuid });
+			// }
 
 			const embed = new Discord.MessageEmbed()
 				.setColor('#03fc7b')
@@ -97,14 +101,14 @@ module.exports = {
 				.setDescription(`Your minecraft account \`${await DataHandler.getPlayer(uuid).then(user => user.dataValues.ign)}\` has been linked! Try \`/weight\` with no arguments!`)
 				.setFooter('Created by Kaeso#5346');
 			
-			if (isEliteFarmer) {
-				const embed2 = new Discord.MessageEmbed()
-					.setColor('#03fc7b')
-					.setDescription(`You're also an Elite Farmer! \`/jacob\` will update the leaderboard!`);
-				interaction.editReply({ embeds: [embed, embed2] });
-			} else {
+			// if (isEliteFarmer) {
+			// 	const embed2 = new Discord.MessageEmbed()
+			// 		.setColor('#03fc7b')
+			// 		.setDescription(`You're also an Elite Farmer! \`/jacob\` will update the leaderboard!`);
+			// 	interaction.editReply({ embeds: [embed, embed2] });
+			// } else {
 				interaction.editReply({ embeds: [embed] });
-			}
+			// }
 		});		
 	}
 };
