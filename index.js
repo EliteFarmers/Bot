@@ -2,7 +2,7 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const { token } = require('./config.json');
 const { DataHandler } = require('./database.js')
-const { ServerLB } = require('./serverlb.js');
+const { ServerUtil } = require('./serverutil.js');
 const args = process.argv.slice(2);
 
 const client = new Discord.Client({ partials: ['CHANNEL'], intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.DIRECT_MESSAGES] });
@@ -32,14 +32,14 @@ client.on('interactionCreate', async (interaction) => {
 			}
 		} else if (interaction.customId.startsWith('LBROLETOGGLE')) {
 			try {
-				ServerLB.toggleRole(interaction);
+				ServerUtil.toggleRole(interaction);
 			} catch (e) {
 				error(e);
 			}
 			return;
 		} else if (interaction.customId.startsWith('LBSUBMIT')) {
 			try {
-				ServerLB.submitScores(interaction);
+				ServerUtil.submitScores(interaction);
 			} catch (e) {
 				error(e);
 			}

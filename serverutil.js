@@ -2,7 +2,7 @@ const { MessageEmbed, MessageActionRow } = require('discord.js');
 const { DataHandler } = require('./database.js');
 const { Data } = require('./data.js');
 
-class ServerLB {
+class ServerUtil {
 	static async submitScores(interaction) {
 		const user = await DataHandler.getPlayer(undefined, { discordid: interaction.user.id });
 		if (!user) {
@@ -73,7 +73,7 @@ class ServerLB {
 
 		// This will only be false if someone was manually removed from the scores
 		const silentUpdate = (Object.keys(server.scores).length !== interaction.message.embeds[0].fields.length);
-		
+
 		if (Object.keys(newScores).length <= 0) {
 			const embed = new MessageEmbed().setColor('#FF8600')
 				.setTitle('Sorry! No New Records')
@@ -173,5 +173,5 @@ class ServerLB {
 }
 
 module.exports = {
-	ServerLB
+	ServerUtil
 }
