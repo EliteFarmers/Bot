@@ -22,6 +22,9 @@ module.exports = (sequelize, DataTypes) => {
     weightreq: DataTypes.INTEGER,
     weightrole: DataTypes.STRING,
     weightchannel: DataTypes.STRING,
+    reviewchannel: DataTypes.STRING,
+    reviewerrole: DataTypes.STRING,
+    inreview: DataTypes.ARRAY(DataTypes.STRING),
 
     lbchannel: DataTypes.STRING,
     lbcutoff: DataTypes.STRING,
