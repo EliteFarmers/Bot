@@ -43,8 +43,29 @@ client.on('interactionCreate', async (interaction) => {
 			} catch (e) {
 				error(e);
 			}
-		} else return;
+		} else if (interaction.customId.startsWith('WEIGHTROLEAPPROVE')) {
+			const serverPromise = interaction.guildId ? DataHandler.getServer(interaction.guildId) : undefined;
+			const userPromise = DataHandler.getPlayer(undefined, { discordid: interaction.customId.split('|')[1] });
 
+			Promise.all([serverPromise, userPromise]).then(async (values) => {
+				const server = values[0], user = values[1];
+
+				if (!server || !user) return;
+				if (!server.reviewerrole || !(interaction.member.permissions.has('ADMINISTRATOR') || interaction.member.roles.cache.has(server.reviewerrole))) {
+					return interaction.reply({ content: '**Error!** You don\'t have permission to do this!', ephemeral: true }).catch();
+				}
+	
+				try {
+					ServerUtil.grantWeightRole(interaction, interaction.guild, user.discordid, server, user);
+				} catch (e) {
+					error(e);
+				}
+			}).catch((e) => error(e));
+
+		} else if (interaction.customId === 'WEIGHTROLEDENY') {
+			interaction.update({ content: `**Denied by** <@${interaction.user.id}>!`, components: [] }).catch();
+		}
+		return;
 		async function error(error) {
 			console.log(error);
 			await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => {
@@ -55,7 +76,7 @@ client.on('interactionCreate', async (interaction) => {
 	if (!interaction.isCommand()) return;
 	if (!client.commands.has(interaction.commandName)) return;
 
-	const server = await DataHandler.getServer(interaction.guildId);
+	const server = interaction.guildId ? await DataHandler.getServer(interaction.guildId) : undefined;
 
 	if (server && server?.channels && !['admin', 'config'].includes(interaction.commandName)) {
 		const channels = server.channels;
@@ -97,7 +118,7 @@ client.on('interactionCreate', async (interaction) => {
 	}
 
 	try {
-		await client.commands.get(interaction.commandName).execute(interaction);
+		await client.commands.get(interaction.commandName).execute(interaction, server);
 	} catch (error) {
 		console.log(error);
 		await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => {});
