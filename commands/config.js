@@ -398,8 +398,8 @@ async function setCutoffDate(server, interaction) {
 
 async function setWeightReview(server, interaction) {
 	const roleId = interaction.options.getRole('role', false)?.id;
-	const channel = interaction.options.getChannel('channel', false);
-	if (channel?.type !== 'GUILD_TEXT') return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch();
+	const channel = interaction.options.getChannel('channel', false) ?? undefined;
+	if (channel && channel?.type !== 'GUILD_TEXT') return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch();
 	const channelId = channel?.id;
 
 	if (!channelId || !roleId) {
