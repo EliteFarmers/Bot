@@ -262,7 +262,7 @@ async function setWeightRole(server, interaction) {
 	const roleId = interaction.options.getRole('role', false)?.id;
 
 	const channel = interaction.options.getChannel('channel', false);
-	if (channel?.type !== 'GUILD_TEXT') return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch();
+	if (channel && channel?.type !== 'GUILD_TEXT') return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch();
 	const channelId = channel?.id;
 
 	if (weight === undefined || !roleId) {
