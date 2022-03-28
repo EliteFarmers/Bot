@@ -170,6 +170,99 @@ class ServerUtil {
 			interaction.reply({ content: 'This feature isn\'t set up! This may be intentional, so don\'t bother the server admins about it.', ephemeral: true });
 		}
 	}
+
+	static async handleWeightRole(interaction, server) {
+		if (!server.weightrole || !(server.weightreq !== undefined)) return;
+
+		if (server.inreview?.includes(interaction.user.id)) return;
+
+		const user = await DataHandler.getPlayer(undefined, { discordid: interaction.user.id });
+		if (!user) return;
+
+		if (!server.reviewchannel) return this.grantWeightRole(interaction, interaction.guild, interaction.member, server, user);
+		DataHandler.updateServer({ inreview: [interaction.user.id, ...(server.inreview ?? [])] }, server.guildid);
+
+		const channel = interaction.guild.channels.cache.get(server.reviewchannel) 
+			?? await interaction.guild.channels.fetch(server.reviewchannel);
+
+		if (!channel) return;
+
+		const reviewEmbed = new MessageEmbed().setColor('#03fc7b')
+			.setTitle(`${user.ign} ${server.weightreq === 0 ? `is verified!` : `has reached ${server?.weightreq} weight!`}`)
+			.setDescription(`<@${user.discordid}> has ${server.weightreq === 0 ? `linked their account` : `achieved ${server?.weightreq} weight`}, they're awaiting approval now!`);
+
+		const reviewRow = new MessageActionRow().addComponents(
+			{ label: 'Approve', customId: `WEIGHTROLEAPPROVE|${user.discordid}`, style: 'SUCCESS', type: 'BUTTON' },
+			{ label: 'Deny', customId: `WEIGHTROLEDENY`, style: 'DANGER', type: 'BUTTON' },
+			{ label: 'SkyCrypt', style: 'LINK', url: `https://sky.shiiyu.moe/stats/${user.ign}`, type: 'BUTTON' },
+			{ label: 'Plancke', style: 'LINK', url: `https://plancke.io/hypixel/player/stats/${user.ign}`, type: 'BUTTON' }
+		);
+
+		if (server.reviewerrole) {
+			channel?.send({ content: `<@&${server.reviewerrole}>`, embeds: [reviewEmbed], components: [reviewRow], allowedMentions: { roles: [server.reviewerrole] } }).catch();
+		} else {
+			channel?.send({ embeds: [reviewEmbed], components: [reviewRow] }).catch();
+		}
+	}
+
+	static async grantWeightRole(interaction, guild, member, server, user) {
+
+		if (typeof member === 'string') {
+			member = guild.members?.cache?.get(member) ?? await guild.members?.fetch(member);
+			if (!member) return;
+		}
+
+		if (!user) {
+			user = await DataHandler.getPlayer(undefined, { discordid: interaction.user.id });
+			if (!user) return;
+		}
+
+		DataHandler.updateServer({ inreview: [...((server.inreview ?? []).filter(e => e !== user.discordid))] }, server.guildid);
+
+		await member?.roles?.add(server.weightrole).then(async () => {
+			const embed = new MessageEmbed().setColor('#03fc7b')
+				.setTitle('Congratulations!')
+				.setDescription(`You have ${server.weightreq === 0 ? `linked your account` : `achieved ${server?.weightreq} weight`}, earning you the <@&${server.weightrole}> role!`);
+
+			if (server.weightchannel) {
+				const channel = guild.channels.cache.get(server.weightchannel) 
+					?? await guild.channels.fetch(server.weightchannel);
+
+				if (!channel) return;
+
+				try {
+					const welcomeEmbed = new MessageEmbed().setColor('#03fc7b')
+						.setTitle(`Welcome ${user.ign}!`)
+						.setDescription(`<@${member.id}> has ${server.weightreq === 0 ? `linked their account.` : `achieved ${server?.weightreq} weight!`}`);
+
+					const linkRow = new MessageActionRow().addComponents(
+						{ label: 'SkyCrypt', style: 'LINK', url: `https://sky.shiiyu.moe/stats/${user.ign}`, type: 'BUTTON' },
+						{ label: 'Plancke', style: 'LINK', url: `https://plancke.io/hypixel/player/stats/${user.ign}`, type: 'BUTTON' }
+					);
+
+					channel.send({ embeds: [welcomeEmbed], components: [linkRow] }).catch();
+				} catch (e) { console.log(e); }
+			}
+
+			reply(interaction, { embeds: [embed], ephemeral: true });
+		}).catch(async () => {
+			reply(interaction, { content: '**Error!** Looks like this isn\'t configured properly!\nI don\'t have permission to add this role to you! Please message an admin so they can fix this!', ephemeral: true });
+		});
+
+		function reply(interaction, message) {
+			if (interaction.isButton()) {
+				return interaction.update({ content: `**Approved by** <@${interaction.user.id}>!`, components: [] }).catch();
+			}
+
+			if (interaction.replied) {
+				interaction.followUp(message).catch();
+			} else {
+				interaction.reply(message).catch(() => {
+					interaction.channel.send(message).catch();
+				});
+			}
+		}
+	}
 }
 
 module.exports = {
