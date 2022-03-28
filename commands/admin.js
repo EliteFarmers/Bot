@@ -40,8 +40,8 @@ module.exports = {
 		const embed = new Discord.MessageEmbed().setColor('#03fc7b')
 			.setTitle('Server Admin Panel')
 			.setDescription('Configure your server specific settings!')
-			.addField('Warning', 'Role settings require the \`Manage Roles\` permission.\nSetting channels requires the \`Read Messages\` permission.\n__This is only to view channels, the bot still **CANNOT** read messages.__\n⠀\nYou can change permissions manually, or **[click here](https://discord.com/api/oauth2/authorize?client_id=845065148997566486&permissions=277361249280&scope=bot%20applications.commands)** to reinvite the bot.')
-			.addField('How?', 'Please click the buttons below in order to register the slash commands that you\'ll need in order to configure these settings. To prevent command clutter, you can remove these commands when you\'re finished and enable them when you need them.')
+			.addField('WARNING', `**Role settings** require the \`Manage Roles\` permission.\n__And for the @Elite role to be above others in the hierarchy!__\n**Setting channels** requires the \`Read Messages\` permission.\n__This is only to view channels, the bot still **CANNOT** read messages!__\n⠀\n**You must change permissions manually, or [click here](https://discord.com/api/oauth2/authorize?client_id=845065148997566486&permissions=277361249280&scope=bot%20applications.commands) to reinvite the bot.**`)
+			.addField('How?', 'Please click the buttons below in order to register the slash commands that you\'ll need in order to configure these settings. To prevent command clutter, you can remove these commands when you\'re finished and enable them when you need them.\n⠀\n\`/config view\` is useful! Browse all \`/config\` commands by looking through the slash commands GUI without typing anything after they\'re registered.')
 			.setFooter('Instead of "Read Messages" you can give the bot view access to specific channels\nCreated by Kaeso#5346')
 
 		if (onCooldown) {
