@@ -198,7 +198,7 @@ async function clearedSettings(interaction, superUser = true) {
 }
 
 async function whitelist(server, interaction) {
-	const channel = interaction.options.getChannel('channel', false);
+	const channel = interaction.options.getChannel('channel', false) ?? interaction.channel;
 	if (channel?.type !== 'GUILD_TEXT') return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch();
 	const channelId = channel?.id;
 
