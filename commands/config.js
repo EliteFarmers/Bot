@@ -92,23 +92,30 @@ module.exports = {
 				setWeightRole(server, interaction);
 				break;
 			}
+			case 'weight-review': {
+				if (group === 'clear') {
+					await DataHandler.updateServer({ 
+						reviewchannel: null,
+						reviewerrole: null,
+						inreview: []
+					}, guildId);
+					clearedSettings(interaction);
+					break;
+				}
+				setWeightReview(server, interaction);
+				break;
+			}
 			case 'cutoff-date': {
 				setCutoffDate(server, interaction);
 				break;
 			}
 			case 'all': {
 				await DataHandler.updateServer({
-					channels: null,
 					adminrole: superUser ? null : server.adminrole,
-					weightrole: null,
-					weightchannel: null,
-					weightreq: null, 
-					lbchannel: null,
-					lbcutoff: null,
-					lbrolereq: null,
-					lbupdatechannel: null,
-					lbroleping: null,
-					scores: {}
+					weightrole: null, weightchannel: null, weightreq: null,
+					reviewchannel: null, reviewerrole: null, lbchannel: null,
+					lbcutoff: null, lbrolereq: null, lbupdatechannel: null,
+					lbroleping: null, scores: {}, inreview: [], channels: null,
 				}, guildId);
 				clearedSettings(interaction, superUser);
 				break;
@@ -134,7 +141,12 @@ module.exports = {
 			}
 			case 'scores': {
 				await DataHandler.updateServer({ scores: {} }, guildId);
-				interaction.reply({ content: 'Success! The scores have been cleared.', ephemeral: true });
+				interaction.reply({ content: '**Success!** The scores have been cleared.', ephemeral: true });
+				break;
+			}
+			case 'weight-role-blacklist': {
+				await DataHandler.updateServer({ inreview: [] }, guildId);
+				interaction.reply({ content: '**Success!** The blacklist has been cleared.', ephemeral: true });
 				break;
 			}
 			default: {
@@ -150,7 +162,9 @@ async function viewSettings(s, interaction) {
 **Admin Role:** ${s.adminrole ? `<@&${s.adminrole}>` : 'Not set'}\n
 **Weight Requirement:** ${s.weightreq ? (s.weightreq === 0 ? 'All Verified Users' : s.weightreq) : 'Not set'}
 - Reward Role: ${s.weightrole ? `<@&${s.weightrole}>` : 'Not set'}
-- Annoucement Channel: ${s.weightchannel ? `<#${s.weightchannel}>` : 'Not set'}\n	
+- Annoucement Channel: ${s.weightchannel ? `<#${s.weightchannel}>` : 'Not set'}
+- Review Channel: ${s.reviewchannel ? `<#${s.reviewchannel}>` : 'Not set'}
+- Reviewer Role: ${s.reviewerrole ? `<@&${s.reviewerrole}>` : 'Not set'}\n	
 **Leaderboard Channel:** ${s.lbchannel ? `<#${s.lbchannel}>` : 'Not set'}
 - Role Requirement: ${s.lbrolereq ? `<@&${s.lbrolereq}>` : 'Not set'}
 - Annoucement Channel: ${s.lbupdatechannel ? `<#${s.lbupdatechannel}>` : 'Not set'}
@@ -174,7 +188,7 @@ async function viewSettings(s, interaction) {
 }
 
 async function clearedSettings(interaction, superUser = true) {
-	let content = 'Success! These settings have been cleared.';
+	let content = '**Success!** These settings have been cleared.';
 
 	if (!superUser) {
 		content += '\nThe admin role has not been cleared, doing so requires the \`ADMINISTRATOR\` permission.'
@@ -184,7 +198,10 @@ async function clearedSettings(interaction, superUser = true) {
 }
 
 async function whitelist(server, interaction) {
-	const channelId = interaction.options.getChannel('channel', false)?.id ?? interaction.channelId;
+	const channel = interaction.options.getChannel('channel', false);
+	if (channel?.type !== 'GUILD_TEXT') return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch();
+	const channelId = channel?.id;
+
 	const channels = [];
 
 	const embed = new MessageEmbed().setColor('#03fc7b')
@@ -193,8 +210,8 @@ async function whitelist(server, interaction) {
 
 	if (server.channels?.includes(channelId)) {
 		if (server.channels) {
-			server.channels.forEach(channel => { 
-				if (channel !== channelId) channels.push(channel); 
+			server.channels.forEach(c => { 
+				if (c !== channelId) channels.push(c); 
 			});
 		}
 	} else {
@@ -243,7 +260,10 @@ async function setAdminRole(server, interaction) {
 async function setWeightRole(server, interaction) {
 	const weight = interaction.options.getInteger('weight', false) ?? undefined;
 	const roleId = interaction.options.getRole('role', false)?.id;
-	const channelId = interaction.options.getChannel('channel', false)?.id;
+
+	const channel = interaction.options.getChannel('channel', false);
+	if (channel?.type !== 'GUILD_TEXT') return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch();
+	const channelId = channel?.id;
 
 	if (weight === undefined || !roleId) {
 		interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch();
@@ -266,6 +286,7 @@ async function setWeightRole(server, interaction) {
 
 async function createLeaderboard(server, interaction) {
 	const channel = interaction.options.getChannel('channel', false);
+	if (channel?.type !== 'GUILD_TEXT') return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch();
 	if (!channel) return interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch();
 
 	const roleId = interaction.options.getRole('role', false)?.id;
@@ -320,7 +341,9 @@ async function createLeaderboard(server, interaction) {
 }
 
 async function createLeaderboardNotifs(server, interaction) {
-	const channelId = interaction.options.getChannel('channel', false)?.id;
+	const channel = interaction.options.getChannel('channel', false);
+	if (channel?.type !== 'GUILD_TEXT') return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch();
+	const channelId = channel?.id;
 	if (!channelId) return interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch();
 
 	const roleId = interaction.options.getRole('role', false)?.id;
@@ -371,4 +394,28 @@ async function setCutoffDate(server, interaction) {
 			.setDescription(`New Cutoff Date: **${Data.getReadableDate(date)}**\nOnly scores that are on or after this date will be counted!`)
 			.setFooter('Created by Kaeso#5346')
 	], ephemeral: true }).catch();
+}
+
+async function setWeightReview(server, interaction) {
+	const roleId = interaction.options.getRole('role', false)?.id;
+	const channel = interaction.options.getChannel('channel', false);
+	if (channel?.type !== 'GUILD_TEXT') return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch();
+	const channelId = channel?.id;
+
+	if (!channelId || !roleId) {
+		interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch();
+		return;
+	}
+
+	await DataHandler.updateServer({ 
+		reviewerrole: roleId, 
+		reviewchannel: channelId
+	}, server.guildid);
+
+	const embed = new MessageEmbed().setColor('#03fc7b')
+		.setTitle('Success!')
+		.setDescription(`Review Channel: <#${channelId}>\nReviewer Role: <@&${roleId}>`)
+		.setFooter('Created by Kaeso#5346');
+
+	interaction.reply({ embeds: [embed], ephemeral: true }).catch();
 }
