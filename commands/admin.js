@@ -67,7 +67,7 @@ module.exports = {
 			if (inter.customId === 'register') {
 				try {
 					await inter.guild.commands.set([slashCommandData]);
-					await inter.reply({ content: 'Success! The \`/config\` command should now be available to you!', ephemeral: true });
+					await inter.reply({ content: '**Success!** The \`/config\` command should now be available to you!', ephemeral: true });
 					await DataHandler.updateServer({ configshowedat: dateNow }, inter.guild.id);
 				} catch (e) {
 					await inter.reply({ content: 'Something went wrong! This is likely due to the bot lacking permissions to create slash commands. Please reinvite the bot with the link or fix this manually. If the issue still occurs contact Kaeso#5346', ephemeral: true });
@@ -75,7 +75,7 @@ module.exports = {
 			} else if (inter.customId === 'clear') {
 				try {
 					await inter.guild.commands.set([]);
-					await inter.reply({ content: 'Success! The \`/config\` command should now be gone!', ephemeral: true });
+					await inter.reply({ content: '**Success!** The \`/config\` command should now be gone!', ephemeral: true });
 				} catch (e) {
 					await inter.reply({ content: 'Something went wrong! This is likely due to the bot lacking permissions to create slash commands. Please reinvite the bot with the link or fix this manually. If the issue still occurs contact Kaeso#5346', ephemeral: true });
 				}
@@ -195,6 +195,21 @@ const slashCommandData = {
 			required: false
 		}]
 	}, {
+		name: 'weight-review',
+		description: 'Specify these options to manually approve each weight-role auto-grant.',
+		type: 1,
+		options: [{
+			name: 'channel',
+			description: 'What channel should applications wait for review in?',
+			type: 7,
+			required: true
+		}, {
+			name: 'role',
+			description: 'What role should be pinged and be able to approve applications?',
+			type: 8,
+			required: true
+		}]
+	}, {
 		name: 'cutoff-date',
 		description: 'Please read about this command in "/config view" before using this.',
 		type: 1,
@@ -262,6 +277,14 @@ const slashCommandData = {
 			name: 'weight-role',
 			description: 'Stop rewarding a role for a specific weight.',
 			type: 1
+		}, {
+			name: 'weight-review',
+			description: 'Remove the application process of the auto weight-role grant.',
+			type: 1,
+		}, {
+			name: 'weight-role-blacklist',
+			description: 'Clear the blacklist of denied users!',
+			type: 1,
 		}, {
 			name: 'whitelist',
 			description: 'Allow the bot to be used in all channels (it can access) again.',
