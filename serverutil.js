@@ -38,7 +38,7 @@ class ServerUtil {
 
 		const onCooldown = +(user.updatedat ?? 0) > +(Date.now() - (10 * 60 * 1000));
 		const contestData = await Data.getLatestContestData(user, !onCooldown).catch(e => console.log(e));
-		if (!onCooldown) DataHandler.update({ updatedat: Date.now().toString() }, { discordid: user.discordid }).catch();
+		if (!onCooldown) DataHandler.update({ updatedat: Date.now().toString() }, { discordid: user.discordid }).catch(() => {});
 
 		if (!contestData) {
 			const embed = new MessageEmbed().setColor('#CB152B')
@@ -116,7 +116,7 @@ class ServerUtil {
 		await interaction.editReply({ content: '⠀', embeds: [embed] }).catch(async () => {
 			await interaction.editReply({ embeds: [embed] });
 		});
-		if (!silentUpdate) await interaction.followUp({ content: 'Success! Check the leaderboard now!', ephemeral: true }).catch();
+		if (!silentUpdate) await interaction.followUp({ content: 'Success! Check the leaderboard now!', ephemeral: true }).catch(() => {});
 
 		if (channel) {
 			const embeds = [];
@@ -134,9 +134,9 @@ class ServerUtil {
 				embeds.push(embed);
 			}
 			if (server.lbroleping) {
-				await channel?.send({ content: `<@&${server.lbroleping}>`, embeds: embeds, allowedMentions: { roles: [server.lbroleping] } }).catch();
+				await channel?.send({ content: `<@&${server.lbroleping}>`, embeds: embeds, allowedMentions: { roles: [server.lbroleping] } }).catch(() => {});
 			} else {
-				await channel?.send({ embeds: embeds }).catch();
+				await channel?.send({ embeds: embeds }).catch(() => {});
 			}
 		}
 	}
@@ -199,9 +199,9 @@ class ServerUtil {
 		);
 
 		if (server.reviewerrole) {
-			channel?.send({ content: `<@&${server.reviewerrole}>`, embeds: [reviewEmbed], components: [reviewRow], allowedMentions: { roles: [server.reviewerrole] } }).catch();
+			channel?.send({ content: `<@&${server.reviewerrole}>`, embeds: [reviewEmbed], components: [reviewRow], allowedMentions: { roles: [server.reviewerrole] } }).catch(() => {});
 		} else {
-			channel?.send({ embeds: [reviewEmbed], components: [reviewRow] }).catch();
+			channel?.send({ embeds: [reviewEmbed], components: [reviewRow] }).catch(() => {});
 		}
 	}
 
@@ -240,7 +240,7 @@ class ServerUtil {
 						{ label: 'Plancke', style: 'LINK', url: `https://plancke.io/hypixel/player/stats/${user.ign}`, type: 'BUTTON' }
 					);
 
-					channel.send({ embeds: [welcomeEmbed], components: [linkRow] }).catch();
+					channel.send({ embeds: [welcomeEmbed], components: [linkRow] }).catch(() => {});
 				} catch (e) { console.log(e); }
 			}
 
@@ -251,14 +251,14 @@ class ServerUtil {
 
 		function reply(interaction, message) {
 			if (interaction.isButton()) {
-				return interaction.update({ content: `**Approved by** <@${interaction.user.id}>!`, components: [] }).catch();
+				return interaction.update({ content: `**Approved by** <@${interaction.user.id}>!`, components: [] }).catch(() => {});
 			}
 
 			if (interaction.replied) {
-				interaction.followUp(message).catch();
+				interaction.followUp(message).catch(() => {});
 			} else {
 				interaction.reply(message).catch(() => {
-					interaction.channel.send(message).catch();
+					interaction.channel.send(message).catch(() => {});
 				});
 			}
 		}

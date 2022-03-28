@@ -63,13 +63,13 @@ client.on('interactionCreate', async (interaction) => {
 			}).catch((e) => error(e));
 
 		} else if (interaction.customId === 'WEIGHTROLEDENY') {
-			interaction.update({ content: `**Denied by** <@${interaction.user.id}>!`, components: [] }).catch();
+			interaction.update({ content: `**Denied by** <@${interaction.user.id}>!`, components: [] }).catch(() => {});
 		}
 		return;
 		async function error(error) {
 			console.log(error);
 			await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => {
-				interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true }).catch()
+				interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => {});
 			});
 		}
 	}
