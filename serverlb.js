@@ -71,6 +71,9 @@ class ServerLB {
 			}
 		}
 
+		// This will only be false if someone was manually removed from the scores
+		const silentUpdate = (Object.keys(server.scores).length !== interaction.message.embeds[0].fields.length);
+		
 		if (Object.keys(newScores).length <= 0) {
 			const embed = new MessageEmbed().setColor('#FF8600')
 				.setTitle('Sorry! No New Records')
@@ -80,8 +83,11 @@ class ServerLB {
 			if (onCooldown) {
 				embed.description += `\n⠀\nThis could be because fetching your profile is on cooldown, try again <t:${Math.floor((+(user.updatedat ?? 0) + (10 * 60 * 1000)) / 1000)}:R>`;
 			}
-			await interaction.editReply().catch((e) => console.log(e));
-			return await interaction.followUp({ embeds: [embed], ephemeral: true }).catch((e) => console.log(e));
+			await interaction.followUp({ embeds: [embed], ephemeral: true }).catch((e) => console.log(e));
+
+			if (!silentUpdate) {
+				return await interaction.editReply().catch((e) => console.log(e));
+			}
 		}
 
 		const updatedScores = {...server.scores, ...newScores};
@@ -110,7 +116,7 @@ class ServerLB {
 		await interaction.editReply({ content: '⠀', embeds: [embed] }).catch(async () => {
 			await interaction.editReply({ embeds: [embed] });
 		});
-		await interaction.followUp({ content: 'Success! Check the leaderboard now!', ephemeral: true }).catch();
+		if (!silentUpdate) await interaction.followUp({ content: 'Success! Check the leaderboard now!', ephemeral: true }).catch();
 
 		if (channel) {
 			const embeds = [];

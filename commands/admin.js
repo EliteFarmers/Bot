@@ -249,8 +249,8 @@ const slashCommandData = {
 			description: 'Remove a user from the leaderboard',
 			type: 1,
 			options: [{
-				name: 'ign',
-				description: 'The IGN of the user to remove',
+				name: 'player',
+				description: 'The Minecraft username of the user to remove',
 				type: 3,
 				required: true
 			}]

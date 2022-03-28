@@ -114,7 +114,22 @@ module.exports = {
 				break;
 			}
 			case 'user-score': {
-				
+				if (Object.keys(server.scores) <= 0) {
+					return interaction.reply({ content: 'Nothing Changed! There are no saved scores currently.', ephemeral: true })
+				}
+
+				const ign = interaction.options.getString('player', false)?.toLowerCase() ?? undefined;
+				if (!ign) return interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch();
+
+				for (const crop of Object.keys(server.scores)) {
+					const record = server.scores[crop];
+					if (!record || !record.ign) continue;
+					if (record.ign.toLowerCase() === ign) delete server.scores[crop];
+				}
+
+				await DataHandler.updateServer({ scores: server.scores }, guildId);
+
+				interaction.reply({ content: '**Success!** Please click "Submit Scores" to update the leaderboard message!\n**Note:** This doesn\'t prevent the user from submitting their scores again.', ephemeral: true }).catch();
 				break;
 			}
 			case 'scores': {
@@ -199,19 +214,19 @@ async function whitelist(server, interaction) {
 
 	await DataHandler.updateServer({ channels: channels.length === 0 ? null : channels }, server.guildid);
 
-	interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => { });
+	interaction.reply({ embeds: [embed], ephemeral: true }).catch();
 }
 
 async function setAdminRole(server, interaction) {
 	if (!interaction.member.permissions.has('ADMINISTRATOR')) {
-		interaction.reply({ content: '**Error!** Only users with the \`ADMINISTRATOR\` permission can configure this.', ephemeral: true }).catch(() => { });
+		interaction.reply({ content: '**Error!** Only users with the \`ADMINISTRATOR\` permission can configure this.', ephemeral: true }).catch();
 		return;
 	}
 
 	const roleId = interaction.options.getRole('role', false)?.id;
 
 	if (!roleId) {
-		interaction.reply({ content: '**Error!** No role specified!', ephemeral: true }).catch(() => { });
+		interaction.reply({ content: '**Error!** No role specified!', ephemeral: true }).catch();
 		return;
 	}
 
@@ -222,7 +237,7 @@ async function setAdminRole(server, interaction) {
 		.setDescription(`Admin Role: <@&${roleId}>`)
 		.setFooter('Created by Kaeso#5346');
 
-	interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => { });
+	interaction.reply({ embeds: [embed], ephemeral: true }).catch();
 }
 
 async function setWeightRole(server, interaction) {
@@ -231,7 +246,7 @@ async function setWeightRole(server, interaction) {
 	const channelId = interaction.options.getChannel('channel', false)?.id;
 
 	if (weight === undefined || !roleId) {
-		interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch(() => { });
+		interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch();
 		return;
 	}
 
@@ -246,12 +261,12 @@ async function setWeightRole(server, interaction) {
 		.setDescription(`Required Weight: **${weight === 0 ? 'N/A (All verified users qualify)' : weight}**\nReward Role: <@&${roleId}>${channelId ? `\nAnnouncement Channel: <#${channelId}>` : ''}`)
 		.setFooter('Created by Kaeso#5346');
 
-	interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => { });
+	interaction.reply({ embeds: [embed], ephemeral: true }).catch();
 }
 
 async function createLeaderboard(server, interaction) {
 	const channel = interaction.options.getChannel('channel', false);
-	if (!channel) return interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch(() => { });
+	if (!channel) return interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch();
 
 	const roleId = interaction.options.getRole('role', false)?.id;
 	const clearScores = interaction.options.getBoolean('clear', false) ?? false;
@@ -306,7 +321,7 @@ async function createLeaderboard(server, interaction) {
 
 async function createLeaderboardNotifs(server, interaction) {
 	const channelId = interaction.options.getChannel('channel', false)?.id;
-	if (!channelId) return interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch(() => { });
+	if (!channelId) return interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch();
 
 	const roleId = interaction.options.getRole('role', false)?.id;
 
@@ -320,7 +335,7 @@ async function createLeaderboardNotifs(server, interaction) {
 		.setDescription(`Annoucement Channel: <#${channelId}>\nRole That\'s Pinged: ${roleId ? `<@&${roleId}>` : 'Not set'}`)
 		.setFooter('Created by Kaeso#5346');
 
-	interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => { });
+	interaction.reply({ embeds: [embed], ephemeral: true }).catch();
 }
 
 async function setCutoffDate(server, interaction) {
@@ -329,24 +344,24 @@ async function setCutoffDate(server, interaction) {
 	let year = interaction.options.getInteger('year', false) ?? undefined;
 
 	if (!day || !month || !year) {
-		return interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch(() => { });
+		return interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch();
 	}
 
 	// Jacob's contests have their years starting at 0
 	year--;
 
 	if (day < 1 || day > 31) {
-		return interaction.reply({ content: '**Error!** Day must be a number [1-31] (inclusive)', ephemeral: true }).catch(() => { });
+		return interaction.reply({ content: '**Error!** Day must be a number [1-31] (inclusive)', ephemeral: true }).catch();
 	}
 
 	const date = `${year}${month <= 9 ? `0${month}` : month}${day <= 9 ? `0${day}` : day}`;
 
 	if (year < 159 || date < +Data.CUTOFFDATE) {
-		return interaction.reply({ content: `**Error!** Overall date must be after **${Data.getReadableDate(Data.CUTOFFDATE)}**, dates before this are currently unsupported.`, ephemeral: true }).catch(() => { });
+		return interaction.reply({ content: `**Error!** Overall date must be after **${Data.getReadableDate(Data.CUTOFFDATE)}**, dates before this are currently unsupported.`, ephemeral: true }).catch();
 	}
 
 	if (year > 9999) {
-		return interaction.reply({ content: `**Error!** You really think Hypixel will exist still?`, ephemeral: true }).catch(() => { });
+		return interaction.reply({ content: `**Error!** You really think Hypixel will exist still?`, ephemeral: true }).catch();
 	}
 
 	await DataHandler.updateServer({ lbcutoff: date }, server.guildid);
@@ -355,5 +370,5 @@ async function setCutoffDate(server, interaction) {
 			.setTitle('Success!')
 			.setDescription(`New Cutoff Date: **${Data.getReadableDate(date)}**\nOnly scores that are on or after this date will be counted!`)
 			.setFooter('Created by Kaeso#5346')
-	], ephemeral: true }).catch(() => { });
+	], ephemeral: true }).catch();
 }
