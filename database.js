@@ -10,6 +10,11 @@ const Users = require('./models/users.js')(new Sequelize(dbUri, {
     logging: false,
 }), Sequelize);
 
+const Servers = require('./models/servers.js')(new Sequelize(dbUri, {
+    dialect: 'postgres',
+    logging: false,
+}), Sequelize);
+
 class DataHandler {
 
     constructor() {
@@ -18,6 +23,7 @@ class DataHandler {
 
     static async syncTables() {
         await Users.sync();
+        await Servers.sync();
 
         this.updateLeaderboard();
         //For wiping table
@@ -27,9 +33,7 @@ class DataHandler {
     static leaderboard;
 
     static async getPlayer(playeruuid, where = null) {
-        if (!where) {
-            where = { uuid: playeruuid };
-        }
+        if (!where) { where = { uuid: playeruuid }; }
         return await Users.findOne({ where: where });
     }
 
@@ -92,6 +96,33 @@ class DataHandler {
     static async getJacobLB(crop) {
         const lb = await Users.findAll({ limit: 1000, order: [[[Sequelize.json(`contestdata.scores.${crop}`), `${crop}`], 'DESC']] });
         return lb;
+    }
+
+    static async getServer(guild, where = null) {
+        if (!where) { where = { guildid: guild }; }
+        const server = await Servers.findOne({ where: where });
+        return (server) ? server : await this.createServer(guild, true);
+    }
+
+    static async createServer(guildid, skipfind = false) {
+        try {
+            const server = (skipfind) ? undefined : await this.getServer(guildid);
+            if (!server) { 
+                await Servers.create({ guildid: guildid });
+                return await Servers.findOne({ where: { guildid: guildid } }) ?? undefined;
+            }
+            return undefined;
+        } catch (e) {
+            console.log(e);
+            return undefined;
+        }
+    }
+
+    static async updateServer(changes, guildid) {
+        const server = await Servers.findOne({ where: { guildid: guildid } });
+        if (server) {
+            return await Servers.update(changes, { where: { guildid: guildid } });
+        }
     }
 
     static async getLeaderboardEmbed(from = 0, playerName = null, firstCall = false) {
@@ -164,5 +195,3 @@ module.exports = {
 //     dialect: 'sqlite',
 //     logging: false,
 // });
-
-

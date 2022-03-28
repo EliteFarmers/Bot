@@ -67,18 +67,8 @@ module.exports = {
 
 		await interaction.deferReply();
 
-        const contestData = await new Promise(async (resolve, reject) => {
-            if (grabnewdata || !user?.dataValues?.contestdata || !user?.dataValues?.contestdata?.recents) {
-                let fullData = await Data.getBestData(user?.dataValues?.profiledata, uuid);
-                let data = await Data.getBestContests(fullData, uuid);
-                resolve(data);
-            } else {
-                let data = user?.dataValues?.contestdata;
-                resolve(data);
-            }
-            reject(undefined);
-        });
-
+        const contestData = await Data.getLatestContestData(user, grabnewdata);
+		if (grabnewdata) DataHandler.update({ updatedat: Date.now().toString() }, { discordid: user.discordid }).catch();
 
         if (!contestData) {
             const embed = new Discord.MessageEmbed()

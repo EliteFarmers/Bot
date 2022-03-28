@@ -2,6 +2,7 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const { token } = require('./config.json');
 const { DataHandler } = require('./database.js')
+const { ServerUtil } = require('./serverutil.js');
 const args = process.argv.slice(2);
 
 const client = new Discord.Client({ partials: ['CHANNEL'], intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.DIRECT_MESSAGES] });
@@ -26,16 +27,72 @@ client.on('interactionCreate', async (interaction) => {
 		if (interaction.customId.includes('jacob')) {
 			try {
 				await client.commands.get('jacob').execute(interaction, interaction.customId.split('_')[1]);
-			} catch (error) {
-				console.log(error);
-				await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => {});
+			} catch (e) {
+				error();
 			}
-		} else {
+		} else if (interaction.customId.startsWith('LBROLETOGGLE')) {
+			try {
+				ServerUtil.toggleRole(interaction);
+			} catch (e) {
+				error(e);
+			}
 			return;
+		} else if (interaction.customId.startsWith('LBSUBMIT')) {
+			try {
+				ServerUtil.submitScores(interaction);
+			} catch (e) {
+				error(e);
+			}
+		} else if (interaction.customId.startsWith('WEIGHTROLEAPPROVE')) {
+			const serverPromise = interaction.guildId ? DataHandler.getServer(interaction.guildId) : undefined;
+			const userPromise = DataHandler.getPlayer(undefined, { discordid: interaction.customId.split('|')[1] });
+
+			Promise.all([serverPromise, userPromise]).then(async (values) => {
+				const server = values[0], user = values[1];
+
+				if (!server || !user) return;
+				if (!server.reviewerrole || !(interaction.member.permissions.has('ADMINISTRATOR') || interaction.member.roles.cache.has(server.reviewerrole))) {
+					return interaction.reply({ content: '**Error!** You don\'t have permission to do this!', ephemeral: true }).catch();
+				}
+	
+				try {
+					ServerUtil.grantWeightRole(interaction, interaction.guild, user.discordid, server, user);
+				} catch (e) {
+					error(e);
+				}
+			}).catch((e) => error(e));
+
+		} else if (interaction.customId === 'WEIGHTROLEDENY') {
+			interaction.update({ content: `**Denied by** <@${interaction.user.id}>!`, components: [] }).catch(() => {});
+		}
+		return;
+		async function error(error) {
+			console.log(error);
+			await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => {
+				interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => {});
+			});
 		}
 	}
 	if (!interaction.isCommand()) return;
 	if (!client.commands.has(interaction.commandName)) return;
+
+	const server = interaction.guildId ? await DataHandler.getServer(interaction.guildId) : undefined;
+
+	if (server && server?.channels && !['admin', 'config'].includes(interaction.commandName)) {
+		const channels = server.channels;
+		if (!channels.includes(interaction.channelId)) {
+			let content = '';
+			channels.forEach(channel => { content += `<#${channel}> `; });
+
+			const embed = new Discord.MessageEmbed().setColor('#FF0000')
+				.setTitle('Commands are disabled in this channel!')
+				.setDescription('Please use the channels that this server whitelisted.')
+				.addField(`Available Channel${channels.length > 1 ? 's' : ''}`, content.trim() === '' ? '**Something went wrong**' : content.trim());
+
+			interaction.reply({ embeds: [embed], ephemeral: true}).catch(() => { });
+			return;
+		}
+	}
 
 	let command;
 	try {
@@ -61,7 +118,7 @@ client.on('interactionCreate', async (interaction) => {
 	}
 
 	try {
-		await client.commands.get(interaction.commandName).execute(interaction);
+		await client.commands.get(interaction.commandName).execute(interaction, server);
 	} catch (error) {
 		console.log(error);
 		await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => {});

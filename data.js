@@ -34,9 +34,9 @@ class Data {
 						if (result.success === true) {
 							return result;
 						}
-						reject(undefined);
+						resolve(undefined);
 					}).catch(error => {
-						reject(undefined);
+						resolve(undefined);
 					});
 				resolve(await response);
 			});
@@ -58,9 +58,9 @@ class Data {
 						if (result.success) {
 							return result;
 						}
-						reject(undefined);
+						resolve(undefined);
 					}).catch(error => {
-						reject(undefined);
+						resolve(undefined);
 					});
 				resolve(await response);
 			});
@@ -407,6 +407,20 @@ class Data {
 			return undefined;
 		}
 		return await Data.takeNewestData(saved, fresh);
+	}
+
+	static async getLatestContestData(user, fetchnewdata = true) {
+		return new Promise(async (resolve, reject) => {
+			if (fetchnewdata || !user?.contestdata || !user?.contestdata?.recents) {
+				let fullData = await Data.getBestData(user?.profiledata, user?.uuid);
+				let data = await Data.getBestContests(fullData, user?.uuid);
+				resolve(data);
+			} else {
+				let data = user?.contestdata;
+				resolve(data);
+			}
+			resolve(undefined);
+		});
 	}
 
     static getDateFromContest(split) {

@@ -1,6 +1,8 @@
 const Discord = require('discord.js');
 const { Data } = require('../data.js');
 const { DataHandler } = require('../database.js');
+const { ServerUtil } = require('../serverutil.js');
+// const { eliteserverid, verifiedroleid } = require('../config.json');
 
 module.exports = {
 	name: 'verify',
@@ -79,12 +81,35 @@ module.exports = {
 				await DataHandler.update({ discordid: interaction.user.id, ign: playerName }, { uuid: uuid });
 			}
 
+			// const isEliteFarmer = (interaction.guild.id === eliteserverid && interaction.member.roles.cache.some(role => role.id === verifiedroleid));
+			// if (isEliteFarmer) {
+			// 	let styledata = { elitefarmer: true }
+
+			// 	if (user && user.dataValues?.styledata) {
+			// 		const old = user.dataValues?.styledata;
+			// 		old.elitefarmer = true;
+			// 		styledata = old;
+			// 	}
+
+			// 	await DataHandler.update({ discordid: interaction.user.id, styledata: styledata }, { uuid: uuid });
+			// } else {
+			// 	await DataHandler.update({ discordid: interaction.user.id }, { uuid: uuid });
+			// }
+
 			const embed = new Discord.MessageEmbed()
 				.setColor('#03fc7b')
 				.setTitle('Success!')
 				.setDescription(`Your minecraft account \`${playerName}\` has been linked! Try \`/weight\` with no arguments!`)
 				.setFooter('Created by Kaeso#5346');
-			interaction.editReply({embeds: [embed]});
+			
+			// if (isEliteFarmer) {
+			// 	const embed2 = new Discord.MessageEmbed()
+			// 		.setColor('#03fc7b')
+			// 		.setDescription(`You're also an Elite Farmer! \`/jacob\` will update the leaderboard!`);
+			// 	interaction.editReply({ embeds: [embed, embed2] });
+			// } else {
+				interaction.editReply({ embeds: [embed] });
+			// }
 		});		
 	}
 };
