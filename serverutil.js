@@ -129,7 +129,7 @@ class ServerUtil {
 
 				if (serverScores[crop]) {
 					embed.description = `<@${interaction.user.id}> (${user.ign}) has ${interaction.user.id !== serverScores[crop]?.user ? `beaten <@${serverScores[crop]?.user}> (${serverScores[crop]?.ign})` : 'improved their score'} by **${(record.value - serverScores[crop]?.value ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** collection for a total of **${record.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**!`;
-					embed.setFooter(`The previous score was **${(serverScores[crop]?.value ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**!`)
+					embed.setFooter(`The previous score was ${(serverScores[crop]?.value ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}!`)
 				} else {
 					embed.description = `<@${interaction.user.id}> (${user.ign}) has set a new record of **${record.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**!`;
 				}
