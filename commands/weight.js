@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const Canvas = require('canvas');
 const { Data } = require('../data.js');
 const { DataHandler } = require('../database.js');
+const { ServerUtil } = require('../serverutil.js');
 
 module.exports = {
 	name: 'weight',
@@ -10,7 +11,7 @@ module.exports = {
 	usage: '[username] (profile name)',
 	guildOnly: false,
 	dmOnly: false,
-	async execute(interaction) {
+	async execute(interaction, server) {
 		const options = interaction?.options?._hoistedOptions;
 
 		let playerName = undefined;
@@ -98,6 +99,18 @@ module.exports = {
 		
 		await sendWeight();
 		await saveData();
+
+		// Check if they're eligible for server weight-role
+		if (server && server?.weightrole && server?.weightreq >= 0 && user.discordid === interaction.user.id) {
+			if (server.weightreq === 0) {
+				if (interaction.member?.roles?.cache?.has(server.weightrole)) return;
+				return ServerUtil.handleWeightRole(interaction, server);
+			}
+			const eligible = (mainWeight + mainBWeight >= server.weightreq && !interaction.member?.roles?.cache?.has(server.weightrole));
+			if (!eligible) return;
+
+			ServerUtil.handleWeightRole(interaction, server);
+		}
 
 		async function saveData() {
 			const jacob = await Data.getBestContests(fullData);
