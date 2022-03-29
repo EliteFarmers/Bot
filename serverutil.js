@@ -63,7 +63,7 @@ class ServerUtil {
 			const serverScore = serverScores[crop];
 
 			if (!userScore || (+server.lbcutoff > +userScore.obtained)) continue;
-			const nowClaimed = (serverScore?.value && serverScore?.obtained === userScore?.obtained && serverScore?.user === interaction.user.id && !serverScore?.par && userScore?.par);
+			const nowClaimed = (serverScore && serverScore.obtained === userScore.obtained && serverScore.user === interaction.user.id && serverScore.par === null && userScore.par !== null);
 
 			if ((!serverScore && userScore.value) || userScore.value > (serverScore?.value ?? 0) || nowClaimed) {
 				newScores[crop] = { user: interaction.user.id, ign: user.ign, ...userScore };
@@ -71,8 +71,8 @@ class ServerUtil {
 			}
 		}
 
-		// This will only be false if someone was manually removed from the scores
-		const silentUpdate = (Object.keys(server.scores).length !== interaction.message.embeds[0].fields.length);
+		// True if someone has since claimed the contest for their highscore, or if a user's scores were removed from the leaderboard
+		const silentUpdate = (Object.keys(server.scores).length > interaction.message.embeds[0].fields.length || (dontUpdate.length > 0 && Object.keys(newScores).length === dontUpdate.length));
 
 		if (Object.keys(newScores).length <= 0) {
 			const embed = new MessageEmbed().setColor('#FF8600')
@@ -116,7 +116,12 @@ class ServerUtil {
 		await interaction.editReply({ content: '⠀', embeds: [embed] }).catch(async () => {
 			await interaction.editReply({ embeds: [embed] });
 		});
-		if (!silentUpdate) await interaction.followUp({ content: 'Success! Check the leaderboard now!', ephemeral: true }).catch(() => {});
+
+		if (silentUpdate) {
+			return interaction.followUp({ content: 'Success! No new scores, but your contest has since been claimed and updated!', ephemeral: true }).catch(() => {});
+		}
+		
+		await interaction.followUp({ content: 'Success! Check the leaderboard now!', ephemeral: true }).catch(() => {});
 
 		if (channel) {
 			const embeds = [];
