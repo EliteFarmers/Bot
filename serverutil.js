@@ -112,6 +112,8 @@ class ServerUtil {
 				value: `<@${contest.user}> - **${contest.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**⠀⠀${details}\n${Data.getReadableDate(contest.obtained)}⠀[\🔗](https://sky.shiiyu.moe/stats/${contest.ign}/${contest.profilename})`,
 			});
 		}
+		// Sort the leaderboard embeds
+		embed.fields.sort((a, b) => a.name - b.name);
 		
 		await interaction.editReply({ content: '⠀', embeds: [embed] }).catch(async () => {
 			await interaction.editReply({ embeds: [embed] });
