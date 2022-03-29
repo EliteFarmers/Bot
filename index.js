@@ -26,7 +26,7 @@ client.on('interactionCreate', async (interaction) => {
 	if (interaction.isButton()) {
 		if (interaction.customId.includes('jacob')) {
 			try {
-				await client.commands.get('jacob').execute(interaction, interaction.customId.split('_')[1]);
+				await client.commands.get('jacob').execute(interaction, undefined, interaction.customId.split('_')[1]);
 			} catch (e) {
 				error();
 			}

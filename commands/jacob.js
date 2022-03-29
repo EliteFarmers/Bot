@@ -9,7 +9,7 @@ module.exports = {
     usage: '(username)',
     guildOnly: false,
     dmOnly: false,
-	async execute(interaction, p = undefined) {
+	async execute(interaction, server, p = undefined) {
 		const options = interaction?.options?._hoistedOptions;
 
 		let playerName = p;
@@ -60,22 +60,28 @@ module.exports = {
 		}
 
         let grabnewdata = true;
-		const user = await DataHandler.getPlayer(uuid);
+		let user = await DataHandler.getPlayer(uuid);
+
 		if (user && user.dataValues?.updatedat) {
 			grabnewdata = (+(user.dataValues?.updatedat ?? 0) < +(Date.now() - (10 * 60 * 1000)));
 		}
 
+        if (!user) {
+            user = await DataHandler.updatePlayer(uuid, playerName, null, null);
+            grabnewdata = true;
+        }
+
 		await interaction.deferReply();
 
         const contestData = await Data.getLatestContestData(user, grabnewdata);
-		if (grabnewdata) DataHandler.update({ updatedat: Date.now().toString() }, { discordid: user.discordid }).catch();
+		if (grabnewdata && user) DataHandler.update({ updatedat: Date.now().toString() }, { discordid: user.discordid }).catch();
 
         if (!contestData) {
             const embed = new Discord.MessageEmbed()
                 .setColor('#CB152B')
                 .setTitle('Error: No Contest Data!')
                 .addField('Proper Usage:', '`/jacob` `player:`(player name)')
-                .setDescription('This could mean that my code is bad, or well, that my code is bad.\n`*(API might be down)*')
+                .setDescription('This could mean that my code is bad, or well, that my code is bad.\n*(API might be down)*')
                 .setFooter('Created by Kaeso#5346');
             interaction.editReply({ embeds: [embed] });
             return;
