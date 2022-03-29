@@ -77,11 +77,11 @@ class ServerUtil {
 		if (Object.keys(newScores).length <= 0) {
 			const embed = new MessageEmbed().setColor('#FF8600')
 				.setTitle('Sorry! No New Records')
-				.setDescription(`You don\'t have any jacob\'s scores that would beat these records!\nKeep in mind that scores are only valid starting on ${server.lbcutoff ? `**${Data.getReadableDate(server.lbcutoff)}**\n(The custom cutoff date for this leaderboard)` : `**${Data.getReadableDate(Data.CUTOFFDATE)}**\n(The first contest after the last nerf to farming)`}`)
+				.setDescription(`You don\'t have any scores that would beat these records!\nKeep in mind that scores are only valid starting on ${server.lbcutoff ? `**${Data.getReadableDate(server.lbcutoff)}**\n(The custom cutoff date for this leaderboard)` : `**${Data.getReadableDate(Data.CUTOFFDATE)}**\n(The first contest after the last nerf to farming)`}`)
 				.setFooter('If you\'re positive that this isn\'t true please contact Kaeso#5346');
 
 			if (onCooldown) {
-				embed.description += `\n⠀\nThis could be because fetching your profile is on cooldown, try again <t:${Math.floor((+(user.updatedat ?? 0) + (10 * 60 * 1000)) / 1000)}:R>`;
+				embed.description += `\n⠀\n**This could be because fetching your profile is on cooldown.** Try again <t:${Math.floor((+(user.updatedat ?? 0) + (10 * 60 * 1000)) / 1000)}:R>`;
 			}
 			await interaction.followUp({ embeds: [embed], ephemeral: true }).catch((e) => console.log(e));
 
@@ -102,14 +102,14 @@ class ServerUtil {
 			const contest = updatedScores[crop];
 
 			let details = (contest.par) 
-				? `\`#${(contest.pos + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${contest.par.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` on \`${contest.profilename}\`!` 
-				: `Contest Still Unclaimed!`;
+				? `\`#${(contest.pos + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${contest.par.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` on [${contest.profilename}](https://sky.shiiyu.moe/stats/${contest.ign}/${contest.profilename})` 
+				: `Contest Still Unclaimed! [Link](https://sky.shiiyu.moe/stats/${contest.ign}/${contest.profilename})`;
 
 			if (!contest.value) { continue };
 
 			embed.fields.push({
 				name: `${Data.getReadableCropName(crop)} - ${contest.ign}`,
-				value: `<@${contest.user}> - **${contest.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**⠀⠀${details}\n${Data.getReadableDate(contest.obtained)}⠀[\🔗](https://sky.shiiyu.moe/stats/${contest.ign}/${contest.profilename})`,
+				value: `<@${contest.user}> - **${contest.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**⠀⠀${details}\n${Data.getReadableDate(contest.obtained)}`,
 			});
 		}
 		// Sort the leaderboard embeds
@@ -130,15 +130,18 @@ class ServerUtil {
 			for (const crop of Object.keys(newScores)) {
 				if (dontUpdate.includes(crop)) continue;
 				const record = newScores[crop];
+				const url = Data.getCropURL(crop);
 
-				const embed = new MessageEmbed().setColor('#03fc7b')
+				const embed = new MessageEmbed().setColor(Data.getCropHex(crop))
 					.setTitle(`New High Score for ${Data.getReadableCropName(crop)}!`)
+					
+				if (url) embed.setThumbnail(url);
 
 				if (serverScores[crop]) {
-					embed.description = `<@${interaction.user.id}> (${user.ign}) has ${interaction.user.id !== serverScores[crop]?.user ? `beaten <@${serverScores[crop]?.user}> (${serverScores[crop]?.ign})` : 'improved their score'} by **${(record.value - serverScores[crop]?.value ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** collection for a total of **${record.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**!`;
+					embed.description = `<@${interaction.user.id}> (${user.ign}) ${interaction.user.id !== serverScores[crop]?.user ? `has beaten <@${serverScores[crop]?.user}> (${serverScores[crop]?.ign})` : 'improved their score'} by **${(record.value - serverScores[crop]?.value ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** collection for a total of **${record.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**!`;
 					embed.setFooter(`The previous score was ${(serverScores[crop]?.value ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}!`)
 				} else {
-					embed.description = `<@${interaction.user.id}> (${user.ign}) has set a new record of **${record.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**!`;
+					embed.description = `<@${interaction.user.id}> (${user.ign}) set a new record of **${record.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**!`;
 				}
 				
 				embeds.push(embed);
