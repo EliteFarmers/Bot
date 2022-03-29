@@ -513,6 +513,38 @@ class Data {
 
 		return null;
 	}
+
+	static getCropURL(crop) {
+		// Melon and cactus courtesy of https://github.com/thepotatoking55/2D-block-texture-pack/
+		if (crop === 'wheat') return 'https://media.discordapp.net/attachments/850812400747544657/958131911308488735/unknown.png';
+		if (crop === 'melon') return 'https://media.discordapp.net/attachments/850812400747544657/958131910310248518/unknown.png';
+		if (crop === 'cactus') return 'https://media.discordapp.net/attachments/850812400747544657/958131911543386192/unknown.png';
+		if (crop === 'pumpkin') return 'https://media.discordapp.net/attachments/850812400747544657/958131910721302588/unknown.png';
+		if (crop === 'carrot') return 'https://media.discordapp.net/attachments/850812400747544657/958131911916654622/unknown.png';
+		if (crop === 'potato') return 'https://media.discordapp.net/attachments/850812400747544657/958154868739153940/potato2.png';
+		if (crop === 'sugarcane') return 'https://media.discordapp.net/attachments/850812400747544657/958131911757267035/unknown.png';
+		if (crop === 'netherwart') return 'https://media.discordapp.net/attachments/850812400747544657/958131911111376937/unknown.png';
+		if (crop === 'mushroom') return 'https://media.discordapp.net/attachments/850812400747544657/958154868521058344/mushrooms.png';
+		if (crop === 'cocoa') return 'https://media.discordapp.net/attachments/850812400747544657/958131912143167558/unknown.png';
+
+		return undefined;
+	}
+
+	static getCropHex(crop) {
+		if (crop === 'wheat') return '#d5da45';
+		if (crop === 'melon') return '#bb170b';
+		if (crop === 'cactus') return '#3b5b1d';
+		if (crop === 'pumpkin') return '#a0560b';
+		if (crop === 'carrot') return '#ff8e09';
+		if (crop === 'potato') return '#e9ba62';
+		if (crop === 'sugarcane') return '#82a859';
+		if (crop === 'netherwart') return '#5c151a';
+		if (crop === 'mushroom') return '#725643';
+		if (crop === 'cocoa') return '#61381d';
+
+		// Default green
+		return '#03fc7b';
+	}
 }
 
 module.exports = {
