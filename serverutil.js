@@ -49,8 +49,14 @@ class ServerUtil {
 			return await interaction.followUp({ embeds: [embed], ephemeral: true });
 		}
 
-		const channel = (server.lbupdatechannel) ? interaction.guild.channels.cache.get(server.lbupdatechannel) 
-			?? await interaction.guild.channels.fetch(server.lbupdatechannel) : undefined;
+		let channel;
+		try {
+			channel = (server.lbupdatechannel) ? interaction.guild.channels.cache.get(server.lbupdatechannel) 
+				?? await interaction.guild.channels.fetch(server.lbupdatechannel) : undefined;
+		} catch (e) {
+			channel = undefined;
+		}
+		
 
 		let newScores = {};
 		const dontUpdate = [];
