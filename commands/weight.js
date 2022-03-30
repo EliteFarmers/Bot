@@ -405,39 +405,27 @@ module.exports = {
 		
 			attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'weight.png');
 	
-			let reply;
+			let replyMessage = {
+				files: [attachment],
+				components: [row],
+				allowedMentions: { repliedUser: false },
+				fetchReply: true
+			};
 	
 			if (user?.dataValues?.cheating) {
 				const embed = new Discord.MessageEmbed()
 					.setColor('#FF8600')
 					.setDescription(`**This player is a __cheater__.** ${!profile.api ? ` They also turned off their api access.` : ``}`)
 					.setFooter('Players are only marked as cheating when it\'s proven beyond a reasonable doubt.\nThey hold no position in any leaderboards.');
-				reply = {
-					files: [attachment],
-					components: [row],
-					embeds: [embed],
-					allowedMentions: { repliedUser: false }
-				}
-			} else if (profile.api) {
-				reply = {
-					files: [attachment],
-					components: [row],
-					allowedMentions: { repliedUser: false }
-				}
-			} else {
+				reply.embeds = [embed];
+			} else if (!profile.api) {
 				const embed = new Discord.MessageEmbed()
 					.setColor('#FF8600')
 					.setDescription(`**This data is outdated!** ${playerName.replace(/\_/g, '\\_')} turned off their api access.`);
-				reply = {
-					files: [attachment],
-					components: [row],
-					embeds: [embed],
-					allowedMentions: { repliedUser: false }
-				}
+				reply.embeds = [embed];
 			}
 	
-			interaction.editReply(reply).then(async () => {
-				let reply = await interaction.fetchReply();
+			interaction.editReply(replyMessage).then(async (reply) => {
 				let infoClicked = false;
 	
 				const collector = reply.createMessageComponentCollector({ componentType: 'BUTTON', time: 30000 });
@@ -467,7 +455,7 @@ module.exports = {
 								.setStyle('LINK')
 								.setURL(`https://plancke.io/hypixel/player/stats/${playerName}`)
 						);
-						reply.edit({ components: [linkRow], allowedMentions: { repliedUser: false } })
+						reply.edit({ components: [linkRow], allowedMentions: { repliedUser: false } }).catch(() => {})
 					} catch (error) { console.log(error) }
 				});
 			}).catch(error => { console.log(error) });
