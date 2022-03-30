@@ -84,7 +84,7 @@ client.on('interactionCreate', async (interaction) => {
 		if (!channels.includes(interaction.channelId) && !parentWhitelisted) {
 			let content = '';
 			channels.forEach(channel => { 
-				content += `<#${channel}> `; 
+				content += channel[0] === 'C' ? `<#${channel.substring(1)}> ` : `<#${channel}> `; 
 			});
 
 			const embed = new Discord.MessageEmbed().setColor('#FF0000')

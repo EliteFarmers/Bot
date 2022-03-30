@@ -15,7 +15,7 @@ module.exports = {
 		}
 
 		const server = await DataHandler.getServer(interaction.member.guild.id) 
-					?? await DataHandler.createServer(interaction.member.guild.id);
+			?? await DataHandler.createServer(interaction.member.guild.id);
 
 		if (!interaction.member.permissions.has('ADMINISTRATOR') && !interaction.member.roles.cache.some(role => role.id === server.dataValues.adminrole)) {
 			interaction.reply({ content: '**Error!** This command is only for server Admins/authorized users!', ephemeral: true }); 
@@ -37,7 +37,7 @@ module.exports = {
 		const command = (subCommand === 'clear') 
 			? interaction.options.getString('setting', false) 
 			: subCommand;
-			
+
 		const guildId = interaction.guild.id;
 		const superUser = interaction.member.permissions.has('ADMINISTRATOR');
 		
@@ -183,7 +183,7 @@ async function viewSettings(s, interaction) {
 
 	let channels = '';
 	s.channels?.forEach(channel => {
-		channels += `<#${channel}> `;
+		channels += channel[0] === 'C' ? `<#${channel.substring(1)}> ` : `<#${channel}> `;
 	});
 	
 	const embed = new MessageEmbed().setColor('#03fc7b')
@@ -208,8 +208,8 @@ async function clearedSettings(interaction, superUser = true) {
 
 async function whitelist(server, interaction) {
 	const channel = interaction.options.getChannel('channel', false) ?? interaction.channel;
-	if (channel?.type !== 'GUILD_TEXT') return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch(() => {});
-	const channelId = channel?.id;
+	if (!channel.id) return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch(() => {});
+	const channelId = (channel.type === 'GUILD_TEXT') ? channel.id : 'C' + channel.id;
 
 	const channels = [];
 
@@ -230,7 +230,7 @@ async function whitelist(server, interaction) {
 
 	let content = '';
 	channels.forEach(channel => {
-		content += `<#${channel}> `;
+		content += channel[0] === 'C' ? `<#${channel.substring(1)}> ` : `<#${channel}> `;
 	});
 	if (content.length > 0) {
 		embed.addField('Whitelisted Channels', content.trim());
