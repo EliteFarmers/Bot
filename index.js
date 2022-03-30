@@ -80,9 +80,12 @@ client.on('interactionCreate', async (interaction) => {
 
 	if (server && server?.channels && !['admin', 'config'].includes(interaction.commandName)) {
 		const channels = server.channels;
-		if (!channels.includes(interaction.channelId)) {
+		const parentWhitelisted = (interaction?.channel?.parentId && channels.includes('C' + interaction.channel.parentId));
+		if (!channels.includes(interaction.channelId) && !parentWhitelisted) {
 			let content = '';
-			channels.forEach(channel => { content += `<#${channel}> `; });
+			channels.forEach(channel => { 
+				content += `<#${channel}> `; 
+			});
 
 			const embed = new Discord.MessageEmbed().setColor('#FF0000')
 				.setTitle('Commands are disabled in this channel!')

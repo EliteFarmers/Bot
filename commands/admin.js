@@ -246,54 +246,52 @@ const slashCommandData = {
 	}, {
 		name: 'clear',
 		description: 'Clear various settings.',
-		type: 2,
+		type: 1,
 		options: [{
-			name: 'all',
-			description: 'Clear all server-specific settings',
-			type: 1,
-		}, {
-			name: 'leaderboard',
-			description: 'Clear your leaderboard settings',
-			type: 1,
-		}, {
-			name: 'scores',
-			description: 'Clear your leaderboard scores, but keep the settings!',
-			type: 1,
-		}, {
-			name: 'user-score',
-			description: 'Remove a user from the leaderboard',
-			type: 1,
-			options: [{
-				name: 'player',
-				description: 'The Minecraft username of the user to remove',
-				type: 3,
-				required: true
+			name: 'setting',
+			description: 'Close the setting to clear!',
+			type: 3,
+			required: true,
+			choices: [{
+				value: 'all',
+				name: 'All - Clear all server-specific settings',
+			}, {
+				value: 'leaderboard',
+				name: 'Leaderboard - Clear your leaderboard settings',
+			}, {
+				value: 'scores',
+				name: 'Scores - Clear your leaderboard scores, but keep the settings!',
+			}, {
+				value: 'admin-role',
+				name: 'Admin Role - Remove the set role from having these permissions!',
+			}, {
+				value: 'weight-role',
+				name: 'Weight-Role - Stop rewarding a role for a specific weight.',
+			}, {
+				value: 'weight-review',
+				name: 'Weight-review - Remove the application process of the auto weight-role grant.',
+			}, {
+				value: 'weight-role-blacklist',
+				name: 'Weight-Role Blacklist - Clear the blacklist of denied users!',
+			}, {
+				value: 'whitelist',
+				name: 'Whitelist - Allow the bot to be used in all channels (it can access) again.',
 			}]
-		}, {
-			name: 'admin-role',
-			description: 'Remove the set role from having these permissions!',
-			type: 1,
-		}, {
-			name: 'weight-role',
-			description: 'Stop rewarding a role for a specific weight.',
-			type: 1
-		}, {
-			name: 'weight-review',
-			description: 'Remove the application process of the auto weight-role grant.',
-			type: 1,
-		}, {
-			name: 'weight-role-blacklist',
-			description: 'Clear the blacklist of denied users!',
-			type: 1,
-		}, {
-			name: 'whitelist',
-			description: 'Allow the bot to be used in all channels (it can access) again.',
-			type: 1
 		}]
 	}, {
 		name: 'view',
 		description: 'View the config!',
 		type: 1
+	}, {
+		name: 'remove-user',
+		description: 'Remove a user from the leaderboard',
+		type: 1,
+		options: [{
+			name: 'player',
+			description: 'The Minecraft username of the player to remove!', 
+			type: 3,
+			required: true,
+		}]
 	}]
 }
 

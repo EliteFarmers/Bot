@@ -27,8 +27,17 @@ module.exports = {
 			return; 
 		}
 
-		const command = interaction.options.getSubcommand();
+		// Handling for old registered commands
 		const group = interaction.options.getSubcommandGroup(false);
+		if (group) {
+			return interaction.reply({ content: '**Error!** Command not found! Re-register \`/config\` with \`/admin\`\nIf this issue persists, contact Kaeso!', ephemeral: true});
+		}
+
+		const subCommand = interaction.options.getSubcommand();
+		const command = (subCommand === 'clear') 
+			? interaction.options.getString('setting', false) 
+			: subCommand;
+			
 		const guildId = interaction.guild.id;
 		const superUser = interaction.member.permissions.has('ADMINISTRATOR');
 		
@@ -38,7 +47,7 @@ module.exports = {
 				break;
 			}
 			case 'whitelist': {
-				if (group === 'clear') {
+				if (subCommand === 'clear') {
 					await DataHandler.updateServer({ channels: null }, guildId);
 					clearedSettings(interaction);
 					break;
@@ -47,7 +56,7 @@ module.exports = {
 				break;
 			}
 			case 'leaderboard': {
-				if (group === 'clear') {
+				if (subCommand === 'clear') {
 					await DataHandler.updateServer({ 
 						lbchannel: null,
 						lbcutoff: null,
@@ -67,7 +76,7 @@ module.exports = {
 				break;
 			}
 			case 'admin-role': {
-				if (group === 'clear') {
+				if (subCommand === 'clear') {
 					if (superUser) { 
 						await DataHandler.updateServer({ adminrole: null }, guildId);
 						clearedSettings(interaction);
@@ -80,7 +89,7 @@ module.exports = {
 				break;
 			}
 			case 'weight-role': {
-				if (group === 'clear') {
+				if (subCommand === 'clear') {
 					await DataHandler.updateServer({ 
 						weightrole: null,
 						weightchannel: null,
@@ -93,7 +102,7 @@ module.exports = {
 				break;
 			}
 			case 'weight-review': {
-				if (group === 'clear') {
+				if (subCommand === 'clear') {
 					await DataHandler.updateServer({ 
 						reviewchannel: null,
 						reviewerrole: null,
@@ -120,7 +129,7 @@ module.exports = {
 				clearedSettings(interaction, superUser);
 				break;
 			}
-			case 'user-score': {
+			case 'remove-user': {
 				if (Object.keys(server.scores) <= 0) {
 					return interaction.reply({ content: 'Nothing Changed! There are no saved scores currently.', ephemeral: true })
 				}
@@ -150,7 +159,7 @@ module.exports = {
 				break;
 			}
 			default: {
-				interaction.reply({ content: 'Command not found!', ephemeral: true});
+				interaction.reply({ content: '**Error!** Command not found! Re-register \`/config\` with \`/admin\`\nIf this issue persists, contact Kaeso!', ephemeral: true});
 				break;
 			}
 		}
