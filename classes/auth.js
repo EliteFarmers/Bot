@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const base32 = require('hi-base32');
-const { secret } = require('./config.json');
+const { secret } = require('../config.json');
 
 class Auth {
 

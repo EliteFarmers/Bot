@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
-const { Auth } = require('../auth.js');
+const { Auth } = require('../classes/auth.js');
 const { superusers } = require('../config.json');
-const { DataHandler } = require('../database.js');
+const { DataHandler } = require('../classes/database.js');
 
 module.exports = {
 	name: 'admin',

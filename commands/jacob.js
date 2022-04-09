@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
-const { Data } = require('../data.js');
-const { DataHandler } = require('../database.js');
+const { Data } = require('../classes/data.js');
+const { DataHandler } = require('../classes/database.js');
 
 module.exports = {
     name: 'jacob',

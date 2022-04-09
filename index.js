@@ -1,8 +1,8 @@
 const fs = require('fs');
 const Discord = require('discord.js');
 const { token } = require('./config.json');
-const { DataHandler } = require('./database.js')
-const { ServerUtil } = require('./serverutil.js');
+const { DataHandler } = require('./classes/database.js')
+const { ServerUtil } = require('./classes/serverutil.js');
 const args = process.argv.slice(2);
 
 const client = new Discord.Client({ partials: ['CHANNEL'], intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.DIRECT_MESSAGES] });

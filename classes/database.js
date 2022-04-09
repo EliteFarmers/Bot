@@ -1,16 +1,16 @@
 const Discord = require('discord.js');
 const { Sequelize, Op } = require('sequelize');
-const { dbUri } = require('./config.json');
+const { dbUri } = require('../config.json');
 const fetch = require('node-fetch');
 const throttledQueue = require('throttled-queue');
 const throttle = throttledQueue(1, 60000);
 
-const Users = require('./models/users.js')(new Sequelize(dbUri, {
+const Users = require('../database/models/users.js')(new Sequelize(dbUri, {
     dialect: 'postgres',
     logging: false,
 }), Sequelize);
 
-const Servers = require('./models/servers.js')(new Sequelize(dbUri, {
+const Servers = require('../database/models/servers.js')(new Sequelize(dbUri, {
     dialect: 'postgres',
     logging: false,
 }), Sequelize);
@@ -189,9 +189,3 @@ class DataHandler {
 module.exports = {
     DataHandler
 }
-
-// new Sequelize(database, username, password, {
-//     host: 'localhost',
-//     dialect: 'sqlite',
-//     logging: false,
-// });
