@@ -1,5 +1,5 @@
 const throttledQueue = require('throttled-queue');
-const { hypixelApiKey } = require('./config.json');
+const { hypixelApiKey } = require('../config.json');
 const throttle = throttledQueue(2, 1000);
 const fetch = require('node-fetch');
 class Data {

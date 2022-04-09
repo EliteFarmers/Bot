@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { DataHandler } = require('../database.js');
+const { DataHandler } = require('../classes/database.js');
 let { prefix } = require('../config.json');
 module.exports = {
 	name: 'help',

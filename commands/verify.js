@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
-const { Data } = require('../data.js');
-const { DataHandler } = require('../database.js');
-const { ServerUtil } = require('../serverutil.js');
+const { Data } = require('../classes/data.js');
+const { DataHandler } = require('../classes/database.js');
+const { ServerUtil } = require('../classes/serverutil.js');
 // const { eliteserverid, verifiedroleid } = require('../config.json');
 
 module.exports = {

@@ -1,8 +1,8 @@
 const Discord = require('discord.js');
 const Canvas = require('canvas');
-const { Data } = require('../data.js');
-const { DataHandler } = require('../database.js');
-const { ServerUtil } = require('../serverutil.js');
+const { Data } = require('../classes/data.js');
+const { DataHandler } = require('../classes/database.js');
+const { ServerUtil } = require('../classes/serverutil.js');
 
 module.exports = {
 	name: 'weight',
@@ -101,7 +101,7 @@ module.exports = {
 		await saveData();
 
 		// Check if they're eligible for server weight-role
-		if (server && server?.weightrole && server?.weightreq >= 0 && user.discordid === interaction.user.id) {
+		if (server && user && server?.weightrole && server?.weightreq >= 0 && user?.discordid === interaction.user.id) {
 			if (server.weightreq === 0) {
 				if (interaction.member?.roles?.cache?.has(server.weightrole)) return;
 				return ServerUtil.handleWeightRole(interaction, server);
@@ -329,13 +329,13 @@ module.exports = {
 			let imagePath;
 			if (mainCollections) {
 				const topCollection = new Map([...mainCollections.entries()].sort((a, b) => b[1] - a[1])).entries().next().value[0];
-				imagePath = `./images/${topCollection.toLowerCase().replace(' ', '_')}.png`;
+				imagePath = `./assets/images/${topCollection.toLowerCase().replace(' ', '_')}.png`;
 			} else {
-				imagePath = `./images/wheat.png`
+				imagePath = `./assets/images/wheat.png`
 			}
 	
 			const { registerFont, createCanvas } = require('canvas');
-			registerFont('./fonts/OpenSans-Regular.ttf', { family: 'Open Sans' });
+			registerFont('./assets/fonts/OpenSans-Regular.ttf', { family: 'Open Sans' });
 			let attachment;
 	
 			//Load crop image and avatar

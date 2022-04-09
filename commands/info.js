@@ -117,9 +117,7 @@ For now, reaching 55m xp (lvl 50) rewards you with 100 weight, with 150 more aft
 			});
 
 			collector.on('end', collected => {
-				try {
-					reply.edit({ components: [], allowedMentions: { repliedUser: false } })
-				} catch (error) { console.log(error) }
+				reply.edit({ components: [], allowedMentions: { repliedUser: false } }).catch(() => {});
 			});
 		}).catch(error => { console.log(error) });
 	},

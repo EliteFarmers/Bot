@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { DataHandler } = require('../database.js');
+const { DataHandler } = require('../classes/database.js');
 
 module.exports = {
     name: 'leaderboard',
