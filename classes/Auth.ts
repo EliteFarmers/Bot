@@ -1,12 +1,12 @@
-const crypto = require('crypto');
-const base32 = require('hi-base32');
-const { secret } = require('../config.json');
+import crypto from 'crypto';
+import base32 from 'hi-base32';
+import { secret } from '../config.json';
 
-class Auth {
+export default class Auth {
 
-    constructor() {}
+    private constructor() { }
 
-    static verifyTOTP(token, scr = secret, window = 1) {
+    static verifyTOTP(token: number, scr = secret, window = 1) {
         if (Math.abs(+window) > 10) {
             console.error('Window size is too large');
             return false;
@@ -22,12 +22,12 @@ class Auth {
         return false;
     }
 
-    static generateTOTP(secret, window = 0) {
+    static generateTOTP(secret: string, window = 0) {
         const counter = Math.floor(Date.now() / 30000);
         return this.generateHOTP(secret, counter + window);
     }
 
-    static generateHOTP(secret, counter) {
+    static generateHOTP(secret: string, counter: number) {
         const decodedSecret = base32.decode.asBytes(secret);
         const buffer = Buffer.alloc(8);
         for (let i = 0; i < 8; i++) {
@@ -47,7 +47,7 @@ class Auth {
         return code % 10 ** 6;
     }
 
-    static dynamicTruncationFn(hmacValue) {
+    static dynamicTruncationFn(hmacValue: string | any[] | Buffer) {
         const offset = hmacValue[hmacValue.length - 1] & 0xf;
 
         return (
@@ -62,10 +62,6 @@ class Auth {
         const randomBuffer = crypto.randomBytes(length);
         return base32.encode(randomBuffer).replace(/=/g, '');
     }
-}
-
-module.exports = {
-    Auth,
 }
 
 //CREDITS: https://hackernoon.com/how-to-implement-google-authenticator-two-factor-auth-in-javascript-091wy3vh3/

@@ -1,23 +1,29 @@
-const fs = require('fs');
-const Discord = require('discord.js');
-const { token } = require('./config.json');
-const { DataHandler } = require('./classes/database.js')
-const { ServerUtil } = require('./classes/serverutil.js');
+import fs from 'fs';
+import { Client, Intents, Collection, GuildMemberRoleManager, BaseCommandInteraction, CommandInteraction, MessageEmbed } from 'discord.js';
+import { token } from './config.json';
+import { DataHandler } from './classes/database.js';
+import { ServerUtil } from './classes/serverutil.js';
+import { Command } from './classes/Command';
+
 const args = process.argv.slice(2);
 
-const client = new Discord.Client({ partials: ['CHANNEL'], intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.DIRECT_MESSAGES] });
-client.commands = new Discord.Collection();
+export const client = new Client({ 
+	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES],
+	partials: ['CHANNEL'],
+});
+export const commands = new Collection<string, Command>();
 
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
 
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
-	client.commands.set(command.name, command);
+	commands.set(command.name, command);
 }
 
 client.once('ready', async () => {
 	DataHandler.syncTables();
-	client.user.setActivity('skyblock players', { type: 'WATCHING' });
+
+	client.user?.setActivity('skyblock players', { type: 'WATCHING' });
 
 	console.log('Ready!');
 });
@@ -26,9 +32,9 @@ client.on('interactionCreate', async (interaction) => {
 	if (interaction.isButton()) {
 		if (interaction.customId.includes('jacob')) {
 			try {
-				await client.commands.get('jacob').execute(interaction, undefined, interaction.customId.split('_')[1]);
+				await commands.get('jacob')?.execute(interaction, undefined, interaction.customId.split('_')[1]);
 			} catch (e) {
-				error();
+				error(e);
 			}
 		} else if (interaction.customId.startsWith('LBROLETOGGLE')) {
 			try {
@@ -50,8 +56,8 @@ client.on('interactionCreate', async (interaction) => {
 			Promise.all([serverPromise, userPromise]).then(async (values) => {
 				const server = values[0], user = values[1];
 
-				if (!server || !user) return;
-				if (!server.reviewerrole || !(interaction.member.permissions.has('ADMINISTRATOR') || interaction.member.roles.cache.has(server.reviewerrole))) {
+				if (!server || !user || !interaction.member) return;
+				if (!server.reviewerrole || !(interaction.member.permissions.has('ADMINISTRATOR') || (interaction.member.roles as GuildMemberRoleManager).cache.has(server.reviewerrole))) {
 					return interaction.reply({ content: '**Error!** You don\'t have permission to do this!', ephemeral: true }).catch();
 				}
 	
@@ -66,7 +72,7 @@ client.on('interactionCreate', async (interaction) => {
 			interaction.update({ content: `**Denied by** <@${interaction.user.id}>!`, components: [] }).catch(() => {});
 		}
 		return;
-		async function error(error) {
+		async function error(error: unknown) {
 			console.log(error);
 			await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => {
 				interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => {});
@@ -87,7 +93,7 @@ client.on('interactionCreate', async (interaction) => {
 				content += channel[0] === 'C' ? `<#${channel.substring(1)}> ` : `<#${channel}> `; 
 			});
 
-			const embed = new Discord.MessageEmbed().setColor('#FF0000')
+			const embed = new MessageEmbed().setColor('#FF0000')
 				.setTitle('Commands are disabled in this channel!')
 				.setDescription('Please use the channels that this server whitelisted.')
 				.addField(`Available Channel${channels.length > 1 ? 's' : ''}`, content.trim() === '' ? '**Something went wrong**' : content.trim());
@@ -99,7 +105,7 @@ client.on('interactionCreate', async (interaction) => {
 
 	let command;
 	try {
-		command = await client.commands.get(interaction.commandName);
+		command = await commands.get(interaction.commandName);
 	} catch (error) {
 		console.log(error);
 	}

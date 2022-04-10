@@ -1,16 +1,18 @@
-const { MessageEmbed, MessageActionRow } = require('discord.js');
-const { DataHandler } = require('./database.js');
-const { Data } = require('./data.js');
+import { MessageEmbed, MessageActionRow, ButtonInteraction, GuildMemberRoleManager } from 'discord.js';
+import DataHandler from './database';
+import Data, { CropString, FarmingContestScores } from './Data';
 
-class ServerUtil {
-	static async submitScores(interaction) {
+export default class ServerUtil {
+	static async submitScores(interaction: ButtonInteraction) {
+		if (!interaction.guildId || !interaction.member) return;
+
 		const user = await DataHandler.getPlayer(undefined, { discordid: interaction.user.id });
 		if (!user) {
 			return await interaction.reply({ content: '**Error!** You need to use \`/verify\` to link your Minecraft account first!', ephemeral: true });
 		}
 
 		const server = await DataHandler.getServer(interaction.guildId);
-		if (!server) return error();
+		if (!server) return;
 		if (!server.lbchannel) {
 			return await interaction.reply({ content: 'This feature was turned off! This may be intentional, so don\'t bother the server admins about it.', ephemeral: true });
 		}
@@ -20,14 +22,14 @@ class ServerUtil {
 			if (!embed) {
 				await interaction.update({ embeds: [], components: [] })
 			} else {
-				embed.footer.text = 'This leaderboard no longer accepts updates\n' + embed.footer.text;
+				embed.footer = { text: 'This leaderboard no longer accepts updates\n' + (embed.footer?.text ?? '')};
 				embed.description = 'These highscores were set by your fellow server members!';
 				await interaction.update({ embeds: [embed], components: [] });
 			}
 			return await interaction.followUp({ content: 'This leaderboard was turned off! This may be intentional, so don\'t bother the server admins about it.', ephemeral: true });
 		}
 
-		if (server.lbrolereq && !interaction.member.roles.cache.has(server.lbrolereq)) {
+		if (server.lbrolereq && !(interaction.member.roles as GuildMemberRoleManager).cache.has(server.lbrolereq)) {
 			if (server.lbrolereq === server.weightrole && server.weightreq >= 0) {
 				return await interaction.reply({ content: `**Error!** You need the <@&${server.lbrolereq}> role first!\nThis is a reward for reaching **${server.weightreq}** total farming weight! Check your weight with \`/weight\`.`, ephemeral: true });
 			}
@@ -44,27 +46,38 @@ class ServerUtil {
 			const embed = new MessageEmbed().setColor('#CB152B')
 				.setTitle('Error: No Contest Data!')
 				.setDescription('This could mean that my code is bad, or well, that my code is bad.\n`*(API could be down)*')
-				.setFooter('Created by Kaeso#5346');
-			await interaction.editReply();
+				.setFooter({ text: 'Created by Kaeso#5346' });
+			await interaction.editReply({});
 			return await interaction.followUp({ embeds: [embed], ephemeral: true });
 		}
 
 		let channel;
 		try {
-			channel = (server.lbupdatechannel) ? interaction.guild.channels.cache.get(server.lbupdatechannel) 
-				?? await interaction.guild.channels.fetch(server.lbupdatechannel) : undefined;
+			channel = (server.lbupdatechannel) ? interaction.guild?.channels.cache.get(server.lbupdatechannel) 
+				?? await interaction.guild?.channels.fetch(server.lbupdatechannel) : undefined;
 		} catch (e) {
 			channel = undefined;
 		}
 		
 
-		let newScores = {};
+		let newScores: FarmingContestScores = {
+			cactus: { value: 0, obtained: '' },
+			carrot: { value: 0, obtained: '' },
+			cocoa: { value: 0, obtained: '' },
+			melon: { value: 0, obtained: '' },
+			mushroom: { value: 0, obtained: '' },
+			netherwart: { value: 0, obtained: '' },
+			potato: { value: 0, obtained: '' },
+			pumpkin: { value: 0, obtained: '' },
+			sugarcane: { value: 0, obtained: '' },
+			wheat: { value: 0, obtained: '' }
+		};
 		const dontUpdate = [];
 
-		const userScores = contestData.scores ?? {};
-		const serverScores = server.scores ?? {};
+		const userScores = contestData.highScores ?? {};
+		const serverScores = server.highScores ?? {};
 
-		for (const crop of Object.keys(contestData.scores)) {
+		for (const crop of Object.keys(contestData.highScores) as CropString[]) {
 			const userScore = userScores[crop];
 			const serverScore = serverScores[crop];
 

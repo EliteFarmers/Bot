@@ -1,41 +1,43 @@
-const throttledQueue = require('throttled-queue');
-const { hypixelApiKey } = require('../config.json');
+import throttledQueue from 'throttled-queue';
+import { hypixelApiKey } from '../config.json';
+import fetch from 'node-fetch';
+import { Snowflake } from 'discord.js';
 const throttle = throttledQueue(2, 1000);
-const fetch = require('node-fetch');
-class Data {
+
+export default class Data {
     
     constructor() { }
 
 	static CUTOFFDATE = '1590824';
 
-	static async getUUID(playerName) {
+	static async getUUID(playerName: string) {
 		const uuid = await fetch(`https://api.mojang.com/users/profiles/minecraft/${playerName}`)
-			.then(response => response.json())
-			.then(result => {
+			.then((response: any) => response.json())
+			.then((result: any) => {
 				if (result.success === false) {
 					throw new Error("That minecraft player doesn't exist");
 				} else {
 					return result;
 				}
 			})
-			.catch(error => {
+			.catch((error: any) => {
 				throw error;
 			});
 		return uuid;
 	}
 	
-	static async getProfiles(uuid) {
+	static async getProfiles(uuid: string) {
 		return new Promise(async (resolve, reject) => {
 			throttle(async function() {
 				const response = await fetch(`https://api.hypixel.net/skyblock/profiles?uuid=${uuid}&key=${hypixelApiKey}`)
-					.then(response => {
+					.then((response: any) => {
 						return response.json();
-					}).then(result => {
+					}).then((result: any) => {
 						if (result.success === true) {
 							return result;
 						}
 						resolve(undefined);
-					}).catch(error => {
+					}).catch(() => {
 						resolve(undefined);
 					});
 				resolve(await response);
@@ -43,23 +45,23 @@ class Data {
 		});
 	}
 
-	static async getStrippedProfiles(uuid) {
+	static async getStrippedProfiles(uuid: string) {
 		const profileData = await Data.getProfiles(uuid);
 		return (profileData) ? await Data.stripData(profileData, uuid) : undefined;
 	}
 
-	static async getOverview(uuid) {
+	static async getOverview(uuid: string) {
 		return new Promise(async (resolve, reject) => {
 			throttle(async function() {
 				const response = await fetch(`https://api.hypixel.net/player?uuid=${uuid}&key=${hypixelApiKey}`)
-					.then(response => {
+					.then((response: any) => {
 						return response.json();
-					}).then(result => {
+					}).then((result: any) => {
 						if (result.success) {
 							return result;
 						}
 						resolve(undefined);
-					}).catch(error => {
+					}).catch((error: any) => {
 						resolve(undefined);
 					});
 				resolve(await response);
@@ -67,10 +69,10 @@ class Data {
 		});
 	}
 
-	static async getDiscord(uuid) {
+	static async getDiscord(uuid: string) {
 		return new Promise(async (resolve, reject) => {
 			await throttle(async function() {
-				const data = await Data.getOverview(uuid);
+				const data = await Data.getOverview(uuid) as any;
 				if (data === undefined || !data?.success) resolve(undefined);
 				
 				resolve(data?.player?.socialMedia?.links?.DISCORD);
@@ -78,10 +80,10 @@ class Data {
 		});
 	}
 
-    static async stripData(data, uuid) {
+    static async stripData(data: any, uuid: string) {
 		if (!data || !data?.profiles) return undefined;
 
-		let stripped = {
+		let stripped: { success: boolean, profiles: any[] } = {
 			success: data.success,
 			profiles: []
 		}
@@ -145,37 +147,37 @@ class Data {
 		return stripped;
 	}
 
-    static async stripContests(jacob) {
-		const formattedData = {
-			currentmedals: {
+    static async stripContests(jacob: any) {
+		const formattedData: StrippedContestData = {
+			currentMedals: {
 				bronze: jacob?.medals_inv?.bronze ?? 0,
 				silver: jacob?.medals_inv?.silver ?? 0,
 				gold: jacob?.medals_inv?.gold ?? 0
 			},
-			totalmedals: {
+			earnedMedals: {
 				bronze: 0,
 				silver: 0,
 				gold: 0
 			},
 			perks: {
-				double_drops: jacob?.perks?.double_drops ?? 0,
-				farming_level_cap: jacob?.perks?.farming_level_cap ?? 0
+				doubleDrops: jacob?.perks?.double_drops ?? 0,
+				levelCap: jacob?.perks?.farming_level_cap ?? 0
 			},
 			participations: 0,
-			firstplace: 0,
-			scores: {
-				cactus: { value: 0, obtained: '', pos: null, par: null },
-				carrot: { value: 0, obtained: '', pos: null, par: null },
-				cocoa: { value: 0, obtained: '', pos: null, par: null },
-				melon: { value: 0, obtained: '', pos: null, par: null },
-				mushroom: { value: 0, obtained: '', pos: null, par: null },
-				netherwart: { value: 0, obtained: '', pos: null, par: null },
-				potato: { value: 0, obtained: '', pos: null, par: null },
-				pumpkin: { value: 0, obtained: '', pos: null, par: null },
-				sugarcane: { value: 0, obtained: '', pos: null, par: null },
-				wheat: { value: 0, obtained: '', pos: null, par: null }
+			placedFirst: 0,
+			highScores: {
+				cactus: { value: 0, obtained: '' },
+				carrot: { value: 0, obtained: '' },
+				cocoa: { value: 0, obtained: '' },
+				melon: { value: 0, obtained: '' },
+				mushroom: { value: 0, obtained: '' },
+				netherwart: { value: 0, obtained: '' },
+				potato: { value: 0, obtained: '' },
+				pumpkin: { value: 0, obtained: '' },
+				sugarcane: { value: 0, obtained: '' },
+				wheat: { value: 0, obtained: '' }
 			},
-			recents: {
+			recentContests: {
 				overall: [], cactus: [], carrot: [], cocoa: [], 
 				melon: [], mushroom: [], netherwart: [], potato: [], 
 				pumpkin: [], sugarcane: [], wheat: [] 
@@ -200,35 +202,37 @@ class Data {
 				const split = key.split(':');
                 const date = this.getDateFromContest(split);
 				const crop = this.getGoodCropName(split[2]);
+				if (!crop) continue;
+
 				const valid = (+date >= +this.CUTOFFDATE);
 				
-                if (valid && formattedData.scores[crop].value < collected) {
-					formattedData.scores[crop] = { 
+                if (valid && formattedData.highScores[crop].value < collected) {
+					formattedData.highScores[crop] = { 
 						value: +collected, obtained: date, pos: position, par: participants 
 					}
                 }
 
-				if (formattedData.recents.overall.length < 5) {
-					formattedData.recents.overall.push({
+				if (formattedData.recentContests.overall.length < 5) {
+					formattedData.recentContests.overall.push({
 						value: +collected, obtained: date, pos: position, par: participants, valid: valid, crop: crop
 					})
 				}
 				
-				if (formattedData.recents[crop].length < 10) {
-					formattedData.recents[crop].push({
+				if (formattedData.recentContests[crop].length < 10) {
+					formattedData.recentContests[crop].push({
 						value: +collected, obtained: date, pos: position, par: participants, valid: valid
 					})
 				}
 					
-				if (position === 0) formattedData.firstplace++;
+				if (position === 0) formattedData.placedFirst++;
 				
 				if (position + 1 && participants) {
 					if (position <= (participants * 0.05) + 1) {
-						formattedData.totalmedals.gold++;
+						formattedData.earnedMedals.gold++;
 					} else if (position <= (participants * 0.25) + 1) {
-						formattedData.totalmedals.silver++;
+						formattedData.earnedMedals.silver++;
 					} else if (position <= (participants * 0.60) + 1) {
-						formattedData.totalmedals.bronze++;
+						formattedData.earnedMedals.bronze++;
 					}
 				}
 			}
@@ -237,35 +241,35 @@ class Data {
 		return formattedData;
 	}
 
-	static async getBestContests(data) {
-		if (!data) return;
+	static async getBestContests(data: any, uuid: string) {
+		if (!data) return undefined;
 		
-        const best = {
-			currentmedals: {
+        const best: BestContestData = {
+			currentMedals: {
 				bronze: 0,
 				silver: 0,
 				gold: 0
 			},
-			totalmedals: {
+			earnedMedals: {
 				bronze: 0,
 				silver: 0,
 				gold: 0
 			},
 			participations: 0,
-			firstplace: 0,
-			scores: {
-				cactus: { value: 0, obtained: '', profilename: '', pos: null, par: null },
-				carrot: { value: 0, obtained: '', profilename: '', pos: null, par: null },
-				cocoa: { value: 0, obtained: '', profilename: '', pos: null, par: null },
-				melon: { value: 0, obtained: '', profilename: '', pos: null, par: null },
-				mushroom: { value: 0, obtained: '', profilename: '', pos: null, par: null },
-				netherwart: { value: 0, obtained: '', profilename: '', pos: null, par: null },
-				potato: { value: 0, obtained: '', profilename: '', pos: null, par: null },
-				pumpkin: { value: 0, obtained: '', profilename: '', pos: null, par: null },
-				sugarcane: { value: 0, obtained: '', profilename: '', pos: null, par: null },
-				wheat: { value: 0, obtained: '', profilename: '', pos: null, par: null }
+			placedFirst: 0,
+			highScores: {
+				cactus: { value: 0, obtained: '', profile: '' },
+				carrot: { value: 0, obtained: '', profile: '' },
+				cocoa: { value: 0, obtained: '', profile: '' },
+				melon: { value: 0, obtained: '', profile: '' },
+				mushroom: { value: 0, obtained: '', profile: '' },
+				netherwart: { value: 0, obtained: '', profile: '' },
+				potato: { value: 0, obtained: '', profile: '' },
+				pumpkin: { value: 0, obtained: '', profile: '' },
+				sugarcane: { value: 0, obtained: '', profile: '' },
+				wheat: { value: 0, obtained: '', profile: '' }
 			},
-			recents: {
+			recentContests: {
 				overall: [], cactus: [], carrot: [], cocoa: [], 
 				melon: [], mushroom: [], netherwart: [], potato: [], 
 				pumpkin: [], sugarcane: [], wheat: [] 
@@ -282,45 +286,45 @@ class Data {
             const profile = data.profiles[Object.keys(data.profiles)[i]];
             const player = profile.members[Object.keys(profile.members)[0]];
 
-			const jacob = player.jacob;
+			const jacob = player.jacob as BestContestData;
 			
             if (jacob) {
 				best.participations += jacob.participations;
-				best.firstplace += jacob.firstplace;
+				best.placedFirst += jacob.placedFirst;
 
-				best.currentmedals.bronze += jacob.currentmedals.bronze;
-				best.currentmedals.silver += jacob.currentmedals.silver;
-				best.currentmedals.gold += jacob.currentmedals.gold;
+				best.currentMedals.bronze += jacob.currentMedals.bronze;
+				best.currentMedals.silver += jacob.currentMedals.silver;
+				best.currentMedals.gold += jacob.currentMedals.gold;
 
-				best.totalmedals.bronze += jacob.totalmedals.bronze;
-				best.totalmedals.silver += jacob.totalmedals.silver;
-				best.totalmedals.gold += jacob.totalmedals.gold;
+				best.earnedMedals.bronze += jacob.earnedMedals.bronze;
+				best.earnedMedals.silver += jacob.earnedMedals.silver;
+				best.earnedMedals.gold += jacob.earnedMedals.gold;
 
-                for (let j = 0; j < Object.keys(jacob.scores).length; j++) {
-                    const crop = Object.keys(jacob.scores)[j];
+                for (let j = 0; j < Object.keys(jacob.highScores).length; j++) {
+                    const crop = Object.keys(jacob.highScores)[j] as CropString;
                     if (!crop) { break; }
 
-                    if (jacob.scores[crop].value > best.scores[crop].value) {
-                        best.scores[crop] = {
-                            value: jacob.scores[crop].value,
-                            obtained: jacob.scores[crop].obtained,
-                            profilename: profile.cute_name,
-							pos: jacob.scores[crop].pos,
-							par: jacob.scores[crop].par
+                    if (jacob.highScores[crop].value > best.highScores[crop].value) {
+                        best.highScores[crop] = {
+                            value: jacob.highScores[crop].value,
+                            obtained: jacob.highScores[crop].obtained,
+                            profile: profile.cute_name,
+							pos: jacob.highScores[crop].pos,
+							par: jacob.highScores[crop].par
                         }
                     }
                 }
 
-				if (!jacob.recents) continue;
+				if (!jacob.recentContests) continue;
 
-				for (let j = 0; j < Object.keys(jacob.recents).length; j++) {
-					const crop = Object.keys(jacob.recents)[j];
-					const recents = jacob.recents[crop];
+				for (let j = 0; j < Object.keys(jacob.recentContests).length; j++) {
+					const crop = Object.keys(jacob.recentContests)[j] as CropString | 'overall';
+					const recents = jacob.recentContests[crop];
 					
 					for (let k = 0; k < recents.length; k++) {
 						const contest = recents[k];
 						if (crop === 'overall') {
-							allRecents[crop].set(contest.obtained, {
+							allRecents.overall.set(contest.obtained, {
 								value: contest.value, obtained: contest.obtained, pos: contest.pos, 
 								par: contest.par, valid: contest.valid, name: profile.cute_name, crop: contest.crop
 							})	
@@ -336,24 +340,24 @@ class Data {
         }
 
 		for (let i = 0; i < Object.keys(allRecents).length; i++) {
-			const crop = Object.keys(allRecents)[i];
+			const crop = Object.keys(allRecents)[i] as CropString | 'overall';
 			const recentMap = allRecents[crop];
 
 			let max = (crop === 'overall') ? 5 : 9;
 			const sorted = new Map([...recentMap.entries()].sort());
 			sorted.forEach(function (value, key) {
 				if (max-- < 0) return; 
-				best.recents[crop].unshift(value);
+				best.recentContests[crop].unshift(value);
 			});
 		}
 		return best;
 	}
 
-	static async takeNewestData(saved, fresh) {
+	static async takeNewestData(saved: any, fresh: any) {
 		try {
 			if (saved?.data) { saved = saved.data; }
 			
-			const newData = {
+			const newData: { success: boolean, profiles: any[] } = {
 				success: true,
 				profiles: []
 			}
@@ -397,7 +401,7 @@ class Data {
 		}
 	}
 
-    static async getBestData(saved, uuid) {
+    static async getBestData(saved: BestContestData, uuid: string) {
 		const fresh = await Data.getStrippedProfiles(uuid);
 		if (!saved && fresh) {
 			return fresh;
@@ -409,7 +413,7 @@ class Data {
 		return await Data.takeNewestData(saved, fresh);
 	}
 
-	static async getLatestContestData(user, fetchnewdata = true) {
+	static async getLatestContestData(user: any, fetchnewdata = true): Promise<BestContestData | undefined> {
 		return new Promise(async (resolve, reject) => {
 			if (fetchnewdata || !user?.contestdata || !user?.contestdata?.recents) {
 				let fullData = await Data.getBestData(user?.profiledata, user?.uuid);
@@ -423,7 +427,7 @@ class Data {
 		});
 	}
 
-    static getDateFromContest(split) {
+    static getDateFromContest(split: string[]) {
         let day = split[1].split('_')[1];
         day = (+day < 10) ? `0${day}` : day;
 
@@ -435,7 +439,7 @@ class Data {
         return '' + year + month + day;
     }
 
-	static getReadableDate(date) {
+	static getReadableDate(date: string | number) {
 		const dateStr = '' + date;
 
 		let day = dateStr.slice(-2);
@@ -454,8 +458,8 @@ class Data {
 		return `${months[+month - 1]} ${suffixed}, Year ${+year + 1}`; //Year is 1 behind in api
 	}
 
-	static appendOrdinalSuffix(i) {
-		var j = i % 10,
+	static appendOrdinalSuffix(i: number) {
+		let j = i % 10,
 			k = i % 100;
 		if (j == 1 && k != 11) {
 			return i + "st";
@@ -469,7 +473,7 @@ class Data {
 		return i + "th";
 	}
 
-    static getGoodCropName(bad) {
+    static getGoodCropName(bad: string) {
 		if (bad === 'WHEAT') return 'wheat';
 		if (bad === 'MELON') return 'melon';
 		if (bad === 'CACTUS') return 'cactus';
@@ -484,7 +488,7 @@ class Data {
 		return null;
 	}
 
-	static getReadableCropName(crop) {
+	static getReadableCropName(crop: CropString) {
 		if (crop === 'wheat') return 'Wheat';
 		if (crop === 'melon') return 'Melon';
 		if (crop === 'cactus') return 'Cactus';
@@ -499,7 +503,7 @@ class Data {
 		return null;
 	}
 
-	static getApproxWeightByCrop(value, crop) {
+	static getApproxWeightByCrop(value: number, crop: CropString) {
 		if (crop === 'wheat') return value / 100000;
 		if (crop === 'melon') return value / 355000;
 		if (crop === 'cactus') return value / 158000;
@@ -514,7 +518,7 @@ class Data {
 		return null;
 	}
 
-	static getCropURL(crop) {
+	static getCropURL(crop: CropString) {
 		// Melon and cactus courtesy of https://github.com/thepotatoking55/2D-block-texture-pack/
 		if (crop === 'wheat') return 'https://media.discordapp.net/attachments/850812400747544657/958131911308488735/unknown.png';
 		if (crop === 'melon') return 'https://media.discordapp.net/attachments/850812400747544657/958131910310248518/unknown.png';
@@ -530,7 +534,7 @@ class Data {
 		return undefined;
 	}
 
-	static getCropHex(crop) {
+	static getCropHex(crop: CropString) {
 		if (crop === 'wheat') return '#d5da45';
 		if (crop === 'melon') return '#bb170b';
 		if (crop === 'cactus') return '#3b5b1d';
@@ -547,6 +551,54 @@ class Data {
 	}
 }
 
-module.exports = {
-    Data
+interface BaseContestData {
+	currentMedals: MedalInventory,
+	earnedMedals: MedalInventory,
+	participations: number,
+	placedFirst: number,
 }
+
+interface StrippedContestData extends BaseContestData {
+	perks: FarmingPerks,
+	scores: FarmingContestScores,
+	recents: RecentFarmingContests
+}
+
+interface BestContestData extends BaseContestData {
+	scores: FarmingContestScores,
+	recents: RecentFarmingContests
+}
+
+type MedalInventory = {
+	bronze: number,
+	silver: number,
+	gold: number
+}
+
+type FarmingPerks = {
+	doubleDrops: number,
+	levelCap: number
+}
+
+export type FarmingContestScores = {
+	[key in CropString]: ContestScore;
+};
+
+interface ContestScore {
+	value: number, 
+	obtained: string, 
+	pos?: number, 
+	par?: number,
+	profile?: string,
+	valid?: boolean,
+	crop?: string,
+	user?: Snowflake
+}
+
+type RecentFarmingContests = {
+	[key in CropString]: ContestScore[];
+} & {
+	overall: ContestScore[]
+};
+
+export type CropString = 'cactus' | 'carrot' | 'cocoa' | 'melon' | 'mushroom' | 'netherwart' | 'potato' | 'pumpkin' | 'sugarcane' | 'wheat'

@@ -1,8 +1,9 @@
-const Discord = require('discord.js');
-const { Sequelize, Op } = require('sequelize');
-const { dbUri } = require('../config.json');
-const fetch = require('node-fetch');
-const throttledQueue = require('throttled-queue');
+import Discord from 'discord.js';
+import { Sequelize, Op } from 'sequelize';
+import { dbUri } from '../config.json';
+import throttledQueue from 'throttled-queue';
+import { CropString } from './Data';
+
 const throttle = throttledQueue(1, 60000);
 
 const Users = require('../database/models/users.js')(new Sequelize(dbUri, {
@@ -15,11 +16,9 @@ const Servers = require('../database/models/servers.js')(new Sequelize(dbUri, {
     logging: false,
 }), Sequelize);
 
-class DataHandler {
+export default class DataHandler {
 
-    constructor() {
-
-    }
+    private constructor() { }
 
     static async syncTables() {
         await Users.sync();
@@ -30,25 +29,25 @@ class DataHandler {
         //Users.sync({ force: true })
     }
 
-    static leaderboard;
+    static leaderboard: any;
 
-    static async getPlayer(playeruuid, where = null) {
+    static async getPlayer(playeruuid?: string, where: any = null) {
         if (!where) { where = { uuid: playeruuid }; }
         return await Users.findOne({ where: where });
     }
 
-    static async getPlayerByName(name) {
+    static async getPlayerByName(name: string) {
         return await Users.findOne({ where: { ign: { [Op.iLike]: '%' + name } } });
     }
 
-    static async update(changes, where) {
+    static async update(changes: any, where: any) {
         const user = await Users.findOne({ where: where });
         if (user) {
             return await Users.update(changes, { where: where });
         }
     }
 
-    static async updatePlayer(playeruuid, playerName, profileuuid, nWeight) {
+    static async updatePlayer(playeruuid: string, playerName: string, profileuuid: string, nWeight: number) {
         let newWeight = Math.round(nWeight * 100);
         if (typeof newWeight !== typeof 1) { return; }
 
@@ -76,7 +75,7 @@ class DataHandler {
     }
 
     static getLbLength() {
-        return this.leaderboardLength;
+        return this.leaderboard.length;
     }
 
     static async updateLeaderboard() {
@@ -93,18 +92,18 @@ class DataHandler {
         return await Users.findAll({ limit: 1000, order: [['weight', 'DESC']], where: { cheating: false } });
     }
 
-    static async getJacobLB(crop) {
+    static async getJacobLB(crop: CropString) {
         const lb = await Users.findAll({ limit: 1000, order: [[[Sequelize.json(`contestdata.scores.${crop}`), `${crop}`], 'DESC']] });
         return lb;
     }
 
-    static async getServer(guild, where = null) {
+    static async getServer(guild: string, where: any = null) {
         if (!where) { where = { guildid: guild }; }
         const server = await Servers.findOne({ where: where });
         return (server) ? server : await this.createServer(guild, true);
     }
 
-    static async createServer(guildid, skipfind = false) {
+    static async createServer(guildid: string, skipfind = false) {
         try {
             const server = (skipfind) ? undefined : await this.getServer(guildid);
             if (!server) { 
@@ -118,7 +117,7 @@ class DataHandler {
         }
     }
 
-    static async updateServer(changes, guildid) {
+    static async updateServer(changes: any, guildid: string) {
         const server = await Servers.findOne({ where: { guildid: guildid } });
         if (server) {
             return await Servers.update(changes, { where: { guildid: guildid } });
@@ -164,7 +163,7 @@ class DataHandler {
             }
             const player = leaderboard[i].dataValues;
 
-            const isHighlightedPlayer = (foundPlayer && (playerName.toLowerCase() === player.ign.toLowerCase()));
+            const isHighlightedPlayer = (foundPlayer && ((playerName ?? '').toLowerCase() === player.ign.toLowerCase()));
             const weightFormatted = (player.weight / 100).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 
             embed.fields.push({
@@ -184,8 +183,4 @@ class DataHandler {
 
         return embed;
     }
-}
-
-module.exports = {
-    DataHandler
 }
