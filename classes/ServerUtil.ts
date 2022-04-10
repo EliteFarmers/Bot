@@ -1,4 +1,4 @@
-import { MessageEmbed, MessageActionRow, ButtonInteraction, GuildMemberRoleManager } from 'discord.js';
+import { MessageEmbed, MessageActionRow, ButtonInteraction, GuildMemberRoleManager, GuildMember, Guild, GuildTextBasedChannel, CommandInteraction, InteractionReplyOptions, MessageOptions, MessagePayload } from 'discord.js';
 import DataHandler from './database';
 import Data, { CropString, FarmingContestScores } from './Data';
 
@@ -51,10 +51,18 @@ export default class ServerUtil {
 			return await interaction.followUp({ embeds: [embed], ephemeral: true });
 		}
 
-		let channel;
+		let channel: GuildTextBasedChannel | undefined;
 		try {
-			channel = (server.lbupdatechannel) ? interaction.guild?.channels.cache.get(server.lbupdatechannel) 
+			const fetchedChannel = (server.lbupdatechannel) ? interaction.guild?.channels.cache.get(server.lbupdatechannel) 
 				?? await interaction.guild?.channels.fetch(server.lbupdatechannel) : undefined;
+
+			if (fetchedChannel) {
+				if (!fetchedChannel.hasOwnProperty('send')) {
+					channel = undefined;
+				} else {
+					channel = fetchedChannel as GuildTextBasedChannel;
+				}
+			}
 		} catch (e) {
 			channel = undefined;
 		}
@@ -74,10 +82,10 @@ export default class ServerUtil {
 		};
 		const dontUpdate = [];
 
-		const userScores = contestData.highScores ?? {};
-		const serverScores = server.highScores ?? {};
+		const userScores = contestData.scores ?? {};
+		const serverScores = server.scores ?? {};
 
-		for (const crop of Object.keys(contestData.highScores) as CropString[]) {
+		for (const crop of Object.keys(contestData.scores) as CropString[]) {
 			const userScore = userScores[crop];
 			const serverScore = serverScores[crop];
 
@@ -91,13 +99,13 @@ export default class ServerUtil {
 		}
 
 		// True if someone has since claimed the contest for their highscore, or if a user's scores were removed from the leaderboard
-		const silentUpdate = (Object.keys(server.scores).length > interaction.message.embeds[0].fields.length || (dontUpdate.length > 0 && Object.keys(newScores).length === dontUpdate.length));
+		const silentUpdate = (Object.keys(server.scores).length > (interaction.message?.embeds[0]?.fields?.length ?? 0) || (dontUpdate.length > 0 && Object.keys(newScores).length === dontUpdate.length));
 
 		if (Object.keys(newScores).length <= 0) {
 			const embed = new MessageEmbed().setColor('#FF8600')
 				.setTitle('Sorry! No New Records')
 				.setDescription(`You don\'t have any scores that would beat these records!\nKeep in mind that scores are only valid starting on ${server.lbcutoff ? `**${Data.getReadableDate(server.lbcutoff)}**\n(The custom cutoff date for this leaderboard)` : `**${Data.getReadableDate(Data.CUTOFFDATE)}**\n(The first contest after the last nerf to farming)`}`)
-				.setFooter('If you\'re positive that this isn\'t true please contact Kaeso#5346');
+				.setFooter({ text: 'If you\'re positive that this isn\'t true please contact Kaeso#5346' });
 
 			if (onCooldown) {
 				embed.description += `\n⠀\n**This could be because fetching your profile is on cooldown.** Try again <t:${Math.floor((+(user.updatedat ?? 0) + (10 * 60 * 1000)) / 1000)}:R>`;
@@ -105,7 +113,7 @@ export default class ServerUtil {
 			await interaction.followUp({ embeds: [embed], ephemeral: true }).catch((e) => console.log(e));
 
 			if (!silentUpdate) {
-				return await interaction.editReply().catch((e) => console.log(e));
+				return await interaction.editReply({}).catch((e) => console.log(e));
 			}
 		}
 
@@ -115,7 +123,7 @@ export default class ServerUtil {
 		const embed = new MessageEmbed().setColor('#03fc7b')
 			.setTitle('Jacob\'s Contest Leaderboard')
 			.setDescription('These are the highscores set by your fellow server members!')
-			.setFooter(`Highscores only valid after ${Data.getReadableDate(server.lbcutoff ?? Data.CUTOFFDATE)}⠀⠀Created by Kaeso#5346`);
+			.setFooter({ text: `Highscores only valid after ${Data.getReadableDate(server.lbcutoff ?? Data.CUTOFFDATE)}⠀⠀Created by Kaeso#5346` });
 
 		for (const crop of Object.keys(updatedScores)) {
 			const contest = updatedScores[crop];
@@ -129,10 +137,11 @@ export default class ServerUtil {
 			embed.fields.push({
 				name: `${Data.getReadableCropName(crop)} - ${contest.ign}`,
 				value: `<@${contest.user}> - **${contest.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**⠀⠀${details}\n${Data.getReadableDate(contest.obtained)}`,
+				inline: false,
 			});
 		}
 		// Sort the leaderboard embeds
-		embed.fields.sort((a, b) => a.name - b.name);
+		embed.fields.sort((a, b) => a.name.localeCompare(b.name));
 		
 		await interaction.editReply({ content: '⠀', embeds: [embed] }).catch(async () => {
 			await interaction.editReply({ embeds: [embed] });
@@ -148,7 +157,8 @@ export default class ServerUtil {
 			const embeds = [];
 			for (const crop of Object.keys(newScores)) {
 				if (dontUpdate.includes(crop)) continue;
-				const record = newScores[crop];
+
+				const record = newScores[crop as CropString];
 				const url = Data.getCropURL(crop);
 
 				const embed = new MessageEmbed().setColor(Data.getCropHex(crop))
@@ -158,13 +168,14 @@ export default class ServerUtil {
 
 				if (serverScores[crop]) {
 					embed.description = `<@${interaction.user.id}> (${user.ign}) ${interaction.user.id !== serverScores[crop]?.user ? `has beaten <@${serverScores[crop]?.user}> (${serverScores[crop]?.ign})` : 'improved their score'} by **${(record.value - serverScores[crop]?.value ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** collection for a total of **${record.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**!`;
-					embed.setFooter(`The previous score was ${(serverScores[crop]?.value ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}!`)
+					embed.setFooter({ text: `The previous score was ${(serverScores[crop]?.value ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}!` })
 				} else {
 					embed.description = `<@${interaction.user.id}> (${user.ign}) set a new record of **${record.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**!`;
 				}
 				
 				embeds.push(embed);
 			}
+
 			if (server.lbroleping) {
 				await channel?.send({ content: `<@&${server.lbroleping}>`, embeds: embeds, allowedMentions: { roles: [server.lbroleping] } }).catch(() => {});
 			} else {
@@ -173,9 +184,11 @@ export default class ServerUtil {
 		}
 	}
 
-	static async toggleRole(interaction) {
+	static async toggleRole(interaction: ButtonInteraction) {
+		if (!interaction.guildId || !interaction.guild || !interaction.member) return;
+
 		const server = await DataHandler.getServer(interaction.guildId);
-		if (!server) return error('No server found');
+		if (!server) return;
 		
 		if (server.lbroleping && server.lbupdatechannel) {
 			if (!interaction.guild.roles.cache.has(server.lbroleping)) {
@@ -185,14 +198,17 @@ export default class ServerUtil {
 				}
 			}
 
-			if (interaction.member.roles.cache.has(server.lbroleping)) {
-				await interaction.member.roles.remove(server.lbroleping, 'User opted out.').then(async () => {
+			if (Array.isArray(interaction.member.roles)) return;
+			const roleManager = interaction.member.roles as GuildMemberRoleManager;
+
+			if (roleManager.cache.has(server.lbroleping)) {
+				await roleManager.remove(server.lbroleping, 'User opted out.').then(async () => {
 					await interaction.reply({ content: '**Success!** You\'ll no longer get pinged when someone gets a new score on the leaderboard.', ephemeral: true });
 				}).catch(async () => {
 					await interaction.reply({ content: '**Error!** Looks like this isn\'t configured properly!\nI don\'t have permission to remove this role from you! Please message an admin so they can fix this!', ephemeral: true });
 				});
 			} else {
-				await interaction.member.roles.add(server.lbroleping).then(async () => {
+				await roleManager.add(server.lbroleping).then(async () => {
 					await interaction.reply({ content: '**Success!** You\'ll now get pinged when someone gets a new score on the leaderboard!', ephemeral: true });
 				}).catch(async () => {
 					await interaction.reply({ content: '**Error!** Looks like this isn\'t configured properly!\nI don\'t have permission to add this role to you! Please message an admin so they can fix this!', ephemeral: true });
@@ -203,21 +219,21 @@ export default class ServerUtil {
 		}
 	}
 
-	static async handleWeightRole(interaction, server) {
-		if (!server.weightrole || !(server.weightreq !== undefined)) return;
+	static async handleWeightRole(interaction: CommandInteraction, server: any) {
+		if (!server.weightrole || !(server.weightreq !== undefined) || !interaction.guild || !interaction.member) return;
 
 		if (server.inreview?.includes(interaction.user.id)) return;
 
 		const user = await DataHandler.getPlayer(undefined, { discordid: interaction.user.id });
 		if (!user) return;
 
-		if (!server.reviewchannel) return this.grantWeightRole(interaction, interaction.guild, interaction.member, server, user);
+		if (!server.reviewchannel) return this.grantWeightRole(interaction, interaction.guild, (interaction.member as GuildMember), server, user);
 		DataHandler.updateServer({ inreview: [interaction.user.id, ...(server.inreview ?? [])] }, server.guildid);
 
 		const channel = interaction.guild.channels.cache.get(server.reviewchannel) 
 			?? await interaction.guild.channels.fetch(server.reviewchannel);
 
-		if (!channel) return;
+		if (!channel || !channel.hasOwnProperty('send')) return;
 
 		const reviewEmbed = new MessageEmbed().setColor('#03fc7b')
 			.setTitle(`${user.ign} ${server.weightreq === 0 ? `is verified!` : `has reached ${server?.weightreq} weight!`}`)
@@ -231,13 +247,23 @@ export default class ServerUtil {
 		);
 
 		if (server.reviewerrole) {
-			channel?.send({ content: `<@&${server.reviewerrole}>`, embeds: [reviewEmbed], components: [reviewRow], allowedMentions: { roles: [server.reviewerrole] } }).catch(() => {});
+			(channel as GuildTextBasedChannel)?.send({ 
+				content: `<@&${server.reviewerrole}>`, 
+				embeds: [reviewEmbed], 
+				components: [reviewRow], 
+				allowedMentions: { 
+					roles: [server.reviewerrole] 
+				} 
+			}).catch(() => {});
 		} else {
-			channel?.send({ embeds: [reviewEmbed], components: [reviewRow] }).catch(() => {});
+			(channel as GuildTextBasedChannel)?.send({ 
+				embeds: [reviewEmbed], 
+				components: [reviewRow] 
+			}).catch(() => {});
 		}
 	}
 
-	static async grantWeightRole(interaction, guild, member, server, user) {
+	static async grantWeightRole(interaction: ButtonInteraction | CommandInteraction, guild: Guild, member: GuildMember, server: any, user: any) {
 
 		if (typeof member === 'string') {
 			member = guild.members?.cache?.get(member) ?? await guild.members?.fetch(member);
@@ -249,7 +275,7 @@ export default class ServerUtil {
 			if (!user) return;
 		}
 
-		DataHandler.updateServer({ inreview: [...((server.inreview ?? []).filter(e => e !== user.discordid))] }, server.guildid);
+		DataHandler.updateServer({ inreview: [...((server.inreview ?? []).filter((e: any) => e !== user.discordid))] }, server.guildid);
 
 		await member?.roles?.add(server.weightrole).then(async () => {
 			const embed = new MessageEmbed().setColor('#03fc7b')
@@ -260,7 +286,7 @@ export default class ServerUtil {
 				const channel = guild.channels.cache.get(server.weightchannel) 
 					?? await guild.channels.fetch(server.weightchannel);
 
-				if (!channel) return;
+				if (!channel || !channel.hasOwnProperty('send')) return;
 
 				try {
 					const welcomeEmbed = new MessageEmbed().setColor('#03fc7b')
@@ -272,7 +298,7 @@ export default class ServerUtil {
 						{ label: 'Plancke', style: 'LINK', url: `https://plancke.io/hypixel/player/stats/${user.ign}`, type: 'BUTTON' }
 					);
 
-					channel.send({ embeds: [welcomeEmbed], components: [linkRow] }).catch(() => {});
+					(channel as GuildTextBasedChannel)?.send({ embeds: [welcomeEmbed], components: [linkRow] }).catch(() => {});
 				} catch (e) { console.log(e); }
 			}
 
@@ -281,7 +307,7 @@ export default class ServerUtil {
 			reply(interaction, { content: '**Error!** Looks like this isn\'t configured properly!\nI don\'t have permission to add this role to you! Please message an admin so they can fix this!', ephemeral: true });
 		});
 
-		function reply(interaction, message) {
+		function reply(interaction: CommandInteraction | ButtonInteraction, message: string | MessagePayload | MessageOptions | InteractionReplyOptions) {
 			if (interaction.isButton()) {
 				return interaction.update({ content: `**Approved by** <@${interaction.user.id}>!`, components: [] }).catch(() => {});
 			}
@@ -290,13 +316,9 @@ export default class ServerUtil {
 				interaction.followUp(message).catch(() => {});
 			} else {
 				interaction.reply(message).catch(() => {
-					interaction.channel.send(message).catch(() => {});
+					interaction.channel?.send(message).catch(() => {});
 				});
 			}
 		}
 	}
-}
-
-module.exports = {
-	ServerUtil
 }

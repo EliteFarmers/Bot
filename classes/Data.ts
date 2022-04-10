@@ -149,23 +149,23 @@ export default class Data {
 
     static async stripContests(jacob: any) {
 		const formattedData: StrippedContestData = {
-			currentMedals: {
+			currentmedals: {
 				bronze: jacob?.medals_inv?.bronze ?? 0,
 				silver: jacob?.medals_inv?.silver ?? 0,
 				gold: jacob?.medals_inv?.gold ?? 0
 			},
-			earnedMedals: {
+			totalmedals: {
 				bronze: 0,
 				silver: 0,
 				gold: 0
 			},
 			perks: {
-				doubleDrops: jacob?.perks?.double_drops ?? 0,
-				levelCap: jacob?.perks?.farming_level_cap ?? 0
+				double_drops: jacob?.perks?.double_drops ?? 0,
+				farming_level_cap: jacob?.perks?.farming_level_cap ?? 0
 			},
 			participations: 0,
-			placedFirst: 0,
-			highScores: {
+			firstplace: 0,
+			scores: {
 				cactus: { value: 0, obtained: '' },
 				carrot: { value: 0, obtained: '' },
 				cocoa: { value: 0, obtained: '' },
@@ -177,7 +177,7 @@ export default class Data {
 				sugarcane: { value: 0, obtained: '' },
 				wheat: { value: 0, obtained: '' }
 			},
-			recentContests: {
+			recents: {
 				overall: [], cactus: [], carrot: [], cocoa: [], 
 				melon: [], mushroom: [], netherwart: [], potato: [], 
 				pumpkin: [], sugarcane: [], wheat: [] 
@@ -206,33 +206,33 @@ export default class Data {
 
 				const valid = (+date >= +this.CUTOFFDATE);
 				
-                if (valid && formattedData.highScores[crop].value < collected) {
-					formattedData.highScores[crop] = { 
+                if (valid && formattedData.scores[crop].value < collected) {
+					formattedData.scores[crop] = { 
 						value: +collected, obtained: date, pos: position, par: participants 
 					}
                 }
 
-				if (formattedData.recentContests.overall.length < 5) {
-					formattedData.recentContests.overall.push({
+				if (formattedData.recents.overall.length < 5) {
+					formattedData.recents.overall.push({
 						value: +collected, obtained: date, pos: position, par: participants, valid: valid, crop: crop
 					})
 				}
 				
-				if (formattedData.recentContests[crop].length < 10) {
-					formattedData.recentContests[crop].push({
+				if (formattedData.recents[crop].length < 10) {
+					formattedData.recents[crop].push({
 						value: +collected, obtained: date, pos: position, par: participants, valid: valid
 					})
 				}
 					
-				if (position === 0) formattedData.placedFirst++;
+				if (position === 0) formattedData.firstplace++;
 				
 				if (position + 1 && participants) {
 					if (position <= (participants * 0.05) + 1) {
-						formattedData.earnedMedals.gold++;
+						formattedData.totalmedals.gold++;
 					} else if (position <= (participants * 0.25) + 1) {
-						formattedData.earnedMedals.silver++;
+						formattedData.totalmedals.silver++;
 					} else if (position <= (participants * 0.60) + 1) {
-						formattedData.earnedMedals.bronze++;
+						formattedData.totalmedals.bronze++;
 					}
 				}
 			}
@@ -245,31 +245,31 @@ export default class Data {
 		if (!data) return undefined;
 		
         const best: BestContestData = {
-			currentMedals: {
+			currentmedals: {
 				bronze: 0,
 				silver: 0,
 				gold: 0
 			},
-			earnedMedals: {
+			totalmedals: {
 				bronze: 0,
 				silver: 0,
 				gold: 0
 			},
 			participations: 0,
-			placedFirst: 0,
-			highScores: {
-				cactus: { value: 0, obtained: '', profile: '' },
-				carrot: { value: 0, obtained: '', profile: '' },
-				cocoa: { value: 0, obtained: '', profile: '' },
-				melon: { value: 0, obtained: '', profile: '' },
-				mushroom: { value: 0, obtained: '', profile: '' },
-				netherwart: { value: 0, obtained: '', profile: '' },
-				potato: { value: 0, obtained: '', profile: '' },
-				pumpkin: { value: 0, obtained: '', profile: '' },
-				sugarcane: { value: 0, obtained: '', profile: '' },
-				wheat: { value: 0, obtained: '', profile: '' }
+			firstplace: 0,
+			scores: {
+				cactus: { value: 0, obtained: '', profilename: '' },
+				carrot: { value: 0, obtained: '', profilename: '' },
+				cocoa: { value: 0, obtained: '', profilename: '' },
+				melon: { value: 0, obtained: '', profilename: '' },
+				mushroom: { value: 0, obtained: '', profilename: '' },
+				netherwart: { value: 0, obtained: '', profilename: '' },
+				potato: { value: 0, obtained: '', profilename: '' },
+				pumpkin: { value: 0, obtained: '', profilename: '' },
+				sugarcane: { value: 0, obtained: '', profilename: '' },
+				wheat: { value: 0, obtained: '', profilename: '' }
 			},
-			recentContests: {
+			recents: {
 				overall: [], cactus: [], carrot: [], cocoa: [], 
 				melon: [], mushroom: [], netherwart: [], potato: [], 
 				pumpkin: [], sugarcane: [], wheat: [] 
@@ -290,36 +290,36 @@ export default class Data {
 			
             if (jacob) {
 				best.participations += jacob.participations;
-				best.placedFirst += jacob.placedFirst;
+				best.firstplace += jacob.firstplace;
 
-				best.currentMedals.bronze += jacob.currentMedals.bronze;
-				best.currentMedals.silver += jacob.currentMedals.silver;
-				best.currentMedals.gold += jacob.currentMedals.gold;
+				best.currentmedals.bronze += jacob.currentmedals.bronze;
+				best.currentmedals.silver += jacob.currentmedals.silver;
+				best.currentmedals.gold += jacob.currentmedals.gold;
 
-				best.earnedMedals.bronze += jacob.earnedMedals.bronze;
-				best.earnedMedals.silver += jacob.earnedMedals.silver;
-				best.earnedMedals.gold += jacob.earnedMedals.gold;
+				best.totalmedals.bronze += jacob.totalmedals.bronze;
+				best.totalmedals.silver += jacob.totalmedals.silver;
+				best.totalmedals.gold += jacob.totalmedals.gold;
 
-                for (let j = 0; j < Object.keys(jacob.highScores).length; j++) {
-                    const crop = Object.keys(jacob.highScores)[j] as CropString;
+                for (let j = 0; j < Object.keys(jacob.scores).length; j++) {
+                    const crop = Object.keys(jacob.scores)[j] as CropString;
                     if (!crop) { break; }
 
-                    if (jacob.highScores[crop].value > best.highScores[crop].value) {
-                        best.highScores[crop] = {
-                            value: jacob.highScores[crop].value,
-                            obtained: jacob.highScores[crop].obtained,
-                            profile: profile.cute_name,
-							pos: jacob.highScores[crop].pos,
-							par: jacob.highScores[crop].par
+                    if (jacob.scores[crop].value > best.scores[crop].value) {
+                        best.scores[crop] = {
+                            value: jacob.scores[crop].value,
+                            obtained: jacob.scores[crop].obtained,
+                            profilename: profile.cute_name,
+							pos: jacob.scores[crop].pos,
+							par: jacob.scores[crop].par
                         }
                     }
                 }
 
-				if (!jacob.recentContests) continue;
+				if (!jacob.recents) continue;
 
-				for (let j = 0; j < Object.keys(jacob.recentContests).length; j++) {
-					const crop = Object.keys(jacob.recentContests)[j] as CropString | 'overall';
-					const recents = jacob.recentContests[crop];
+				for (let j = 0; j < Object.keys(jacob.recents).length; j++) {
+					const crop = Object.keys(jacob.recents)[j] as CropString | 'overall';
+					const recents = jacob.recents[crop];
 					
 					for (let k = 0; k < recents.length; k++) {
 						const contest = recents[k];
@@ -347,7 +347,7 @@ export default class Data {
 			const sorted = new Map([...recentMap.entries()].sort());
 			sorted.forEach(function (value, key) {
 				if (max-- < 0) return; 
-				best.recentContests[crop].unshift(value);
+				best.recents[crop].unshift(value);
 			});
 		}
 		return best;
@@ -488,7 +488,7 @@ export default class Data {
 		return null;
 	}
 
-	static getReadableCropName(crop: CropString) {
+	static getReadableCropName(crop: CropString | string) {
 		if (crop === 'wheat') return 'Wheat';
 		if (crop === 'melon') return 'Melon';
 		if (crop === 'cactus') return 'Cactus';
@@ -518,7 +518,7 @@ export default class Data {
 		return null;
 	}
 
-	static getCropURL(crop: CropString) {
+	static getCropURL(crop: CropString | string) {
 		// Melon and cactus courtesy of https://github.com/thepotatoking55/2D-block-texture-pack/
 		if (crop === 'wheat') return 'https://media.discordapp.net/attachments/850812400747544657/958131911308488735/unknown.png';
 		if (crop === 'melon') return 'https://media.discordapp.net/attachments/850812400747544657/958131910310248518/unknown.png';
@@ -534,7 +534,7 @@ export default class Data {
 		return undefined;
 	}
 
-	static getCropHex(crop: CropString) {
+	static getCropHex(crop: CropString | string) {
 		if (crop === 'wheat') return '#d5da45';
 		if (crop === 'melon') return '#bb170b';
 		if (crop === 'cactus') return '#3b5b1d';
@@ -552,10 +552,10 @@ export default class Data {
 }
 
 interface BaseContestData {
-	currentMedals: MedalInventory,
-	earnedMedals: MedalInventory,
+	currentmedals: MedalInventory,
+	totalmedals: MedalInventory,
 	participations: number,
-	placedFirst: number,
+	firstplace: number,
 }
 
 interface StrippedContestData extends BaseContestData {
@@ -576,8 +576,8 @@ type MedalInventory = {
 }
 
 type FarmingPerks = {
-	doubleDrops: number,
-	levelCap: number
+	double_drops: number,
+	farming_level_cap: number
 }
 
 export type FarmingContestScores = {
@@ -589,10 +589,11 @@ interface ContestScore {
 	obtained: string, 
 	pos?: number, 
 	par?: number,
-	profile?: string,
+	profilename?: string,
 	valid?: boolean,
 	crop?: string,
-	user?: Snowflake
+	user?: Snowflake,
+	ign?: string,
 }
 
 type RecentFarmingContests = {
