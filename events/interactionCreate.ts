@@ -27,7 +27,7 @@ async function OnButtonInteraction(interaction: ButtonInteraction) {
 	const args = interaction.customId.split('|');
 	const commandName = args[0];
 
-	const command = GetCommand(commandName, 'COMPONENT');
+	const command = GetCommand(commandName, 'BUTTON');
 	if (!command) return;
 
 	if (!HasPermsAndAccess(command, interaction)) return;
