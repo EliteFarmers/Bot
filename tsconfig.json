@@ -24,7 +24,7 @@
         "index.ts",
     ],
     "include": [
-        "./**/*.ts", "./classes/*.ts", "./commands/*.ts", "./database/models/*.js", "./events/*.ts"
+        "./**/*.ts", "./database/models/*.js"
     ],
     "exclude": [
         "node_modules",
