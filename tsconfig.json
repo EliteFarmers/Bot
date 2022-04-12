@@ -4,6 +4,7 @@
         "module": "commonjs",
         "rootDir": "./",
         "strict": true,
+        "strictNullChecks": true,
         "moduleResolution": "node",
         "importHelpers": true,
         "experimentalDecorators": true,
