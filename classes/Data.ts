@@ -1,13 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import throttledQueue from 'throttled-queue';
 import { hypixelApiKey } from '../config.json';
 import fetch from 'node-fetch';
 import { Snowflake } from 'discord.js';
+
 const throttle = throttledQueue(2, 1000);
 
 export default class Data {
     
-    constructor() { }
-
 	static CUTOFFDATE = '1590824';
 
 	static async getUUID(playerName: string) {
@@ -27,7 +27,7 @@ export default class Data {
 	}
 	
 	static async getProfiles(uuid: string) {
-		return new Promise(async (resolve, reject) => {
+		return new Promise((resolve) => {
 			throttle(async function() {
 				const response = await fetch(`https://api.hypixel.net/skyblock/profiles?uuid=${uuid}&key=${hypixelApiKey}`)
 					.then((response: any) => {
@@ -51,7 +51,7 @@ export default class Data {
 	}
 
 	static async getOverview(uuid: string) {
-		return new Promise(async (resolve, reject) => {
+		return new Promise((resolve) => {
 			throttle(async function() {
 				const response = await fetch(`https://api.hypixel.net/player?uuid=${uuid}&key=${hypixelApiKey}`)
 					.then((response: any) => {
@@ -61,7 +61,7 @@ export default class Data {
 							return result;
 						}
 						resolve(undefined);
-					}).catch((error: any) => {
+					}).catch(() => {
 						resolve(undefined);
 					});
 				resolve(await response);
@@ -70,8 +70,8 @@ export default class Data {
 	}
 
 	static async getDiscord(uuid: string) {
-		return new Promise(async (resolve, reject) => {
-			await throttle(async function() {
+		return new Promise((resolve) => {
+			throttle(async function() {
 				const data = await Data.getOverview(uuid) as any;
 				if (data === undefined || !data?.success) resolve(undefined);
 				
@@ -80,20 +80,20 @@ export default class Data {
 		});
 	}
 
-    static async stripData(data: any, uuid: string) {
+	static async stripData(data: any, uuid: string) {
 		if (!data || !data?.profiles) return undefined;
 
-		let stripped: { success: boolean, profiles: any[] } = {
+		const stripped: { success: boolean, profiles: any[] } = {
 			success: data.success,
 			profiles: []
 		}
 		
 		for (let i = 0; i < Object.keys(data.profiles).length; i++) {
-			let key = Object.keys(data.profiles)[i];
-			let profile = data.profiles[key];
-			let user = profile.members[uuid];
+			const key = Object.keys(data.profiles)[i];
+			const profile = data.profiles[key];
+			const user = profile.members[uuid];
 
-			let addedProfile = {
+			const addedProfile = {
 				profile_id: profile.profile_id,
 				cute_name: profile.cute_name,
 				members: {},
@@ -147,7 +147,7 @@ export default class Data {
 		return stripped;
 	}
 
-    static async stripContests(jacob: any) {
+	static async stripContests(jacob: any) {
 		const formattedData: StrippedContestData = {
 			currentmedals: {
 				bronze: jacob?.medals_inv?.bronze ?? 0,
@@ -200,17 +200,17 @@ export default class Data {
 				formattedData.participations++;
                 
 				const split = key.split(':');
-                const date = this.getDateFromContest(split);
+				const date = this.getDateFromContest(split);
 				const crop = this.getGoodCropName(split[2]);
 				if (!crop) continue;
 
 				const valid = (+date >= +this.CUTOFFDATE);
 				
-                if (valid && formattedData.scores[crop].value < collected) {
+				if (valid && formattedData.scores[crop].value < collected) {
 					formattedData.scores[crop] = { 
 						value: +collected, obtained: date, pos: position, par: participants 
 					}
-                }
+				}
 
 				if (formattedData.recents.overall.length < 5) {
 					formattedData.recents.overall.push({
@@ -241,10 +241,10 @@ export default class Data {
 		return formattedData;
 	}
 
-	static async getBestContests(data: any, uuid: string) {
+	static async getBestContests(data: any) { //, uuid: string
 		if (!data) return undefined;
 		
-        const best: BestContestData = {
+		const best: BestContestData = {
 			currentmedals: {
 				bronze: 0,
 				silver: 0,
@@ -274,7 +274,7 @@ export default class Data {
 				melon: [], mushroom: [], netherwart: [], potato: [], 
 				pumpkin: [], sugarcane: [], wheat: [] 
 			}
-        }
+		}
         
 		const allRecents = {
 			overall: new Map(), cactus: new Map(), carrot: new Map(), cocoa: new Map(), 
@@ -282,13 +282,13 @@ export default class Data {
 			pumpkin: new Map(), sugarcane: new Map(), wheat: new Map() 
 		}
 
-        for (let i = 0; i < Object.keys(data.profiles).length; i++) {
-            const profile = data.profiles[Object.keys(data.profiles)[i]];
-            const player = profile.members[Object.keys(profile.members)[0]];
+		for (let i = 0; i < Object.keys(data.profiles).length; i++) {
+			const profile = data.profiles[Object.keys(data.profiles)[i]];
+			const player = profile.members[Object.keys(profile.members)[0]];
 
 			const jacob = player.jacob as BestContestData;
 			
-            if (jacob) {
+			if (jacob) {
 				best.participations += jacob.participations;
 				best.firstplace += jacob.firstplace;
 
@@ -300,20 +300,20 @@ export default class Data {
 				best.totalmedals.silver += jacob.totalmedals.silver;
 				best.totalmedals.gold += jacob.totalmedals.gold;
 
-                for (let j = 0; j < Object.keys(jacob.scores).length; j++) {
-                    const crop = Object.keys(jacob.scores)[j] as CropString;
-                    if (!crop) { break; }
+				for (let j = 0; j < Object.keys(jacob.scores).length; j++) {
+					const crop = Object.keys(jacob.scores)[j] as CropString;
+					if (!crop) { break; }
 
-                    if (jacob.scores[crop].value > best.scores[crop].value) {
-                        best.scores[crop] = {
-                            value: jacob.scores[crop].value,
-                            obtained: jacob.scores[crop].obtained,
-                            profilename: profile.cute_name,
+					if (jacob.scores[crop].value > best.scores[crop].value) {
+						best.scores[crop] = {
+							value: jacob.scores[crop].value,
+							obtained: jacob.scores[crop].obtained,
+							profilename: profile.cute_name,
 							pos: jacob.scores[crop].pos,
 							par: jacob.scores[crop].par
-                        }
-                    }
-                }
+						}
+					}
+				}
 
 				if (!jacob.recents) continue;
 
@@ -336,8 +336,8 @@ export default class Data {
 						}
 					}
 				}
-            }
-        }
+			}
+		}
 
 		for (let i = 0; i < Object.keys(allRecents).length; i++) {
 			const crop = Object.keys(allRecents)[i] as CropString | 'overall';
@@ -345,7 +345,7 @@ export default class Data {
 
 			let max = (crop === 'overall') ? 5 : 9;
 			const sorted = new Map([...recentMap.entries()].sort());
-			sorted.forEach(function (value, key) {
+			sorted.forEach(function (value) {
 				if (max-- < 0) return; 
 				best.recents[crop].unshift(value);
 			});
@@ -362,7 +362,7 @@ export default class Data {
 				profiles: []
 			}
 
-			let length = Math.min(Object.keys(saved.profiles).length, Object.keys(fresh.profiles).length);
+			const length = Math.min(Object.keys(saved.profiles).length, Object.keys(fresh.profiles).length);
 			for (let i = 0; i < length; i++) {
 				const savedProfile = saved.profiles[Object.keys(saved.profiles)[i]];
 				const freshProfile = fresh.profiles[Object.keys(fresh.profiles)[i]];
@@ -401,7 +401,7 @@ export default class Data {
 		}
 	}
 
-    static async getBestData(saved: BestContestData, uuid: string) {
+	static async getBestData(saved: BestContestData, uuid: string) {
 		const fresh = await Data.getStrippedProfiles(uuid);
 		if (!saved && fresh) {
 			return fresh;
@@ -414,37 +414,39 @@ export default class Data {
 	}
 
 	static async getLatestContestData(user: any, fetchnewdata = true): Promise<BestContestData | undefined> {
-		return new Promise(async (resolve, reject) => {
-			if (fetchnewdata || !user?.contestdata || !user?.contestdata?.recents) {
-				let fullData = await Data.getBestData(user?.profiledata, user?.uuid);
-				let data = await Data.getBestContests(fullData, user?.uuid);
-				resolve(data);
-			} else {
-				let data = user?.contestdata;
-				resolve(data);
-			}
-			resolve(undefined);
+		return new Promise((resolve) => {
+			(async function() {
+				if (fetchnewdata || !user?.contestdata || !user?.contestdata?.recents) {
+					const fullData = await Data.getBestData(user?.profiledata, user?.uuid);
+					const data = await Data.getBestContests(fullData); //, user?.uuid);
+					resolve(data);
+				} else {
+					const data = user?.contestdata;
+					resolve(data);
+				}
+				resolve(undefined);
+			}());
 		});
 	}
 
-    static getDateFromContest(split: string[]) {
-        let day = split[1].split('_')[1];
-        day = (+day < 10) ? `0${day}` : day;
+	static getDateFromContest(split: string[]) {
+		let day = split[1].split('_')[1];
+		day = (+day < 10) ? `0${day}` : day;
 
-        let month = split[1].split('_')[0];
-        month = (+month < 10) ? `0${month}` : month;
+		let month = split[1].split('_')[0];
+		month = (+month < 10) ? `0${month}` : month;
         
-        let year = split[0];
+		const year = split[0];
 
-        return '' + year + month + day;
-    }
+		return '' + year + month + day;
+	}
 
 	static getReadableDate(date: string | number) {
 		const dateStr = '' + date;
 
-		let day = dateStr.slice(-2);
-		let month = dateStr.slice(-4, -2);
-		let year = dateStr.slice(0, -4);
+		const day = dateStr.slice(-2);
+		const month = dateStr.slice(-4, -2);
+		const year = dateStr.slice(0, -4);
 
 		const months = [ 
 			'Early Spring', 'Spring', 'Late Spring', 
@@ -459,21 +461,17 @@ export default class Data {
 	}
 
 	static appendOrdinalSuffix(i: number) {
-		let j = i % 10,
-			k = i % 100;
-		if (j == 1 && k != 11) {
-			return i + "st";
-		}
-		if (j == 2 && k != 12) {
-			return i + "nd";
-		}
-		if (j == 3 && k != 13) {
-			return i + "rd";
-		}
+		const j = i % 10; 
+		const k = i % 100;
+
+		if (j == 1 && k != 11) return i + "st";
+		if (j == 2 && k != 12) return i + "nd";
+		if (j == 3 && k != 13) return i + "rd";
+		
 		return i + "th";
 	}
 
-    static getGoodCropName(bad: string) {
+	static getGoodCropName(bad: string) {
 		if (bad === 'WHEAT') return 'wheat';
 		if (bad === 'MELON') return 'melon';
 		if (bad === 'CACTUS') return 'cactus';
@@ -551,31 +549,31 @@ export default class Data {
 	}
 }
 
-interface BaseContestData {
+export interface BaseContestData {
 	currentmedals: MedalInventory,
 	totalmedals: MedalInventory,
 	participations: number,
 	firstplace: number,
 }
 
-interface StrippedContestData extends BaseContestData {
+export interface StrippedContestData extends BaseContestData {
 	perks: FarmingPerks,
 	scores: FarmingContestScores,
 	recents: RecentFarmingContests
 }
 
-interface BestContestData extends BaseContestData {
+export interface BestContestData extends BaseContestData {
 	scores: FarmingContestScores,
 	recents: RecentFarmingContests
 }
 
-type MedalInventory = {
+export type MedalInventory = {
 	bronze: number,
 	silver: number,
 	gold: number
 }
 
-type FarmingPerks = {
+export type FarmingPerks = {
 	double_drops: number,
 	farming_level_cap: number
 }
@@ -584,7 +582,7 @@ export type FarmingContestScores = {
 	[key in CropString]: ContestScore;
 };
 
-interface ContestScore {
+export interface ContestScore {
 	value: number, 
 	obtained: string, 
 	pos?: number, 
@@ -596,7 +594,7 @@ interface ContestScore {
 	ign?: string,
 }
 
-type RecentFarmingContests = {
+export type RecentFarmingContests = {
 	[key in CropString]: ContestScore[];
 } & {
 	overall: ContestScore[]
