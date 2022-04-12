@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "@types/node": "^17.0.23",
+    "@types/sequelize": "^4.28.11",
     "canvas": "^2.8.0",
     "discord.js": "^13.6.0",
     "hi-base32": "^0.5.1",
@@ -11,7 +13,7 @@
     "npm": "^7.24.2",
     "nvm": "0.0.4",
     "pg": "^8.6.0",
-    "sequelize": "^6.7.0",
+    "sequelize": "^6.16.2",
     "sequelize-cli": "^5.0.0"
   },
   "scripts": {
