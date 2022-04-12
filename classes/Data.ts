@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import throttledQueue from 'throttled-queue';
 import { hypixelApiKey } from '../config.json';
 import fetch from 'node-fetch';
 import { Snowflake } from 'discord.js';
+import { UserData } from 'database/models/users';
 
 const throttle = throttledQueue(2, 1000);
 
@@ -12,27 +12,27 @@ export default class Data {
 
 	static async getUUID(playerName: string) {
 		const uuid = await fetch(`https://api.mojang.com/users/profiles/minecraft/${playerName}`)
-			.then((response: any) => response.json())
-			.then((result: any) => {
-				if (result.success === false) {
+			.then((response) => response.json())
+			.then((result: { name: string, id: string }) => {
+				if (!result?.name) {
 					throw new Error("That minecraft player doesn't exist");
 				} else {
 					return result;
 				}
 			})
-			.catch((error: any) => {
+			.catch((error) => {
 				throw error;
 			});
 		return uuid;
 	}
 	
-	static async getProfiles(uuid: string) {
+	static async getProfiles(uuid: string): Promise<RawAPIProfiles | undefined> {
 		return new Promise((resolve) => {
 			throttle(async function() {
 				const response = await fetch(`https://api.hypixel.net/skyblock/profiles?uuid=${uuid}&key=${hypixelApiKey}`)
-					.then((response: any) => {
+					.then((response) => {
 						return response.json();
-					}).then((result: any) => {
+					}).then((result) => {
 						if (result.success === true) {
 							return result;
 						}
@@ -40,7 +40,7 @@ export default class Data {
 					}).catch(() => {
 						resolve(undefined);
 					});
-				resolve(await response);
+				resolve(response);
 			});
 		});
 	}
@@ -54,9 +54,9 @@ export default class Data {
 		return new Promise((resolve) => {
 			throttle(async function() {
 				const response = await fetch(`https://api.hypixel.net/player?uuid=${uuid}&key=${hypixelApiKey}`)
-					.then((response: any) => {
+					.then((response) => {
 						return response.json();
-					}).then((result: any) => {
+					}).then((result) => {
 						if (result.success) {
 							return result;
 						}
@@ -72,6 +72,7 @@ export default class Data {
 	static async getDiscord(uuid: string) {
 		return new Promise((resolve) => {
 			throttle(async function() {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				const data = await Data.getOverview(uuid) as any;
 				if (data === undefined || !data?.success) resolve(undefined);
 				
@@ -80,20 +81,19 @@ export default class Data {
 		});
 	}
 
-	static async stripData(data: any, uuid: string) {
+	static async stripData(data: RawAPIProfiles, uuid: string) {
 		if (!data || !data?.profiles) return undefined;
 
-		const stripped: { success: boolean, profiles: any[] } = {
+		const stripped: TotalProfileData = {
 			success: data.success,
 			profiles: []
 		}
 		
-		for (let i = 0; i < Object.keys(data.profiles).length; i++) {
-			const key = Object.keys(data.profiles)[i];
-			const profile = data.profiles[key];
-			const user = profile.members[uuid];
+		for (const key in data.profiles) {
+			const profile: RawAPIProfile = data.profiles[key];
+			const user: RawAPIMember = profile.members[uuid];
 
-			const addedProfile = {
+			const addedProfile: ProfileData = {
 				profile_id: profile.profile_id,
 				cute_name: profile.cute_name,
 				members: {},
@@ -107,8 +107,8 @@ export default class Data {
 						crafted_generators: user.crafted_generators,
 						jacob: await this.stripContests(user.jacob2)
 					},
-					lamecoop: {
-						sad: null
+					lamecoop: { // Will be removed
+						sad: true
 					}
 				}
 			} else {
@@ -147,7 +147,7 @@ export default class Data {
 		return stripped;
 	}
 
-	static async stripContests(jacob: any) {
+	static async stripContests(jacob: RawAPIJacobData) {
 		const formattedData: StrippedContestData = {
 			currentmedals: {
 				bronze: jacob?.medals_inv?.bronze ?? 0,
@@ -226,7 +226,7 @@ export default class Data {
 					
 				if (position === 0) formattedData.firstplace++;
 				
-				if (position + 1 && participants) {
+				if (position !== undefined && participants) {
 					if (position <= (participants * 0.05) + 1) {
 						formattedData.totalmedals.gold++;
 					} else if (position <= (participants * 0.25) + 1) {
@@ -241,7 +241,7 @@ export default class Data {
 		return formattedData;
 	}
 
-	static async getBestContests(data: any) { //, uuid: string
+	static async getBestContests(data?: TotalProfileData) { //, uuid: string
 		if (!data) return undefined;
 		
 		const best: BestContestData = {
@@ -283,8 +283,8 @@ export default class Data {
 		}
 
 		for (let i = 0; i < Object.keys(data.profiles).length; i++) {
-			const profile = data.profiles[Object.keys(data.profiles)[i]];
-			const player = profile.members[Object.keys(profile.members)[0]];
+			const profile = data.profiles[i];
+			const player = profile.members[Object.keys(profile.members)[0]] as ProfileMember;
 
 			const jacob = player.jacob as BestContestData;
 			
@@ -353,21 +353,29 @@ export default class Data {
 		return best;
 	}
 
-	static async takeNewestData(saved: any, fresh: any) {
+	static async takeNewestData(saved?: TotalProfileData, fresh?: TotalProfileData) {
+
+		if (saved === undefined && fresh === undefined) return undefined;
+		if (saved === undefined && fresh !== undefined) return fresh;
+		if (fresh === undefined) return saved;
+		
 		try {
-			if (saved?.data) { saved = saved.data; }
+			// Handling for *old* data, will be migrated at some point
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			if ((saved as any)?.data) saved = (((saved as any)?.data) as TotalProfileData);
+			if (saved === undefined) return fresh;
 			
-			const newData: { success: boolean, profiles: any[] } = {
+			const newData: TotalProfileData = {
 				success: true,
 				profiles: []
 			}
 
 			const length = Math.min(Object.keys(saved.profiles).length, Object.keys(fresh.profiles).length);
 			for (let i = 0; i < length; i++) {
-				const savedProfile = saved.profiles[Object.keys(saved.profiles)[i]];
-				const freshProfile = fresh.profiles[Object.keys(fresh.profiles)[i]];
+				const savedProfile = saved.profiles[i];
+				const freshProfile = fresh.profiles[i];
 
-				if (freshProfile.members[Object.keys(freshProfile.members)[0]].collection) {
+				if ((freshProfile.members[Object.keys(freshProfile.members)[0]] as ProfileMember)?.collection) {
 					newData.profiles.push({
 						profile_id: freshProfile.profile_id,
 						cute_name: freshProfile.cute_name,
@@ -385,12 +393,13 @@ export default class Data {
 			}
 			if (length < Object.keys(fresh.profiles).length) {
 				for (let i = length; i < Object.keys(fresh.profiles).length; i++) {
-					const profile = fresh.profiles[Object.keys(fresh.profiles)[i]];
+					const profile = fresh.profiles[i];
 
 					newData.profiles.push({
 						profile_id: profile.profile_id,
 						cute_name: profile.cute_name,
-						members: profile.members
+						members: profile.members,
+						api: true
 					});
 				}
 			}
@@ -401,7 +410,7 @@ export default class Data {
 		}
 	}
 
-	static async getBestData(saved: BestContestData, uuid: string) {
+	static async getBestData(saved: TotalProfileData, uuid: string) {
 		const fresh = await Data.getStrippedProfiles(uuid);
 		if (!saved && fresh) {
 			return fresh;
@@ -413,18 +422,21 @@ export default class Data {
 		return await Data.takeNewestData(saved, fresh);
 	}
 
-	static async getLatestContestData(user: any, fetchnewdata = true): Promise<BestContestData | undefined> {
+	static async getLatestContestData(user: UserData, fetchnewdata = true): Promise<BestContestData | undefined> {
 		return new Promise((resolve) => {
 			(async function() {
 				if (fetchnewdata || !user?.contestdata || !user?.contestdata?.recents) {
-					const fullData = await Data.getBestData(user?.profiledata, user?.uuid);
+					if (!user.profiledata) {
+						resolve(undefined);
+						return;
+					}
+					const fullData = await Data.getBestData(user.profiledata, user?.uuid);
 					const data = await Data.getBestContests(fullData); //, user?.uuid);
 					resolve(data);
 				} else {
 					const data = user?.contestdata;
-					resolve(data);
+					resolve(data ?? undefined);
 				}
-				resolve(undefined);
 			}());
 		});
 	}
@@ -600,4 +612,73 @@ export type RecentFarmingContests = {
 	overall: ContestScore[]
 };
 
-export type CropString = 'cactus' | 'carrot' | 'cocoa' | 'melon' | 'mushroom' | 'netherwart' | 'potato' | 'pumpkin' | 'sugarcane' | 'wheat'
+export type CropString = 'cactus' | 'carrot' | 'cocoa' | 'melon' | 'mushroom' | 'netherwart' | 'potato' | 'pumpkin' | 'sugarcane' | 'wheat';
+
+export type TotalProfileData = {
+	success: boolean,
+	profiles: ProfileData[]
+}
+
+type ProfileData = {
+	profile_id: string,
+	cute_name: string,
+	members: ProfileMembers,
+	api: boolean
+}
+
+type ProfileMembers = { 
+	[key: string]: ProfileMemberData
+}
+
+type ProfileMember = {
+	experience_skill_farming: number,
+	collection: { 
+		[key: string]: number 
+	},
+	crafted_generators: string[],
+	jacob: StrippedContestData
+}
+
+type ProfileMemberData =  ProfileMember | { sad: boolean }; // Temporary alternate type (was my old and bad way to tell if you were a coop member)
+
+type RawAPIProfiles = {
+	success: boolean,
+	profiles: RawAPIProfile[]
+}
+
+type RawAPIProfile = {
+	profile_id: string,
+	members: {
+		[key: string]: RawAPIMember
+	},
+	cute_name: string,
+	game_mode: string, // Probably will use soon
+	[key: string]: unknown // Not using anything else
+}
+
+type RawAPIMember = {
+	last_save: number,
+	experience_skill_farming: number,
+	collection: { 
+		[key: string]: number 
+	},
+	crafted_generators: string[],
+	jacob2: RawAPIJacobData,
+	[key: string]: unknown // Not using anything else
+}
+
+type RawAPIJacobData = {
+	medals_inv: MedalInventory,
+	perks: FarmingPerks,
+	talked: boolean,
+	contests: {
+		[key: string]: RawAPIFarmingContest
+	}
+}
+
+type RawAPIFarmingContest = {
+	collected: number,
+	claimed_rewards?: true,
+	claimed_position?: number,
+	claimed_participants?: number
+}
