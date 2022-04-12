@@ -43,14 +43,14 @@ export default class DataHandler {
 		}
 	}
 
-	static async updatePlayer(playeruuid: string, playerName: string, profileuuid: string, nWeight: number) {
+	static async updatePlayer(playeruuid: string, playerName: string, profileuuid?: string, nWeight = 0) {
 		const newWeight = Math.round(nWeight * 100);
 		if (typeof newWeight !== typeof 1) { return; }
 
 		try {
 			const user = await this.getPlayer(playeruuid);
 			if (user) {
-				if (user.weight > newWeight && user.profile !== profileuuid) {
+				if ((user?.weight ?? 0) > newWeight && user.profile !== profileuuid) {
 					if (!user.profile) {
 						await Users.update({ ign: playerName, profile: profileuuid, updatedat: Date.now().toString() }, { where: { uuid: playeruuid } });
 					}
@@ -136,8 +136,8 @@ export default class DataHandler {
 
 			if (user) {
 				foundPlayer = true;
-				startIndex = (firstCall) ? user.rank - 1 : startIndex;
-				const weightFormatted = (user.weight / 100).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+				startIndex = (firstCall && user.rank) ? user.rank - 1 : startIndex;
+				const weightFormatted = ((user.weight ?? 0) / 100).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 				embed.setDescription(`**${user.ign}** is rank **#${user.rank}** with **${weightFormatted}** weight`)
 			} else {
 				startIndex = 0;
@@ -157,8 +157,8 @@ export default class DataHandler {
 			}
 			const player = leaderboard[i];
 
-			const isHighlightedPlayer = (foundPlayer && ((playerName ?? '').toLowerCase() === player.ign.toLowerCase()));
-			const weightFormatted = (player.weight / 100).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+			const isHighlightedPlayer = (foundPlayer && ((playerName ?? '').toLowerCase() === (player.ign ?? '').toLowerCase()));
+			const weightFormatted = ((player.weight ?? 0) / 100).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 
 			embed.fields.push({
 				name: `#${i + 1} – ${player.ign ? player.ign.replace(/_/g, '\\_') : 'N/A'}`,

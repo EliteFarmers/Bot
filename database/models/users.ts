@@ -1,5 +1,5 @@
 'use strict';
-import { BestContestData, FarmingContestScores } from 'classes/Data';
+import { BestContestData, TotalProfileData } from 'classes/Data';
 import { CreationOptional, InferAttributes, InferCreationAttributes, IntegerDataType, Model, Optional, Sequelize, WhereAttributeHash } from 'sequelize';
 
 export class Users extends Model<InferAttributes<Users>, InferCreationAttributes<Users>> {
@@ -10,19 +10,19 @@ export class Users extends Model<InferAttributes<Users>, InferCreationAttributes
 
 	// Added 
 	declare uuid: string;
-	declare ign: CreationOptional<string>;
-	declare rank: CreationOptional<number>;
+	declare ign: CreationOptional<string | null>;
+	declare rank: CreationOptional<number | null>;
 	
-	declare profile: CreationOptional<string>;
-	declare weight: CreationOptional<number>;
-	declare discordid: CreationOptional<string>;
+	declare profile: CreationOptional<string | null>;
+	declare weight: CreationOptional<number | null>;
+	declare discordid: CreationOptional<string | null>;
 
-	declare profiledata: CreationOptional<BestContestData>;
-	declare contestdata: CreationOptional<FarmingContestScores>;
-	declare styledata: CreationOptional<Record<string, unknown>>;
+	declare profiledata: CreationOptional<TotalProfileData | null>;
+	declare contestdata: CreationOptional<BestContestData | null>;
+	declare styledata: CreationOptional<Record<string, unknown> | null>;
 
-	declare cheating: CreationOptional<boolean>;
-	declare updatedat: CreationOptional<string>;
+	declare cheating: CreationOptional<boolean | null>;
+	declare updatedat: CreationOptional<string | null>;
 }
 
 // I have no idea what type DataTypes is supposed to be

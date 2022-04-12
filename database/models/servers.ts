@@ -10,23 +10,23 @@ export class Servers extends Model<InferAttributes<Servers>, InferCreationAttrib
 
 	// Added 
 	declare guildid: string;
-	declare adminrole: CreationOptional<string>;
-	declare channels: CreationOptional<string[]>;
+	declare adminrole: CreationOptional<string | null>;
+	declare channels: CreationOptional<string[] | null>;
 	
-	declare weightreq: CreationOptional<number>;
-	declare weightrole: CreationOptional<string>;
-	declare weightchannel: CreationOptional<string>;
-	declare reviewchannel: CreationOptional<string>;
-	declare reviewerrole: CreationOptional<string>;
-	declare inreview: CreationOptional<string[]>;
+	declare weightreq: CreationOptional<number | null>;
+	declare weightrole: CreationOptional<string | null>;
+	declare weightchannel: CreationOptional<string | null>;
+	declare reviewchannel: CreationOptional<string | null>;
+	declare reviewerrole: CreationOptional<string | null>;
+	declare inreview: CreationOptional<string[] | null>;
 
-	declare lbchannel: CreationOptional<string>;
-	declare lbcutoff: CreationOptional<string>;
-	declare lbrolereq: CreationOptional<string>;
-	declare lbupdatechannel: CreationOptional<string>;
-	declare lbroleping: CreationOptional<string>;
-	declare lbactiveid: CreationOptional<string>;
-	declare scores: CreationOptional<FarmingContestScores>;
+	declare lbchannel: CreationOptional<string | null>;
+	declare lbcutoff: CreationOptional<string | null>;
+	declare lbrolereq: CreationOptional<string | null>;
+	declare lbupdatechannel: CreationOptional<string | null>;
+	declare lbroleping: CreationOptional<string | null>;
+	declare lbactiveid: CreationOptional<string | null>;
+	declare scores: CreationOptional<FarmingContestScores | null>;
 	
 	declare configshowedat: CreationOptional<string>;
 }

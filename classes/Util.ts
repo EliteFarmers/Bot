@@ -48,3 +48,5 @@ export async function FindGuild(guildId: Snowflake): Promise<Guild | undefined> 
 	const guild = await client.guilds.fetch(guildId);
 	return guild ?? undefined;
 }
+
+export type Nullable<T> = T | null;
