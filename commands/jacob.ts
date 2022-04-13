@@ -1,6 +1,6 @@
-import { Command } from "classes/Command";
-import { CanUpdateAndFlag } from "classes/Util";
-import { ServerData } from "database/models/servers";
+import { Command } from "../classes/Command";
+import { CanUpdateAndFlag } from "../classes/Util";
+import { ServerData } from "../database/models/servers";
 import { CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu } from 'discord.js';
 import Data, { CropString } from '../classes/Data';
 import DataHandler from '../classes/Database';
