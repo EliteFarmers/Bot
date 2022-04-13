@@ -1,8 +1,8 @@
 import Discord, { Snowflake } from 'discord.js';
 import { Sequelize, Op } from 'sequelize';
 import { dbUri } from '../config.json';
-import { ServersInit, ServerUpdateOptions, ServerWhereOptions } from 'database/models/servers';
-import { UserData, UsersInit, UserUpdateOptions, UserWhereOptions } from 'database/models/users';
+import { ServersInit, ServerUpdateOptions, ServerWhereOptions } from '../database/models/servers';
+import { UserData, UsersInit, UserUpdateOptions, UserWhereOptions } from '../database/models/users';
 
 const Users = UsersInit(new Sequelize(dbUri, {
 	dialect: 'postgres',
