@@ -25,7 +25,6 @@ export const commands = new Collection<string, Command>();
 		commands.set(command.default.name, command.default);
 	}
 	
-	
 	const eventFiles = fs.readdirSync('./src/events/').filter((file) => file.endsWith('.ts'));
 	
 	for (const file of eventFiles) {
