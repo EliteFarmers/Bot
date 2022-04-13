@@ -17,7 +17,7 @@
     "sequelize-cli": "^5.0.0"
   },
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "start": "ts-node index.ts",
     "lint": "eslint . --ext .ts"
   },
   "devDependencies": {
