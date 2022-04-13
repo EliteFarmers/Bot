@@ -18,14 +18,14 @@ export const commands = new Collection<string, Command>();
 * as it only runs once on startup and allows you to only create a new file.
 */
 (async function() {
-	const commandFiles = fs.readdirSync('./src/commands/').filter((file) => file.endsWith('.ts'));
+	const commandFiles = fs.readdirSync('./commands/').filter((file) => file.endsWith('.ts'));
 
 	for (const file of commandFiles) {
 		const command = await import(`./commands/${file}`);
 		commands.set(command.default.name, command.default);
 	}
 	
-	const eventFiles = fs.readdirSync('./src/events/').filter((file) => file.endsWith('.ts'));
+	const eventFiles = fs.readdirSync('./events/').filter((file) => file.endsWith('.ts'));
 	
 	for (const file of eventFiles) {
 		const event = await import(`./events/${file}`);
