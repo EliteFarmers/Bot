@@ -25,10 +25,10 @@
         "index.ts",
     ],
     "include": [
-        "./**/*.ts", "./database/models/*.js"
+        "./**/*.ts", "./**/**/*.ts"
     ],
     "exclude": [
         "node_modules",
-        "dist"
+        "oldindex.ts"
     ],
 }
