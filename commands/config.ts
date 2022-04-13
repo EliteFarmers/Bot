@@ -325,7 +325,7 @@ async function createLeaderboard(server: ServerData, interaction: CommandInterac
 		for (const crop in server.scores) {
 			const contest = server.scores[crop as CropString];
 
-			const details = (contest.par && contest.pos) 
+			const details = (contest.par && contest.pos !== undefined) 
 				? `\`#${(contest.pos + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${contest.par.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` on \`${contest.profilename}\`!` 
 				: `Contest Still Unclaimed!`;
 
