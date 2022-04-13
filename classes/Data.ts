@@ -630,7 +630,7 @@ type ProfileMembers = {
 	[key: string]: ProfileMemberData
 }
 
-type ProfileMember = {
+export type ProfileMember = {
 	experience_skill_farming: number,
 	collection: { 
 		[key: string]: number 
