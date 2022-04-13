@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionChoice, CommandInteraction, MessageEmbed } from "discord.js";
 import { Command } from "../classes/Command";
-import { commands } from "index";
+import { commands } from "../index";
 
 const command: Command = {
 	name: 'help',
