@@ -1,12 +1,11 @@
 import { ButtonInteraction, CommandInteraction, InteractionReplyOptions, Message, MessageActionRow, MessageAttachment, MessageButton, MessageEmbed } from 'discord.js';
-import Canvas from 'canvas';
 import Data, { ProfileMember, TotalProfileData } from '../classes/Data';
 import DataHandler from '../classes/Database';
 import ServerUtil from '../classes/ServerUtil';
-import { Command } from "classes/Command";
-import { ServerData } from 'database/models/servers';
-import { CanUpdate } from 'classes/Util';
-import { registerFont, createCanvas } from 'canvas';
+import { Command } from "../classes/Command";
+import { ServerData } from '../database/models/servers';
+import { CanUpdate } from '../classes/Util';
+import Canvas, { registerFont, createCanvas } from 'canvas';
 
 const command: Command = {
 	name: 'weight',
@@ -78,8 +77,6 @@ async function execute(interaction: CommandInteraction, server: ServerData) {
 	const user = await DataHandler.getPlayer(uuid) ?? undefined;
 	const grabnewdata = CanUpdate(user);
 
-	await interaction.deferReply();
-
 	const fullData = (grabnewdata && user?.profiledata) 
 		? await Data.getBestData(user.profiledata, uuid) 
 		: user?.profiledata;
@@ -91,6 +88,8 @@ async function execute(interaction: CommandInteraction, server: ServerData) {
 			.setFooter({ text: 'Contact Kaeso#5346 if this continues to occur.' });
 		return interaction.reply({ embeds: [embed], ephemeral: true });
 	}
+
+	await interaction.deferReply();
 
 	let mainProfileuuid: string | undefined;
 	let mainCollections: Map<string, number> | undefined;

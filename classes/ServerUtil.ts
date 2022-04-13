@@ -1,6 +1,9 @@
 import { MessageEmbed, MessageActionRow, ButtonInteraction, GuildMemberRoleManager, GuildMember, Guild, GuildTextBasedChannel, CommandInteraction, InteractionReplyOptions, MessageOptions, MessagePayload } from 'discord.js';
-import DataHandler from './database';
+import DataHandler from './Database';
 import Data, { CropString, FarmingContestScores } from './Data';
+import { FindChannel } from './Util';
+import { ServerData } from 'database/models/servers';
+import { UserData } from 'database/models/users';
 
 export default class ServerUtil {
 	static async submitScores(interaction: ButtonInteraction) {
@@ -8,7 +11,7 @@ export default class ServerUtil {
 
 		const user = await DataHandler.getPlayer(undefined, { discordid: interaction.user.id });
 		if (!user) {
-			return await interaction.reply({ content: '**Error!** You need to use \`/verify\` to link your Minecraft account first!', ephemeral: true });
+			return await interaction.reply({ content: '**Error!** You need to use `/verify` to link your Minecraft account first!', ephemeral: true });
 		}
 
 		const server = await DataHandler.getServer(interaction.guildId);
@@ -17,7 +20,7 @@ export default class ServerUtil {
 			return await interaction.reply({ content: 'This feature was turned off! This may be intentional, so don\'t bother the server admins about it.', ephemeral: true });
 		}
 
-		if (!interaction.customId.includes(server.lbactiveid)) {
+		if (!server.lbactiveid || !interaction.customId.includes(server.lbactiveid)) {
 			const embed = interaction?.message?.embeds[0];
 			if (!embed) {
 				await interaction.update({ embeds: [], components: [] })
@@ -30,7 +33,7 @@ export default class ServerUtil {
 		}
 
 		if (server.lbrolereq && !(interaction.member.roles as GuildMemberRoleManager).cache.has(server.lbrolereq)) {
-			if (server.lbrolereq === server.weightrole && server.weightreq >= 0) {
+			if (server.lbrolereq === server.weightrole && (server.weightreq ?? -1) >= 0) {
 				return await interaction.reply({ content: `**Error!** You need the <@&${server.lbrolereq}> role first!\nThis is a reward for reaching **${server.weightreq}** total farming weight! Check your weight with \`/weight\`.`, ephemeral: true });
 			}
 			return await interaction.reply({ content: `**Error!** You need the <@&${server.lbrolereq}> role first!`, ephemeral: true });
@@ -40,7 +43,7 @@ export default class ServerUtil {
 
 		const onCooldown = +(user.updatedat ?? 0) > +(Date.now() - (10 * 60 * 1000));
 		const contestData = await Data.getLatestContestData(user, !onCooldown).catch(e => console.log(e));
-		if (!onCooldown) DataHandler.update({ updatedat: Date.now().toString() }, { discordid: user.discordid }).catch(() => {});
+		if (!onCooldown) DataHandler.update({ updatedat: Date.now().toString() }, { discordid: user.discordid }).catch(() => undefined);
 
 		if (!contestData) {
 			const embed = new MessageEmbed().setColor('#CB152B')
@@ -51,24 +54,10 @@ export default class ServerUtil {
 			return await interaction.followUp({ embeds: [embed], ephemeral: true });
 		}
 
-		let channel: GuildTextBasedChannel | undefined;
-		try {
-			const fetchedChannel = (server.lbupdatechannel) ? interaction.guild?.channels.cache.get(server.lbupdatechannel) 
-				?? await interaction.guild?.channels.fetch(server.lbupdatechannel) : undefined;
+		if (!interaction.guild) return;
+		const channel = (server.lbupdatechannel) ? await FindChannel(interaction.guild, server.lbupdatechannel) : undefined;
 
-			if (fetchedChannel) {
-				if (!fetchedChannel.hasOwnProperty('send')) {
-					channel = undefined;
-				} else {
-					channel = fetchedChannel as GuildTextBasedChannel;
-				}
-			}
-		} catch (e) {
-			channel = undefined;
-		}
-		
-
-		let newScores: FarmingContestScores = {
+		const newScores: FarmingContestScores = {
 			cactus: { value: 0, obtained: '' },
 			carrot: { value: 0, obtained: '' },
 			cocoa: { value: 0, obtained: '' },
@@ -82,29 +71,29 @@ export default class ServerUtil {
 		};
 		const dontUpdate = [];
 
-		const userScores = contestData.scores ?? {};
-		const serverScores = server.scores ?? {};
+		const userScores = contestData.scores ?? ({} as FarmingContestScores);
+		const serverScores = server.scores ?? ({} as FarmingContestScores);
 
 		for (const crop of Object.keys(contestData.scores) as CropString[]) {
 			const userScore = userScores[crop];
 			const serverScore = serverScores[crop];
 
-			if (!userScore || (+server.lbcutoff > +userScore.obtained)) continue;
+			if (!userScore || (+(server.lbcutoff ?? -1) > +userScore.obtained)) continue;
 			const nowClaimed = (serverScore && serverScore.obtained === userScore.obtained && serverScore.user === interaction.user.id && serverScore.par === null && userScore.par !== null);
 
 			if ((!serverScore && userScore.value) || userScore.value > (serverScore?.value ?? 0) || nowClaimed) {
-				newScores[crop] = { user: interaction.user.id, ign: user.ign, ...userScore };
+				newScores[crop] = { user: interaction.user.id, ign: user.ign ?? undefined, ...userScore };
 				if (nowClaimed) dontUpdate.push(crop);
 			}
 		}
 
 		// True if someone has since claimed the contest for their highscore, or if a user's scores were removed from the leaderboard
-		const silentUpdate = (Object.keys(server.scores).length > (interaction.message?.embeds[0]?.fields?.length ?? 0) || (dontUpdate.length > 0 && Object.keys(newScores).length === dontUpdate.length));
+		const silentUpdate = (Object.keys(serverScores).length > (interaction.message?.embeds[0]?.fields?.length ?? 0) || (dontUpdate.length > 0 && Object.keys(newScores).length === dontUpdate.length));
 
 		if (Object.keys(newScores).length <= 0) {
 			const embed = new MessageEmbed().setColor('#FF8600')
 				.setTitle('Sorry! No New Records')
-				.setDescription(`You don\'t have any scores that would beat these records!\nKeep in mind that scores are only valid starting on ${server.lbcutoff ? `**${Data.getReadableDate(server.lbcutoff)}**\n(The custom cutoff date for this leaderboard)` : `**${Data.getReadableDate(Data.CUTOFFDATE)}**\n(The first contest after the last nerf to farming)`}`)
+				.setDescription(`You don't have any scores that would beat these records!\nKeep in mind that scores are only valid starting on ${server.lbcutoff ? `**${Data.getReadableDate(server.lbcutoff)}**\n(The custom cutoff date for this leaderboard)` : `**${Data.getReadableDate(Data.CUTOFFDATE)}**\n(The first contest after the last nerf to farming)`}`)
 				.setFooter({ text: 'If you\'re positive that this isn\'t true please contact Kaeso#5346' });
 
 			if (onCooldown) {
@@ -125,14 +114,14 @@ export default class ServerUtil {
 			.setDescription('These are the highscores set by your fellow server members!')
 			.setFooter({ text: `Highscores only valid after ${Data.getReadableDate(server.lbcutoff ?? Data.CUTOFFDATE)}⠀⠀Created by Kaeso#5346` });
 
-		for (const crop of Object.keys(updatedScores)) {
+		for (const crop of Object.keys(updatedScores) as CropString[]) {
 			const contest = updatedScores[crop];
 
-			let details = (contest.par) 
+			const details = (contest.par && contest.pos !== undefined) 
 				? `\`#${(contest.pos + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${contest.par.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` on [${contest.profilename}](https://sky.shiiyu.moe/stats/${contest.ign}/${contest.profilename})` 
 				: `Contest Still Unclaimed! [Link](https://sky.shiiyu.moe/stats/${contest.ign}/${contest.profilename})`;
 
-			if (!contest.value) { continue };
+			if (!contest.value) continue;
 
 			embed.fields.push({
 				name: `${Data.getReadableCropName(crop)} - ${contest.ign}`,
@@ -148,14 +137,14 @@ export default class ServerUtil {
 		});
 
 		if (silentUpdate) {
-			return interaction.followUp({ content: 'Success! No new scores, but your contest has since been claimed and updated!', ephemeral: true }).catch(() => {});
+			return interaction.followUp({ content: 'Success! No new scores, but your contest has since been claimed and updated!', ephemeral: true }).catch(() => undefined);
 		}
 		
-		await interaction.followUp({ content: 'Success! Check the leaderboard now!', ephemeral: true }).catch(() => {});
+		await interaction.followUp({ content: 'Success! Check the leaderboard now!', ephemeral: true }).catch(() => undefined);
 
 		if (channel) {
 			const embeds = [];
-			for (const crop of Object.keys(newScores)) {
+			for (const crop of Object.keys(newScores) as CropString[]) {
 				if (dontUpdate.includes(crop)) continue;
 
 				const record = newScores[crop as CropString];
@@ -176,10 +165,14 @@ export default class ServerUtil {
 				embeds.push(embed);
 			}
 
-			if (server.lbroleping) {
-				await channel?.send({ content: `<@&${server.lbroleping}>`, embeds: embeds, allowedMentions: { roles: [server.lbroleping] } }).catch(() => {});
+			if (server.lbroleping && channel && Object.prototype.hasOwnProperty.call(channel, 'send')) {
+				await (channel as GuildTextBasedChannel).send({ 
+					content: `<@&${server.lbroleping}>`, 
+					embeds: embeds, 
+					allowedMentions: { roles: [server.lbroleping] } 
+				}).catch(() => undefined);
 			} else {
-				await channel?.send({ embeds: embeds }).catch(() => {});
+				await (channel as GuildTextBasedChannel).send({ embeds: embeds }).catch(() => undefined);
 			}
 		}
 	}
@@ -219,7 +212,7 @@ export default class ServerUtil {
 		}
 	}
 
-	static async handleWeightRole(interaction: CommandInteraction, server: any) {
+	static async handleWeightRole(interaction: CommandInteraction, server: ServerData) {
 		if (!server.weightrole || !(server.weightreq !== undefined) || !interaction.guild || !interaction.member) return;
 
 		if (server.inreview?.includes(interaction.user.id)) return;
@@ -233,7 +226,7 @@ export default class ServerUtil {
 		const channel = interaction.guild.channels.cache.get(server.reviewchannel) 
 			?? await interaction.guild.channels.fetch(server.reviewchannel);
 
-		if (!channel || !channel.hasOwnProperty('send')) return;
+		if (!channel || !Object.prototype.hasOwnProperty.call(channel, 'send')) return;
 
 		const reviewEmbed = new MessageEmbed().setColor('#03fc7b')
 			.setTitle(`${user.ign} ${server.weightreq === 0 ? `is verified!` : `has reached ${server?.weightreq} weight!`}`)
@@ -254,16 +247,16 @@ export default class ServerUtil {
 				allowedMentions: { 
 					roles: [server.reviewerrole] 
 				} 
-			}).catch(() => {});
+			}).catch(() => undefined);
 		} else {
 			(channel as GuildTextBasedChannel)?.send({ 
 				embeds: [reviewEmbed], 
 				components: [reviewRow] 
-			}).catch(() => {});
+			}).catch(() => undefined);
 		}
 	}
 
-	static async grantWeightRole(interaction: ButtonInteraction | CommandInteraction, guild: Guild, member: GuildMember, server: any, user: any) {
+	static async grantWeightRole(interaction: ButtonInteraction | CommandInteraction, guild: Guild, member: GuildMember, server: ServerData, user: UserData) {
 
 		if (typeof member === 'string') {
 			member = guild.members?.cache?.get(member) ?? await guild.members?.fetch(member);
@@ -271,12 +264,15 @@ export default class ServerUtil {
 		}
 
 		if (!user) {
-			user = await DataHandler.getPlayer(undefined, { discordid: interaction.user.id });
-			if (!user) return;
+			const findUser = await DataHandler.getPlayer(undefined, { discordid: interaction.user.id });
+			if (findUser) {
+				user = findUser;
+			} else return;
 		}
 
-		DataHandler.updateServer({ inreview: [...((server.inreview ?? []).filter((e: any) => e !== user.discordid))] }, server.guildid);
+		DataHandler.updateServer({ inreview: [...((server.inreview ?? []).filter((e) => e !== user.discordid))] }, server.guildid);
 
+		if (!server?.weightrole) return;
 		await member?.roles?.add(server.weightrole).then(async () => {
 			const embed = new MessageEmbed().setColor('#03fc7b')
 				.setTitle('Congratulations!')
@@ -286,7 +282,7 @@ export default class ServerUtil {
 				const channel = guild.channels.cache.get(server.weightchannel) 
 					?? await guild.channels.fetch(server.weightchannel);
 
-				if (!channel || !channel.hasOwnProperty('send')) return;
+				if (!channel || !Object.prototype.hasOwnProperty.call(channel, 'send')) return;
 
 				try {
 					const welcomeEmbed = new MessageEmbed().setColor('#03fc7b')
@@ -298,7 +294,7 @@ export default class ServerUtil {
 						{ label: 'Plancke', style: 'LINK', url: `https://plancke.io/hypixel/player/stats/${user.ign}`, type: 'BUTTON' }
 					);
 
-					(channel as GuildTextBasedChannel)?.send({ embeds: [welcomeEmbed], components: [linkRow] }).catch(() => {});
+					(channel as GuildTextBasedChannel)?.send({ embeds: [welcomeEmbed], components: [linkRow] }).catch(() => undefined);
 				} catch (e) { console.log(e); }
 			}
 
@@ -309,14 +305,14 @@ export default class ServerUtil {
 
 		function reply(interaction: CommandInteraction | ButtonInteraction, message: string | MessagePayload | MessageOptions | InteractionReplyOptions) {
 			if (interaction.isButton()) {
-				return interaction.update({ content: `**Approved by** <@${interaction.user.id}>!`, components: [] }).catch(() => {});
+				return interaction.update({ content: `**Approved by** <@${interaction.user.id}>!`, components: [] }).catch(() => undefined);
 			}
 
 			if (interaction.replied) {
-				interaction.followUp(message).catch(() => {});
+				interaction.followUp(message).catch(() => undefined);
 			} else {
 				interaction.reply(message).catch(() => {
-					interaction.channel?.send(message).catch(() => {});
+					interaction.channel?.send(message).catch(() => undefined);
 				});
 			}
 		}

@@ -1,5 +1,5 @@
-import { Command } from "classes/Command";
-import { CanUpdate } from "classes/Util";
+import { Command } from "../classes/Command";
+import { CanUpdate } from "../classes/Util";
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import Data from '../classes/Data';
 import DataHandler from '../classes/Database';
