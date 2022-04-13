@@ -1,7 +1,8 @@
 import { Command } from "classes/Command";
+import { CanUpdateAndFlag } from "classes/Util";
 import { ServerData } from "database/models/servers";
-import { CommandInteraction, MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu } from 'discord.js';
-import Data from '../classes/Data';
+import { CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu } from 'discord.js';
+import Data, { CropString } from '../classes/Data';
 import DataHandler from '../classes/Database';
 
 const command: Command = {
@@ -9,7 +10,6 @@ const command: Command = {
 	description: 'Get jacob\'s high scores or leaderboard!',
 	access: 'ALL',
 	type: 'SLASH',
-	execute: execute,
 	slash: {
 		name: 'jacob',
 		description: 'Get jacob\'s high scores or leaderboard!',
@@ -28,6 +28,7 @@ const command: Command = {
 			}
 		]
 	},
+	execute: execute
 }
 
 export default command;
@@ -44,10 +45,9 @@ async function execute(interaction: CommandInteraction, server?: ServerData, ign
 				.setColor('#CB152B')
 				.setTitle('Error: Specify a Username!')
 				.addField('Proper Usage:', '`/jacob` `player:` `(player name)` `profile:` `(profile name)`')
-				.setDescription('Checking for yourself?\nYou must use \`/verify\` \`player:\`(account name) before using this shortcut!\n**Please verify again if you were already, this data had to be reset**')
+				.setDescription('Checking for yourself?\nYou must use `/verify` `player:`(account name) before using this shortcut!\n**Please verify again if you were already, this data had to be reset**')
 				.setFooter({ text: 'Created by Kaeso#5346' });
-			interaction.reply({ embeds: [embed], ephemeral: true });
-			return;
+			return interaction.reply({ embeds: [embed], ephemeral: true });
 		}
 		
 		playerName = user.ign;
@@ -60,74 +60,61 @@ async function execute(interaction: CommandInteraction, server?: ServerData, ign
 		return undefined;
 	});
 	if (!uuid) {
-		const embed = new MessageEmbed()
-			.setColor('#CB152B')
+		const embed = new MessageEmbed().setColor('#CB152B')
 			.setTitle('Error: Invalid Username!')
 			.setDescription(`Player "${playerName}" does not exist.`)
 			.addField('Proper Usage:', '`/weight` `player:`(player name)')
 			.setFooter({ text: 'Created by Kaeso#5346' });
-		interaction.reply({ embeds: [embed], ephemeral: true });
-		return;
-	}
-
-	let grabnewdata = true;
-	let user = await DataHandler.getPlayer(uuid);
-
-	if (user && user?.updatedat) {
-		grabnewdata = (+(user?.updatedat ?? 0) < +(Date.now() - (10 * 60 * 1000)));
-	}
-
-	if (!user) {
-		await DataHandler.updatePlayer(uuid, playerName, undefined, undefined);
-		user = await DataHandler.getPlayer(uuid);
-		grabnewdata = true;
+		return interaction.reply({ embeds: [embed], ephemeral: true });
 	}
 
 	await interaction.deferReply();
 
+	let user = await DataHandler.getPlayer(uuid);
+
+	if (!user) {
+		await DataHandler.updatePlayer(uuid, playerName, undefined, undefined);
+		user = await DataHandler.getPlayer(uuid);
+	}
+
+	if (!user) {
+		const embed = new MessageEmbed().setColor('#CB152B')
+			.setTitle('Error: Couldn\'t Get User!')
+			.setDescription(`Something weird happened with the database. Try again?`)
+			.setFooter({ text: 'Contact Kaeso#5346 if this continues to happen!' });
+		return interaction.reply({ embeds: [embed], ephemeral: true });
+	}
+
+	const grabnewdata = await CanUpdateAndFlag(user);
 	const contestData = await Data.getLatestContestData(user, grabnewdata);
-	if (grabnewdata && user) DataHandler.update({ updatedat: Date.now().toString() }, { discordid: user.discordid }).catch();
 
 	if (!contestData) {
-		const embed = new MessageEmbed()
-			.setColor('#CB152B')
+		const embed = new MessageEmbed().setColor('#CB152B')
 			.setTitle('Error: No Contest Data!')
 			.addField('Proper Usage:', '`/jacob` `player:`(player name)')
 			.setDescription('This could mean that my code is bad, or well, that my code is bad.\n*(API might be down)*')
 			.setFooter({ text: 'Created by Kaeso#5346' });
-		interaction.editReply({ embeds: [embed] });
-		return;
+		return interaction.editReply({ embeds: [embed] });
 	}
 
 	if (!playerName) {
-		const embed = new MessageEmbed()
-			.setColor('#CB152B')
+		const embed = new MessageEmbed().setColor('#CB152B')
 			.setTitle('Error: Specify a Username!')
 			.addField('Proper Usage:', '`/jacob` `player:`(player name)')
-			.setDescription('Checking for yourself?\nYou must use \`/verify\` \`player:\`(account name) before using this shortcut!')
+			.setDescription('Checking for yourself?\nYou must use `/verify` `player:`(account name) before using this shortcut!')
 			.setFooter({ text: 'Created by Kaeso#5346' });
-		interaction.editReply({ embeds: [embed] });
-		return;
+		return interaction.editReply({ embeds: [embed] });
 	}
 
-	// if (!user || !user.dataValues?.contestdata?.scores) {
-	//     const embed = new Discord.MessageEmbed()
-	//         .setColor('#CB152B')
-	//         .setTitle('Error: No Jacob\'s Data Found!')
-	//         .setDescription(`Try running \`/weight\` \`player: ${playerName}\` first!\n`)
-	//         .setFooter({ text: 'Created by Kaeso#5346' });
-	//     interaction.editReply({ embeds: [embed] });
-	//     return;
-	// }
-
+	// Nothing depends on this being waited for
 	DataHandler.update({ contestdata: contestData }, { uuid: uuid });
 
 	const embed = await getHighScoreEmbed();
 	if (!embed) { return; }
 
 	let scoresCount = 0;
-	for (let i = 0; i < contestData.scores.length; i++) {
-		const score = contestData.scores[i];
+	for (const crop in contestData.scores) {
+		const score = contestData.scores[crop as CropString];
 		scoresCount += (score.value !== 0) ? 1 : 0;
 	}
 
@@ -136,12 +123,12 @@ async function execute(interaction: CommandInteraction, server?: ServerData, ign
 			.setCustomId('overall')
 			.setLabel('Overall Stats')
 			.setStyle('SUCCESS')
-			.setDisabled(profileName !== true),
+			.setDisabled(profileName !== undefined),
 		new MessageButton()
 			.setCustomId('crops')
 			.setLabel('All Crops')
 			.setStyle('PRIMARY')
-			.setDisabled(profileName !== true || scoresCount > 3),
+			.setDisabled(profileName !== undefined && scoresCount <= 3),
 		new MessageButton()
 			.setCustomId('recents')
 			.setLabel('Recent Contests')
@@ -172,45 +159,45 @@ async function execute(interaction: CommandInteraction, server?: ServerData, ign
 			]),
 	);
 
-	selectedCrop = undefined;
-	recentsInter = undefined;
+	let selectedCrop: CropString | undefined = undefined;
 	interaction.editReply(args).then(async reply => {
+		if (!(reply instanceof Message)) return;
 		const collector = reply.createMessageComponentCollector({ componentType: 'BUTTON', time: 30000 });
 
 		collector.on('collect', async i => {
 			if (i.user.id === interaction.user.id) {
 				collector.resetTimer({ time: 30000 });
 
-				const newRow = new Discord.MessageActionRow().addComponents(
-					new Discord.MessageButton()
+				const newRow = new MessageActionRow().addComponents(
+					new MessageButton()
 						.setCustomId('overall')
 						.setLabel('Overall Stats')
 						.setStyle('SUCCESS')
 						.setDisabled(i.customId === 'overall'),
-					new Discord.MessageButton()
+					new MessageButton()
 						.setCustomId('crops')
 						.setLabel('All Crops')
 						.setStyle('PRIMARY')
 						.setDisabled(i.customId === 'crops' || scoresCount > 3),
-					new Discord.MessageButton()
+					new MessageButton()
 						.setCustomId('recents')
 						.setLabel('Recent Contests')
 						.setStyle('PRIMARY')
 						.setDisabled(i.customId === 'recents')
 				);
 
-				const recentRow = new Discord.MessageActionRow().addComponents(
-					new Discord.MessageButton()
+				const recentRow = new MessageActionRow().addComponents(
+					new MessageButton()
 						.setCustomId('overall')
 						.setLabel('Overall Stats')
 						.setStyle('SECONDARY')
 						.setDisabled(i.customId === 'overall'),
-					new Discord.MessageButton()
+					new MessageButton()
 						.setCustomId('expand')
 						.setLabel('Show More')
 						.setStyle('SUCCESS')
 						.setDisabled(i.customId === 'expand'),
-					new Discord.MessageButton()
+					new MessageButton()
 						.setCustomId('recents')
 						.setLabel('Recent Contests')
 						.setStyle('PRIMARY')
@@ -218,71 +205,90 @@ async function execute(interaction: CommandInteraction, server?: ServerData, ign
 				);
 
 				if (i.customId === 'overall') {
-					profileName = undefined;
-					i.update({ embeds: [await getHighScoreEmbed(false)], components: [newRow] }).catch(error => { console.log(error); collector.stop(); });
+					profileName = null;
+
+					const scoresEmbed = await getHighScoreEmbed(false);
+					if (!scoresEmbed) return;
+
+					i.update({ embeds: [scoresEmbed], components: [newRow] }).catch(error => { console.log(error); collector.stop(); });
 				} else if (i.customId === 'crops') {
-					profileName = undefined;
-					i.update({ embeds: [await getHighScoreEmbed(true)], components: [newRow] }).catch(error => { console.log(error); collector.stop(); });
+					profileName = null;
+
+					const scoresEmbed = await getHighScoreEmbed(false);
+					if (!scoresEmbed) return;
+
+					i.update({ embeds: [scoresEmbed], components: [newRow] }).catch(error => { console.log(error); collector.stop(); });
 				} else if (i.customId === 'recents') {
-					profileName = undefined;
-					i.update({ embeds: [await getRecents(undefined, i.customId === 'expand')], components: [select, recentRow], fetchReply: true }).then(reply => {
+					profileName = null;
+
+					const recentsEmbed = await getRecents(undefined, false)
+					if (!recentsEmbed) return;
+
+					i.update({ embeds: [recentsEmbed], components: [select, recentRow], fetchReply: true }).then(reply => {
+						if (!(reply instanceof Message)) return;
 						const newCollector = reply.createMessageComponentCollector({ componentType: 'SELECT_MENU', time: 30000 });
 
 						newCollector.on('collect', async inter => {
-							recentsInter = inter;
 							if (inter.user.id === interaction.user.id) {
 								collector.resetTimer({ time: 30000 });
 								newCollector.resetTimer({ time: 30000 });
 
-								selectedCrop = inter.values[0];
-								inter.update({ embeds: [await getRecents(selectedCrop, i.customId === 'expand')], components: [select, recentRow] }).catch(error => { console.log(error) });
+								selectedCrop = inter.values[0] as CropString;
+
+								const cropsEmbed = await getRecents(selectedCrop, i.customId === 'expand');
+								if (!cropsEmbed) return;
+
+								inter.update({ embeds: [cropsEmbed], components: [select, recentRow] }).catch(error => { console.log(error) });
 							} else {
 								inter.reply({ content: `These buttons aren't for you!`, ephemeral: true });
 							}
 						});
 
-						newCollector.on('end', async collected => {
+						newCollector.on('end', () => {
 							collector.stop();
 						});
 					}).catch(error => { console.log(error); collector.stop(); });
 				} else if (i.customId === 'expand') {
-					i.update({ embeds: [await getRecents(selectedCrop, true)], components: [select, recentRow] }).catch(error => { console.log(error) });            
+					const cropsEmbed = await getRecents(selectedCrop, true);
+					if (!cropsEmbed) return;
+
+					i.update({ embeds: [cropsEmbed], components: [select, recentRow] }).catch(error => { console.log(error) });            
 				}
 			} else {
 				i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
 			}
 		});
 
-		collector.on('end', async collected => {
-			interaction.editReply({ components: [] })
+		collector.on('end', () => {
+			interaction.editReply({ components: [] }).catch(() => undefined);
 		});
 	});
 
-	async function getRecents(selectedCrop = undefined, expand = false) {
-		const newEmbed = new Discord.MessageEmbed()
-			.setColor('#03fc7b')
-			.setTitle(`Recent ${selectedCrop ? Data.getReadableCropName(selectedCrop) : 'Jacob\'s'} Contests for ${user?.dataValues?.ign ? user?.dataValues?.ign.replace(/\_/g, '\\_') : playerName}${profileName ? ` on ${profileName}` : ``}`)
+	async function getRecents(selectedCrop?: CropString, expand = false) {
+		if (!contestData) return;
+
+		const newEmbed = new MessageEmbed().setColor('#03fc7b')
+			.setTitle(`Recent ${selectedCrop ? Data.getReadableCropName(selectedCrop) : 'Jacob\'s'} Contests for ${user?.ign ? user?.ign.replace(/_/g, '\\_') : playerName}${profileName ? ` on ${profileName}` : ``}`)
 			.setFooter({ text: `Note: Highscores only valid after ${Data.getReadableDate(Data.CUTOFFDATE)}\nCreated by Kaeso#5346    Can take up to 10 minutes to update` });
 
 		const contests = (selectedCrop) ? contestData.recents[selectedCrop] : contestData.recents.overall;
 
 		let addedIndex = 0;
 		const contestAmount = Object.keys(contests).length;
-		if (!expand && contestAmount > 4) newEmbed.description = 'Click \"Show More\" to see more contests!';
+		if (!expand && contestAmount > 4) newEmbed.description = 'Click "Show More" to see more contests!';
 		for (let i = 0; i < Math.min(expand ? 10 : 4, contestAmount); i++) {
-			const crop = Object.keys(contests)[i]
-			const contest = contests[crop];
+			const contest = contests[i];
 
-			let details = (contest.par) 
-				? `\`#${(contest.pos + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${contest.par.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` ${!profileName ? ` on \`${contest.name}\`!` : ` players!`}` 
-				: `${!profileName ? `Unclaimed on \`${contest.name}\`!` : `Contest Still Unclaimed!`}`;
+			const details = (contest.par && contest.pos !== undefined) 
+				? `\`#${(contest.pos + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${contest.par.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` ${!profileName ? ` on \`${contest.profilename}\`!` : ` players!`}` 
+				: `${!profileName ? `Unclaimed on \`${contest.profilename}\`!` : `Contest Still Unclaimed!`}`;
 
-			if (!contest.value) { continue };
+			if (!contest.value) continue;
 			addedIndex++;
 
 			newEmbed.fields.push({
 				name: `${Data.getReadableDate(contest.obtained)}`,
-				value: `${(selectedCrop) ? 'Collected ' : `${Data.getReadableCropName(contest.crop)} - `}**${contest.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**\n` + details,// + '\n⠀ ',
+				value: `${(selectedCrop) ? 'Collected ' : `${Data.getReadableCropName(contest?.crop ?? '') ?? 'ERROR'} - `}**${contest.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**\n` + details,// + '\n⠀',
 				inline: true
 			});
 
@@ -298,7 +304,7 @@ async function execute(interaction: CommandInteraction, server?: ServerData, ign
 		if (addedIndex === 0) {
 			newEmbed.fields.push({
 				name: `No Data Found`,
-				value: `Sorry, but ${user?.dataValues?.ign ? user?.dataValues?.ign.replace(/\_/g, '\\_') : playerName.replace(/\_/g, '\\_') } hasn\'t participated in any ${selectedCrop ? Data.getReadableCropName(selectedCrop) : ''} contests!\n⠀ `,
+				value: `Sorry, but ${user?.ign ? user?.ign.replace(/_/g, '\\_') : (playerName ?? 'Player').replace(/_/g, '\\_') } hasn't participated in any ${selectedCrop ? Data.getReadableCropName(selectedCrop) : ''} contests!\n⠀`,
 				inline: false
 			});
 		}
@@ -308,42 +314,38 @@ async function execute(interaction: CommandInteraction, server?: ServerData, ign
 
 	async function getHighScoreEmbed(allcrops = false) {
 		const jacob = contestData
-		const scores = jacob?.scores;
+		if (!jacob) return undefined;
+
+		const scores = jacob.scores;
 
 		const cMedals = jacob.currentmedals;
 		const tMedals = jacob.totalmedals;
 
 		const partic = (jacob.firstplace) 
-			? `Out of **${jacob.participations.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests, **${user?.dataValues?.ign ? user?.dataValues?.ign.replace(/\_/g, '\\_') : playerName.replace(/\_/g, '\\_') }** has been 1st **${jacob.firstplace.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** times!`
-			: `**${user.dataValues?.ign ? user.dataValues?.ign.replace(/\_/g, '\\_') : 'N/A'}** has participated in **${jacob.participations.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests!`;
+			? `Out of **${jacob.participations.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests, **${user?.ign ? user?.ign.replace(/_/g, '\\_') : (playerName ?? 'Player').replace(/_/g, '\\_') }** has been 1st **${jacob.firstplace.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** times!`
+			: `**${user?.ign ? user?.ign.replace(/_/g, '\\_') : 'N/A'}** has participated in **${jacob.participations.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests!`;
 
-		const embed = new Discord.MessageEmbed()
-			.setColor('#03fc7b')
-			.setTitle(`${!profileName || allcrops ? `Overall ` : ``}Jacob's High Scores for ${user?.dataValues?.ign ? user?.dataValues?.ign.replace(/\_/g, '\\_') : playerName.replace(/\_/g, '\\_') }${profileName ? ` on ${profileName}` : ``}`)
+		const embed = new MessageEmbed().setColor('#03fc7b')
+			.setTitle(`${!profileName || allcrops ? `Overall ` : ``}Jacob's High Scores for ${user?.ign ? user?.ign.replace(/_/g, '\\_') : (playerName ?? 'Player').replace(/_/g, '\\_') }${profileName ? ` on ${profileName}` : ``}`)
 			.setFooter({ text: `Note: Scores only valid after ${Data.getReadableDate(Data.CUTOFFDATE)}\nCreated by Kaeso#5346    Can take up to 10 minutes to update` })
-			.setDescription(`
-🥇 ${cMedals.gold} / **${tMedals.gold}** 🥈 ${cMedals.silver} / **${tMedals.silver}** 🥉 ${cMedals.bronze} / **${tMedals.bronze}**
-
-${partic}
-⠀  　
-`);
+			.setDescription(`🥇 ${cMedals.gold} / **${tMedals.gold}** 🥈 ${cMedals.silver} / **${tMedals.silver}** 🥉 ${cMedals.bronze} / **${tMedals.bronze}**\n${partic}\n⠀`);
 
 		if (profileName || allcrops) {
 			let addedIndex = 0;
 			for (let i = 0; i < Object.keys(scores).length; i++) {
-				const crop = Object.keys(scores)[i];
-				if (!crop) { break; }
+				const crop = Object.keys(scores)[i] as CropString;
+				if (!crop) break;
 
-				let details = (scores[crop].par) 
-					? `\`#${(scores[crop].pos + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${scores[crop].par.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` ${!profileName ? ` on \`${scores[crop].profilename}\`!` : ` players!`}\n\`${Data.getReadableDate(scores[crop].obtained)}\`` 
+				const details = (scores[crop].par && scores[crop].pos !== undefined) 
+					? `\`#${((scores[crop].pos ?? 0) + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${(scores[crop].par ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` ${!profileName ? ` on \`${scores[crop].profilename}\`!` : ` players!`}\n\`${Data.getReadableDate(scores[crop].obtained)}\`` 
 					: `${!profileName ? `Unclaimed on \`${scores[crop].profilename}\`!` : `Contest Still Unclaimed!`}\n\`${Data.getReadableDate(scores[crop].obtained)}\``;
 
-				if (!scores[crop].value) { continue };
+				if (!scores[crop].value) continue;
 				addedIndex++;
 
 				embed.fields.push({
 					name: `${Data.getReadableCropName(crop)} - ${scores[crop].value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
-					value: details + '\n⠀ ',
+					value: details + '\n⠀',
 					inline: true
 				});
 
@@ -359,19 +361,19 @@ ${partic}
 			if (addedIndex === 0) {
 				embed.fields.push({
 					name: `No Data Found`,
-					value: `Sorry, but ${user.dataValues?.ign} hasn\'t participated in any recent contests!\n⠀ `,
+					value: `Sorry, but ${user?.ign} hasn't participated in any recent contests!\n⠀`,
 					inline: false
 				});
 			}
 		} else {
-			let highscores = new Map();
+			const highscores = new Map();
 
 			for (let i = 0; i < Object.keys(scores).length; i++) {
-				const crop = Object.keys(scores)[i];
-				if (!crop) { break; }
+				const crop = Object.keys(scores)[i] as CropString;
+				if (!crop) break;
 				
-				let details = (scores[crop].par) 
-					? `Placed \`#${(scores[crop].pos + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${scores[crop].par.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` players in \`${Data.getReadableDate(scores[crop].obtained)}!\`` 
+				const details = (scores[crop].par && scores[crop].pos !== undefined) 
+					? `Placed \`#${((scores[crop].pos ?? 0) + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${(scores[crop].par ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` players in \`${Data.getReadableDate(scores[crop].obtained)}!\`` 
 					: `Obtained in \`${Data.getReadableDate(scores[crop].obtained)}\``;
 
 				if (scores[crop].value > 0) {
@@ -385,13 +387,13 @@ ${details}
 			if (highscores.size === 0) {
 				embed.fields.push({
 					name: `No Data Found`,
-					value: `Sorry, but ${user.dataValues?.ign} hasn\'t participated in any recent contests!\n⠀ `,
+					value: `Sorry, but ${user?.ign} hasn't participated in any recent contests!\n⠀`,
 					inline: false
 				});
 			} else {
-				let sortedHighs = new Map([...highscores.entries()].sort((a, b) => b[1] - a[1]));
+				const sortedHighs = new Map([...highscores.entries()].sort((a, b) => b[1] - a[1]));
 
-				let breakdown = ` ⠀  　`;
+				let breakdown = `⠀`;
 				let remaining = 3;
 
 				sortedHighs.forEach(function (value, key) {
@@ -411,21 +413,20 @@ ${details}
 
 		return embed;
 	}
-
-	function getJacobData(user, profileName) {
-		const profiles = user.dataValues?.profiledata?.profiles;
-
-		for (let i = 0; i < Object.keys(profiles).length; i++) {
-			let key = Object.keys(profiles)[i];
-			let profile = profiles[key];
-
-			if (profile.cute_name.toLowerCase() === profileName.toLowerCase()) {
-				profileName = profile.cute_name;
-				let p = profile?.members[Object.keys(profile?.members)[0]].jacob
-				return p ? p : user.dataValues?.contestdata;
-			}
-		}
-		profileName = undefined;
-		return user.dataValues?.contestdata;
-	}
 }
+// function getJacobData(user, profileName) {
+// 	const profiles = user.dataValues?.profiledata?.profiles;
+
+// 	for (let i = 0; i < Object.keys(profiles).length; i++) {
+// 		let key = Object.keys(profiles)[i];
+// 		let profile = profiles[key];
+
+// 		if (profile.cute_name.toLowerCase() === profileName.toLowerCase()) {
+// 			profileName = profile.cute_name;
+// 			let p = profile?.members[Object.keys(profile?.members)[0]].jacob
+// 			return p ? p : user.dataValues?.contestdata;
+// 		}
+// 	}
+// 	profileName = undefined;
+// 	return user.dataValues?.contestdata;
+// }
