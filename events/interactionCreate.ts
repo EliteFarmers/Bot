@@ -35,7 +35,7 @@ async function OnButtonInteraction(interaction: ButtonInteraction) {
 	try {
 		command.execute(interaction);
 	} catch (error) {
-		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true }).catch();
+		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => undefined);
 	}
 }
 
@@ -56,7 +56,13 @@ async function OnAutocompleteInteraction(interaction: AutocompleteInteraction) {
 
 function GetCommand(name: string, type: CommandType): Command | undefined {
 	const command: Command | undefined = commands.get(name);
-	if (!command || command.type !== type) return undefined;
+
+	if (!command) return undefined;
+	// If type and command type are autocomplete it's valid
+	if (command.type === 'AUTOCOMPLETE' && type === 'AUTOCOMPLETE') return command; 
+	// If the types don't match or the type isn't combo than it's invalid
+	if (![ 'COMBO', type ].includes(command.type)) return undefined;
+
 	return command;
 }
 
