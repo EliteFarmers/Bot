@@ -66,7 +66,7 @@ export function CanUpdate(user?: UserData, minutes = 10): boolean {
 	const updateInterval = minutes * 60 * 1000;
 	const currentTime = Date.now();
 
-	return lastUpdated + updateInterval >= currentTime;
+	return lastUpdated + updateInterval < currentTime;
 }
 /**
  *  Returns `true` and updates the last updated time if the number of `minutes` have passed since the last time the user's data was fetched or `false` otherwise.
