@@ -1,6 +1,6 @@
 import { MessageEmbed, MessageActionRow, ButtonInteraction, GuildMemberRoleManager, GuildMember, Guild, GuildTextBasedChannel, CommandInteraction, InteractionReplyOptions, MessageOptions, MessagePayload } from 'discord.js';
 import DataHandler from './Database';
-import Data, { CropString, FarmingContestScores } from './Data';
+import Data, { ContestScore, CropString, FarmingContestScores } from './Data';
 import { FindChannel } from './Util';
 import { ServerData } from 'database/models/servers';
 import { UserData } from 'database/models/users';
@@ -57,18 +57,7 @@ export default class ServerUtil {
 		if (!interaction.guild) return;
 		const channel = (server.lbupdatechannel) ? await FindChannel(interaction.guild, server.lbupdatechannel) : undefined;
 
-		const newScores: FarmingContestScores = {
-			cactus: { value: 0, obtained: '' },
-			carrot: { value: 0, obtained: '' },
-			cocoa: { value: 0, obtained: '' },
-			melon: { value: 0, obtained: '' },
-			mushroom: { value: 0, obtained: '' },
-			netherwart: { value: 0, obtained: '' },
-			potato: { value: 0, obtained: '' },
-			pumpkin: { value: 0, obtained: '' },
-			sugarcane: { value: 0, obtained: '' },
-			wheat: { value: 0, obtained: '' }
-		};
+		const newScores: { [key: string]: ContestScore } = {};
 		const dontUpdate = [];
 
 		const userScores = contestData.scores ?? ({} as FarmingContestScores);
@@ -107,7 +96,7 @@ export default class ServerUtil {
 		}
 
 		const updatedScores = {...server.scores, ...newScores};
-		await DataHandler.updateServer({ scores: updatedScores }, server.guildid);
+		await DataHandler.updateServer({ scores: updatedScores as FarmingContestScores ?? null }, server.guildid);
 
 		const embed = new MessageEmbed().setColor('#03fc7b')
 			.setTitle('Jacob\'s Contest Leaderboard')
@@ -116,6 +105,7 @@ export default class ServerUtil {
 
 		for (const crop of Object.keys(updatedScores) as CropString[]) {
 			const contest = updatedScores[crop];
+			if (!contest) continue;
 
 			const details = (contest.par && contest.pos !== undefined) 
 				? `\`#${(contest.pos + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${contest.par.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` on [${contest.profilename}](https://sky.shiiyu.moe/stats/${contest.ign}/${contest.profilename})` 
@@ -257,11 +247,6 @@ export default class ServerUtil {
 	}
 
 	static async grantWeightRole(interaction: ButtonInteraction | CommandInteraction, guild: Guild, member: GuildMember, server: ServerData, user: UserData) {
-
-		if (typeof member === 'string') {
-			member = guild.members?.cache?.get(member) ?? await guild.members?.fetch(member);
-			if (!member) return;
-		}
 
 		if (!user) {
 			const findUser = await DataHandler.getPlayer(undefined, { discordid: interaction.user.id });
