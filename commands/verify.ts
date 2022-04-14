@@ -3,8 +3,6 @@ import { CanUpdate } from "../classes/Util";
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import Data from '../classes/Data';
 import DataHandler from '../classes/Database';
-// import ServerUtil from '../classes/ServerUtil';
-// import { eliteserverid, verifiedroleid } from '../config.json';
 
 const command: Command = {
 	name: 'verify',
@@ -31,29 +29,31 @@ async function execute(interaction: CommandInteraction) {
 	let playerName = interaction.options.getString('player', false);
 	if (!playerName) return;
 
-	await interaction.deferReply();
 
 	const player = await DataHandler.getPlayer(undefined, { discordid: interaction.user.id });
-	const canUpdate = CanUpdate(player ?? undefined);
+
+	if (interaction.user.id === player?.discordid && player?.ign?.toLowerCase() === playerName.toLowerCase()) {
+		await DataHandler.update({ discordid: null }, { discordid: interaction.user.id });
+
+		const embed = new MessageEmbed()
+			.setColor('#03fc7b')
+			.setTitle('Unlinked!')
+			.setDescription(`Your discord account was already linked with "${player?.ign}"\nIt has now been unlinked. Use \`/verify\` again to revert this.`)
+			.setFooter({ text: 'Created by Kaeso#5346' });
+		return interaction.reply({ embeds: [embed], ephemeral: true });
+	}
+
+	const canUpdate = CanUpdate(player ?? undefined, 2);
 
 	if (!canUpdate) {
-		if (interaction.user.id === player?.discordid) {
-			await DataHandler.update({ discordid: null }, { discordid: interaction.user.id });
-
-			const embed = new MessageEmbed()
-				.setColor('#03fc7b')
-				.setTitle('Unlinked!')
-				.setDescription(`Your discord account was already linked with "${playerName}"\nIt has now been unlinked.`)
-				.setFooter({ text: 'Created by Kaeso#5346' });
-			return interaction.editReply({ embeds: [embed] });
-		}
-
 		const embed = new MessageEmbed()
 			.setColor('#CB152B')
 			.setTitle('User on Cooldown!')
-			.setDescription(`Try again <t:${player?.updatedat ?? Date.now() / 1000 + 30}:R>`);
-		return interaction.editReply({ embeds: [embed] });
+			.setDescription(`Try again <t:${Math.floor((parseInt(player?.updatedat ?? Date.now().toString())) / 1000) + 120}:R>`);
+		return interaction.reply({ embeds: [embed], ephemeral: true });
 	}
+
+	await interaction.deferReply();
 
 	const uuid = await Data.getUUID(playerName).then(response => {
 		playerName = response.name;
@@ -91,10 +91,10 @@ async function execute(interaction: CommandInteraction) {
 	}
 
 	if (player) {
-		await DataHandler.update({ discordid: interaction.user.id, ign: playerName }, { uuid: uuid });
+		await DataHandler.update({ discordid: interaction.user.id, ign: playerName, updatedat: Date.now().toString() }, { uuid: uuid });
 	} else {
 		await DataHandler.updatePlayer(uuid, playerName, undefined, undefined);
-		await DataHandler.update({ discordid: interaction.user.id, ign: playerName }, { uuid: uuid });
+		await DataHandler.update({ discordid: interaction.user.id, ign: playerName, updatedat: Date.now().toString() }, { uuid: uuid });
 	}
 
 	// const isEliteFarmer = (interaction.guild.id === eliteserverid && interaction.member.roles.cache.some(role => role.id === verifiedroleid));
