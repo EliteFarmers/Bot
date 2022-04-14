@@ -2,7 +2,7 @@ import { ButtonInteraction, CommandInteraction, InteractionReplyOptions, Message
 import Data, { ProfileMember, TotalProfileData } from '../classes/Data';
 import DataHandler from '../classes/Database';
 import ServerUtil from '../classes/ServerUtil';
-import { Command } from "../classes/Command";
+import { Command } from '../classes/Command';
 import { ServerData } from '../database/models/servers';
 import { CanUpdate } from '../classes/Util';
 import Canvas, { registerFont, createCanvas } from 'canvas';
@@ -77,8 +77,8 @@ async function execute(interaction: CommandInteraction, server: ServerData) {
 	const user = await DataHandler.getPlayer(uuid) ?? undefined;
 	const grabnewdata = CanUpdate(user);
 
-	const fullData = (grabnewdata && user?.profiledata) 
-		? await Data.getBestData(user.profiledata, uuid) 
+	const fullData = (grabnewdata || !user?.profiledata) 
+		? await Data.getBestData(user?.profiledata ?? undefined, uuid) 
 		: user?.profiledata;
 
 	if (!fullData) {
@@ -317,7 +317,7 @@ async function execute(interaction: CommandInteraction, server: ServerData) {
 				.setStyle('LINK')
 				.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${profile.cute_name}`),
 			new MessageButton()
-				.setCustomId(`jacob_${playerName}`)
+				.setCustomId(`jacob|${playerName}`)
 				.setLabel('Jacob\'s Stats')
 				.setStyle('DANGER')
 		);
@@ -378,8 +378,8 @@ async function execute(interaction: CommandInteraction, server: ServerData) {
 			ctx.font = fontSize + 'px ' + "Open Sans";
 		} while (ctx.measureText(name).width > canvas.width * 0.66);
 
-		const metrics = ctx.measureText(name);
-		const fontHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+		const metrics = ctx.measureText(name) as unknown as { emHeightAscent: number, emHeightDescent: number };
+		const fontHeight = metrics.emHeightAscent + metrics.emHeightDescent;
 
 		ctx.fillStyle = '#dddddd';
 		ctx.fillText(name, 55, 90 - (90 - fontHeight) / 2);
@@ -408,8 +408,8 @@ async function execute(interaction: CommandInteraction, server: ServerData) {
 
 		ctx.fillStyle = '#dddddd';
 		ctx.fillText('Weight', weightWidth + 75, canvas.height * 0.9);
-		const mes = ctx.measureText('Weight');
-		ctx.fillText('Farming', weightWidth + 75, canvas.height * 0.9 - (mes.actualBoundingBoxAscent + mes.actualBoundingBoxDescent));
+		const mes = ctx.measureText('Weight') as unknown as { emHeightAscent: number, emHeightDescent: number };
+		ctx.fillText('Farming', weightWidth + 75, canvas.height * 0.9 - (mes.emHeightAscent + mes.emHeightDescent));
 
 		//Draw avatar
 		if (avatar) {
