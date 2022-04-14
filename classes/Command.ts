@@ -24,6 +24,6 @@ export interface CommandArgument extends CommandInteractionOption {
 	choices?: {}[]
 }
 
-export type CommandType = 'SLASH' | 'BUTTON' | 'AUTOCOMPLETE';
+export type CommandType = 'SLASH' | 'BUTTON' | 'COMBO' | 'AUTOCOMPLETE';
 
 export type CommandAccess = 'ALL' | 'DIRECT' | 'GUILD';

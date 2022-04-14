@@ -1,7 +1,7 @@
 import { Command } from "../classes/Command";
 import { CanUpdateAndFlag } from "../classes/Util";
 import { ServerData } from "../database/models/servers";
-import { CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu } from 'discord.js';
+import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu } from 'discord.js';
 import Data, { CropString } from '../classes/Data';
 import DataHandler from '../classes/Database';
 
@@ -9,7 +9,7 @@ const command: Command = {
 	name: 'jacob',
 	description: 'Get jacob\'s high scores or leaderboard!',
 	access: 'ALL',
-	type: 'SLASH',
+	type: 'COMBO',
 	slash: {
 		name: 'jacob',
 		description: 'Get jacob\'s high scores or leaderboard!',
@@ -33,10 +33,21 @@ const command: Command = {
 
 export default command;
 
-async function execute(interaction: CommandInteraction, server?: ServerData, ign?: string) {
+async function execute(interaction: ButtonInteraction | CommandInteraction) {
+	if (interaction instanceof CommandInteraction) {
 
-	let playerName = interaction.options.getString('player', false) ?? ign;
-	let profileName = interaction.options.getString('profile', false);
+		const args: JacobCMDArgs = {
+			playerName: interaction.options.getString('player', false) ?? undefined,
+			profileName: interaction.options.getString('profile', false) ?? undefined
+		}
+
+		return await commandExecute(interaction, args);
+		
+	} else return await commandExecute(interaction, { playerName: interaction.customId.split('|')[1] });
+}
+
+async function commandExecute(interaction: CommandInteraction | ButtonInteraction, cmdArgs: JacobCMDArgs) {
+	let { playerName, profileName } = cmdArgs;
 
 	if (!playerName) {
 		const user = await DataHandler.getPlayer(undefined, { discordid: interaction.user.id });
@@ -205,21 +216,21 @@ async function execute(interaction: CommandInteraction, server?: ServerData, ign
 				);
 
 				if (i.customId === 'overall') {
-					profileName = null;
+					profileName = undefined;
 
 					const scoresEmbed = await getHighScoreEmbed(false);
 					if (!scoresEmbed) return;
 
 					i.update({ embeds: [scoresEmbed], components: [newRow] }).catch(error => { console.log(error); collector.stop(); });
 				} else if (i.customId === 'crops') {
-					profileName = null;
+					profileName = undefined;
 
 					const scoresEmbed = await getHighScoreEmbed(false);
 					if (!scoresEmbed) return;
 
 					i.update({ embeds: [scoresEmbed], components: [newRow] }).catch(error => { console.log(error); collector.stop(); });
 				} else if (i.customId === 'recents') {
-					profileName = null;
+					profileName = undefined;
 
 					const recentsEmbed = await getRecents(undefined, false)
 					if (!recentsEmbed) return;
@@ -430,3 +441,10 @@ ${details}
 // 	profileName = undefined;
 // 	return user.dataValues?.contestdata;
 // }
+
+type JacobCMDArgs = {
+	playerName?: string,
+	profileName?: string
+	server?: ServerData,
+	ign?: string,
+}
