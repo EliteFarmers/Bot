@@ -326,12 +326,12 @@ export default class Data {
 						if (crop === 'overall') {
 							allRecents.overall.set(contest.obtained, {
 								value: contest.value, obtained: contest.obtained, pos: contest.pos, 
-								par: contest.par, valid: contest.valid, name: profile.cute_name, crop: contest.crop
+								par: contest.par, valid: contest.valid, profilename: profile.cute_name, crop: contest.crop
 							})	
 						} else {
 							allRecents[crop].set(contest.obtained, {
 								value: contest.value, obtained: contest.obtained, pos: contest.pos, 
-								par: contest.par, valid: contest.valid, name: profile.cute_name
+								par: contest.par, valid: contest.valid, profilename: profile.cute_name
 							})	
 						}
 					}
@@ -410,7 +410,7 @@ export default class Data {
 		}
 	}
 
-	static async getBestData(saved: TotalProfileData, uuid: string) {
+	static async getBestData(saved: TotalProfileData | undefined, uuid: string) {
 		const fresh = await Data.getStrippedProfiles(uuid);
 		if (!saved && fresh) {
 			return fresh;
