@@ -3,7 +3,6 @@ import Data, { ProfileMember, TotalProfileData } from '../classes/Data';
 import DataHandler from '../classes/Database';
 import ServerUtil from '../classes/ServerUtil';
 import { Command } from '../classes/Command';
-import { ServerData } from '../database/models/servers';
 import { CanUpdate } from '../classes/Util';
 import Canvas, { registerFont, createCanvas } from 'canvas';
 
@@ -36,7 +35,7 @@ const command: Command = {
 
 export default command;
 
-async function execute(interaction: CommandInteraction, server: ServerData) {
+async function execute(interaction: CommandInteraction) {
 
 	let playerName = interaction.options.getString('player', false)?.trim();
 	const _profileName = interaction.options.getString('profile', false)?.trim();
@@ -116,6 +115,7 @@ async function execute(interaction: CommandInteraction, server: ServerData) {
 	await saveData();
 
 	// Check if they're eligible for server weight-role
+	const server = interaction.guildId ? await DataHandler.getServer(interaction.guildId) : undefined;
 	if (server && user && server?.weightrole && (server?.weightreq ?? -1) >= 0 && user?.discordid === interaction.user.id) {
 		if (Array.isArray(interaction.member?.roles)) return;
 		const hasRole = interaction.member?.roles?.cache?.has(server.weightrole);
@@ -124,7 +124,7 @@ async function execute(interaction: CommandInteraction, server: ServerData) {
 			if (hasRole) return;
 			return ServerUtil.handleWeightRole(interaction, server);
 		}
-
+	
 		const eligible = (mainWeight + mainBWeight >= (server?.weightreq ?? 0) && !hasRole);
 		if (!eligible) return;
 
