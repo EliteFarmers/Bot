@@ -68,9 +68,10 @@ async function execute(interaction: CommandInteraction) {
 		helpMenu.setTitle('Here\'s a list of all the commands:')
 
 		commands.forEach(command => {
+			if (command.type === 'BUTTON') return;
 			helpMenu.fields.push({
 				name: `${newPrefix}${command.name}`,
-				value: `${command.description}\nUsage: ${newPrefix}${command.name} ${command.usage}`,
+				value: `${command.description}\nUsage: ${newPrefix}${command.name} ${command.usage ? command.usage : ''}`,
 				inline: false
 			});
 		});
