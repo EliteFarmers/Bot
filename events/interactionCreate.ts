@@ -1,7 +1,8 @@
-import { AutocompleteInteraction, ButtonInteraction, CommandInteraction, Interaction, Permissions, PermissionString } from "discord.js";
-import { commands } from "../index";
-import { Command, CommandType } from "../classes/Command";
-import { isValidAccess } from "../classes/Util";
+import { AutocompleteInteraction, ButtonInteraction, CommandInteraction, GuildTextBasedChannel, Interaction, MessageEmbed, Permissions, PermissionString } from 'discord.js';
+import { commands } from '../index';
+import { Command, CommandType } from '../classes/Command';
+import { isValidAccess } from '../classes/Util';
+import DataHandler from '../classes/Database';
 
 export default async function(interaction: Interaction) {
 	if (interaction.isCommand()) return OnCommandInteraction(interaction);
@@ -13,6 +14,9 @@ async function OnCommandInteraction(interaction: CommandInteraction) {
 
 	const command = GetCommand(interaction.commandName, 'SLASH');
 	if (!command) return;
+
+	const isWhitelisted = await whitelistedChannel(interaction.commandName, interaction);
+	if (!isWhitelisted) return;
 
 	if (!HasPermsAndAccess(command, interaction)) return;
 
@@ -83,5 +87,34 @@ async function HasPermsAndAccess(command: Command, interaction: CommandInteracti
 		return false;
 	}	
 
+	return true;
+}
+
+async function whitelistedChannel(commandName: string, interaction: CommandInteraction | ButtonInteraction) {
+	if (!interaction.guildId) return true;
+
+	const server = interaction.guildId ? await DataHandler.getServer(interaction.guildId) : undefined;
+	if (!server || !server?.channels || ['admin', 'config'].includes(commandName)) return true;
+
+	const channels = server.channels;
+
+	const channel = interaction.channel as GuildTextBasedChannel;
+	const parentWhitelisted = (channel.parentId && channels.includes('C' + channel.parentId));
+
+	if (!channels.includes(interaction.channelId) && !parentWhitelisted) {
+		let content = '';
+		channels.forEach(channel => { 
+			content += channel[0] === 'C' ? `<#${channel.substring(1)}> ` : `<#${channel}> `; 
+		});
+
+		const embed = new MessageEmbed().setColor('#FF0000')
+			.setTitle('Commands are disabled in this channel!')
+			.setDescription('Please use the channels that this server whitelisted.')
+			.addField(`Available Channel${channels.length > 1 ? 's' : ''}`, content.trim() === '' ? '**Something went wrong**' : content.trim());
+
+		interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => undefined);
+		return false;
+	}
+	
 	return true;
 }
