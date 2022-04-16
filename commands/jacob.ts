@@ -56,7 +56,7 @@ async function commandExecute(interaction: CommandInteraction | ButtonInteractio
 				.setColor('#CB152B')
 				.setTitle('Error: Specify a Username!')
 				.addField('Proper Usage:', '`/jacob` `player:` `(player name)` `profile:` `(profile name)`')
-				.setDescription('Checking for yourself?\nYou must use `/verify` `player:`(account name) before using this shortcut!\n**Please verify again if you were already, this data had to be reset**')
+				.setDescription('Checking for yourself?\nYou must use `/verify` `player:`(account name) before using this shortcut!')
 				.setFooter({ text: 'Created by Kaeso#5346' });
 			return interaction.reply({ embeds: [embed], ephemeral: true });
 		}

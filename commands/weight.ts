@@ -48,7 +48,7 @@ async function execute(interaction: CommandInteraction, server: ServerData) {
 				.setColor('#CB152B')
 				.setTitle('Error: Specify a Username!')
 				.addField('Proper Usage:', '`/weight` `player:`(player name)')
-				.setDescription('Checking for yourself?\nYou must use `/verify` `player:`(account name) before using this shortcut!\n**Please verify again if you were already, this data had to be reset**')
+				.setDescription('Checking for yourself?\nYou must use `/verify` `player:`(account name) before using this shortcut!')
 				.setFooter({ text: 'Created by Kaeso#5346' });
 			interaction.reply({ embeds: [embed], ephemeral: true });
 			return;
