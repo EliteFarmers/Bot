@@ -541,7 +541,7 @@ async function execute(interaction: CommandInteraction, server: ServerData) {
 					.setStyle('LINK')
 					.setURL(`https://plancke.io/hypixel/player/stats/${playerName}`)
 			);
-			interaction.update({ embeds: [embed], allowedMentions: { repliedUser: false }, files: [], components: [row] });
+			interaction.update({ embeds: [embed], allowedMentions: { repliedUser: false }, components: [row] });
 		}
 	}
 

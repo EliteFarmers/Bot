@@ -391,6 +391,8 @@ export default class Data {
 					});
 				}
 			}
+			// eslint-disable-next-line no-warning-comments
+			// TODO: FIX THIS. When a new profile is created it's not guaranteed to be at the end of the list. Better checking needs to be done.
 			if (length < Object.keys(fresh.profiles).length) {
 				for (let i = length; i < Object.keys(fresh.profiles).length; i++) {
 					const profile = fresh.profiles[i];

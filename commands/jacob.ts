@@ -324,7 +324,7 @@ async function commandExecute(interaction: CommandInteraction | ButtonInteractio
 	}
 
 	async function getHighScoreEmbed(allcrops = false) {
-		const jacob = contestData
+		const jacob = contestData;
 		if (!jacob) return undefined;
 
 		const scores = jacob.scores;
