@@ -68,7 +68,8 @@ export default class ServerUtil {
 			const serverScore = serverScores[crop];
 
 			if (!userScore || (+(server.lbcutoff ?? -1) > +userScore.obtained)) continue;
-			const nowClaimed = (serverScore && serverScore.obtained === userScore.obtained && serverScore.user === interaction.user.id && serverScore.par === null && userScore.par !== null);
+
+			const nowClaimed = !!(serverScore && serverScore.obtained === userScore.obtained && serverScore.user === interaction.user.id && (serverScore.par === undefined || serverScore.par === null) && userScore.par);
 
 			if ((!serverScore && userScore.value) || userScore.value > (serverScore?.value ?? 0) || nowClaimed) {
 				newScores[crop] = { user: interaction.user.id, ign: user.ign ?? undefined, ...userScore };
@@ -77,7 +78,7 @@ export default class ServerUtil {
 		}
 
 		// True if someone has since claimed the contest for their highscore, or if a user's scores were removed from the leaderboard
-		const silentUpdate = (Object.keys(serverScores).length > (interaction.message?.embeds[0]?.fields?.length ?? 0) || (dontUpdate.length > 0 && Object.keys(newScores).length === dontUpdate.length));
+		const silentUpdate = (Object.keys(serverScores).length < (interaction.message?.embeds[0]?.fields?.filter(f => f.name !== 'Nothing Yet')?.length ?? 0) || (dontUpdate.length > 0 && Object.keys(newScores).length === dontUpdate.length));
 
 		if (Object.keys(newScores).length <= 0) {
 			const embed = new MessageEmbed().setColor('#FF8600')
@@ -155,14 +156,14 @@ export default class ServerUtil {
 				embeds.push(embed);
 			}
 
-			if (server.lbroleping && channel && Object.prototype.hasOwnProperty.call(channel, 'send')) {
-				await (channel as GuildTextBasedChannel).send({ 
+			if (server.lbroleping && channel) {
+				await (channel as GuildTextBasedChannel)?.send({ 
 					content: `<@&${server.lbroleping}>`, 
 					embeds: embeds, 
 					allowedMentions: { roles: [server.lbroleping] } 
 				}).catch(() => undefined);
 			} else {
-				await (channel as GuildTextBasedChannel).send({ embeds: embeds }).catch(() => undefined);
+				await (channel as GuildTextBasedChannel)?.send({ embeds: embeds }).catch(() => undefined);
 			}
 		}
 	}
@@ -216,7 +217,7 @@ export default class ServerUtil {
 		const channel = interaction.guild.channels.cache.get(server.reviewchannel) 
 			?? await interaction.guild.channels.fetch(server.reviewchannel);
 
-		if (!channel || !Object.prototype.hasOwnProperty.call(channel, 'send')) return;
+		if (!channel || channel.type !== 'GUILD_TEXT') return;
 
 		const reviewEmbed = new MessageEmbed().setColor('#03fc7b')
 			.setTitle(`${user.ign} ${server.weightreq === 0 ? `is verified!` : `has reached ${server?.weightreq} weight!`}`)
@@ -263,11 +264,14 @@ export default class ServerUtil {
 				.setTitle('Congratulations!')
 				.setDescription(`You have ${server.weightreq === 0 ? `linked your account` : `achieved ${server?.weightreq} weight`}, earning you the <@&${server.weightrole}> role!`);
 
+			reply(interaction, { embeds: [embed], ephemeral: true });
+
 			if (server.weightchannel) {
 				const channel = guild.channels.cache.get(server.weightchannel) 
 					?? await guild.channels.fetch(server.weightchannel);
 
-				if (!channel || !Object.prototype.hasOwnProperty.call(channel, 'send')) return;
+
+				if (!channel || channel.type !== 'GUILD_TEXT') return;
 
 				try {
 					const welcomeEmbed = new MessageEmbed().setColor('#03fc7b')
@@ -282,8 +286,6 @@ export default class ServerUtil {
 					(channel as GuildTextBasedChannel)?.send({ embeds: [welcomeEmbed], components: [linkRow] }).catch(() => undefined);
 				} catch (e) { console.log(e); }
 			}
-
-			reply(interaction, { embeds: [embed], ephemeral: true });
 		}).catch(async () => {
 			reply(interaction, { content: '**Error!** Looks like this isn\'t configured properly!\nI don\'t have permission to add this role to you! Please message an admin so they can fix this!', ephemeral: true });
 		});
