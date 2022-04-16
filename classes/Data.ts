@@ -428,11 +428,11 @@ export default class Data {
 		return new Promise((resolve) => {
 			(async function() {
 				if (fetchnewdata || !user?.contestdata || !user?.contestdata?.recents) {
-					if (!user.profiledata) {
-						resolve(undefined);
-						return;
-					}
-					const fullData = await Data.getBestData(user.profiledata, user?.uuid);
+					// if (!user.profiledata) {
+					// 	resolve(undefined);
+					// 	return;
+					// }
+					const fullData = await Data.getBestData(user?.profiledata ?? undefined, user?.uuid);
 					const data = await Data.getBestContests(fullData); //, user?.uuid);
 					resolve(data);
 				} else {

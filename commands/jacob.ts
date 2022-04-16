@@ -96,7 +96,7 @@ async function commandExecute(interaction: CommandInteraction | ButtonInteractio
 		return interaction.reply({ embeds: [embed], ephemeral: true });
 	}
 
-	const grabnewdata = await CanUpdateAndFlag(user);
+	const grabnewdata = await CanUpdateAndFlag(user) || !user.contestdata;
 	const contestData = await Data.getLatestContestData(user, grabnewdata);
 
 	if (!contestData) {
