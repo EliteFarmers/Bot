@@ -85,7 +85,7 @@ async function execute(interaction: CommandInteraction) {
 		const embed = new MessageEmbed()
 			.setColor('#CB152B')
 			.setTitle('Error: Account Mismatch!')
-			.setDescription(`Your discord account does not match the one linked with "${playerName}"`)
+			.setDescription(`Your discord account does not match the one linked with \`${playerName}\`!\n\`${playerName}\` has the account \`${discordTag}\` linked in Hypixel!`)
 			.setFooter({ text: 'Created by Kaeso#5346' });
 		return interaction.editReply({ embeds: [embed] });
 	}
