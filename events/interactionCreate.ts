@@ -44,18 +44,55 @@ async function OnButtonInteraction(interaction: ButtonInteraction) {
 }
 
 async function OnAutocompleteInteraction(interaction: AutocompleteInteraction) {
-	const commandName = interaction.commandName;
+	if (interaction.responded) return;
+	const focused = interaction.options.getFocused(true);
+	if (!focused) return;
 
-	if (!commands.has(commandName)) return;
+	const typed = (focused.value ?? '').toString().toLowerCase();
 
-	const command: Command | undefined = commands.get(commandName);
-	if (!command || command.type !== 'AUTOCOMPLETE') return;
-
-	try {
-		command.execute(interaction);
-	} catch (error) {
-		console.log(error);
+	if (typed === '') {
+		const top5 = DataHandler.leaderboard.slice(0, 5).map(user => { 
+			return { name: user.ign ?? 'ERROR', value: user.ign ?? 'ERROR' }
+		});
+		return interaction.respond(top5);
 	}
+
+	const sortedNames = await DataHandler.getSortedNames();
+	const options = [{ name: typed, value: typed }];
+
+	// A rough sort that works for now
+	const matches = sortedNames.filter(name => name.toLowerCase().startsWith(typed)).slice(0, 9).map(name => {
+		return { name: name, value: name }
+	});
+
+	if (matches.length < 9) {
+		matches.push(...sortedNames.filter(name => name.toLowerCase().substring(1).startsWith(typed)).slice(0, 9 - matches.length).map(name => {
+			return { name: name, value: name }
+		}));
+	}
+	
+	if (matches.length <= 0) {
+		const top5 = DataHandler.leaderboard.slice(0, 5).map(user => { 
+			return { name: user.ign ?? 'ERROR', value: user.ign ?? 'ERROR' }
+		});
+		return interaction.respond([...options, ...top5]);
+	}
+
+	const total = [...options, ...matches.filter(opt => opt.name !== typed)];
+
+	interaction.respond(total);
+	// const commandName = interaction.commandName;
+
+	// if (!commands.has(commandName)) return;
+
+	// const command: Command | undefined = commands.get(commandName);
+	// if (!command || command.type !== 'AUTOCOMPLETE') return;
+
+	// try {
+	// 	command.execute(interaction);
+	// } catch (error) {
+	// 	console.log(error);
+	// }
 }
 
 function GetCommand(name: string, type: CommandType): Command | undefined {

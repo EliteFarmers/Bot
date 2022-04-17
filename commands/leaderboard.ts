@@ -16,7 +16,8 @@ const command: Command = {
 			name: 'player',
 			type: 'STRING',
 			description: 'Jump to a specific player!',
-			required: false
+			required: false,
+			autocomplete: true
 		}]
 	}
 }

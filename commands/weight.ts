@@ -20,7 +20,8 @@ const command: Command = {
 				name: 'player',
 				type: 'STRING',
 				description: 'The player in question.',
-				required: false
+				required: false,
+				autocomplete: true
 			},
 			{
 				name: 'profile',
@@ -109,7 +110,7 @@ async function execute(interaction: CommandInteraction) {
 		return;
 	}
 
-	if (grabnewdata) await DataHandler.updatePlayer(uuid, playerName, mainProfileuuid, mainWeight + mainBWeight);
+	if (grabnewdata || user?.ign !== playerName) await DataHandler.updatePlayer(uuid, playerName, mainProfileuuid, mainWeight + mainBWeight);
 	
 	await sendWeight();
 	await saveData();

@@ -17,7 +17,8 @@ const command: Command = {
 			name: 'player',
 			type: 'STRING',
 			description: 'Your minecraft account name.',
-			required: true
+			required: true,
+			autocomplete: true
 		}]
 	},
 	execute: execute

@@ -28,6 +28,7 @@ export default class DataHandler {
 	}
 
 	static leaderboard: UserData[];
+	static sortedNames: string[];
 
 	static async getPlayer(playeruuid?: string, where: UserWhereOptions | undefined = undefined) {
 		if (!where) { where = { uuid: playeruuid }; }
@@ -79,6 +80,8 @@ export default class DataHandler {
 	static async updateLeaderboard() {
 		return await this.getLeaderboard().then(leaderboard => {
 			this.leaderboard = leaderboard;
+			const names = this.leaderboard.filter(u => u.ign ?? false).map(u => u.ign ?? '');
+			this.sortedNames = names.sort((a, b) => a?.localeCompare(b ?? '') ?? 0);
 			for (let i = 0; i < leaderboard.length; i++) {
 				const player = leaderboard[i];
 				Users.update({ rank: i + 1 }, { where: { uuid: player.uuid } });

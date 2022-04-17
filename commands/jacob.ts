@@ -18,7 +18,8 @@ const command: Command = {
 				name: 'player',
 				type: 'STRING',
 				description: 'The player in question.',
-				required: false
+				required: false,
+				autocomplete: true
 			},
 			{
 				name: 'profile',

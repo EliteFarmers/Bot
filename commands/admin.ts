@@ -306,6 +306,7 @@ const slashCommandData = {
 			description: 'The Minecraft username of the player to remove!', 
 			type: 3,
 			required: true,
+			autocomplete: true
 		}]
 	}]
 }
