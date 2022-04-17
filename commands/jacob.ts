@@ -290,6 +290,9 @@ async function commandExecute(interaction: CommandInteraction | ButtonInteractio
 		for (let i = 0; i < Math.min(expand ? 10 : 4, contestAmount); i++) {
 			const contest = contests[i];
 
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			if ((contest as any)?.name) contest.profilename = (contest as any).name;
+
 			const details = (contest.par && contest.pos !== undefined) 
 				? `\`#${(contest.pos + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${contest.par.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` ${!profileName ? ` on \`${contest.profilename}\`!` : ` players!`}` 
 				: `${!profileName ? `Unclaimed on \`${contest.profilename}\`!` : `Contest Still Unclaimed!`}`;
