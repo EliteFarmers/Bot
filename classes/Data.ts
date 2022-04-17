@@ -370,44 +370,69 @@ export default class Data {
 				profiles: []
 			}
 
-			const length = Math.min(Object.keys(saved.profiles).length, Object.keys(fresh.profiles).length);
-			for (let i = 0; i < length; i++) {
-				const savedProfile = saved.profiles[i];
-				const freshProfile = fresh.profiles[i];
+			// Loop through all saved profiles first
+			for (const profile of saved.profiles) {
+				// If the profile is somehow already added to newData, skip it
+				if (newData.profiles.some(p => p.profile_id === profile.profile_id)) continue;
 
-				if ((freshProfile.members[Object.keys(freshProfile.members)[0]] as ProfileMember)?.collection) {
-					newData.profiles.push({
-						profile_id: freshProfile.profile_id,
-						cute_name: freshProfile.cute_name,
-						members: freshProfile.members,
-						api: true
-					});
-				} else {
-					newData.profiles.push({
-						profile_id: savedProfile.profile_id,
-						cute_name: savedProfile.cute_name,
-						members: savedProfile.members,
-						api: false
-					});
+				// Check if the profile exists on the new data (it should unless deleted)
+				const freshProfile = fresh.profiles.find(p => p.profile_id === profile.profile_id);
+				if (!freshProfile) {
+					// If it doesn't exist, add it with no api
+					newData.profiles.push({ ...profile, api: false });
+					continue;
 				}
-			}
-			// eslint-disable-next-line no-warning-comments
-			// TODO: FIX THIS. When a new profile is created it's not guaranteed to be at the end of the list. Better checking needs to be done.
-			if (length < Object.keys(fresh.profiles).length) {
-				for (let i = length; i < Object.keys(fresh.profiles).length; i++) {
-					const profile = fresh.profiles[i];
 
-					newData.profiles.push({
-						profile_id: profile.profile_id,
-						cute_name: profile.cute_name,
-						members: profile.members,
-						api: true
-					});
+				// Get the member data from the fresh profile
+				const freshMember = freshProfile.members[Object.keys(freshProfile.members)[0]];
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				if ((freshMember as any)?.sad !== undefined) continue;
+
+				const savedMember = profile.members[Object.keys(profile.members)[0]];
+
+				const members: ProfileMembers = {
+					[Object.keys(freshProfile.members)[0]]: {
+						// These should always exist
+						crafted_generators: (freshMember as ProfileMember).crafted_generators,
+						jacob: (freshMember as ProfileMember).jacob,
+						// If it exists on the new data, use that, otherwise use the old.
+						collection: ((freshMember as ProfileMember)?.collection) 
+							? (freshMember as ProfileMember).collection 
+							: (savedMember as ProfileMember)?.collection ?? {},
+						experience_skill_farming: ((freshMember as ProfileMember)?.experience_skill_farming) 
+							? (freshMember as ProfileMember).experience_skill_farming 
+							: (savedMember as ProfileMember)?.experience_skill_farming ?? 0,
+					}
 				}
+
+				// Bad handling of coops, will be fixed
+				if (Object.keys(freshProfile.members).length > 1) {
+					members.lamecoop = { sad: true };
+				}
+
+				// Finally add the constructed profile
+				newData.profiles.push({
+					profile_id: freshProfile.profile_id,
+					cute_name: freshProfile.cute_name,
+					api: (freshMember as ProfileMember)?.collection !== undefined,
+					members: members
+				})
 			}
+
+			// Get all profiles that are new
+			const newProfiles = fresh.profiles.filter(p => !saved?.profiles.some(s => s.profile_id === p.profile_id));
+
+			// Add all new profiles with api: true
+			for (const profile of newProfiles) {
+				if (newData.profiles.some(p => p.profile_id === profile.profile_id)) continue;
+				
+				newData.profiles.push({ ...profile, api: true });
+			}
+
+			// console.log(newData);
 			return newData;
 		} catch (e) {
-			console.log(e);
+			// console.log(e);
 			return fresh;
 		}
 	}

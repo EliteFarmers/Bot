@@ -249,7 +249,7 @@ async function commandExecute(interaction: CommandInteraction | ButtonInteractio
 								const cropsEmbed = await getRecents(selectedCrop, i.customId === 'expand');
 								if (!cropsEmbed) return;
 
-								inter.update({ embeds: [cropsEmbed], components: [select, recentRow] }).catch(error => { console.log(error) });
+								inter.update({ embeds: [cropsEmbed], components: [select, recentRow] }).catch(() => undefined);
 							} else {
 								inter.reply({ content: `These buttons aren't for you!`, ephemeral: true });
 							}
