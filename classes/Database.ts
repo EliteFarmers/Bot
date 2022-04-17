@@ -21,8 +21,10 @@ export default class DataHandler {
 		await Servers.sync();
 
 		this.updateLeaderboard();
-		//For wiping table
-		//Users.sync({ force: true })
+
+		setInterval(function() {
+			DataHandler.updateLeaderboard();
+		}, 60000);
 	}
 
 	static leaderboard: UserData[];
