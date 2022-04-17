@@ -74,14 +74,14 @@ if (proccessArgs[0] === 'deploy') {
 
 			if (command.slash) slashCommandsData.push(command.slash);
 		});
-	}, 5000);
+	}, 10000);
 
 	if (proccessArgs[1] === 'global') {
 		setTimeout(async function() {
 			await client.application?.commands.set([]);
 			await client.application?.commands.set(slashCommandsData as ApplicationCommandDataResolvable[]);
 			console.log('Probably updated slash commands globally');
-		}, 10000);
+		}, 15000);
 	} else if (proccessArgs[1]) {
 		setTimeout(async function() {
 			const guild = await client.guilds.fetch('' + proccessArgs[1]);
@@ -92,6 +92,6 @@ if (proccessArgs[0] === 'deploy') {
 				guildCommands.set([]);
 			}
 			console.log('Probably updated slash commands on that server');
-		}, 1000);
+		}, 1500);
 	}
 }
