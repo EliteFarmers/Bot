@@ -87,7 +87,13 @@ export default class DataHandler {
 	}
 
 	static async getLeaderboard() {
-		return await Users.findAll({ limit: 1000, order: [['weight', 'DESC']], where: { cheating: false } });
+		return await Users.findAll({ limit: 1000, order: [['weight', 'DESC']], where: { cheating: false, weight: { [Op.gt]: 0 } } });
+	}
+
+	static async getSortedNames() {
+		if (this.sortedNames) return this.sortedNames;
+		await this.updateLeaderboard();
+		return this.sortedNames;
 	}
 
 	// static async getJacobLB(crop: CropString) {
