@@ -80,8 +80,8 @@ export async function CanUpdateAndFlag(user: UserData, minutes = 10) {
 	const canUpdate = CanUpdate(user, minutes);
 	if (!canUpdate) return false;
 	
-	const count = await DataHandler.update({ updatedat: Date.now().toString() }, { uuid: user.uuid });
-	return (count === [1]);
+	await DataHandler.update({ updatedat: Date.now().toString() }, { uuid: user.uuid });
+	return canUpdate;
 }
 /**
  * Returns `true` if member has a role, or `false` otherwise. By default, a user having the ADMINISTRATOR permission will return `true` unless adminOverride is false.
