@@ -342,13 +342,10 @@ export default class Data {
 		for (let i = 0; i < Object.keys(allRecents).length; i++) {
 			const crop = Object.keys(allRecents)[i] as CropString | 'overall';
 			const recentMap = allRecents[crop];
-
-			let max = (crop === 'overall') ? 5 : 9;
-			const sorted = new Map([...recentMap.entries()].sort());
-			sorted.forEach(function (value) {
-				if (max-- < 0) return; 
-				best.recents[crop].unshift(value);
-			});
+			
+			const sorted = [...recentMap.values()].sort((a, b) => b.obtained.localeCompare(a.obtained));
+		
+			best.recents[crop].push(...sorted.slice(0, 10));
 		}
 		return best;
 	}

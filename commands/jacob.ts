@@ -97,8 +97,8 @@ async function commandExecute(interaction: CommandInteraction | ButtonInteractio
 		return interaction.reply({ embeds: [embed], ephemeral: true });
 	}
 
-	const grabnewdata = await CanUpdateAndFlag(user) || !user.contestdata;
-	const contestData = await Data.getLatestContestData(user, grabnewdata);
+	const grabnewdata = await CanUpdateAndFlag(user);
+	const contestData = await Data.getLatestContestData(user, grabnewdata || !user?.contestdata);
 
 	if (!contestData) {
 		const embed = new MessageEmbed().setColor('#CB152B')
@@ -284,6 +284,7 @@ async function commandExecute(interaction: CommandInteraction | ButtonInteractio
 			.setFooter({ text: `Note: Highscores only valid after ${Data.getReadableDate(Data.CUTOFFDATE)}\nCreated by Kaeso#5346    Can take up to 10 minutes to update` });
 
 		const contests = (selectedCrop) ? contestData.recents[selectedCrop] : contestData.recents.overall;
+		contests.sort((a, b) => b.obtained.localeCompare(a.obtained));
 
 		let addedIndex = 0;
 		const contestAmount = Object.keys(contests).length;
