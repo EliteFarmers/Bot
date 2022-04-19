@@ -212,7 +212,7 @@ export default class Data {
 					}
 				}
 
-				if (formattedData.recents.overall.length < 5) {
+				if (formattedData.recents.overall.length < 10) {
 					formattedData.recents.overall.push({
 						value: +collected, obtained: date, pos: position, par: participants, valid: valid, crop: crop
 					})
@@ -282,8 +282,7 @@ export default class Data {
 			pumpkin: new Map(), sugarcane: new Map(), wheat: new Map() 
 		}
 
-		for (let i = 0; i < Object.keys(data.profiles).length; i++) {
-			const profile = data.profiles[i];
+		for (const profile of data.profiles) {
 			const player = profile.members[Object.keys(profile.members)[0]] as ProfileMember;
 
 			const jacob = player.jacob as BestContestData;
@@ -342,7 +341,7 @@ export default class Data {
 		for (let i = 0; i < Object.keys(allRecents).length; i++) {
 			const crop = Object.keys(allRecents)[i] as CropString | 'overall';
 			const recentMap = allRecents[crop];
-			
+
 			const sorted = [...recentMap.values()].sort((a, b) => b.obtained.localeCompare(a.obtained));
 		
 			best.recents[crop].push(...sorted.slice(0, 10));
