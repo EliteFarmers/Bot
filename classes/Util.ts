@@ -91,18 +91,15 @@ export async function CanUpdateAndFlag(user: UserData, minutes = 10) {
  * @param  {} adminOverride=true
  * @returns boolean
  */
-export async function HasRole(member?: GuildMember, roleId?: Snowflake, adminOverride = true) {
-	if (!member) return false;
-
-	// If no role then everyone has access
-	if (!roleId) return true;
+export function HasRole(member?: GuildMember, roleId?: Snowflake, adminOverride = true) {
+	if (!member || !roleId) return false;
 
 	const perms = ((member.permissions) as Readonly<Permissions>).toArray();
-	const roles = (member.roles?.cache)?.map((role) => role.id);
+	const roles = member.roles?.cache?.map((role) => role.id);
 
 	// If user has the admin perm and overide is true then return true 
 	if (adminOverride && perms && perms.includes('ADMINISTRATOR' as PermissionString)) return true;
 
 	// Otherwise return whether or not the user has the role
-	return roles?.includes(roleId);
+	return roles.includes(roleId) ?? false;
 }
