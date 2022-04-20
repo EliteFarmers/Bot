@@ -1,7 +1,7 @@
-import { AutocompleteInteraction, ButtonInteraction, CommandInteraction, GuildTextBasedChannel, Interaction, MessageEmbed, Permissions, PermissionString } from 'discord.js';
+import { AutocompleteInteraction, ButtonInteraction, CommandInteraction, GuildMember, GuildTextBasedChannel, Interaction, MessageEmbed, Permissions, PermissionString } from 'discord.js';
 import { commands } from '../index';
 import { Command, CommandType } from '../classes/Command';
-import { isValidAccess } from '../classes/Util';
+import { HasRole, isValidAccess } from '../classes/Util';
 import DataHandler from '../classes/Database';
 
 export default async function(interaction: Interaction) {
@@ -18,7 +18,8 @@ async function OnCommandInteraction(interaction: CommandInteraction) {
 	const isWhitelisted = await whitelistedChannel(interaction.commandName, interaction);
 	if (!isWhitelisted) return;
 
-	if (!HasPermsAndAccess(command, interaction)) return;
+	const hasPerms = await HasPermsAndAccess(command, interaction);
+	if (!hasPerms) return;
 
 	try {
 		command.execute(interaction);
@@ -34,7 +35,8 @@ async function OnButtonInteraction(interaction: ButtonInteraction) {
 	const command = GetCommand(commandName, 'BUTTON');
 	if (!command) return;
 
-	if (!HasPermsAndAccess(command, interaction)) return;
+	const hasPerms = await HasPermsAndAccess(command, interaction);
+	if (!hasPerms) return;
 
 	try {
 		command.execute(interaction);
@@ -78,7 +80,7 @@ async function OnAutocompleteInteraction(interaction: AutocompleteInteraction) {
 		return interaction.respond([...options, ...top5]);
 	}
 
-	const total = [...options, ...matches.filter(opt => opt.name !== typed)];
+	const total = [...options.filter(opt => opt.name.toLowerCase() !== matches[0]?.name.toLowerCase()), ...matches];
 
 	interaction.respond(total);
 	// const commandName = interaction.commandName;
@@ -110,7 +112,25 @@ function GetCommand(name: string, type: CommandType): Command | undefined {
 async function HasPermsAndAccess(command: Command, interaction: CommandInteraction | ButtonInteraction) {
 	if (interaction.channel && !isValidAccess(command.access, interaction.channel.type)) return false;
 
-	if (!interaction.guildId || !command.permissions) return true;
+	if (!interaction.guildId || !command.permissions || !(interaction.member instanceof GuildMember)) return true;
+
+	if (command.adminRoleOverride) {
+		const server = await DataHandler.getServer(interaction.guildId);
+
+		if (server && server.adminrole) {
+			const hasRole = HasRole(interaction.member, server.adminrole);
+
+			if (!hasRole) {
+				await interaction.reply({ 
+					content: 'You don\'t have the required permissions for this command.', 
+					allowedMentions: { repliedUser: true }, 
+					ephemeral: true 
+				});
+			}
+
+			return hasRole;
+		}
+	}
 
 	// Get user permissions
 	const perms = ((interaction.member?.permissions) as Readonly<Permissions>).toArray();
