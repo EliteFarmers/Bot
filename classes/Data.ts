@@ -453,7 +453,7 @@ export default class Data {
 					// 	resolve(undefined);
 					// 	return;
 					// }
-					const fullData = await Data.getBestData(user?.profiledata ?? undefined, user?.uuid);
+					const fullData = await Data.getBestData(user?.profiledata ?? undefined, user.uuid);
 					const data = await Data.getBestContests(fullData); //, user?.uuid);
 					resolve(data);
 				} else {
@@ -462,6 +462,50 @@ export default class Data {
 				}
 			}());
 		});
+	}
+
+	static async getAllValidContests(uuid: string, cutoff: number) {
+		try {
+			const data = await this.getProfiles(uuid);
+			if (!data) return undefined;
+	
+			const contests: { [key: string]: ContestScore } = {};
+	
+			for (const profile of data.profiles) {
+				for (const memberuuid in profile.members) {
+					if (memberuuid !== uuid) continue;
+	
+					const member = profile.members[memberuuid];
+	
+					for (const contestKey in member.jacob2.contests) {
+						const contest = member.jacob2.contests[contestKey];
+		
+						const collected = contest.collected;
+						if (collected < 100) continue;
+										
+						const split = contestKey.split(':');
+						const date = this.getDateFromContest(split);
+						const crop = this.getGoodCropName(split[2]);
+	
+						if (!crop || parseInt(date) < cutoff || (contests[crop]?.value ?? 0) > collected) continue;
+	
+						contests[crop] = {
+							value: collected,
+							obtained: date,
+							crop: crop,
+							profilename: profile.cute_name,
+							pos: contest.claimed_position,
+							par: contest.claimed_participants,
+							valid: true
+						}
+					}
+				}
+			}
+	
+			return contests;
+		} catch (e) {
+			return undefined;
+		}
 	}
 
 	static getDateFromContest(split: string[]) {
