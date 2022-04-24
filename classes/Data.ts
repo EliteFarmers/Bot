@@ -212,13 +212,13 @@ export default class Data {
 					}
 				}
 
-				if (formattedData.recents.overall.length < 10) {
+				if (formattedData.recents.overall.length < 11) {
 					formattedData.recents.overall.push({
 						value: +collected, obtained: date, pos: position, par: participants, valid: valid, crop: crop
 					})
 				}
 				
-				if (formattedData.recents[crop].length < 10) {
+				if (formattedData.recents[crop].length < 11) {
 					formattedData.recents[crop].push({
 						value: +collected, obtained: date, pos: position, par: participants, valid: valid
 					})
@@ -344,7 +344,7 @@ export default class Data {
 
 			const sorted = [...recentMap.values()].sort((a, b) => b.obtained.localeCompare(a.obtained));
 		
-			best.recents[crop].push(...sorted.slice(0, 10));
+			best.recents[crop].push(...sorted.slice(0, 11));
 		}
 		return best;
 	}
