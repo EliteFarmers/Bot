@@ -1,7 +1,7 @@
 import { MessageEmbed, MessageActionRow, ButtonInteraction, GuildMemberRoleManager, GuildMember, Guild, GuildTextBasedChannel, CommandInteraction, InteractionReplyOptions, MessageOptions, MessagePayload } from 'discord.js';
 import DataHandler from './Database';
 import Data, { ContestScore, CropString, FarmingContestScores } from './Data';
-import { FindChannel } from './Util';
+import { CanUpdateAndFlag, FindChannel } from './Util';
 import { ServerData } from 'database/models/servers';
 import { UserData } from 'database/models/users';
 
@@ -41,9 +41,10 @@ export default class ServerUtil {
 
 		await interaction.deferUpdate();
 
-		const onCooldown = +(user.updatedat ?? 0) > +(Date.now() - (10 * 60 * 1000));
-		const contestData = await Data.getLatestContestData(user, !onCooldown).catch(e => console.log(e));
-		if (!onCooldown) DataHandler.update({ updatedat: Date.now().toString() }, { discordid: user.discordid }).catch(() => undefined);
+		const grabnewdata = await CanUpdateAndFlag(user, 2);
+		const contestData = grabnewdata 
+			? await Data.getAllValidContests(user.uuid, parseInt(server.lbcutoff ?? Data.CUTOFFDATE))
+			: await Data.getLatestContestData(user, false).then(data => data?.scores);
 
 		if (!contestData) {
 			const embed = new MessageEmbed().setColor('#CB152B')
@@ -60,12 +61,12 @@ export default class ServerUtil {
 		const newScores: { [key: string]: ContestScore } = {};
 		const dontUpdate = [];
 
-		const userScores = contestData.scores ?? ({} as FarmingContestScores);
+		const userScores = contestData ?? ({} as FarmingContestScores);
 		const serverScores = server.scores ?? ({} as FarmingContestScores);
 
-		for (const crop of Object.keys(contestData.scores) as CropString[]) {
+		for (const crop in contestData) {
 			const userScore = userScores[crop];
-			const serverScore = serverScores[crop];
+			const serverScore = serverScores[crop as CropString];
 
 			if (!userScore || (+(server.lbcutoff ?? -1) > +userScore.obtained)) continue;
 
@@ -86,8 +87,8 @@ export default class ServerUtil {
 				.setDescription(`You don't have any scores that would beat these records!\nKeep in mind that scores are only valid starting on ${server.lbcutoff ? `**${Data.getReadableDate(server.lbcutoff)}**\n(The custom cutoff date for this leaderboard)` : `**${Data.getReadableDate(Data.CUTOFFDATE)}**\n(The first contest after the last nerf to farming)`}`)
 				.setFooter({ text: 'If you\'re positive that this isn\'t true please contact Kaeso#5346' });
 
-			if (onCooldown) {
-				embed.description += `\n⠀\n**This could be because fetching your profile is on cooldown.** Try again <t:${Math.floor((+(user.updatedat ?? 0) + (10 * 60 * 1000)) / 1000)}:R>`;
+			if (!grabnewdata) {
+				embed.description += `\n⠀\n**This could be because fetching your profile is on cooldown.** Try again <t:${Math.floor((+(user.updatedat ?? 0) + (2 * 60 * 1000)) / 1000)}:R>`;
 			}
 			await interaction.followUp({ embeds: [embed], ephemeral: true }).catch((e) => console.log(e));
 
