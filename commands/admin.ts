@@ -254,7 +254,7 @@ const slashCommandData = {
 			]
 		}, {
 			name: 'year',
-			description: 'Set the year of the cutoff date! Must be greater than 159.',
+			description: 'Set the year of the cutoff date!',
 			type: 4,
 			required: true
 		}]

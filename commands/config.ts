@@ -389,8 +389,8 @@ async function setCutoffDate(server: ServerData, interaction: CommandInteraction
 
 	const date = `${year}${month <= 9 ? `0${month}` : month}${day <= 9 ? `0${day}` : day}`;
 
-	if (year < 159 || +date < +Data.CUTOFFDATE) {
-		return interaction.reply({ content: `**Error!** Overall date must be after **${Data.getReadableDate(Data.CUTOFFDATE)}**, dates before this are currently unsupported.`, ephemeral: true }).catch(() => undefined);
+	if (year < 1) {
+		return interaction.reply({ content: `**Error!** Year must be equal to or greater than 1.`, ephemeral: true }).catch(() => undefined);
 	}
 
 	if (year > 9999) {
