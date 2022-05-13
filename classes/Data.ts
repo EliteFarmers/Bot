@@ -370,14 +370,8 @@ export default class Data {
 			for (const profile of saved.profiles) {
 				// If the profile is somehow already added to newData, skip it
 				if (newData.profiles.some(p => p.profile_id === profile.profile_id)) continue;
-
 				// Check if the profile exists on the new data (it should unless deleted)
 				const freshProfile = fresh.profiles.find(p => p.profile_id === profile.profile_id);
-				if (!freshProfile) {
-					// If it doesn't exist, add it with no api
-					newData.profiles.push({ ...profile, api: false });
-					continue;
-				}
 
 				// Get the member data from the fresh profile
 				const freshMember = freshProfile.members[Object.keys(freshProfile.members)[0]];
