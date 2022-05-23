@@ -43,7 +43,7 @@ export default class ServerUtil {
 
 		const grabnewdata = await CanUpdateAndFlag(user, 2);
 		const contestData = grabnewdata 
-			? await Data.getAllValidContests(user.uuid, parseInt(server.lbcutoff ?? Data.CUTOFFDATE))
+			? await Data.getAllValidContests(user.uuid, parseInt(server.lbcutoff ?? Data.CUTOFFDATE), server.lbconfig?.exclusions)
 			: await Data.getLatestContestData(user, false).then(data => data?.scores);
 
 		if (!contestData) {
@@ -64,11 +64,18 @@ export default class ServerUtil {
 		const userScores = contestData ?? ({} as FarmingContestScores);
 		const serverScores = server.scores ?? ({} as FarmingContestScores);
 
-		for (const crop in contestData) {
+		const exclusions = server.lbconfig?.exclusions;
+
+		outer: for (const crop in contestData) {
 			const userScore = userScores[crop];
 			const serverScore = serverScores[crop as CropString];
+			const obtained = +userScore.obtained;
 
-			if (!userScore || (+(server.lbcutoff ?? -1) > +userScore.obtained)) continue;
+			if (!userScore || (+(server.lbcutoff ?? -1) > obtained)) continue;
+
+			if (exclusions) for (const range of exclusions) {
+				if (obtained > +range.from && obtained < +range.to) continue outer;
+			}
 
 			const nowClaimed = !!(serverScore && serverScore.obtained === userScore.obtained && serverScore.user === interaction.user.id && (serverScore.par === undefined || serverScore.par === null) && userScore.par);
 
@@ -86,6 +93,16 @@ export default class ServerUtil {
 				.setTitle('Sorry! No New Records')
 				.setDescription(`You don't have any scores that would beat these records!\nKeep in mind that scores are only valid starting on ${server.lbcutoff ? `**${Data.getReadableDate(server.lbcutoff)}**\n(The custom cutoff date for this leaderboard)` : `**${Data.getReadableDate(Data.CUTOFFDATE)}**\n(The first contest after the last nerf to farming)`}`)
 				.setFooter({ text: 'If you\'re positive that this isn\'t true please contact Kaeso#5346' });
+
+			if ((exclusions?.length ?? 0) > 0) {
+				let text = 'Scores are also not counted if they fall within these date ranges:\n⠀\n';
+
+				exclusions?.forEach(ex => {
+					text += `**${Data.getReadableDate(ex.to)}** - **${Data.getReadableDate(ex.from)}**\n${ex.reason ? `**Reason:** \`${ex.reason}\`` : '⠀'}`;
+				})
+
+				embed.addField('Date Exclusions:', text);
+			}
 
 			if (!grabnewdata) {
 				embed.description += `\n⠀\n**This could be because fetching your profile is on cooldown.** Try again <t:${Math.floor((+(user.updatedat ?? 0) + (2 * 60 * 1000)) / 1000)}:R>`;

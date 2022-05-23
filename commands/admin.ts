@@ -259,6 +259,74 @@ const slashCommandData = {
 			required: true
 		}]
 	}, {
+		name: 'exclude-range',
+		description: 'Exclude a range of dates from the leaderboard!',
+		type: 1,
+		options: [{
+			name: 'reason',
+			description: 'What reason should be shown for this?',
+			type: 3,
+			required: true,
+		}, {
+			name: 'start-day',
+			description: 'Set the day of the cutoff date! [1-31] (inclusive)',
+			type: 4,
+			required: true,
+		}, {
+			name: 'start-month',
+			description: 'Set the month of the cutoff date!',
+			type: 4,
+			required: true,
+			choices: [
+				{ name: 'Early Spring', value: 1 }, 
+				{ name: 'Spring', value: 2 }, 
+				{ name: 'Late Spring', value: 3 }, 
+				{ name: 'Early Summer', value: 4 }, 
+				{ name: 'Summer', value: 5 }, 
+				{ name: 'Late Summer', value: 6 }, 
+				{ name: 'Early Autumn', value: 7 }, 
+				{ name: 'Autumn', value: 8 }, 
+				{ name: 'Late Autumn', value: 9 }, 
+				{ name: 'Early Winter', value: 10 }, 
+				{ name: 'Winter', value: 11 }, 
+				{ name: 'Late Winter', value: 12 }
+			]
+		}, {
+			name: 'start-year',
+			description: 'Set the year of the cutoff date!',
+			type: 4,
+			required: true
+		}, {
+			name: 'end-day',
+			description: 'Set the day of the cutoff date! [1-31] (inclusive)',
+			type: 4,
+			required: true,
+		}, {
+			name: 'end-month',
+			description: 'Set the month of the cutoff date!',
+			type: 4,
+			required: true,
+			choices: [
+				{ name: 'Early Spring', value: 1 }, 
+				{ name: 'Spring', value: 2 }, 
+				{ name: 'Late Spring', value: 3 }, 
+				{ name: 'Early Summer', value: 4 }, 
+				{ name: 'Summer', value: 5 }, 
+				{ name: 'Late Summer', value: 6 }, 
+				{ name: 'Early Autumn', value: 7 }, 
+				{ name: 'Autumn', value: 8 }, 
+				{ name: 'Late Autumn', value: 9 }, 
+				{ name: 'Early Winter', value: 10 }, 
+				{ name: 'Winter', value: 11 }, 
+				{ name: 'Late Winter', value: 12 }
+			]
+		}, {
+			name: 'end-year',
+			description: 'Set the year of the cutoff date!',
+			type: 4,
+			required: true
+		}]
+	}, {
 		name: 'clear',
 		description: 'Clear various settings.',
 		type: 1,
@@ -273,6 +341,9 @@ const slashCommandData = {
 			}, {
 				value: 'leaderboard',
 				name: 'Leaderboard - Clear your leaderboard settings',
+			}, {
+				value: 'exclude-range',
+				name: 'Excluded Ranges - Clear date ranges that were excluded!',
 			}, {
 				value: 'scores',
 				name: 'Scores - Clear your leaderboard scores, but keep the settings!',

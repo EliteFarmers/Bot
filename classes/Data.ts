@@ -464,7 +464,7 @@ export default class Data {
 		});
 	}
 
-	static async getAllValidContests(uuid: string, cutoff: number) {
+	static async getAllValidContests(uuid: string, cutoff: number, exclusions?: DateRange[]) {
 		try {
 			const data = await this.getProfiles(uuid);
 			if (!data) return undefined;
@@ -477,7 +477,7 @@ export default class Data {
 	
 					const member = profile.members[memberuuid];
 	
-					for (const contestKey in member.jacob2.contests) {
+					outer: for (const contestKey in member.jacob2.contests) {
 						const contest = member.jacob2.contests[contestKey];
 		
 						const collected = contest.collected;
@@ -488,6 +488,12 @@ export default class Data {
 						const crop = this.getGoodCropName(split[2]);
 	
 						if (!crop || parseInt(date) < cutoff || (contests[crop]?.value ?? 0) > collected) continue;
+
+						if (exclusions) for (const range of exclusions) {
+							if (parseInt(date) > +range.from && parseInt(date) < +range.to) {
+								continue outer;
+							}
+						}
 	
 						contests[crop] = {
 							value: collected,
@@ -749,3 +755,13 @@ type RawAPIFarmingContest = {
 	claimed_position?: number,
 	claimed_participants?: number
 }
+
+type DateRange = {
+	to: string;
+	from: string;
+	reason?: string;
+}
+
+export type LeaderboardConfig = {
+	exclusions: DateRange[];
+};

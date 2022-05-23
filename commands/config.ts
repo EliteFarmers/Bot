@@ -119,6 +119,17 @@ async function execute(interaction: CommandInteraction) {
 		setCutoffDate(server, interaction);
 		break;
 	}
+	case 'exclude-range': {
+		if (subCommand === 'clear') {
+			await DataHandler.updateServer({ 
+				lbconfig: { ...server.lbconfig, exclusions: [] }
+			}, guildId);
+			clearedSettings(interaction);
+			break;
+		}
+		excludeRange(server, interaction);
+		break;
+	}
 	case 'all': {
 		await DataHandler.updateServer({
 			adminrole: superUser ? null : server.adminrole,
@@ -126,6 +137,7 @@ async function execute(interaction: CommandInteraction) {
 			reviewchannel: null, reviewerrole: null, lbchannel: null,
 			lbcutoff: null, lbrolereq: null, lbupdatechannel: null,
 			lbroleping: null, scores: null, inreview: [], channels: null,
+			lbconfig: { exclusions: [] }
 		}, guildId);
 		clearedSettings(interaction, superUser);
 		break;
@@ -429,4 +441,62 @@ async function setWeightReview(server: ServerData, interaction: CommandInteracti
 		.setFooter({ text: 'Created by Kaeso#5346' });
 
 	interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => undefined);
+}
+
+async function excludeRange(server: ServerData, interaction: CommandInteraction) {
+	if ((server.lbconfig?.exclusions?.length ?? 0) >= 10) {
+		return interaction.reply({ content: '**Error!** You can only have 10 exluded ranges!', ephemeral: true }).catch(() => undefined);
+	}
+
+	const reason = interaction.options.getString('reason', false) ?? 'No reason specified.';
+
+	const startDay = interaction.options.getInteger('start-day', false) ?? undefined;
+	const startMonth = interaction.options.getInteger('start-month', false) ?? undefined;
+	let startYear = interaction.options.getInteger('start-year', false) ?? undefined;
+
+	const endDay = interaction.options.getInteger('end-day', false) ?? undefined;
+	const endMonth = interaction.options.getInteger('end-month', false) ?? undefined;
+	let endYear = interaction.options.getInteger('end-year', false) ?? undefined;
+
+	if (!startDay || !endDay || !startMonth || !endMonth || !startYear || !endYear) {
+		return interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch(() => undefined);
+	}
+
+	// Jacob's contests have their years starting at 0
+	startYear--; endYear--;
+
+	if (startDay < 1 || startDay > 31 || endDay < 1 || endDay > 31) {
+		return interaction.reply({ content: '**Error!** Day must be a number [1-31] (inclusive)', ephemeral: true }).catch(() => undefined);
+	}
+
+	if (startYear < 1 || startYear < 1) {
+		return interaction.reply({ content: `**Error!** Year must be equal to or greater than 1.`, ephemeral: true }).catch(() => undefined);
+	}
+
+	if (startYear > 9999 || startYear > 9999) {
+		return interaction.reply({ content: `**Error!** You really think Hypixel will exist still?`, ephemeral: true }).catch(() => undefined);
+	}
+
+	const getDate = (year: number, month: number, day: number) => `${year}${month <= 9 ? `0${month}` : month}${day <= 9 ? `0${day}` : day}`;
+
+	const startDate = getDate(startYear, startMonth, startDay);
+	const endDate = getDate(endYear, endMonth, endDay);
+
+	if (+endDate < +startDate) {
+		return interaction.reply({ content: `**Error!** End date must be greater than start date!`, ephemeral: true }).catch(() => undefined);
+	}
+
+	const oldConfig = server.lbconfig;
+	await DataHandler.updateServer({ lbconfig: { ...oldConfig, exclusions: [ {
+		to: endDate,
+		from: startDate,
+		reason: reason
+	}, ...(oldConfig?.exclusions ?? [])] } }, server.guildid);
+
+	interaction.reply({ embeds: [
+		new MessageEmbed().setColor('#03fc7b')
+			.setTitle('Success!')
+			.setDescription(`New Exclusion Range: **${Data.getReadableDate(startDate)} - ${Data.getReadableDate(endDate)}**\n**Reason:** \`${reason}\`\nNo scores that are in this range will be counted!`)
+			.setFooter({ text: 'Created by Kaeso#5346' })
+	], ephemeral: true }).catch(() => undefined);
 }

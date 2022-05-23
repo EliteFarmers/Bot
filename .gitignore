@@ -4,3 +4,4 @@ images/*.xcf
 debug.json
 oldindex.ts
 .vscode*
+config

@@ -1,5 +1,5 @@
 'use strict';
-import { FarmingContestScores } from 'classes/Data';
+import { FarmingContestScores, LeaderboardConfig } from 'classes/Data';
 import { CreationOptional, InferAttributes, InferCreationAttributes, IntegerDataType, Model, Optional, Sequelize, WhereAttributeHash } from 'sequelize';
 
 export class Servers extends Model<InferAttributes<Servers>, InferCreationAttributes<Servers>> {
@@ -26,6 +26,8 @@ export class Servers extends Model<InferAttributes<Servers>, InferCreationAttrib
 	declare lbupdatechannel: CreationOptional<string | null>;
 	declare lbroleping: CreationOptional<string | null>;
 	declare lbactiveid: CreationOptional<string | null>;
+
+	declare lbconfig: CreationOptional<LeaderboardConfig | null>;
 	declare scores: CreationOptional<FarmingContestScores | null>;
 	
 	declare configshowedat: CreationOptional<string>;
@@ -63,7 +65,9 @@ export function ServersInit(sequelize: Sequelize, DataTypes: any) {
 		lbupdatechannel: DataTypes.STRING,
 		lbroleping: DataTypes.STRING,
 		lbactiveid: DataTypes.STRING,
+	
 		scores: DataTypes.JSON,
+		lbconfig: DataTypes.JSON,
 		
 		configshowedat: DataTypes.STRING,
 	}, {
