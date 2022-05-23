@@ -51,6 +51,11 @@ client.once('ready', async () => {
 	DataHandler.syncTables();
 
 	console.log('Ready!');
+	
+	if (proccessArgs[0] === 'deploy') {
+		console.log('hi');
+		deploySlashCommands();
+	}
 });
 
 client.login(config.token);
@@ -65,23 +70,21 @@ client.login(config.token);
 *  ===================================================================
 */
 
-if (proccessArgs[0] === 'deploy') {
+function deploySlashCommands() {
 	const slashCommandsData: ApplicationCommandData[] = [];
 
-	setTimeout(async function() {
-		commands.forEach(command => {
-			if (command.type === 'AUTOCOMPLETE' || command.type === 'BUTTON') return;
+	for (const [, command ] of commands) {
+		if (command.type === 'AUTOCOMPLETE' || command.type === 'BUTTON') continue;
 
-			if (command.slash) slashCommandsData.push(command.slash);
-		});
-	}, 10000);
+		if (command.slash) slashCommandsData.push(command.slash);
+	}
 
 	if (proccessArgs[1] === 'global') {
 		setTimeout(async function() {
 			await client.application?.commands.set([]);
 			await client.application?.commands.set(slashCommandsData as ApplicationCommandDataResolvable[]);
 			console.log('Probably updated slash commands globally');
-		}, 15000);
+		}, 3000);
 	} else if (proccessArgs[1]) {
 		setTimeout(async function() {
 			const guild = await client.guilds.fetch('' + proccessArgs[1]);
@@ -92,6 +95,6 @@ if (proccessArgs[0] === 'deploy') {
 				guildCommands.set([]);
 			}
 			console.log('Probably updated slash commands on that server');
-		}, 1500);
+		}, 3000);
 	}
 }
