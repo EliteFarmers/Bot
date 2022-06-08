@@ -98,7 +98,7 @@ export default class ServerUtil {
 				let text = 'Scores are also not counted if they fall within these date ranges:\n⠀\n';
 
 				exclusions?.forEach(ex => {
-					text += `**${Data.getReadableDate(ex.to)}** - **${Data.getReadableDate(ex.from)}**\n${ex.reason ? `**Reason:** \`${ex.reason}\`` : '⠀'}`;
+					text += `**${Data.getReadableDate(ex.from)}** - **${Data.getReadableDate(ex.to)}**\n${ex.reason ? `**Reason:** \`${ex.reason}\`` : '⠀'}`;
 				})
 
 				embed.addField('Date Exclusions:', text);
