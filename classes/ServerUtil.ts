@@ -74,7 +74,7 @@ export default class ServerUtil {
 			if (!userScore || (+(server.lbcutoff ?? -1) > obtained)) continue;
 
 			if (exclusions) for (const range of exclusions) {
-				if (obtained > +range.from && obtained < +range.to) continue outer;
+				if (obtained >= +range.from && obtained <= +range.to) continue outer;
 			}
 
 			const nowClaimed = !!(serverScore && serverScore.obtained === userScore.obtained && serverScore.user === interaction.user.id && (serverScore.par === undefined || serverScore.par === null) && userScore.par);

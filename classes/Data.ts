@@ -490,7 +490,7 @@ export default class Data {
 						if (!crop || parseInt(date) < cutoff || (contests[crop]?.value ?? 0) > collected) continue;
 
 						if (exclusions) for (const range of exclusions) {
-							if (parseInt(date) > +range.from && parseInt(date) < +range.to) {
+							if (parseInt(date) >= +range.from && parseInt(date) <= +range.to) {
 								continue outer;
 							}
 						}
