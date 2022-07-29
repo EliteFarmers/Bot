@@ -374,8 +374,8 @@ export default class Data {
 				// Check if the profile exists on the new data (it should unless deleted)
 				const freshProfile = fresh.profiles.find(p => p.profile_id === profile.profile_id);
 				if (!freshProfile) {
-					// If it doesn't exist, add it with no api
-					newData.profiles.push({ ...profile, api: false });
+					// Not adding deleted profiles removes them
+					// newData.profiles.push({ ...profile, api: false });
 					continue;
 				}
 
