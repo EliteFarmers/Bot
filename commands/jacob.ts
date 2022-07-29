@@ -75,7 +75,7 @@ async function commandExecute(interaction: CommandInteraction | ButtonInteractio
 		const embed = new MessageEmbed().setColor('#CB152B')
 			.setTitle('Error: Invalid Username!')
 			.setDescription(`Player "${playerName}" does not exist.`)
-			.addField('Proper Usage:', '`/weight` `player:`(player name)')
+			.addField('Proper Usage:', '`/jacob` `player:`(player name)')
 			.setFooter({ text: 'Created by Kaeso#5346' });
 		return interaction.reply({ embeds: [embed], ephemeral: true });
 	}
