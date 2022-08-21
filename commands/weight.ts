@@ -74,6 +74,16 @@ async function execute(interaction: CommandInteraction) {
 		return;
 	}
 
+	try {
+		await interaction.deferReply();
+	} catch (e) {
+		const embed = new MessageEmbed().setColor('#CB152B')
+			.setTitle('Error: Something went wrong!')
+			.setDescription(`Discord didn't want to wait for me to reply.`)
+			.setFooter({ text: 'Contact Kaeso#5346 if this continues to occur.' });
+		return interaction.reply({ embeds: [embed], ephemeral: true });
+	}
+
 	const user = await DataHandler.getPlayer(uuid) ?? undefined;
 	const grabnewdata = CanUpdate(user);
 
@@ -86,10 +96,8 @@ async function execute(interaction: CommandInteraction) {
 			.setTitle('Error: Couldn\'t fetch data!')
 			.setDescription(`Something went wrong when getting data for "${playerName}".`)
 			.setFooter({ text: 'Contact Kaeso#5346 if this continues to occur.' });
-		return interaction.reply({ embeds: [embed], ephemeral: true });
+		return interaction.editReply({ embeds: [embed] });
 	}
-
-	await interaction.deferReply();
 
 	let mainProfileuuid: string | undefined;
 	let mainCollections: Map<string, number> | undefined;
