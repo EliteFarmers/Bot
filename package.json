@@ -2,7 +2,7 @@
   "dependencies": {
     "@types/node": "^17.0.23",
     "@types/sequelize": "^4.28.11",
-    "canvas": "^2.8.0",
+    "canvas": "^2.10.2",
     "discord.js": "^13.6.0",
     "hi-base32": "^0.5.1",
     "https": "^1.0.0",

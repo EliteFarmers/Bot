@@ -173,7 +173,7 @@ export default class DataHandler {
 
 			embed.fields.push({
 				name: `#${i + 1} – ${player.ign ? player.ign.replace(/_/g, '\\_') : 'N/A'}`,
-				value: `[🔗](https://sky.shiiyu.moe/stats/${player.uuid}) ${weightFormatted} ${(isHighlightedPlayer) ? '⭐' : ' '}`,
+				value: `[[/]](https://elitebot.dev/stats/${player.uuid}) ${weightFormatted} ${(isHighlightedPlayer) ? '⭐' : ' '}`,
 				inline: true
 			});
 
