@@ -244,8 +244,8 @@ export default class ServerUtil {
 		const reviewRow = new MessageActionRow().addComponents(
 			{ label: 'Approve', customId: `WEIGHTROLEAPPROVE|${user.discordid}`, style: 'SUCCESS', type: 'BUTTON' },
 			{ label: 'Deny', customId: `WEIGHTROLEDENY`, style: 'DANGER', type: 'BUTTON' },
-			{ label: 'SkyCrypt', style: 'LINK', url: `https://sky.shiiyu.moe/stats/${user.ign}`, type: 'BUTTON' },
-			{ label: 'Plancke', style: 'LINK', url: `https://plancke.io/hypixel/player/stats/${user.ign}`, type: 'BUTTON' }
+			{ label: 'Elite', style: 'LINK', url: `https://elitebot.dev/stats/${user.ign}`, type: 'BUTTON' },
+			{ label: 'SkyCrypt', style: 'LINK', url: `https://sky.shiiyu.moe/stats/${user.ign}`, type: 'BUTTON' }
 		);
 
 		if (server.reviewerrole) {
@@ -297,8 +297,8 @@ export default class ServerUtil {
 						.setDescription(`<@${member.id}> has ${server.weightreq === 0 ? `linked their account.` : `achieved ${server?.weightreq} weight!`}`);
 
 					const linkRow = new MessageActionRow().addComponents(
-						{ label: 'SkyCrypt', style: 'LINK', url: `https://sky.shiiyu.moe/stats/${user.ign}`, type: 'BUTTON' },
-						{ label: 'Plancke', style: 'LINK', url: `https://plancke.io/hypixel/player/stats/${user.ign}`, type: 'BUTTON' }
+						{ label: 'Elite', style: 'LINK', url: `https://elitebot.dev/stats/${user.ign}`, type: 'BUTTON' },
+						{ label: 'SkyCrypt', style: 'LINK', url: `https://sky.shiiyu.moe/stats/${user.ign}`, type: 'BUTTON' }
 					);
 
 					(channel as GuildTextBasedChannel)?.send({ embeds: [welcomeEmbed], components: [linkRow] }).catch(() => undefined);

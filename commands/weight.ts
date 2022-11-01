@@ -473,13 +473,13 @@ async function execute(interaction: CommandInteraction) {
 				try {
 					const linkRow = new MessageActionRow().addComponents(
 						new MessageButton()
+							.setLabel('Elite')
+							.setStyle('LINK')
+							.setURL(`https://elitebot.dev/stats/${playerName}/${profile.cute_name}`),
+						new MessageButton()
 							.setLabel('SkyCrypt')
 							.setStyle('LINK')
-							.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${profile.cute_name}`),
-						new MessageButton()
-							.setLabel('Plancke')
-							.setStyle('LINK')
-							.setURL(`https://plancke.io/hypixel/player/stats/${playerName}`)
+							.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${profile.cute_name}`)
 					);
 					reply.edit({ components: [linkRow], allowedMentions: { repliedUser: false } }).catch(() => undefined);
 				} catch (error) { console.log(error) }
@@ -542,13 +542,13 @@ async function execute(interaction: CommandInteraction) {
 		} else {
 			const row = new MessageActionRow().addComponents(
 				new MessageButton()
+					.setLabel('Elite')
+					.setStyle('LINK')
+					.setURL(`https://elitebot.dev/stats/${playerName}/${profile ? profile.cute_name : ''}`),
+				new MessageButton()
 					.setLabel('SkyCrypt')
 					.setStyle('LINK')
 					.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${profile ? profile.cute_name : ''}`),
-				new MessageButton()
-					.setLabel('Plancke')
-					.setStyle('LINK')
-					.setURL(`https://plancke.io/hypixel/player/stats/${playerName}`)
 			);
 			interaction.update({ embeds: [embed], allowedMentions: { repliedUser: false }, components: [row] });
 		}

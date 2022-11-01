@@ -53,7 +53,7 @@ client.once('ready', async () => {
 	console.log('Ready!');
 	
 	if (proccessArgs[0] === 'deploy') {
-		console.log('hi');
+		console.log('Deploying slash commands...');
 		deploySlashCommands();
 	}
 });
