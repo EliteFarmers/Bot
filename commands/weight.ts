@@ -322,9 +322,9 @@ async function execute(interaction: CommandInteraction) {
 				.setLabel('More Info')
 				.setStyle('SUCCESS'),
 			new MessageButton()
-				.setLabel('SkyCrypt')
+				.setLabel('Elite')
 				.setStyle('LINK')
-				.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${profile.cute_name}`),
+				.setURL(`https://elitebot.dev/stats/${playerName}/${profile.cute_name}`),
 			new MessageButton()
 				.setCustomId(`jacob|${playerName}`)
 				.setLabel('Jacob\'s Stats')
