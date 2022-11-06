@@ -1,7 +1,5 @@
 node_modules
-config.json
 images/*.xcf
-debug.json
-oldindex.ts
-.vscode*
-config
+.env
+.env.*
+!.env.example

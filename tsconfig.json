@@ -2,7 +2,8 @@
     "compilerOptions": {
         "target": "ESNext",
         "module": "commonjs",
-        "rootDir": "./",
+        "rootDir": "./src",
+        "outDir": "./dist",
         "strict": true,
         "strictNullChecks": true,
         "moduleResolution": "node",
@@ -21,14 +22,10 @@
         "sourceMap": false,
         "baseUrl": "./"
     },
-    "files": [
-        "index.ts",
-    ],
     "include": [
-        "./**/*.ts", "./**/**/*.ts"
+        "./config.json", "./**/*.ts", "./**/**/*.ts"
     ],
     "exclude": [
         "node_modules",
-        "oldindex.ts"
     ],
 }

@@ -1,14 +1,12 @@
 import fs from 'fs';
-import { Client, Intents, Collection, ApplicationCommandDataResolvable, ApplicationCommandData } from 'discord.js';
-import * as config from './config.json';
+import { Client, GatewayIntentBits, Partials, Collection, ApplicationCommandDataResolvable, ApplicationCommandData, ActivityType } from 'discord.js';
 import { Command } from './classes/Command';
-import DataHandler from './classes/Database';
 
 const proccessArgs = process.argv.slice(2);
 
 export const client = new Client({ 
-	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES],
-	partials: ['CHANNEL']
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.DirectMessages],
+	partials: [Partials.Channel]
 });
 
 export const commands = new Collection<string, Command>();
@@ -45,10 +43,8 @@ export const commands = new Collection<string, Command>();
 
 client.once('ready', async () => {
 	if (client.user) {
-		client.user.setActivity('skyblock players', { type: 'WATCHING' });
+		client.user.setActivity('skyblock players', { type: ActivityType.Watching });
 	}
-
-	DataHandler.syncTables();
 
 	console.log('Ready!');
 	
@@ -58,7 +54,8 @@ client.once('ready', async () => {
 	}
 });
 
-client.login(config.token);
+// Get token from .env file
+client.login(process.env.BOT_TOKEN);
 
 /*
 *  ===================================================================

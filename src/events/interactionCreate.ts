@@ -1,4 +1,4 @@
-import { AutocompleteInteraction, ButtonInteraction, CommandInteraction, GuildMember, GuildTextBasedChannel, Interaction, MessageEmbed, Permissions, PermissionString } from 'discord.js';
+import { AutocompleteInteraction, ButtonInteraction, CommandInteraction, GuildMember, GuildTextBasedChannel, Interaction, Embed, Permissions, PermissionFlagsBits } from 'discord.js';
 import { commands } from '../index';
 import { Command, CommandType } from '../classes/Command';
 import { HasRole, isValidAccess } from '../classes/Util';
@@ -133,9 +133,9 @@ async function HasPermsAndAccess(command: Command, interaction: CommandInteracti
 	}
 
 	// Get user permissions
-	const perms = ((interaction.member?.permissions) as Readonly<Permissions>).toArray();
+	const perms = interaction.memberPermissions;
 	// Return if lacking one
-	if (!(command.permissions.every((perm) => perms.includes(perm as PermissionString)))) {
+	if (!perms || !(command.permissions.every((perm) => perms.has(perm)))) {
 		await interaction.reply({ 
 			content: 'You don\'t have the required permissions for this command.', 
 			allowedMentions: { repliedUser: true }, 
