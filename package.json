@@ -18,6 +18,7 @@
   },
   "scripts": {
     "start": "ts-node index.ts",
+    "deploy": "ts-node index.ts --transpile-only",
     "lint": "eslint . --ext .ts"
   },
   "devDependencies": {
