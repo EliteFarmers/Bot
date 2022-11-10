@@ -1,6 +1,11 @@
-import fs from 'fs';
 import { Client, GatewayIntentBits, Partials, Collection, ApplicationCommandDataResolvable, ApplicationCommandData, ActivityType } from 'discord.js';
 import { Command } from './classes/Command';
+
+import fs from 'fs';
+import path from 'path';
+
+import dotenv from 'dotenv';
+dotenv.config();
 
 const proccessArgs = process.argv.slice(2);
 
@@ -18,24 +23,24 @@ export const commands = new Collection<string, Command>();
 (async function() {
 	const filter = (fileName: string) => fileName.endsWith('.ts');
 
-	const commandFiles = fs.readdirSync('./commands/').filter(filter);
+	const commandFiles = fs.readdirSync(path.resolve('./src/commands/')).filter(filter);
 
 	for (const file of commandFiles) {
 		const command = await import(`./commands/${file}`);
 		commands.set(command.default.name, command.default);
 	}
 
-	const buttonFiles = fs.readdirSync('./buttons/').filter(filter);
+	const buttonFiles = fs.readdirSync('../buttons/').filter(filter);
 
 	for (const file of buttonFiles) {
-		const command = await import(`./buttons/${file}`);
+		const command = await import(`buttons/${file.replace('.ts', '')}`);
 		commands.set(command.default.name, command.default);
 	}
 	
-	const eventFiles = fs.readdirSync('./events/').filter(filter);
+	const eventFiles = fs.readdirSync('../events/').filter(filter);
 	
 	for (const file of eventFiles) {
-		const event = await import(`./events/${file}`);
+		const event = await import(`events/${file.replace('.ts', '')}`);
 		client.on(file.split('.')[0], event.default);
 	}
 }()); 
@@ -54,7 +59,6 @@ client.once('ready', async () => {
 	}
 });
 
-// Get token from .env file
 client.login(process.env.BOT_TOKEN);
 
 /*
