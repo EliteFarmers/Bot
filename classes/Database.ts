@@ -4,15 +4,13 @@ import { dbUri } from '../config.json';
 import { ServersInit, ServerUpdateOptions, ServerWhereOptions } from '../database/models/servers';
 import { UserData, UsersInit, UserUpdateOptions, UserWhereOptions } from '../database/models/users';
 
-const Users = UsersInit(new Sequelize(dbUri, {
+const sequelize = new Sequelize(dbUri, {
 	dialect: 'postgres',
 	logging: false,
-}), Sequelize);
+});
 
-const Servers = ServersInit(new Sequelize(dbUri, {
-	dialect: 'postgres',
-	logging: false,
-}), Sequelize);
+const Users = UsersInit(sequelize, Sequelize);
+const Servers = ServersInit(sequelize, Sequelize);
 
 export default class DataHandler {
 
