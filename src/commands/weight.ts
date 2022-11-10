@@ -1,10 +1,9 @@
-import { ButtonInteraction, CommandInteraction, InteractionReplyOptions, Message, MessageActionRow, MessageAttachment, MessageButton, MessageEmbed } from 'discord.js';
-import Data, { ProfileMember, TotalProfileData } from '../classes/Data';
-import DataHandler from '../classes/Database';
-import ServerUtil from '../classes/ServerUtil';
+import { ApplicationCommandOptionType, ButtonInteraction, ChatInputCommandInteraction, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, AttachmentBuilder, ComponentType } from 'discord.js';
 import { Command } from '../classes/Command';
-import { CanUpdate } from '../classes/Util';
 import Canvas, { registerFont, createCanvas } from 'canvas';
+import { ImproperUsageError } from 'src/classes/Errors';
+import { FetchAccount, FetchAccountFromDiscord, FetchPlayerRanking, FetchPlayerWeight, UserInfo, WeightInfo } from 'src/classes/Elite';
+import { AccountData } from 'src/classes/skyblock';
 
 const command: Command = {
 	name: 'weight',
@@ -18,14 +17,14 @@ const command: Command = {
 		options: [
 			{
 				name: 'player',
-				type: 'STRING',
+				type: ApplicationCommandOptionType.String,
 				description: 'The player in question.',
 				required: false,
 				autocomplete: true
 			},
 			{
 				name: 'profile',
-				type: 'STRING',
+				type: ApplicationCommandOptionType.String,
 				description: 'Optionally specify a profile!',
 				required: false
 			}
@@ -36,81 +35,112 @@ const command: Command = {
 
 export default command;
 
-async function execute(interaction: CommandInteraction) {
+async function execute(interaction: ChatInputCommandInteraction) {
+	if (!interaction.isChatInputCommand()) return;
 
 	let playerName = interaction.options.getString('player', false)?.trim();
 	const _profileName = interaction.options.getString('profile', false)?.trim();
 
+	let account: AccountData | undefined;
+
 	if (!playerName) {
-		const user = await DataHandler.getPlayer(undefined, { discordid: interaction.user.id });
-		if (!user || !user?.ign) {
-			const embed = new MessageEmbed()
+		const user = await FetchAccountFromDiscord(interaction.user.id);
+
+		if (!user?.success || !user.account?.id) {
+			const embed = new EmbedBuilder()
 				.setColor('#CB152B')
 				.setTitle('Error: Specify a Username!')
-				.addField('Proper Usage:', '`/weight` `player:`(player name)')
+				.addFields({ name: 'Proper Usage:', value: '`/weight` `player:`(player name)' })
 				.setDescription('Checking for yourself?\nYou must use `/verify` `player:`(account name) before using this shortcut!')
 				.setFooter({ text: 'Created by Kaeso#5346' });
 			interaction.reply({ embeds: [embed], ephemeral: true });
 			return;
 		}
 		
-		playerName = user.ign;
+		account = user.account;
+		playerName = user.account.id;
 	}
 
-	const uuid = await Data.getUUID(playerName).then(result => {
-		playerName = result.name;
-		return result.id;
-	}).catch(() => {
-		return undefined;
-	});
-	if (!uuid) {
-		const embed = new MessageEmbed()
-			.setColor('#CB152B')
-			.setTitle('Error: Invalid Username!')
-			.setDescription(`Player "${playerName}" does not exist.`)
-			.addField('Proper Usage:', '`/weight` `player:`(player name)')
-			.setFooter({ text: 'Created by Kaeso#5346' });
-		interaction.reply({ embeds: [embed], ephemeral: true });
-		return;
+	if (!account) {
+		const acc = await FetchAccount(playerName);
+		if (!acc?.success || !acc.account) {
+			const embed = ImproperUsageError('Error: Invalid Username!', `Player "${playerName}" does not exist.`, '`/weight` `player:`(player name)');
+			interaction.reply({ embeds: [embed], ephemeral: true });
+			return;
+		}
+		account = acc.account;
 	}
+
+	const uuid = account.id;
+	playerName = account.name;
 
 	try {
 		await interaction.deferReply();
 	} catch (e) {
-		const embed = new MessageEmbed().setColor('#CB152B')
+		const embed = new EmbedBuilder().setColor('#CB152B')
 			.setTitle('Error: Something went wrong!')
 			.setDescription(`Discord didn't want to wait for me to reply.`)
 			.setFooter({ text: 'Contact Kaeso#5346 if this continues to occur.' });
 		return interaction.reply({ embeds: [embed], ephemeral: true });
 	}
 
-	const user = await DataHandler.getPlayer(uuid) ?? undefined;
-	const grabnewdata = CanUpdate(user);
+	const weight = await FetchPlayerWeight(uuid);
 
-	const fullData = (grabnewdata || !user?.profiledata) 
-		? await Data.getBestData(user?.profiledata ?? undefined, uuid) 
-		: user?.profiledata;
-
-	if (!fullData) {
-		const embed = new MessageEmbed().setColor('#CB152B')
+	if ((weight as { success: boolean }).success === false) {
+		const embed = new EmbedBuilder().setColor('#CB152B')
 			.setTitle('Error: Couldn\'t fetch data!')
 			.setDescription(`Something went wrong when getting data for "${playerName}".`)
 			.setFooter({ text: 'Contact Kaeso#5346 if this continues to occur.' });
 		return interaction.editReply({ embeds: [embed] });
 	}
 
-	let mainProfileuuid: string | undefined;
-	let mainCollections: Map<string, number> | undefined;
-	let mainBonus: Map<string, number> | undefined;
-	let mainWeight = 0;
-	let mainBWeight = 0;
-	const profile = await getUserdata(fullData, _profileName);
+	const userInfo = weight as UserInfo;
 
-	if (!profile) {
-		const embed = new MessageEmbed()
+	let profile: WeightInfo;
+	let profileId = '';
+
+	if (_profileName && weight) {
+		const foundProfile = Object.values(userInfo.profiles).find(p => p?.cute_name.toLowerCase() === _profileName.toLowerCase());
+		if (!foundProfile) {
+			const embed = ImproperUsageError('Error: Invalid Profile!', `Profile "${_profileName}" does not exist.`, '`/weight` `player:`(player name) `profile:`(profile name)');
+			return interaction.editReply({ embeds: [embed] });
+		}
+		profile = foundProfile;
+	} else if (weight) {
+		const profiles = Object.entries(userInfo.profiles);
+
+		if (!profiles || !profiles[0]) {
+			const embed = new EmbedBuilder().setColor('#CB152B')
+				.setTitle('Error: Couldn\'t fetch data!')
+				.setDescription(`Something went wrong when getting data for "${playerName}".`)
+				.setFooter({ text: 'Contact Kaeso#5346 if this continues to occur.' });
+			return interaction.editReply({ embeds: [embed] });
+		}
+
+		profile = profiles[0][1] as WeightInfo;
+		profileId = profiles[0][0];
+
+		for (const [id, p] of profiles) {
+			if (p && (p.farming?.total ?? 0) > (profile?.farming?.total ?? 0)) {
+				profile = p;
+				profileId = id;
+			}
+		}
+	} else {
+		const embed = new EmbedBuilder().setColor('#CB152B')
+			.setTitle('Error: Couldn\'t fetch data!')
+			.setDescription(`Something went wrong when getting data for "${playerName}".`)
+			.setFooter({ text: 'Contact Kaeso#5346 if this continues to occur.' });
+		return interaction.editReply({ embeds: [embed] });
+	}
+
+	const totalWeight = profile?.farming?.total ?? 0;
+
+	if (totalWeight === 0) {
+		const embed = new EmbedBuilder()
 			.setColor('#CB152B')
 			.setTitle(`Stats for ${playerName.replace(/_/g, '\\_')}`)
-			.addField('Farming Weight', 'Zero! - Try some farming!\nOr turn on collections API access and help make Skyblock a more transparent place!')
+			.addFields({ name: 'Farming Weight', value: 'Zero! - Try some farming!\nOr turn on collections API access and help make Skyblock a more transparent place!' })
 			.setFooter({ text: 'This could also mean that Hypixel\'s API is down.\nCreated by Kaeso#5346' })
 			.setThumbnail(`https://mc-heads.net/head/${uuid}/left`);
 
@@ -118,221 +148,40 @@ async function execute(interaction: CommandInteraction) {
 		return;
 	}
 
-	if (grabnewdata || user?.ign !== playerName) await DataHandler.updatePlayer(uuid, playerName, mainProfileuuid, mainWeight + mainBWeight);
-	
+	const rank = await FetchPlayerRanking(uuid);
+	const ranking = rank.success ? rank : undefined;
+
 	await sendWeight();
-	await saveData();
-
-	// Check if they're eligible for server weight-role
-	const server = interaction.guildId ? await DataHandler.getServer(interaction.guildId) : undefined;
-	if (server && user && server?.weightrole && (server?.weightreq ?? -1) >= 0 && user?.discordid === interaction.user.id) {
-		if (Array.isArray(interaction.member?.roles)) return;
-		const hasRole = interaction.member?.roles?.cache?.has(server.weightrole);
-
-		if (server.weightreq === 0) {
-			if (hasRole) return;
-			return ServerUtil.handleWeightRole(interaction, server);
-		}
-	
-		const eligible = (mainWeight + mainBWeight >= (server?.weightreq ?? 0) && !hasRole);
-		if (!eligible) return;
-
-		ServerUtil.handleWeightRole(interaction, server);
-	}
-
-	async function saveData() {
-		const jacob = await Data.getBestContests(fullData ?? undefined);
-		return await DataHandler.update({ profiledata: fullData, contestdata: jacob }, { uuid: uuid });
-	}
-
-	async function getUserdata(data: TotalProfileData, profileName?: string) {
-		if (!data || !data?.profiles || !uuid) {
-			return undefined;
-		}
-
-		const profiles = data.profiles;
-		let bestProfile = null;
-		let bestWeight = 0;
-
-		for (let i = 0; i < profiles.length; i++) {
-			const profile = profiles[i];
-
-			const tempCollections = await calcCollections(profile.members[uuid] as ProfileMember);
-			const weight = await computeWeight(tempCollections);
-			const tempBonus = await calcBonus(profile.members[uuid] as ProfileMember);
-			const bonus = await computeBonusWeight(tempBonus) ?? 0;
-
-			if (profileName !== null && profile.cute_name.toLowerCase() === profileName?.toLowerCase()) {
-				bestProfile = profile;
-				mainCollections = tempCollections;
-				mainBonus = tempBonus;
-				mainWeight = weight ?? 0;
-				mainBWeight = bonus ?? 0;
-
-				break;
-			}
-
-			if (weight) {
-				const total = weight + bonus;
-				if (!bestProfile || total > bestWeight) {		
-					bestProfile = profile;
-					mainCollections = tempCollections;
-					mainBonus = tempBonus;
-					mainProfileuuid = profile.profile_id;
-					mainWeight = weight;
-					mainBWeight = bonus;
-
-					bestWeight = total;
-				}
-			}
-		}
-
-		return bestProfile ?? undefined;
-	}
-
-	async function calcCollections(userData: ProfileMember) {
-		if (!userData.collection) return undefined;
-		
-		let { 
-			WHEAT, POTATO_ITEM: POTATO, CARROT_ITEM: CARROT, 
-			MUSHROOM_COLLECTION: MUSHROOM, PUMPKIN, MELON, 
-			SUGAR_CANE: CANE, CACTUS, NETHER_STALK: WART 
-		} = userData.collection;
-
-		let COCOA = userData.collection["INK_SACK:3"]; //Dumb cocoa
-
-		//Set potentially empty values to 0, and fix overflow
-		if (!WHEAT) { WHEAT = 0; } else if (WHEAT < 0) { WHEAT += 4294967294; }
-		if (!PUMPKIN) { PUMPKIN = 0; } else if (PUMPKIN < 0) { PUMPKIN += 4294967294; }
-		if (!MUSHROOM) { MUSHROOM = 0; } else if (MUSHROOM < 0) { MUSHROOM += 4294967294; }
-		if (!CARROT) { CARROT = 0; } else if (CARROT < 0) { CARROT += 4294967294; }
-		if (!POTATO) { POTATO = 0; } else if (POTATO < 0) { POTATO += 4294967294; }
-		if (!MELON) { MELON = 0; } else if (MELON < 0) { MELON += 4294967294; }
-		if (!COCOA) { COCOA = 0; } else if (COCOA < 0) { COCOA += 4294967294; }
-		if (!CACTUS) { CACTUS = 0; } else if (CACTUS < 0) { CACTUS += 4294967294; }
-		if (!WART) { WART = 0; } else if (WART < 0) { WART += 4294967294; }
-		if (!CANE) { CANE = 0; } else if (CANE < 0) { CANE += 4294967294; }
-
-		const collections = new Map();
-
-		//Normalize collections
-		collections.set('Wheat', Math.round(WHEAT / 1000) / 100);
-		collections.set('Carrot', Math.round(CARROT / 3000) / 100);
-		collections.set('Potato', Math.round(POTATO / 3000) / 100);
-		collections.set('Pumpkin', Math.round(PUMPKIN * 1.41089 / 1000) / 100);
-		collections.set('Melon', Math.round(MELON * 1.41089 / 5000) / 100);
-		collections.set('Mushroom', Math.round(MUSHROOM * 1.20763 / 664) / 100);
-		collections.set('Cocoa', Math.round(COCOA * 1.36581 / 3000) / 100);
-		collections.set('Cactus', Math.round(CACTUS * 1.25551 / 2000) / 100);
-		collections.set('Sugar Cane', Math.round(CANE / 2000) / 100);
-		collections.set('Nether Wart', Math.round(WART / 2500) / 100);
-
-		return collections;
-	}
-
-	async function computeWeight(collections: Map<string, number> | undefined) {
-		if (!collections) return undefined;
-
-		let weight = 0;
-		collections.forEach(function (value) {
-			weight += value;
-		});
-		weight = Math.floor(weight * 100) / 100;
-
-		return weight;
-	}
-
-	async function calcBonus(userData: ProfileMember) {
-		//Bonus sources
-		const bonus = new Map();
-
-		if (userData.jacob) {
-			//Farming level bonuses
-			const farmingCap = userData.jacob.perks.farming_level_cap ?? 0;
-			if (userData.experience_skill_farming > 111672425 && farmingCap === 10) {
-				bonus.set('Farming Level 60', 250);
-			} else if (userData.experience_skill_farming > 55172425) {
-				bonus.set('Farming Level 50', 100);
-			}
-
-			//Anita buff bonus
-			const anitaBuff = userData.jacob.perks.double_drops ?? 0;
-			if (anitaBuff > 0) {
-				bonus.set(`${anitaBuff * 2}% Anita Buff`, anitaBuff * 2);
-			}
-
-			const earnedGolds = userData.jacob.totalmedals.gold;
-			if (earnedGolds >= 1000) {
-				bonus.set('1,000 Gold Medals', 500);
-			} else {
-				const roundDown = Math.floor(earnedGolds / 50) * 50;
-				if (roundDown > 0) {
-					bonus.set(`${roundDown} Gold Medals`, roundDown / 2);
-				}
-			}
-		}
-
-		//Tier 12 farming minions
-		const tier12s = [
-			'WHEAT_12', 'CARROT_12', 'POTATO_12', 
-			'PUMPKIN_12', 'MELON_12', 'MUSHROOM_12', 
-			'COCOA_12', 'CACTUS_12', 'SUGAR_CANE_12', 
-			'NETHER_WARTS_12'
-		];
-		let obtained12s = 0;
-		if (userData.crafted_generators) {
-			const obtainedMinions = userData.crafted_generators;
-			tier12s.forEach(minion => {
-				obtained12s += (obtainedMinions.includes(minion)) ? 1 : 0;
-			});
-		}
-		if (obtained12s > 0) {
-			bonus.set(`${obtained12s}/10 Minions`, obtained12s * 5);
-		}
-
-		return bonus;
-	}
-
-	async function computeBonusWeight(bonus: Map<string, number>) {
-		if (!bonus) return undefined;
-
-		let bonusWeight = 0;
-		bonus?.forEach(function (value) {
-			bonusWeight += value;
-		});
-
-		return bonusWeight;
-	}
 
 	async function sendWeight() {
 		if (!profile) {
-			const embed = new MessageEmbed()
+			const embed = new EmbedBuilder()
 				.setColor('#03fc7b')
 				.setTitle(`Stats for ${(playerName ?? 'Player').replace(/_/g, '\\_')}`)
-				.addField('Farming Weight', 'Zero! - Try some farming!\nOr turn on API access and help make Skyblock a better place.')
+				.addFields({ name: 'Farming Weight', value: 'Zero! - Try some farming!\nOr turn on API access and help make Skyblock a better place.' })
 				.setFooter({ text: 'Created by Kaeso#5346' })
 				.setThumbnail(`https://mc-heads.net/head/${uuid}/left`);
 
 			return interaction.editReply({embeds: [embed]});
 		}
 		
-		const row = new MessageActionRow().addComponents(
-			new MessageButton()
+		const row = new ActionRowBuilder<ButtonBuilder>().setComponents(
+			new ButtonBuilder()
 				.setCustomId('info')
 				.setLabel('More Info')
-				.setStyle('SUCCESS'),
-			new MessageButton()
+				.setStyle(ButtonStyle.Success),
+			new ButtonBuilder()
 				.setLabel('Elite')
-				.setStyle('LINK')
-				.setURL(`https://elitebot.dev/stats/${playerName}/${profile.cute_name}`),
-			new MessageButton()
+				.setStyle(ButtonStyle.Link)
+				.setURL(`https://elitebot.dev/stats/${playerName}/${profileId}`),
+			new ButtonBuilder()
 				.setCustomId(`jacob|${playerName}`)
 				.setLabel('Jacob\'s Stats')
-				.setStyle('DANGER')
-		);
+				.setStyle(ButtonStyle.Danger)
+		)
 		
 		let result = "Hey what's up?";
-		const rWeight = Math.round((mainWeight + mainBWeight) * 100) / 100;
+		const rWeight = Math.round(totalWeight * 100) / 100;
 
 		if (rWeight > 1) {
 			result = rWeight.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
@@ -349,11 +198,12 @@ async function execute(interaction: CommandInteraction) {
 		Different sections are commented but you sort of need to know what you're looking at already.
 		*/
 
+		const sources = profile.farming.sources;
 
 		//Get image relating to their top collection
 		let imagePath;
-		if (mainCollections) {
-			const topCollection = new Map([...mainCollections.entries()].sort((a, b) => b[1] - a[1])).entries().next().value[0];
+		if (sources) {
+			const topCollection = Object.entries(sources).sort(([,a], [,b]) => (b - a))[0][0];
 			imagePath = `./assets/images/${topCollection.toLowerCase().replace(' ', '_')}.png`;
 		} else {
 			imagePath = `./assets/images/wheat.png`
@@ -376,8 +226,8 @@ async function execute(interaction: CommandInteraction) {
 	
 		//Add name and rank, then resize to fit
 		let name = playerName ?? 'N/A';
-		if (user && user?.rank !== 0 && mainProfileuuid === profile.profile_id) {
-			name = (`${playerName} - #${user?.rank}`);
+		if (ranking && ranking.entry.rank > 0) {
+			name = (`${playerName} - #${ranking.entry.rank}`);
 		}
 
 		ctx.font = '100px "Open Sans"';
@@ -426,40 +276,38 @@ async function execute(interaction: CommandInteraction) {
 			ctx.restore();
 		}
 	
-		const attachment = new MessageAttachment(canvas.toBuffer(), 'weight.png');
+		const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: 'weight.png' });
 
-		const replyMessage: InteractionReplyOptions = {
-			files: [attachment],
-			components: [row],
-			allowedMentions: { repliedUser: false },
-			fetchReply: true,
-			embeds: undefined 
-		};
-
-		if (user?.cheating) {
-			const embed = new MessageEmbed()
+		let replyEmbed;
+		if (userInfo.cheating) {
+			const embed = new EmbedBuilder()
 				.setColor('#FF8600')
 				.setDescription(`**This player is a __cheater__.** ${!profile.api ? ` They also turned off their api access.` : ``}`)
 				.setFooter({ text: 'Players are only marked as cheating when it\'s proven beyond a reasonable doubt.\nThey hold no position in any leaderboards.' });
-			replyMessage.embeds = [embed];
+			replyEmbed = [embed];
 		} else if (!profile.api) {
-			const embed = new MessageEmbed()
+			const embed = new EmbedBuilder()
 				.setColor('#FF8600')
 				.setDescription(`**This data is outdated!** ${(playerName ?? 'They').replace(/_/g, '\\_')} turned off their api access.`);
-			replyMessage.embeds = [embed];
+			replyEmbed = [embed];
 		}
 
-		interaction.editReply(replyMessage).then(async (reply) => {
-			if (!(reply instanceof Message)) return;
+		interaction.editReply({
+			files: [attachment],
+			components: [row],
+			allowedMentions: { repliedUser: false },
+			embeds: replyEmbed,
+		}).then(async (reply) => {
+			if (!reply) return;
 
 			let infoClicked = false;
 
-			const collector = reply.createMessageComponentCollector({ componentType: 'BUTTON', time: 30000 });
+			const collector = reply.createMessageComponentCollector({ componentType: ComponentType.Button, time: 30_000 });
 
 			collector.on('collect', i => {
 				if (i.user.id === interaction.user.id) {
 					if (i.customId === 'info') {
-						sendDetailedWeight(i, mainWeight, true);
+						sendDetailedWeight(i, totalWeight, true);
 						infoClicked = true;
 						collector.stop();
 					}
@@ -471,14 +319,14 @@ async function execute(interaction: CommandInteraction) {
 			collector.on('end', () => {
 				if (infoClicked) return;
 				try {
-					const linkRow = new MessageActionRow().addComponents(
-						new MessageButton()
+					const linkRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+						new ButtonBuilder()
 							.setLabel('Elite')
-							.setStyle('LINK')
+							.setStyle(ButtonStyle.Link)
 							.setURL(`https://elitebot.dev/stats/${playerName}/${profile.cute_name}`),
-						new MessageButton()
+						new ButtonBuilder()
 							.setLabel('SkyCrypt')
-							.setStyle('LINK')
+							.setStyle(ButtonStyle.Link)
 							.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${profile.cute_name}`)
 					);
 					reply.edit({ components: [linkRow], allowedMentions: { repliedUser: false } }).catch(() => undefined);
@@ -487,13 +335,13 @@ async function execute(interaction: CommandInteraction) {
 		}).catch(error => { console.log(error) });
 	}
 
-	async function sendDetailedWeight(interaction: ButtonInteraction, weight: number, edit = false) {
+	async function sendDetailedWeight(interaction: ButtonInteraction, totalWeight: number, edit = false) {
 		let result = "Hey what's up?";
-		weight = Math.round((weight + mainBWeight) * 100) / 100;
+		totalWeight = Math.round((totalWeight) * 100) / 100;
 
-		if (weight > 1) {
+		if (totalWeight > 1) {
 			result = weight.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-		} else if (weight === -1) {
+		} else if (totalWeight === -1) {
 			result = 'This player has collections API off!';
 		} else {
 			result = weight.toString();
@@ -501,38 +349,37 @@ async function execute(interaction: CommandInteraction) {
 
 		if (!playerName) playerName = 'Player';
 
-		const embed = new MessageEmbed()
+		const embed = new EmbedBuilder()
 			.setColor('#03fc7b')
 			.setTitle(`Stats for ${playerName.replace(/_/g, '\\_')} on ${profile?.cute_name}`)
-			.addField('Farming Weight', !result ? '0 - Try some farming!' : result + ' ')
-			.addField('Breakdown', getBreakdown(), edit)
+			.addFields([
+				{ name: 'Farming Weight', value: !result ? '0 - Try some farming!' : result + ' ' },
+				{ name: 'Breakdown', value: getBreakdown(), inline: edit },
+			])
 			.setFooter({ text: 'Created by Kaeso#5346    Questions? Use /info' });
 		
 		if (!edit) {
 			embed.setThumbnail(`https://mc-heads.net/head/${uuid}/left`)
 		}
 
-		if (user?.rank !== undefined && user?.rank !== 0 && mainProfileuuid === profile?.profile_id && !edit) {
-			embed.setDescription(`**${playerName.replace(/_/g, '\\_')}** is rank **#${user?.rank}!**`)
+		if (ranking?.entry.rank !== undefined && ranking.entry.rank !== 0 && ranking.entry.profile === profileId && !edit) {
+			embed.setDescription(`**${playerName.replace(/_/g, '\\_')}** is rank **#${ranking.entry.rank}!**`)
 		}
 
-		if (mainBonus?.size) {
-			embed.addField('Bonus', getBonus(), edit);
+		if (Object.values(profile.farming.bonuses).length > 0) {
+			embed.addFields({ name: 'Bonus', value: getBonus(), inline: edit });
 		}
 
 		let notes = '';
-		if (Object.keys(profile?.members ?? {}).length > 1) {
-			notes += 'This player has been or is a co op member';
-		}
 
-		if (user?.cheating) { 
-			notes += `\n**This player is a __cheater__.** ${!profile?.api ? ` They also turned off their api access.` : ``}`;
-		} else if (!profile?.api) {
+		if (userInfo?.cheating) { 
+			notes += `\n**This player is a __cheater__.** ${!profile?.api.collections ? ` They also turned off their api access.` : ``}`;
+		} else if (!profile?.api.collections) {
 			notes += `\n**This data is outdated! ${playerName.replace(/_/g, '\\_')} turned off their api access.**`;
 		}
 
 		if (notes !== '') {
-			embed.addField('Notes', notes);
+			embed.addFields({ name: 'Notes', value: notes });
 		}
 
 		if (!edit) {
@@ -540,14 +387,14 @@ async function execute(interaction: CommandInteraction) {
 				console.log(error);
 			});
 		} else {
-			const row = new MessageActionRow().addComponents(
-				new MessageButton()
+			const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+				new ButtonBuilder()
 					.setLabel('Elite')
-					.setStyle('LINK')
+					.setStyle(ButtonStyle.Link)
 					.setURL(`https://elitebot.dev/stats/${playerName}/${profile ? profile.cute_name : ''}`),
-				new MessageButton()
+				new ButtonBuilder()
 					.setLabel('SkyCrypt')
-					.setStyle('LINK')
+					.setStyle(ButtonStyle.Link)
 					.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${profile ? profile.cute_name : ''}`),
 			);
 			interaction.update({ embeds: [embed], allowedMentions: { repliedUser: false }, components: [row] });
@@ -555,28 +402,31 @@ async function execute(interaction: CommandInteraction) {
 	}
 
 	function getBreakdown() {
-		if (!mainCollections) return "This player has no notable collections";
+		const entries = Object.entries(profile.farming.sources);
+		if (entries.length < 1) return "This player has no notable collections";
 
 		//Sort collections
-		const sortedCollections = new Map([...mainCollections.entries()].sort((a, b) => b[1] - a[1]));
+		const sortedCollections = entries.sort(([, a], [, b]) => b - a);
 		let breakdown = '';
 		
-		sortedCollections.forEach(function (value, key) {
-			const percent = Math.floor(value / mainWeight * 100);
-			breakdown += (percent > 1) ? `${key}: ${value}  [${percent}%]\n` : (percent > 1) ? `${key}: ${value}  [${percent}%]\n` : '';
+		sortedCollections.forEach(function (key, val) {
+			const percent = Math.floor(val / profile.farming.total * 100);
+			breakdown += (percent > 1) ? `${val}: ${key}  [${percent}%]\n` : (percent > 1) ? `${val}: ${key}  [${percent}%]\n` : '';
 		});
 
 		return breakdown === '' ? "This player has no notable collections" : breakdown;
 	}
 
 	function getBonus() {
-		if (!mainBonus) return "This player has no bonus points!";
+		if (!profile.farming.bonus) return "This player has no bonus points!";
+		const entries = Object.entries(profile.farming.bonuses);
+
 		//Sort bonus
-		const sortedBounus = new Map([...mainBonus.entries()].sort((a, b) => b[1] - a[1]));
+		const sortedBounus = entries.sort(([, a], [, b]) => b - a);
 		let bonusText = '';
 
-		sortedBounus.forEach(function (value, key) {
-			bonusText += `${key}: ${value}\n`;
+		sortedBounus.forEach(function (key, val) {
+			bonusText += `${val}: ${key}\n`;
 		});
 
 		return bonusText === '' ? 'No bonus points :(' : bonusText;

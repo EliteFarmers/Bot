@@ -1,6 +1,6 @@
 // This is to allow the generic "Function" to be used, as it's the easiest way to allow both types of commandss
 /* eslint-disable @typescript-eslint/ban-types */
-import { ApplicationCommandData, ApplicationCommandOptionType, CommandInteractionOption, PermissionFlags } from "discord.js";
+import { ApplicationCommandData, ApplicationCommandOptionType, CommandInteractionOption, PermissionResolvable } from "discord.js";
 
 export interface Command {
 	name: string,
@@ -9,7 +9,7 @@ export interface Command {
 	type: CommandType,
 	aliases?: string[],
 	usage?: string,
-	permissions?: PermissionFlags[],
+	permissions?: PermissionResolvable[],
 	adminRoleOverride?: boolean,
 	slash?: ApplicationCommandData,
 

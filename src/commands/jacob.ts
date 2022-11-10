@@ -1,9 +1,12 @@
 import { Command } from "../classes/Command";
 import { CanUpdateAndFlag } from "../classes/Util";
 import { ServerData } from "../database/models/servers";
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, CommandInteraction, ComponentType, Embed, EmbedBuilder, Message, SelectMenuBuilder } from 'discord.js';
 import Data, { CropString } from '../classes/Data';
 import DataHandler from '../classes/Database';
+import { FetchAccount, FetchAccountFromDiscord, FetchProfiles } from "src/classes/Elite";
+import { ImproperUsageError } from "src/classes/Errors";
+import { AccountData } from "src/classes/skyblock";
 
 const command: Command = {
 	name: 'jacob',
@@ -16,14 +19,14 @@ const command: Command = {
 		options: [
 			{
 				name: 'player',
-				type: 'STRING',
+				type: ApplicationCommandOptionType.String,
 				description: 'The player in question.',
 				required: false,
 				autocomplete: true
 			},
 			{
 				name: 'profile',
-				type: 'STRING',
+				type: ApplicationCommandOptionType.String,
 				description: 'Optionally specify a profile!',
 				required: false
 			}
@@ -34,7 +37,7 @@ const command: Command = {
 
 export default command;
 
-async function execute(interaction: ButtonInteraction | CommandInteraction) {
+async function execute(interaction: ButtonInteraction | ChatInputCommandInteraction) {
 	if (interaction instanceof CommandInteraction) {
 
 		const args: JacobCMDArgs = {
@@ -47,104 +50,87 @@ async function execute(interaction: ButtonInteraction | CommandInteraction) {
 	} else return await commandExecute(interaction, { playerName: interaction.customId.split('|')[1] });
 }
 
-async function commandExecute(interaction: CommandInteraction | ButtonInteraction, cmdArgs: JacobCMDArgs) {
+async function commandExecute(interaction: ChatInputCommandInteraction | ButtonInteraction, cmdArgs: JacobCMDArgs) {
 	let { playerName, profileName } = cmdArgs;
 
+	let account: AccountData | undefined;
+
 	if (!playerName) {
-		const user = await DataHandler.getPlayer(undefined, { discordid: interaction.user.id });
-		if (!user || !user.ign) {
-			const embed = new MessageEmbed()
-				.setColor('#CB152B')
-				.setTitle('Error: Specify a Username!')
-				.addField('Proper Usage:', '`/jacob` `player:` `(player name)` `profile:` `(profile name)`')
-				.setDescription('Checking for yourself?\nYou must use `/verify` `player:`(account name) before using this shortcut!')
-				.setFooter({ text: 'Created by Kaeso#5346' });
-			return interaction.reply({ embeds: [embed], ephemeral: true });
+		const user = await FetchAccountFromDiscord(interaction.user.id);
+
+		const embed = new EmbedBuilder()
+			.setColor('#CB152B')
+			.setTitle('Error: Specify a Username!')
+			.addFields({ name: 'Proper Usage:', value: '`/weight` `player:`(player name)' })
+			.setDescription('Checking for yourself?\nYou must use `/verify` `player:`(account name) before using this shortcut!')
+			.setFooter({ text: 'Created by Kaeso#5346' });
+
+		if (!user?.success || !user.account?.id || !user.account?.name) {
+			interaction.reply({ embeds: [embed], ephemeral: true });
+			return;
 		}
 		
-		playerName = user.ign;
+		account = user.account;
+		playerName = user.account.name;
+
+		if (!playerName) {
+			interaction.reply({ embeds: [embed], ephemeral: true });
+			return;
+		}
 	}
 
-	const uuid = await Data.getUUID(playerName).then(result => {
-		playerName = result.name;
-		return result.id;
-	}).catch(() => {
-		return undefined;
-	});
-	if (!uuid) {
-		const embed = new MessageEmbed().setColor('#CB152B')
-			.setTitle('Error: Invalid Username!')
-			.setDescription(`Player "${playerName}" does not exist.`)
-			.addField('Proper Usage:', '`/jacob` `player:`(player name)')
-			.setFooter({ text: 'Created by Kaeso#5346' });
-		return interaction.reply({ embeds: [embed], ephemeral: true });
+	if (!account) {
+		const acc = await FetchAccount(playerName);
+		if (!acc?.success || !acc.account) {
+			const embed = ImproperUsageError('Error: Invalid Username!', `Player "${playerName}" does not exist.`, '`/weight` `player:`(player name)');
+			interaction.reply({ embeds: [embed], ephemeral: true });
+			return;
+		}
+		account = acc.account;
 	}
+
+	const { id: uuid } = account;
 
 	await interaction.deferReply();
 
-	let user = await DataHandler.getPlayer(uuid);
+	const user = await FetchProfiles(uuid);
 
-	if (!user) {
-		await DataHandler.updatePlayer(uuid, playerName, undefined, undefined);
-		user = await DataHandler.getPlayer(uuid);
-	}
-
-	if (!user) {
-		const embed = new MessageEmbed().setColor('#CB152B')
+	if (!user?.success) {
+		const embed = new EmbedBuilder().setColor('#CB152B')
 			.setTitle('Error: Couldn\'t Get User!')
-			.setDescription(`Something weird happened with the database. Try again?`)
+			.setDescription(`Couldn't fetch user. Try again or look here: https://elitebot.dev/stats/${uuid}`)
 			.setFooter({ text: 'Contact Kaeso#5346 if this continues to happen!' });
 		return interaction.reply({ embeds: [embed], ephemeral: true });
 	}
 
-	const grabnewdata = await CanUpdateAndFlag(user);
-	const contestData = await Data.getLatestContestData(user, grabnewdata || !user?.contestdata);
+	const profiles = user.profiles;
 
-	if (!contestData) {
-		const embed = new MessageEmbed().setColor('#CB152B')
-			.setTitle('Error: No Contest Data!')
-			.addField('Proper Usage:', '`/jacob` `player:`(player name)')
-			.setDescription('This could mean that my code is bad, or well, that my code is bad.\n*(API might be down)*')
-			.setFooter({ text: 'Created by Kaeso#5346' });
-		return interaction.editReply({ embeds: [embed] });
-	}
+	const profile = profiles.find(p => p.cute_name?.toLowerCase() === profileName?.toLowerCase()) 
+		?? profiles.find(p => p.selected) 
+		?? profiles[0];
 
-	if (!playerName) {
-		const embed = new MessageEmbed().setColor('#CB152B')
-			.setTitle('Error: Specify a Username!')
-			.addField('Proper Usage:', '`/jacob` `player:`(player name)')
-			.setDescription('Checking for yourself?\nYou must use `/verify` `player:`(account name) before using this shortcut!')
-			.setFooter({ text: 'Created by Kaeso#5346' });
-		return interaction.editReply({ embeds: [embed] });
-	}
-
-	// Nothing depends on this being waited for
-	DataHandler.update({ contestdata: contestData }, { uuid: uuid });
+	const jacob = profile.member.jacob;
 
 	const embed = await getHighScoreEmbed();
 	if (!embed) { return; }
 
-	let scoresCount = 0;
-	for (const crop in contestData.scores) {
-		const score = contestData.scores[crop as CropString];
-		scoresCount += (score.value !== 0) ? 1 : 0;
-	}
+	const scoresCount = Object.values(jacob.contests).reduce((a, b) => a + b.length, 0);
 
-	const row = new MessageActionRow().addComponents(
-		new MessageButton()
+	const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+		new ButtonBuilder()
 			.setCustomId('overall')
 			.setLabel('Overall Stats')
-			.setStyle('SUCCESS')
+			.setStyle(ButtonStyle.Success)
 			.setDisabled(profileName !== undefined),
-		new MessageButton()
+		new ButtonBuilder()
 			.setCustomId('crops')
 			.setLabel('All Crops')
-			.setStyle('PRIMARY')
+			.setStyle(ButtonStyle.Secondary)
 			.setDisabled(profileName !== undefined && scoresCount <= 3),
-		new MessageButton()
+		new ButtonBuilder()
 			.setCustomId('recents')
 			.setLabel('Recent Contests')
-			.setStyle('PRIMARY')
+			.setStyle(ButtonStyle.Primary)
 	);
 
 	const args = {
@@ -154,8 +140,8 @@ async function commandExecute(interaction: CommandInteraction | ButtonInteractio
 		fetchReply: true
 	}
 	
-	const select = new MessageActionRow().addComponents(
-		new MessageSelectMenu().setCustomId('select')
+	const select = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
+		new SelectMenuBuilder().setCustomId('select')
 			.setPlaceholder('Filter by Crop!')
 			.addOptions([
 				{ label: 'Cactus', value: 'cactus' },
@@ -174,45 +160,45 @@ async function commandExecute(interaction: CommandInteraction | ButtonInteractio
 	let selectedCrop: CropString | undefined = undefined;
 	interaction.editReply(args).then(async reply => {
 		if (!(reply instanceof Message)) return;
-		const collector = reply.createMessageComponentCollector({ componentType: 'BUTTON', time: 30000 });
+		const collector = reply.createMessageComponentCollector({ componentType: ComponentType.Button, time: 30_000 });
 
 		collector.on('collect', async i => {
 			if (i.user.id === interaction.user.id) {
 				collector.resetTimer({ time: 30000 });
 
-				const newRow = new MessageActionRow().addComponents(
-					new MessageButton()
+				const newRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+					new ButtonBuilder()
 						.setCustomId('overall')
 						.setLabel('Overall Stats')
-						.setStyle('SUCCESS')
+						.setStyle(ButtonStyle.Success)
 						.setDisabled(i.customId === 'overall'),
-					new MessageButton()
+					new ButtonBuilder()
 						.setCustomId('crops')
 						.setLabel('All Crops')
-						.setStyle('PRIMARY')
+						.setStyle(ButtonStyle.Primary)
 						.setDisabled(i.customId === 'crops' || scoresCount > 3),
-					new MessageButton()
+					new ButtonBuilder()
 						.setCustomId('recents')
 						.setLabel('Recent Contests')
-						.setStyle('PRIMARY')
+						.setStyle(ButtonStyle.Primary)
 						.setDisabled(i.customId === 'recents')
 				);
 
-				const recentRow = new MessageActionRow().addComponents(
-					new MessageButton()
+				const recentRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+					new ButtonBuilder()
 						.setCustomId('overall')
 						.setLabel('Overall Stats')
-						.setStyle('SECONDARY')
+						.setStyle(ButtonStyle.Secondary)
 						.setDisabled(i.customId === 'overall'),
-					new MessageButton()
+					new ButtonBuilder()
 						.setCustomId('expand')
 						.setLabel('Show More')
-						.setStyle('SUCCESS')
+						.setStyle(ButtonStyle.Success)
 						.setDisabled(i.customId === 'expand'),
-					new MessageButton()
+					new ButtonBuilder()
 						.setCustomId('recents')
 						.setLabel('Recent Contests')
-						.setStyle('PRIMARY')
+						.setStyle(ButtonStyle.Primary)
 						.setDisabled(i.customId === 'recents' || i.customId === 'expand')
 				);
 
@@ -238,12 +224,12 @@ async function commandExecute(interaction: CommandInteraction | ButtonInteractio
 
 					i.update({ embeds: [recentsEmbed], components: [select, recentRow], fetchReply: true }).then(reply => {
 						if (!(reply instanceof Message)) return;
-						const newCollector = reply.createMessageComponentCollector({ componentType: 'SELECT_MENU', time: 30000 });
+						const newCollector = reply.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 30_000 });
 
 						newCollector.on('collect', async inter => {
 							if (inter.user.id === interaction.user.id) {
-								collector.resetTimer({ time: 30000 });
-								newCollector.resetTimer({ time: 30000 });
+								collector.resetTimer({ time: 30_000 });
+								newCollector.resetTimer({ time: 30_000 });
 
 								selectedCrop = inter.values[0] as CropString;
 
@@ -277,33 +263,32 @@ async function commandExecute(interaction: CommandInteraction | ButtonInteractio
 	});
 
 	async function getRecents(selectedCrop?: CropString, expand = false) {
-		if (!contestData) return;
+		if (!jacob) return;
 
-		const newEmbed = new MessageEmbed().setColor('#03fc7b')
-			.setTitle(`Recent ${selectedCrop ? Data.getReadableCropName(selectedCrop) : 'Jacob\'s'} Contests for ${user?.ign ? user?.ign.replace(/_/g, '\\_') : playerName}${profileName ? ` on ${profileName}` : ``}`)
+		const newEmbed = new EmbedBuilder().setColor('#03fc7b')
+			.setTitle(`Recent ${selectedCrop ? Data.getReadableCropName(selectedCrop) : 'Jacob\'s'} Contests for ${playerName?.replace(/_/g, '\\_')}${profileName ? ` on ${profileName}` : ``}`)
 			.setFooter({ text: `Note: Highscores only valid after ${Data.getReadableDate(Data.CUTOFFDATE)}\nCreated by Kaeso#5346    Can take up to 10 minutes to update` });
 
-		const contests = (selectedCrop) ? contestData.recents[selectedCrop] : contestData.recents.overall;
-		contests.sort((a, b) => b.obtained.localeCompare(a.obtained));
+		const contests = (selectedCrop) ? jacob.contests[selectedCrop] : Object.values(jacob.contests).flatMap(c => c);
+		contests.sort((a, b) => b.timestamp - a.timestamp);
 
 		let addedIndex = 0;
-		const contestAmount = Object.keys(contests).length;
-		if (!expand && contestAmount > 4) newEmbed.description = 'Click "Show More" to see more contests!';
+		const contestAmount = contests.length;
+
+		if (!expand && contestAmount > 4) newEmbed.setDescription('Click "Show More" to see more contests!');
+
 		for (let i = 0; i < Math.min(expand ? 10 : 4, contestAmount); i++) {
 			const contest = contests[i];
 
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			if ((contest as any)?.name) contest.profilename = (contest as any).name;
+			const details = (contest.participants && contest.position !== undefined) 
+				? `\`#${(contest.position + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${contest.participants.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` ${profileName ? ` on \`${profileName}\`!` : ` players!`}` 
+				: `${profileName ? `Unclaimed on \`${profileName}\`!` : `Contest Still Unclaimed!`}`;
 
-			const details = (contest.par && contest.pos !== undefined) 
-				? `\`#${(contest.pos + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${contest.par.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` ${!profileName ? ` on \`${contest.profilename}\`!` : ` players!`}` 
-				: `${!profileName ? `Unclaimed on \`${contest.profilename}\`!` : `Contest Still Unclaimed!`}`;
-
-			if (!contest.value) continue;
+			if (!contest.collected) continue;
 			addedIndex++;
 
-			newEmbed.fields.push({
-				name: `${Data.getReadableDate(contest.obtained)}`,
+			newEmbed.addFields({
+				name: `${Data.getReadableDate(contest.collected)}`,
 				value: `${(selectedCrop) ? 'Collected ' : `${Data.getReadableCropName(contest?.crop ?? '') ?? 'ERROR'} - `}**${contest.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**\n` + details,// + '\n⠀',
 				inline: true
 			});
@@ -329,7 +314,6 @@ async function commandExecute(interaction: CommandInteraction | ButtonInteractio
 	}
 
 	async function getHighScoreEmbed(allcrops = false) {
-		const jacob = contestData;
 		if (!jacob) return undefined;
 
 		const scores = jacob.scores;

@@ -1,8 +1,5 @@
-import { Command } from "classes/Command";
-import Discord, { CommandInteraction, Message, TextBasedChannel } from 'discord.js';
-import Auth from '../classes/Auth';
-import { superusers } from '../config.json';
-import DataHandler from '../classes/Database';
+import { Command } from '../classes/Command';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction, ComponentType, EmbedBuilder, Message, PermissionFlagsBits } from 'discord.js';
 
 const command: Command = {
 	name: 'admin',
@@ -21,10 +18,6 @@ export default command;
 
 async function execute(interaction: CommandInteraction) {
 	if (!interaction.member || !interaction.guildId || !interaction.guild) {
-		if (superusers.includes(interaction.user.id)) {
-			superUser(interaction);
-			return;
-		}
 		interaction.reply({ content: '**Error!**\nUse this command in a server only.', ephemeral: true }); 
 		return; 
 	}
@@ -40,7 +33,7 @@ async function execute(interaction: CommandInteraction) {
 		return interaction.reply({ content: '**Error!**\nLacking permissions to see member permissions or roles.', ephemeral: true }); 
 	}
 
-	if (!interaction.member.permissions.has('ADMINISTRATOR') && !interaction.member.roles.cache.some(role => role.id === server.adminrole)) {
+	if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator) && !interaction.member.roles.cache.some(role => role.id === server.adminrole)) {
 		return interaction.reply({ content: '**Error!** This command is only for server Admins/authorized users!', ephemeral: true }); 
 	}
 
@@ -48,26 +41,39 @@ async function execute(interaction: CommandInteraction) {
 	const onCooldown = (dateNow < +(server.configshowedat ?? 0) + (10 * 60 * 1000));
 	const commandsRegistered = await interaction.guild.commands.fetch().then(commands => commands.size > 0);
 
-	const embed = new Discord.MessageEmbed().setColor('#03fc7b')
+	const embed = new EmbedBuilder().setColor('#03fc7b')
 		.setTitle('Server Admin Panel')
 		.setDescription('Configure your server specific settings!')
-		.addField('WARNING', `**Role settings** require the \`Manage Roles\` permission.\n__And for the @Elite role to be above others in the hierarchy!__\n**Setting channels** requires the \`Read Messages\` permission.\n__This is only to view channels, the bot still **CANNOT** read messages!__\n⠀\n**You must change permissions manually, or [click here](https://discord.com/api/oauth2/authorize?client_id=845065148997566486&permissions=277361249280&scope=bot%20applications.commands) to reinvite the bot.**`)
-		.addField('How?', 'Please click the buttons below in order to register the slash commands that you\'ll need in order to configure these settings. To prevent command clutter, you can remove these commands when you\'re finished and enable them when you need them.\n⠀\n`/config view` is useful! Browse all `/config` commands by looking through the slash commands GUI without typing anything after they\'re registered.')
+		.addFields([
+			{ name: 'WARNING', value: `**Role settings** require the \`Manage Roles\` permission.\n__And for the @Elite role to be above others in the hierarchy!__\n**Setting channels** requires the \`Read Messages\` permission.\n__This is only to view channels, the bot still **CANNOT** read messages!__\n⠀\n**You must change permissions manually, or [click here](https://discord.com/api/oauth2/authorize?client_id=845065148997566486&permissions=277361249280&scope=bot%20applications.commands) to reinvite the bot.**` },
+			{ name: 'How?', value: 'Please click the buttons below in order to register the slash commands that you\'ll need in order to configure these settings. To prevent command clutter, you can remove these commands when you\'re finished and enable them when you need them.\n⠀\n`/config view` is useful! Browse all `/config` commands by looking through the slash commands GUI without typing anything after they\'re registered.' },
+		])
 		.setFooter({ text: 'Instead of "Read Messages" you can give the bot view access to specific channels\nCreated by Kaeso#5346' })
 
 	if (onCooldown) {
-		embed.addField('ATTENTION', `You have registered these commands recently, to prevent spam you can only remove these commands until the cooldown is over <t:${Math.floor((+(server.configshowedat ?? 0) + (10 * 60 * 1000)) / 1000)}:R>.`)
+		embed.addFields({ name: 'ATTENTION', value: `You have registered these commands recently, to prevent spam you can only remove these commands until the cooldown is over <t:${Math.floor((+(server.configshowedat ?? 0) + (10 * 60 * 1000)) / 1000)}:R>.` });
 	}
 
-	const row = new Discord.MessageActionRow().addComponents(
-		{ type: 'BUTTON', style: 'SUCCESS', customId: 'register', label: 'Register /config', disabled: onCooldown || commandsRegistered },
-		{ type: 'BUTTON', style: 'PRIMARY', customId: 'clear', label: 'Remove /config', disabled: !commandsRegistered },
-		{ type: 'BUTTON', style: 'DANGER', customId: 'cancel', label: 'Cancel' },
+	const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+		new ButtonBuilder()
+			.setCustomId('register')
+			.setLabel('Register /config')
+			.setStyle(ButtonStyle.Success)
+			.setDisabled(commandsRegistered || onCooldown),
+		new ButtonBuilder()
+			.setCustomId('clear')
+			.setLabel('Remove /config')
+			.setStyle(ButtonStyle.Primary)
+			.setDisabled(!commandsRegistered),
+		new ButtonBuilder()
+			.setCustomId('cancel')
+			.setLabel('Cancel')
+			.setStyle(ButtonStyle.Danger)
 	);
 
 	const message = await interaction.reply({ embeds: [embed], components: [row], fetchReply: true }) as Message;
 
-	const collector = message.createMessageComponentCollector({ componentType: 'BUTTON', time: 30000 });
+	const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 30_000 });
 
 	collector.on('collect', async inter => {
 		if (inter.user.id !== interaction.user.id) {
@@ -81,7 +87,6 @@ async function execute(interaction: CommandInteraction) {
 
 				await inter.guild.commands.set([slashCommandData]);
 				await inter.reply({ content: '**Success!** The `/config` command should now be available to you!', ephemeral: true });
-				await DataHandler.updateServer({ configshowedat: dateNow.toString() }, inter.guild.id);
 			} catch (e) {
 				await inter.reply({ content: 'Something went wrong! This is likely due to the bot lacking permissions to create slash commands. Please reinvite the bot with the link or fix this manually. If the issue still occurs contact Kaeso#5346', ephemeral: true });
 			}
@@ -113,16 +118,6 @@ const slashCommandData = {
 	name: 'config',
 	description: 'Configure your server settings!',
 	options: [{
-		name: 'whitelist',
-		description: 'Whitelist this current channel, or a specified one!',
-		type: 1,
-		options: [{
-			name: 'channel',
-			description: 'Choose a channel to whitelist!',
-			type: 7,
-			required: false
-		}]
-	}, {
 		name: 'leaderboard',
 		description: 'Set up your server\'s auto-updating Jacob leaderboard!',
 		type: 1,
@@ -359,9 +354,6 @@ const slashCommandData = {
 			}, {
 				value: 'weight-role-blacklist',
 				name: 'Weight-Role Blacklist - Clear the blacklist of denied users!',
-			}, {
-				value: 'whitelist',
-				name: 'Whitelist - Allow the bot to be used in all channels (it can access) again.',
 			}]
 		}]
 	}, {
@@ -380,114 +372,4 @@ const slashCommandData = {
 			autocomplete: true
 		}]
 	}]
-}
-
-async function superUser(interaction: CommandInteraction) {
-	const embed = new Discord.MessageEmbed().setColor('#03fc7b')
-		.setTitle('🚨 AWAITING IDENTITY CONFIRMATION 🚨')
-		.setDescription('Respond with your Two Factor Authenitcation code');
-
-	let authorized = false;
-	
-	const message = await interaction.reply({ embeds: [embed], fetchReply: true }) as Message;
-
-	if (!message) { return; }
-
-	const fakeFilter = () => { return true; };
-	message.channel.awaitMessages({ filter: fakeFilter, max: 1, time: 60000, errors: ['time'] })
-		.then(async collected => {
-			const code = +(collected?.first()?.content?.trim() ?? 0);
-			if (Auth.verifyTOTP(code)) {
-				authorized = true;
-
-				const authEmbed = new Discord.MessageEmbed().setColor('#03fc7b')
-					.setTitle(`🔓 - Welcome ${interaction.user.username}`); 
-
-				if (interaction.channel?.type === 'DM') {
-					await interaction.editReply({ embeds: [authEmbed], components: [] });
-				} else {
-					await message.edit({ embeds: [authEmbed], components: [] });
-				}
-				sendAdminPanel(interaction);
-			} else {
-				throw new Error();
-			}
-		})
-		.catch(() => {
-			if (authorized) return;
-			if (interaction.channel?.type === 'DM') {
-				interaction.deleteReply();
-			} else {
-				message.delete();
-			}
-		});
-
-	if (!authorized) return;
-}
-        
-
-async function sendAdminPanel(interaction: CommandInteraction) {
-
-	const embed = new Discord.MessageEmbed().setColor('#03fc7b')
-		.setTitle('Superuser Admin Panel')
-		.setDescription('More stuff coming eventually');
-
-	const row = new Discord.MessageActionRow().addComponents(
-		new Discord.MessageButton()
-			.setCustomId('flagcheater')
-			.setLabel('Flag Cheater')
-			.setStyle('DANGER'),
-		new Discord.MessageButton()
-			.setCustomId('globalslash')
-			.setLabel('Deploy Global')
-			.setStyle('SECONDARY'),
-	);
-
-	interaction.user.send({ embeds: [embed], components: [row] }).then(reply => {
-		const collector = reply.createMessageComponentCollector({ componentType: 'BUTTON', time: 120000 });
-
-		collector.on('collect', async inter => {
-			if (inter.user.id !== interaction.user.id) {
-				inter.reply({ content: `These buttons aren't for you!`, ephemeral: true });
-			}
-			collector.resetTimer({ time: 120000 });
-
-			if (inter.customId === 'flagcheater') {
-				const filt = () => { return true; };
-				await inter.reply({ content: 'Specify a minecraft uuid or ign.', fetchReply: true }).then((message) => {
-					((message as Message).channel as TextBasedChannel).awaitMessages({ filter: filt, max: 1, time: 60000, errors: ['time'] }).then(async collected => {
-						if (!collected) throw new Error();
-						
-						const response = collected.first()?.content.trim();
-						if (!response || collected.first() === undefined) throw new Error();
-
-						const user = (response.length === 32) ? await DataHandler.getPlayer(response) : await DataHandler.getPlayerByName(response);
-						if (user) {
-							const toggle = !user.cheating;
-							await DataHandler.update({ cheating: toggle, rank: 0, updatedat: (Date.now() - (600000)).toString() }, { uuid: user.uuid });
-							console.log(`Set ${user?.ign}'s cheating status to ${toggle}`);
-							await DataHandler.getPlayer(user.uuid).then(user => {
-								collected.first()?.reply({ content: `${user?.ign ?? 'This player'} has been labled as ${toggle ? 'cheating.' : 'legit.'}` });
-							});
-							throw new Error();
-						} else {
-							collected.first()?.reply({ content: 'Specify a valid uuid next time.' })
-							throw new Error();
-						}
-					}).catch(() => {
-						setTimeout(function() {
-							(message as Message).delete().catch(() => undefined);
-						}, 5000);
-					});
-				})
-			} else if (inter.customId === 'globalslash') {
-				await inter.reply({ content: 'I\'ll do this later' });
-			}
-			
-		});
-
-		collector.on('end', async () => {
-			reply.edit({ components: [] });
-		});
-	});
 }

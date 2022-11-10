@@ -1,8 +1,8 @@
-import { Command } from "classes/Command";
-import { CommandInteraction, MessageEmbed, MessageActionRow, Permissions } from "discord.js";
+import { Command } from "../classes/Command";
+import { CommandInteraction, ChatInputCommandInteraction, ChannelType, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import DataHandler from '../classes/Database';
 import Data, { CropString } from '../classes/Data';
-import { ServerData } from "database/models/servers";
+import { ServerData } from "../database/models/servers";
 
 const command: Command = {
 	name: 'config',
@@ -10,15 +10,15 @@ const command: Command = {
 	usage: '<sub command>',
 	access: 'GUILD',
 	type: 'SLASH',
-	permissions: ['ADMINISTRATOR'],
+	permissions: ['Administrator'],
 	adminRoleOverride: true,
 	execute: execute,
 }
 
 export default command;
 
-async function execute(interaction: CommandInteraction) {
-	if (!interaction.member || !interaction.guildId) return;
+async function execute(interaction: ChatInputCommandInteraction) {
+	if (!interaction.member || !interaction.guildId || !interaction.inCachedGuild()) return;
 
 	const server = await DataHandler.getServer(interaction.guildId) 
 		?? await DataHandler.createServer(interaction.guildId);
@@ -40,20 +40,11 @@ async function execute(interaction: CommandInteraction) {
 		: subCommand;
 
 	const guildId = interaction.guildId;
-	const superUser = (interaction.member.permissions as Readonly<Permissions>).has('ADMINISTRATOR');
+	const superUser = interaction.member.permissions.has(PermissionFlagsBits.Administrator);
 	
 	switch (command) {
 	case 'view': {
 		viewSettings(server, interaction);
-		break;
-	}
-	case 'whitelist': {
-		if (subCommand === 'clear') {
-			await DataHandler.updateServer({ channels: null }, guildId);
-			clearedSettings(interaction);
-			break;
-		}
-		whitelist(server, interaction);
 		break;
 	}
 	case 'leaderboard': {
@@ -192,17 +183,11 @@ async function viewSettings(s: ServerData, interaction: CommandInteraction) {
 - Annoucement Ping: ${s.lbroleping ? `<@&${s.lbroleping}>` : 'Not set'}
 - Custom Cutoff Date: ${s.lbcutoff ? Data.getReadableDate(s.lbcutoff) : 'Not set'}
 	`;
-
-	let channels = '';
-	s.channels?.forEach((channel: string) => {
-		channels += channel[0] === 'C' ? `<#${channel.substring(1)}> ` : `<#${channel}> `;
-	});
 	
-	const embed = new MessageEmbed().setColor('#03fc7b')
+	const embed = new EmbedBuilder().setColor('#03fc7b')
 		.setTitle('Your Server Settings')
 		.setDescription('Use `/config` and its subcommands to change these!\n(Show/hide `/config` with `/admin`)')
-		.addField('Current Settings', content)
-		.addField('Whitelisted Channels', channels.length > 0 ? channels : 'No channels set')
+		.addFields({ name: 'Current Settings', value: content })
 		.setFooter({ text: 'Created by Kaeso#5346' });
 
 	await interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => undefined);
@@ -218,46 +203,10 @@ async function clearedSettings(interaction: CommandInteraction, superUser = true
 	await interaction.reply({ content: content, ephemeral: true }).catch(() => undefined);
 }
 
-async function whitelist(server: ServerData, interaction: CommandInteraction) {
-	const channel = interaction.options.getChannel('channel', false) ?? interaction.channel;
-	
-	if (!channel || !channel.id) return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch(() => undefined);
-	const channelId = (channel.type === 'GUILD_TEXT') ? channel.id : 'C' + channel.id;
+async function setAdminRole(server: ServerData, interaction: ChatInputCommandInteraction) {
+	if (!interaction.inCachedGuild()) return;
 
-	const channels = [];
-
-	const embed = new MessageEmbed().setColor('#03fc7b')
-		.setTitle('Success!')
-		.setFooter({ text: 'Created by Kaeso#5346' });
-
-	if (server.channels?.includes(channelId)) {
-		if (server.channels) {
-			server.channels.forEach((c: string) => { 
-				if (c !== channelId) channels.push(c); 
-			});
-		}
-	} else {
-		channels.push(channelId);
-		if (server.channels) channels.push(...server.channels);
-	}
-
-	let content = '';
-	channels.forEach(channel => {
-		content += channel[0] === 'C' ? `<#${channel.substring(1)}> ` : `<#${channel}> `;
-	});
-	if (content.length > 0) {
-		embed.addField('Whitelisted Channels', content.trim());
-	} else {
-		embed.setDescription('No channels are whitelisted.');
-	}
-
-	await DataHandler.updateServer({ channels: channels.length === 0 ? null : channels }, server.guildid);
-
-	interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => undefined);
-}
-
-async function setAdminRole(server: ServerData, interaction: CommandInteraction) {
-	if (interaction.member && !(interaction.member.permissions as Readonly<Permissions>).has('ADMINISTRATOR')) {
+	if (interaction.member && !interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
 		interaction.reply({ content: '**Error!** Only users with the `ADMINISTRATOR` permission can configure this.', ephemeral: true }).catch(() => undefined);
 		return;
 	}
@@ -271,7 +220,7 @@ async function setAdminRole(server: ServerData, interaction: CommandInteraction)
 
 	await DataHandler.updateServer({ adminrole: roleId }, server.guildid);
 
-	const embed = new MessageEmbed().setColor('#03fc7b')
+	const embed = new EmbedBuilder().setColor('#03fc7b')
 		.setTitle('Success!')
 		.setDescription(`Admin Role: <@&${roleId}>`)
 		.setFooter({ text: 'Created by Kaeso#5346' });
@@ -279,12 +228,12 @@ async function setAdminRole(server: ServerData, interaction: CommandInteraction)
 	interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => undefined);
 }
 
-async function setWeightRole(server: ServerData, interaction: CommandInteraction) {
+async function setWeightRole(server: ServerData, interaction: ChatInputCommandInteraction) {
 	const weight = interaction.options.getInteger('weight', false) ?? undefined;
 	const roleId = interaction.options.getRole('role', false)?.id;
 
 	const channel = interaction.options.getChannel('channel', false);
-	if (channel && channel?.type !== 'GUILD_TEXT') return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch(() => undefined);
+	if (channel && channel?.type !== ChannelType.GuildText) return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch(() => undefined);
 	const channelId = channel?.id;
 
 	if (weight === undefined || !roleId) {
@@ -298,7 +247,7 @@ async function setWeightRole(server: ServerData, interaction: CommandInteraction
 		weightchannel: channelId ?? server.weightchannel
 	}, server.guildid);
 
-	const embed = new MessageEmbed().setColor('#03fc7b')
+	const embed = new EmbedBuilder().setColor('#03fc7b')
 		.setTitle('Success!')
 		.setDescription(`Required Weight: **${weight === 0 ? 'N/A (All verified users qualify)' : weight}**\nReward Role: <@&${roleId}>${channelId ? `\nAnnouncement Channel: <#${channelId}>` : ''}`)
 		.setFooter({ text: 'Created by Kaeso#5346' });
@@ -306,9 +255,11 @@ async function setWeightRole(server: ServerData, interaction: CommandInteraction
 	interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => undefined);
 }
 
-async function createLeaderboard(server: ServerData, interaction: CommandInteraction) {
+async function createLeaderboard(server: ServerData, interaction: ChatInputCommandInteraction) {
+	if (!interaction.inCachedGuild()) return;
+
 	const channel = interaction.options.getChannel('channel', false);
-	if (channel?.type !== 'GUILD_TEXT') return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch(() => undefined);
+	if (channel?.type !== ChannelType.GuildText) return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch(() => undefined);
 	if (!channel) return interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch(() => undefined);
 
 	const roleId = interaction.options.getRole('role', false)?.id;
@@ -322,13 +273,13 @@ async function createLeaderboard(server: ServerData, interaction: CommandInterac
 	}, server.guildid);
 
 	interaction.reply({ embeds: [
-		new MessageEmbed().setColor('#03fc7b')
+		new EmbedBuilder().setColor('#03fc7b')
 			.setTitle('Success!')
 			.setDescription(`Leaderboard Channel: <#${channel.id}>\nRole Requirement: ${roleId ? `<@&${roleId}>` : 'Not set'}`)
 			.setFooter({ text: 'Created by Kaeso#5346' })
 	], ephemeral: true }).catch(() => undefined);
 
-	const embed = new MessageEmbed().setColor('#03fc7b')
+	const embed = new EmbedBuilder().setColor('#03fc7b')
 		.setTitle('Jacob\'s Contest Leaderboard')
 		.setDescription('These are the highscores set by your fellow server members!')
 		.setFooter({ text: `Highscores only valid after ${Data.getReadableDate(server.lbcutoff ?? Data.CUTOFFDATE)}⠀⠀Created by Kaeso#5346` });
@@ -343,18 +294,24 @@ async function createLeaderboard(server: ServerData, interaction: CommandInterac
 
 			if (!contest.value) continue;
 
-			embed.fields.push({
+			embed.addFields({
 				name: `${Data.getReadableCropName(crop)} - ${contest.ign}`, inline: false,
 				value: `<@${contest.user}> - **${contest.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**⠀⠀${details}\n${Data.getReadableDate(contest.obtained)}⠀[🔗](https://sky.shiiyu.moe/stats/${contest.ign}/${contest.profilename})`,
 			});
 		}
 	} else {
-		embed.addField('Nothing Yet', 'Be the first to submit your scores!');
+		embed.addFields({ name: 'Nothing Yet', value: 'Be the first to submit your scores!' });
 	}
 
-	const row = new MessageActionRow().addComponents(
-		{ label: 'Submit Scores', customId: `LBSUBMIT|${interaction.id}`, style: 'SECONDARY', type: 'BUTTON' },
-		{ label: 'Toggle Notifications', customId: `LBROLETOGGLE|${interaction.id}`, style: 'SECONDARY', type: 'BUTTON' }
+	const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+		new ButtonBuilder()
+			.setLabel('Submit Scores')
+			.setCustomId(`LBSUBMIT|${interaction.id}`)
+			.setStyle(ButtonStyle.Secondary),
+		new ButtonBuilder()
+			.setLabel('Toggle Notifications')
+			.setCustomId(`LBROLETOGGLE|${interaction.id}`)
+			.setStyle(ButtonStyle.Secondary)
 	);
 
 	channel.send({ embeds: [embed], components: [row] }).catch(() => {
@@ -362,9 +319,9 @@ async function createLeaderboard(server: ServerData, interaction: CommandInterac
 	});
 }
 
-async function createLeaderboardNotifs(server: ServerData, interaction: CommandInteraction) {
+async function createLeaderboardNotifs(server: ServerData, interaction: ChatInputCommandInteraction) {
 	const channel = interaction.options.getChannel('channel', false);
-	if (channel?.type !== 'GUILD_TEXT') return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch(() => undefined);
+	if (channel?.type !== ChannelType.GuildText) return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch(() => undefined);
 	const channelId = channel?.id;
 	if (!channelId) return interaction.reply({ content: '**Error!** Option not specified!', ephemeral: true }).catch(() => undefined);
 
@@ -375,7 +332,7 @@ async function createLeaderboardNotifs(server: ServerData, interaction: CommandI
 		lbroleping: roleId ?? server.lbrolereq, 
 	}, server.guildid);
 
-	const embed = new MessageEmbed().setColor('#03fc7b')
+	const embed = new EmbedBuilder().setColor('#03fc7b')
 		.setTitle('Success!')
 		.setDescription(`Annoucement Channel: <#${channelId}>\nRole That's Pinged: ${roleId ? `<@&${roleId}>` : 'Not set'}`)
 		.setFooter({ text: 'Created by Kaeso#5346' });
@@ -383,7 +340,7 @@ async function createLeaderboardNotifs(server: ServerData, interaction: CommandI
 	interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => undefined);
 }
 
-async function setCutoffDate(server: ServerData, interaction: CommandInteraction) {
+async function setCutoffDate(server: ServerData, interaction: ChatInputCommandInteraction) {
 	const day = interaction.options.getInteger('day', false) ?? undefined;
 	const month = interaction.options.getInteger('month', false) ?? undefined;
 	let year = interaction.options.getInteger('year', false) ?? undefined;
@@ -411,18 +368,18 @@ async function setCutoffDate(server: ServerData, interaction: CommandInteraction
 
 	await DataHandler.updateServer({ lbcutoff: date }, server.guildid);
 	interaction.reply({ embeds: [
-		new MessageEmbed().setColor('#03fc7b')
+		new EmbedBuilder().setColor('#03fc7b')
 			.setTitle('Success!')
 			.setDescription(`New Cutoff Date: **${Data.getReadableDate(date)}**\nOnly scores that are on or after this date will be counted!`)
 			.setFooter({ text: 'Created by Kaeso#5346' })
 	], ephemeral: true }).catch(() => undefined);
 }
 
-async function setWeightReview(server: ServerData, interaction: CommandInteraction) {
+async function setWeightReview(server: ServerData, interaction: ChatInputCommandInteraction) {
 	const roleId = interaction.options.getRole('role', false)?.id;
 	const channel = interaction.options.getChannel('channel', false) ?? undefined;
 
-	if (channel && channel?.type !== 'GUILD_TEXT') return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch(() => undefined);
+	if (channel && channel?.type !== ChannelType.GuildText) return interaction.reply({ content: '**Error!** Select a text channel!', ephemeral: true }).catch(() => undefined);
 	const channelId = channel?.id;
 
 	if (!channelId || !roleId) {
@@ -435,7 +392,7 @@ async function setWeightReview(server: ServerData, interaction: CommandInteracti
 		reviewchannel: channelId
 	}, server.guildid);
 
-	const embed = new MessageEmbed().setColor('#03fc7b')
+	const embed = new EmbedBuilder().setColor('#03fc7b')
 		.setTitle('Success!')
 		.setDescription(`Review Channel: <#${channelId}>\nReviewer Role: <@&${roleId}>`)
 		.setFooter({ text: 'Created by Kaeso#5346' });
@@ -443,7 +400,7 @@ async function setWeightReview(server: ServerData, interaction: CommandInteracti
 	interaction.reply({ embeds: [embed], ephemeral: true }).catch(() => undefined);
 }
 
-async function excludeRange(server: ServerData, interaction: CommandInteraction) {
+async function excludeRange(server: ServerData, interaction: ChatInputCommandInteraction) {
 	if ((server.lbconfig?.exclusions?.length ?? 0) >= 10) {
 		return interaction.reply({ content: '**Error!** You can only have 10 exluded ranges!', ephemeral: true }).catch(() => undefined);
 	}
@@ -494,7 +451,7 @@ async function excludeRange(server: ServerData, interaction: CommandInteraction)
 	}, ...(oldConfig?.exclusions ?? [])] } }, server.guildid);
 
 	interaction.reply({ embeds: [
-		new MessageEmbed().setColor('#03fc7b')
+		new EmbedBuilder().setColor('#03fc7b')
 			.setTitle('Success!')
 			.setDescription(`New Exclusion Range: **${Data.getReadableDate(startDate)} - ${Data.getReadableDate(endDate)}**\n**Reason:** \`${reason}\`\nNo scores that are in this range will be counted!`)
 			.setFooter({ text: 'Created by Kaeso#5346' })
