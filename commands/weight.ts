@@ -479,7 +479,7 @@ async function execute(interaction: CommandInteraction) {
 						new MessageButton()
 							.setLabel('SkyCrypt')
 							.setStyle('LINK')
-							.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${profile.profile_id}`)
+							.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${encodeURIComponent(profile.cute_name)}`)
 					);
 					reply.edit({ components: [linkRow], allowedMentions: { repliedUser: false } }).catch(() => undefined);
 				} catch (error) { console.log(error) }
@@ -548,7 +548,7 @@ async function execute(interaction: CommandInteraction) {
 				new MessageButton()
 					.setLabel('SkyCrypt')
 					.setStyle('LINK')
-					.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${profile ? profile.profile_id : ''}`),
+					.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${profile ? encodeURIComponent(profile.cute_name) : ''}`),
 			);
 			interaction.update({ embeds: [embed], allowedMentions: { repliedUser: false }, components: [row] });
 		}
