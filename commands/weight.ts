@@ -324,7 +324,7 @@ async function execute(interaction: CommandInteraction) {
 			new MessageButton()
 				.setLabel('Elite')
 				.setStyle('LINK')
-				.setURL(`https://elitebot.dev/stats/${playerName}/${profile.cute_name}`),
+				.setURL(`https://elitebot.dev/stats/${playerName}/${profile.profile_id}`),
 			new MessageButton()
 				.setCustomId(`jacob|${playerName}`)
 				.setLabel('Jacob\'s Stats')
@@ -475,11 +475,11 @@ async function execute(interaction: CommandInteraction) {
 						new MessageButton()
 							.setLabel('Elite')
 							.setStyle('LINK')
-							.setURL(`https://elitebot.dev/stats/${playerName}/${profile.cute_name}`),
+							.setURL(`https://elitebot.dev/stats/${playerName}/${profile.profile_id}`),
 						new MessageButton()
 							.setLabel('SkyCrypt')
 							.setStyle('LINK')
-							.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${profile.cute_name}`)
+							.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${profile.profile_id}`)
 					);
 					reply.edit({ components: [linkRow], allowedMentions: { repliedUser: false } }).catch(() => undefined);
 				} catch (error) { console.log(error) }
@@ -544,11 +544,11 @@ async function execute(interaction: CommandInteraction) {
 				new MessageButton()
 					.setLabel('Elite')
 					.setStyle('LINK')
-					.setURL(`https://elitebot.dev/stats/${playerName}/${profile ? profile.cute_name : ''}`),
+					.setURL(`https://elitebot.dev/stats/${playerName}/${profile ? profile.profile_id : ''}`),
 				new MessageButton()
 					.setLabel('SkyCrypt')
 					.setStyle('LINK')
-					.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${profile ? profile.cute_name : ''}`),
+					.setURL(`https://sky.shiiyu.moe/stats/${playerName}/${profile ? profile.profile_id : ''}`),
 			);
 			interaction.update({ embeds: [embed], allowedMentions: { repliedUser: false }, components: [row] });
 		}
