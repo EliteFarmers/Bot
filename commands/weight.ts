@@ -6,6 +6,19 @@ import { Command } from '../classes/Command';
 import { CanUpdate } from '../classes/Util';
 import Canvas, { registerFont, createCanvas } from 'canvas';
 
+const CROPS_PER_ONE_WEIGHT = {
+	wheat: 100_000,
+	carrot: 300_000,
+	potato: 300_000,
+	sugarcane: 200_000,
+	netherwart: 250_000,
+	pumpkin: 70_877.248,
+	melon: 354_386.238,
+	mushroom: 72_000,
+	cocoa: 219_648.785,
+	cactus: 159_297.912,
+};
+
 const command: Command = {
 	name: 'weight',
 	description: 'Calculate a players farming weight',
@@ -213,19 +226,42 @@ async function execute(interaction: CommandInteraction) {
 		if (!WART) { WART = 0; } else if (WART < 0) { WART += 4294967294; }
 		if (!CANE) { CANE = 0; } else if (CANE < 0) { CANE += 4294967294; }
 
-		const collections = new Map();
+		const collections = new Map<string, number>();
 
+		const wheat = WHEAT / CROPS_PER_ONE_WEIGHT.wheat;
+		const potato = POTATO / CROPS_PER_ONE_WEIGHT.potato;
+		const carrot = CARROT / CROPS_PER_ONE_WEIGHT.carrot;
+		const mushroom = MUSHROOM / CROPS_PER_ONE_WEIGHT.mushroom;
+		const pumpkin = PUMPKIN / CROPS_PER_ONE_WEIGHT.pumpkin;
+		const melon = MELON / CROPS_PER_ONE_WEIGHT.melon;
+		const cane = CANE / CROPS_PER_ONE_WEIGHT.sugarcane;
+		const cactus = CACTUS / CROPS_PER_ONE_WEIGHT.cactus;
+		const wart = WART / CROPS_PER_ONE_WEIGHT.netherwart;
+		const cocoa = COCOA / CROPS_PER_ONE_WEIGHT.cocoa;
+	
 		//Normalize collections
-		collections.set('Wheat', Math.round(WHEAT / 1000) / 100);
-		collections.set('Carrot', Math.round(CARROT / 3000) / 100);
-		collections.set('Potato', Math.round(POTATO / 3000) / 100);
-		collections.set('Pumpkin', Math.round(PUMPKIN * 1.41089 / 1000) / 100);
-		collections.set('Melon', Math.round(MELON * 1.41089 / 5000) / 100);
-		collections.set('Mushroom', Math.round(MUSHROOM * 1.20763 / 664) / 100);
-		collections.set('Cocoa', Math.round(COCOA * 1.36581 / 3000) / 100);
-		collections.set('Cactus', Math.round(CACTUS * 1.25551 / 2000) / 100);
-		collections.set('Sugar Cane', Math.round(CANE / 2000) / 100);
-		collections.set('Nether Wart', Math.round(WART / 2500) / 100);
+		collections.set('Wheat', RoundToFixed(wheat));
+		collections.set('Carrot', RoundToFixed(carrot));
+		collections.set('Potato', RoundToFixed(potato));
+		collections.set('Pumpkin', RoundToFixed(pumpkin));
+		collections.set('Melon', RoundToFixed(melon));
+		collections.set('Cocoa Beans', RoundToFixed(cocoa));
+		collections.set('Cactus', RoundToFixed(cactus));
+		collections.set('Sugar Cane', RoundToFixed(cane));
+		collections.set('Nether Wart', RoundToFixed(wart));
+	
+		// Mushroom is a special case, it needs to be calculated dynamically based on the
+		// ratio between the farmed crops that give two mushrooms per break with cow pet
+		// and the farmed crops that give one mushroom per break with cow pet
+		const total = wheat + carrot + potato + pumpkin + melon + cocoa + cactus + cane + wart + mushroom;
+	
+		const doubleBreakRatio = (cactus + cane) / total;
+		const normalRatio = (total - cactus - cane) / total;
+	
+		const mushWght = CROPS_PER_ONE_WEIGHT.mushroom;
+		const mushroomWeight = doubleBreakRatio * (MUSHROOM / (2 * mushWght)) + normalRatio * (MUSHROOM / mushWght);
+	
+		collections.set('Mushroom', RoundToFixed(mushroomWeight));
 
 		return collections;
 	}
@@ -583,3 +619,11 @@ async function execute(interaction: CommandInteraction) {
 	}
 }
 
+function RoundToFixed(num: number | null, fixed = 2) {
+	if (num === null || !isFinite(num)) return 0;
+
+	const divider = Math.pow(10, fixed);
+	const rounded = Math.round((num + Number.EPSILON) * divider) / divider;
+
+	return isNaN(rounded) ? 0 : rounded;
+}
