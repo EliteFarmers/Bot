@@ -46,7 +46,7 @@ async function OnButtonInteraction(interaction: ButtonInteraction) {
 }
 
 async function OnAutocompleteInteraction(interaction: AutocompleteInteraction) {
-	if (interaction.responded) return;
+	if (interaction.responded || !DataHandler.leaderboard) return;
 	const focused = interaction.options.getFocused(true);
 	if (!focused) return;
 
