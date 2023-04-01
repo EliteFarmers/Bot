@@ -69,7 +69,7 @@ async function execute(interaction: CommandInteraction) {
 						.setTitle('Crop Weight Breakdown')
 						.setDescription('Amount of each crop per 1 farming weight')
 						.addField('Mathematical Hoes', `Wheat: 100,000\nCarrot: 300,000\nPotato: 300,000\nSugar Cane: 200,000\nNether Wart: 250,000`, true)
-						.addField(`Specific Tools`, `Pumpkin: 87,095\nMelon: 435,466\nMushroom: 168,925 - 337,851*\nCocoa Beans: 257,214\nCactus: 169,389`, true)
+						.addField(`Specific Tools`, `Pumpkin: 90,066\nMelon: 450,324\nMushroom: 90,178 - 180,356*\nCocoa Beans: 267,174\nCactus: 177,254`, true)
 						.addField('Infomation', `
 The crops with specific tools have a different calculation in order to equalize their tools with mathematical hoes provided by Bankhier (Only rounded number shown)
 
