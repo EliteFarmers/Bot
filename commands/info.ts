@@ -91,7 +91,7 @@ If you have suggestions for tweaking these numbers contact me with your reason.
 						.addField('Explanation', `
 Well, it's complicated.
 
-Farming xp is rewarded to players along with item drops. Counting xp in a similar fashion would only buff everything excluding netherwart, while not really adding anything informative to the calcuation.
+Farming xp is rewarded to players along with item drops. Counting xp in a similar fashion would only buff everything excluding netherwart (which gave no xp before Garden 1.5), while not really adding anything informative to the calcuation.
 
 **Simply put, if all the xp was counted in the weight there would be no way to balance the weight from different crops.**
 
