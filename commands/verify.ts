@@ -81,7 +81,11 @@ async function execute(interaction: CommandInteraction) {
 
 	if (!uuid) return; // Handled above. This is just to make TS happy
 
-	const userTag = `${interaction.user.username}#${interaction.user.discriminator}`;
+	const user = interaction.user;
+	const userTag = (user.discriminator && user.discriminator !== '0') 
+		? `${user.username}#${user.discriminator}`
+		: user.username;
+		
 	if (userTag !== discordTag) {
 		const embed = new MessageEmbed()
 			.setColor('#CB152B')
