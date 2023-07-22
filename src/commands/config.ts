@@ -1,16 +1,15 @@
-import { Command } from "../classes/Command";
-import { CommandInteraction, ChatInputCommandInteraction, ChannelType, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import DataHandler from '../classes/Database';
+import { Command, CommandAccess, CommandType } from "../classes/Command";
+import { CommandInteraction, ChatInputCommandInteraction, ChannelType, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } from "discord.js";
 import Data, { CropString } from '../classes/Data';
-import { ServerData } from "../database/models/servers";
+import { FetchGuild } from "api/elite";
 
 const command: Command = {
 	name: 'config',
 	description: 'Edit the server config.',
 	usage: '<sub command>',
-	access: 'GUILD',
-	type: 'SLASH',
-	permissions: ['Administrator'],
+	access: CommandAccess.ManageGuild,
+	type: CommandType.GuildSlash,
+	permissions: [ 'Administrator', 'ManageGuild' ],
 	adminRoleOverride: true,
 	execute: execute,
 }
@@ -20,11 +19,13 @@ export default command;
 async function execute(interaction: ChatInputCommandInteraction) {
 	if (!interaction.member || !interaction.guildId || !interaction.inCachedGuild()) return;
 
-	const server = await DataHandler.getServer(interaction.guildId) 
-		?? await DataHandler.createServer(interaction.guildId);
+	await interaction.deferReply();
 
-	if (!server) {
-		interaction.reply({ content: '**Error!**\nSomething went wrong with grabbing/creating your server data. If this issue persists please contact Kaeso#5346', ephemeral: true }); 
+	const server = await FetchGuild(interaction.guildId).then(res => res.data).catch(() => undefined);
+
+	if (server?.id !== interaction.guildId) {
+		await interaction.deleteReply().catch(() => undefined);
+		interaction.followUp({ content: '**Error!**\nSomething went wrong with grabbing/creating your server data. If this issue persists please contact Kaeso#5346', ephemeral: true }); 
 		return; 
 	}
 
