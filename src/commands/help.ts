@@ -1,25 +1,21 @@
-import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
-import { Command } from "../classes/Command";
+import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { Command, CommandAccess, CommandType } from "../classes/Command";
 import { commands } from "../index";
 
 const command: Command = {
 	name: 'help',
 	description: 'All commands',
 	usage: '(command name)',
-	access: 'ALL',
-	type: 'SLASH',
+	access: CommandAccess.Everywhere,
+	type: CommandType.Slash,
+	slash: new SlashCommandBuilder()
+		.setName('help')
+		.setDescription('Get the help menu!')
+		.addStringOption(option => option.setName('command')
+			.setDescription('Specify a command for more info.')
+			.setRequired(false)
+			.addChoices(...generateCommandNameChoices())),
 	execute: execute,
-	slash: {
-		name: 'help',
-		description: 'Get the help menu!',
-		options: [{
-			name: 'command',
-			type: 3,
-			description: 'Specify a command for more info.',
-			required: false,
-			choices: generateCommandNameChoices()
-		}]
-	},
 }
 
 export default command;
@@ -68,7 +64,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		helpMenu.setTitle('Here\'s a list of all the commands:')
 
 		commands.forEach(command => {
-			if (command.type === 'BUTTON') return;
+			if (command.type === CommandType.Button) return;
 			helpMenu.addFields({
 				name: `${newPrefix}${command.name}`,
 				value: `${command.description}\nUsage: ${newPrefix}${command.name} ${command.usage ? command.usage : ''}`,
