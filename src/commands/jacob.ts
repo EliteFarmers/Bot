@@ -1,37 +1,23 @@
-import { Command } from "../classes/Command";
-import { CanUpdateAndFlag } from "../classes/Util";
-import { ServerData } from "../database/models/servers";
-import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, CommandInteraction, ComponentType, Embed, EmbedBuilder, Message, SelectMenuBuilder } from 'discord.js';
-import Data, { CropString } from '../classes/Data';
-import DataHandler from '../classes/Database';
-import { FetchAccount, FetchAccountFromDiscord, FetchProfiles } from "src/classes/Elite";
-import { ImproperUsageError } from "src/classes/Errors";
-import { AccountData } from "src/classes/skyblock";
+import { Command, CommandAccess, CommandType } from "../classes/Command";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, CommandInteraction, ComponentType, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder } from 'discord.js';
+import { EliteEmbed, ErrorEmbed, WarningEmbed } from "classes/embeds";
+import { FetchAccount, FetchProfile } from "api/elite";
+import Data from '../classes/Data';
 
 const command: Command = {
 	name: 'jacob',
 	description: 'Get jacob\'s high scores or leaderboard!',
-	access: 'ALL',
-	type: 'COMBO',
-	slash: {
-		name: 'jacob',
-		description: 'Get jacob\'s high scores or leaderboard!',
-		options: [
-			{
-				name: 'player',
-				type: ApplicationCommandOptionType.String,
-				description: 'The player in question.',
-				required: false,
-				autocomplete: true
-			},
-			{
-				name: 'profile',
-				type: ApplicationCommandOptionType.String,
-				description: 'Optionally specify a profile!',
-				required: false
-			}
-		]
-	},
+	access: CommandAccess.Everywhere,
+	type: CommandType.Combo,
+	slash: new SlashCommandBuilder()
+		.setName('jacob')
+		.setDescription('Get the jacob\'s stats of a player!')
+		.addStringOption(option => option.setName('player')
+			.setDescription('The player in question.')
+			.setRequired(false))
+		.addStringOption(option => option.setName('profile')
+			.setDescription('Optionally specify a profile!')
+			.setRequired(false)),
 	execute: execute
 }
 
@@ -53,248 +39,168 @@ async function execute(interaction: ButtonInteraction | ChatInputCommandInteract
 async function commandExecute(interaction: ChatInputCommandInteraction | ButtonInteraction, cmdArgs: JacobCMDArgs) {
 	let { playerName, profileName } = cmdArgs;
 
-	let account: AccountData | undefined;
-
-	if (!playerName) {
-		const user = await FetchAccountFromDiscord(interaction.user.id);
-
-		const embed = new EmbedBuilder()
-			.setColor('#CB152B')
-			.setTitle('Error: Specify a Username!')
-			.addFields({ name: 'Proper Usage:', value: '`/weight` `player:`(player name)' })
-			.setDescription('Checking for yourself?\nYou must use `/verify` `player:`(account name) before using this shortcut!')
-			.setFooter({ text: 'Created by Kaeso#5346' });
-
-		if (!user?.success || !user.account?.id || !user.account?.name) {
-			interaction.reply({ embeds: [embed], ephemeral: true });
-			return;
-		}
-		
-		account = user.account;
-		playerName = user.account.name;
-
-		if (!playerName) {
-			interaction.reply({ embeds: [embed], ephemeral: true });
-			return;
-		}
-	}
-
-	if (!account) {
-		const acc = await FetchAccount(playerName);
-		if (!acc?.success || !acc.account) {
-			const embed = ImproperUsageError('Error: Invalid Username!', `Player "${playerName}" does not exist.`, '`/weight` `player:`(player name)');
-			interaction.reply({ embeds: [embed], ephemeral: true });
-			return;
-		}
-		account = acc.account;
-	}
-
-	const { id: uuid } = account;
-
 	await interaction.deferReply();
 
-	const user = await FetchProfiles(uuid);
+	const { data: account } = await FetchAccount(playerName ?? interaction.user.id).catch(() => ({ data: undefined }));
 
-	if (!user?.success) {
-		const embed = new EmbedBuilder().setColor('#CB152B')
-			.setTitle('Error: Couldn\'t Get User!')
-			.setDescription(`Couldn't fetch user. Try again or look here: https://elitebot.dev/stats/${uuid}`)
-			.setFooter({ text: 'Contact Kaeso#5346 if this continues to happen!' });
-		return interaction.reply({ embeds: [embed], ephemeral: true });
+	if (!account?.id || !account?.name) {
+		const embed = WarningEmbed('Specify a Username!')
+			.addFields({ name: 'Proper Usage:', value: '`/jacob` `player:`(player name)' })
+			.setDescription('Checking for yourself?\nYou must use `/verify` `player:`(account name) before using this shortcut!')
+		await interaction.deleteReply().catch(() => undefined);
+		interaction.followUp({ embeds: [embed], ephemeral: true });
+		return;
 	}
 
-	const profiles = user.profiles;
+	playerName = account.name;
 
-	const profile = profiles.find(p => p.cute_name?.toLowerCase() === profileName?.toLowerCase()) 
-		?? profiles.find(p => p.selected) 
-		?? profiles[0];
+	const profile = profileName 
+		? account.profiles?.find(p => p?.profileName?.toLowerCase() === profileName?.toLowerCase())
+		: account.profiles?.find(p => p.selected) ?? account.profiles?.[0];
 
-	const jacob = profile.member.jacob;
+	if (!profile?.profileId || !profile.profileName) {
+		const embed = ErrorEmbed('Invalid Profile!')
+			.setDescription(`Profile "${profileName}" does not exist.`)
+			.addFields({ name: 'Proper Usage:', value: '`/jacob` `player:`(player name) `profile:`(profile name)' });
+		await interaction.deleteReply().catch(() => undefined);
+		interaction.followUp({ embeds: [embed], ephemeral: true });
+		return;
+	}
 
-	const embed = await getHighScoreEmbed();
-	if (!embed) { return; }
+	profileName = profile.profileName;
 
-	const scoresCount = Object.values(jacob.contests).reduce((a, b) => a + b.length, 0);
+	const member = await FetchProfile(account.id, profile.profileId).then(res => { return res.data; }).catch(() => undefined);
 
-	const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-		new ButtonBuilder()
-			.setCustomId('overall')
-			.setLabel('Overall Stats')
-			.setStyle(ButtonStyle.Success)
-			.setDisabled(profileName !== undefined),
-		new ButtonBuilder()
-			.setCustomId('crops')
-			.setLabel('All Crops')
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(profileName !== undefined && scoresCount <= 3),
-		new ButtonBuilder()
-			.setCustomId('recents')
-			.setLabel('Recent Contests')
-			.setStyle(ButtonStyle.Primary)
-	);
+	if (!member || !member.jacob) {
+		const embed = ErrorEmbed('Failed to Get Profile!')
+			.setDescription('Please try again later. If this issue persists, contact kaeso.dev on discord.')
+			.addFields({ name: 'Proper Usage:', value: '`/jacob` `player:`(player name) `profile:`(profile name)' })
+			.addFields({ name: 'Want to view online?', value: `Please go to [elitebot.dev/@${playerName}/${profileName}](https://elitebot.dev/@${playerName}/${profileName})` });
+		await interaction.deleteReply().catch(() => undefined);
+		interaction.followUp({ embeds: [embed], ephemeral: true });
+		return;
+	}
+
+	const jacob = member.jacob;
+	const contests = jacob.contests ?? [];
+	contests.sort((a, b) => (b?.timestamp ?? 0) - (a?.timestamp ?? 0));
+
+	const { earnedMedals: earned, medals } = jacob;
+
+	const partic = (jacob.participations && jacob.participations > 0 && jacob.contests && jacob.contests.length > 0)
+		? `Out of **${jacob.participations?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests, **${account.name?.replace(/_/g, '\\_')}** has been 1st **${jacob.contests?.filter(c => c.position === 1).length.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** times!`
+		: `**${account.name?.replace(/_/g, '\\_')}** has participated in **${jacob.participations?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests!`;
+
+	const embed = EliteEmbed()
+		.setTitle(`Jacob's Stats for ${playerName.replace(/_/g, '\\_')}${profileName ? ` on ${profileName}` : ``}`)
+		.setDescription(`🥇 ${medals?.gold} / **${earned?.gold}** 🥈 ${medals?.silver} / **${earned?.silver}** 🥉 ${medals?.bronze} / **${earned?.bronze}**\n${partic}\n⠀`)
+		.addFields({
+			name: '⠀',
+			value: `[elitebot.dev/@${playerName}/${profileName}](https://elitebot.dev/@${playerName}/${profileName})`
+		});
+
+	let page = 0;
 
 	const args = {
-		components: [row],
+		components: getComponents(page),
 		embeds: [embed],
 		allowedMentions: { repliedUser: false },
 		fetchReply: true
 	}
+
+	let selectedCrop: string | undefined = undefined;
+
+	const reply = await interaction.editReply(args);
 	
-	const select = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
-		new SelectMenuBuilder().setCustomId('select')
-			.setPlaceholder('Filter by Crop!')
-			.addOptions([
-				{ label: 'Cactus', value: 'cactus' },
-				{ label: 'Carrot', value: 'carrot' },
-				{ label: 'Cocoa Beans', value: 'cocoa' },
-				{ label: 'Melon', value: 'melon' },
-				{ label: 'Mushroom', value: 'mushroom' },
-				{ label: 'Nether Wart', value: 'netherwart' },
-				{ label: 'Potato', value: 'potato' },
-				{ label: 'Pumpkin', value: 'pumpkin' },
-				{ label: 'Sugar Cane', value: 'sugarcane' },
-				{ label: 'Wheat', value: 'wheat' }
-			]),
-	);
+	const collector = reply.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60_000 });
 
-	let selectedCrop: CropString | undefined = undefined;
-	interaction.editReply(args).then(async reply => {
-		if (!(reply instanceof Message)) return;
-		const collector = reply.createMessageComponentCollector({ componentType: ComponentType.Button, time: 30_000 });
+	collector.on('collect', async i => {
+		if (i.user.id !== interaction.user.id) {
+			i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
+			return;
+		}
 
-		collector.on('collect', async i => {
-			if (i.user.id === interaction.user.id) {
-				collector.resetTimer({ time: 30000 });
+		collector.resetTimer({ time: 30_000 });
 
-				const newRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-					new ButtonBuilder()
-						.setCustomId('overall')
-						.setLabel('Overall Stats')
-						.setStyle(ButtonStyle.Success)
-						.setDisabled(i.customId === 'overall'),
-					new ButtonBuilder()
-						.setCustomId('crops')
-						.setLabel('All Crops')
-						.setStyle(ButtonStyle.Primary)
-						.setDisabled(i.customId === 'crops' || scoresCount > 3),
-					new ButtonBuilder()
-						.setCustomId('recents')
-						.setLabel('Recent Contests')
-						.setStyle(ButtonStyle.Primary)
-						.setDisabled(i.customId === 'recents')
-				);
+		if (i.customId === 'overall') {
+			page = 0;
 
-				const recentRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-					new ButtonBuilder()
-						.setCustomId('overall')
-						.setLabel('Overall Stats')
-						.setStyle(ButtonStyle.Secondary)
-						.setDisabled(i.customId === 'overall'),
-					new ButtonBuilder()
-						.setCustomId('expand')
-						.setLabel('Show More')
-						.setStyle(ButtonStyle.Success)
-						.setDisabled(i.customId === 'expand'),
-					new ButtonBuilder()
-						.setCustomId('recents')
-						.setLabel('Recent Contests')
-						.setStyle(ButtonStyle.Primary)
-						.setDisabled(i.customId === 'recents' || i.customId === 'expand')
-				);
+			i.update({ embeds: [embed], components: getComponents(page) })
+				.catch(() => { collector.stop(); });
+		} else if (i.customId === 'recents') {
+			const recentsEmbed = await getRecents(undefined)
+			if (!recentsEmbed) return;
 
-				if (i.customId === 'overall') {
-					profileName = undefined;
+			page = 1;
 
-					const scoresEmbed = await getHighScoreEmbed(false);
-					if (!scoresEmbed) return;
+			const updated = await i.update({ embeds: [recentsEmbed], components: getComponents(page), fetchReply: true });
+			
+			const cropCollector = updated.createMessageComponentCollector({ 
+				componentType: ComponentType.StringSelect, 
+				time: 30_000 
+			});
 
-					i.update({ embeds: [scoresEmbed], components: [newRow] }).catch(error => { console.log(error); collector.stop(); });
-				} else if (i.customId === 'crops') {
-					profileName = undefined;
-
-					const scoresEmbed = await getHighScoreEmbed(false);
-					if (!scoresEmbed) return;
-
-					i.update({ embeds: [scoresEmbed], components: [newRow] }).catch(error => { console.log(error); collector.stop(); });
-				} else if (i.customId === 'recents') {
-					profileName = undefined;
-
-					const recentsEmbed = await getRecents(undefined, false)
-					if (!recentsEmbed) return;
-
-					i.update({ embeds: [recentsEmbed], components: [select, recentRow], fetchReply: true }).then(reply => {
-						if (!(reply instanceof Message)) return;
-						const newCollector = reply.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 30_000 });
-
-						newCollector.on('collect', async inter => {
-							if (inter.user.id === interaction.user.id) {
-								collector.resetTimer({ time: 30_000 });
-								newCollector.resetTimer({ time: 30_000 });
-
-								selectedCrop = inter.values[0] as CropString;
-
-								const cropsEmbed = await getRecents(selectedCrop, i.customId === 'expand');
-								if (!cropsEmbed) return;
-
-								inter.update({ embeds: [cropsEmbed], components: [select, recentRow] }).catch(() => undefined);
-							} else {
-								inter.reply({ content: `These buttons aren't for you!`, ephemeral: true });
-							}
-						});
-
-						newCollector.on('end', () => {
-							collector.stop();
-						});
-					}).catch(error => { console.log(error); collector.stop(); });
-				} else if (i.customId === 'expand') {
-					const cropsEmbed = await getRecents(selectedCrop, true);
-					if (!cropsEmbed) return;
-
-					i.update({ embeds: [cropsEmbed], components: [select, recentRow] }).catch(error => { console.log(error) });            
+			cropCollector.on('collect', async inter => {
+				if (inter.user.id !== interaction.user.id) {
+					inter.reply({ content: `These buttons aren't for you!`, ephemeral: true });
+					return;
 				}
-			} else {
-				i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
-			}
-		});
 
-		collector.on('end', () => {
-			interaction.editReply({ components: [] }).catch(() => undefined);
-		});
+				collector.resetTimer({ time: 30_000 });
+				cropCollector.resetTimer({ time: 30_000 });
+
+				selectedCrop = inter.values[0];
+
+				const crop = crops[parseInt(selectedCrop)];
+
+				const cropsEmbed = await getRecents(crop.name);
+				
+				inter.update({ embeds: [cropsEmbed], components: getComponents(page) }).catch(() => undefined);
+			});
+
+			cropCollector.on('end', () => {
+				collector.stop();
+			});
+		}
 	});
 
-	async function getRecents(selectedCrop?: CropString, expand = false) {
-		if (!jacob) return;
+	collector.on('end', () => {
+		interaction.editReply({ components: [] }).catch(() => undefined);
+	});
 
+	async function getRecents(selectedCrop?: string) {
+		
 		const newEmbed = new EmbedBuilder().setColor('#03fc7b')
-			.setTitle(`Recent ${selectedCrop ? Data.getReadableCropName(selectedCrop) : 'Jacob\'s'} Contests for ${playerName?.replace(/_/g, '\\_')}${profileName ? ` on ${profileName}` : ``}`)
-			.setFooter({ text: `Note: Highscores only valid after ${Data.getReadableDate(Data.CUTOFFDATE)}\nCreated by Kaeso#5346    Can take up to 10 minutes to update` });
+			.setTitle(`Recent ${selectedCrop ? selectedCrop : 'Jacob\'s'} Contests for ${playerName?.replace(/_/g, '\\_')}${profileName ? ` on ${profileName}` : ``}`);
 
-		const contests = (selectedCrop) ? jacob.contests[selectedCrop] : Object.values(jacob.contests).flatMap(c => c);
-		contests.sort((a, b) => b.timestamp - a.timestamp);
+		const entries = (selectedCrop) ? contests.filter(c => c.crop === selectedCrop) : contests;
 
-		let addedIndex = 0;
 		const contestAmount = contests.length;
 
-		if (!expand && contestAmount > 4) newEmbed.setDescription('Click "Show More" to see more contests!');
+		if (contestAmount === 0) {
+			newEmbed.setDescription(`**${account?.name?.replace(/_/g, '\\_')}** hasn't participated in any contests!`);
+			return newEmbed;
+		}
 
-		for (let i = 0; i < Math.min(expand ? 10 : 4, contestAmount); i++) {
-			const contest = contests[i];
+		let added = 0;
+		for (let i = 0; i < Math.min(10, contestAmount); i++) {
+			const contest = entries[i];
 
 			const details = (contest.participants && contest.position !== undefined) 
 				? `\`#${(contest.position + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${contest.participants.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` ${profileName ? ` on \`${profileName}\`!` : ` players!`}` 
 				: `${profileName ? `Unclaimed on \`${profileName}\`!` : `Contest Still Unclaimed!`}`;
 
 			if (!contest.collected) continue;
-			addedIndex++;
+			added++;
 
 			newEmbed.addFields({
-				name: `${Data.getReadableDate(contest.collected)}`,
-				value: `${(selectedCrop) ? 'Collected ' : `${Data.getReadableCropName(contest?.crop ?? '') ?? 'ERROR'} - `}**${contest.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**\n` + details,// + '\n⠀',
+				name: `${Data.getReadableDate(contest.timestamp ?? 0)}`,
+				value: `${(selectedCrop) ? 'Collected ' : `${contest?.crop ?? 'ERROR'} - `}**${contest.collected.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**\n` + details,
 				inline: true
 			});
 
-			if (addedIndex % 2 == 1) {
-				newEmbed.fields.push({
+			if (added % 2 == 1) {
+				newEmbed.addFields({
 					name: "⠀",
 					value: "⠀",
 					inline: true
@@ -302,138 +208,113 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 			}
 		}
 
-		if (addedIndex === 0) {
-			newEmbed.fields.push({
-				name: `No Data Found`,
-				value: `Sorry, but ${user?.ign ? user?.ign.replace(/_/g, '\\_') : (playerName ?? 'Player').replace(/_/g, '\\_') } hasn't participated in any ${selectedCrop ? Data.getReadableCropName(selectedCrop) : ''} contests!\n⠀`,
-				inline: false
-			});
-		}
-
 		return newEmbed;
 	}
-
-	async function getHighScoreEmbed(allcrops = false) {
-		if (!jacob) return undefined;
-
-		const scores = jacob.scores;
-
-		const cMedals = jacob.currentmedals;
-		const tMedals = jacob.totalmedals;
-
-		const partic = (jacob.firstplace) 
-			? `Out of **${jacob.participations.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests, **${user?.ign ? user?.ign.replace(/_/g, '\\_') : (playerName ?? 'Player').replace(/_/g, '\\_') }** has been 1st **${jacob.firstplace.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** times!`
-			: `**${user?.ign ? user?.ign.replace(/_/g, '\\_') : 'N/A'}** has participated in **${jacob.participations.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests!`;
-
-		const embed = new MessageEmbed().setColor('#03fc7b')
-			.setTitle(`${!profileName || allcrops ? `Overall ` : ``}Jacob's High Scores for ${user?.ign ? user?.ign.replace(/_/g, '\\_') : (playerName ?? 'Player').replace(/_/g, '\\_') }${profileName ? ` on ${profileName}` : ``}`)
-			.setFooter({ text: `Note: Scores only valid after ${Data.getReadableDate(Data.CUTOFFDATE)}\nCreated by Kaeso#5346    Can take up to 10 minutes to update` })
-			.setDescription(`🥇 ${cMedals.gold} / **${tMedals.gold}** 🥈 ${cMedals.silver} / **${tMedals.silver}** 🥉 ${cMedals.bronze} / **${tMedals.bronze}**\n${partic}\n⠀`);
-
-		if (profileName || allcrops) {
-			let addedIndex = 0;
-			for (let i = 0; i < Object.keys(scores).length; i++) {
-				const crop = Object.keys(scores)[i] as CropString;
-				if (!crop) break;
-
-				const details = (scores[crop].par && scores[crop].pos !== undefined) 
-					? `\`#${((scores[crop].pos ?? 0) + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${(scores[crop].par ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` ${!profileName ? ` on \`${scores[crop].profilename}\`!` : ` players!`}\n\`${Data.getReadableDate(scores[crop].obtained)}\`` 
-					: `${!profileName ? `Unclaimed on \`${scores[crop].profilename}\`!` : `Contest Still Unclaimed!`}\n\`${Data.getReadableDate(scores[crop].obtained)}\``;
-
-				if (!scores[crop].value) continue;
-				addedIndex++;
-
-				embed.fields.push({
-					name: `${Data.getReadableCropName(crop)} - ${scores[crop].value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
-					value: details + '\n⠀',
-					inline: true
-				});
-
-				if (addedIndex % 2 == 1) {
-					embed.fields.push({
-						name: "⠀",
-						value: "⠀",
-						inline: true
-					});
-				}
-			}
-
-			if (addedIndex === 0) {
-				embed.fields.push({
-					name: `No Data Found`,
-					value: `Sorry, but ${user?.ign} hasn't participated in any recent contests!\n⠀`,
-					inline: false
-				});
-			}
-		} else {
-			const highscores = new Map();
-
-			for (let i = 0; i < Object.keys(scores).length; i++) {
-				const crop = Object.keys(scores)[i] as CropString;
-				if (!crop) break;
-				
-				const details = (scores[crop].par && scores[crop].pos !== undefined) 
-					? `Placed \`#${((scores[crop].pos ?? 0) + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${(scores[crop].par ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` players in \`${Data.getReadableDate(scores[crop].obtained)}!\`` 
-					: `Obtained in \`${Data.getReadableDate(scores[crop].obtained)}\``;
-
-				if (scores[crop].value > 0) {
-					highscores.set(`
-**${Data.getReadableCropName(crop)}** - Collected **${scores[crop].value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** items${scores[crop].profilename ? ` on \`${scores[crop].profilename}\`` : ``}!
-${details}
-					`, Data.getApproxWeightByCrop(scores[crop].value, crop));
-				}
-			}
-
-			if (highscores.size === 0) {
-				embed.fields.push({
-					name: `No Data Found`,
-					value: `Sorry, but ${user?.ign} hasn't participated in any recent contests!\n⠀`,
-					inline: false
-				});
-			} else {
-				const sortedHighs = new Map([...highscores.entries()].sort((a, b) => b[1] - a[1]));
-
-				let breakdown = `⠀`;
-				let remaining = 3;
-
-				sortedHighs.forEach(function (value, key) {
-					if (remaining) {
-						breakdown += key;
-						remaining--;
-					}
-				});
-
-				embed.fields.push({
-					name: remaining === 0 ? `Top Three High Scores` : 'High Scores',
-					value: breakdown + '⠀  　',
-					inline: false
-				});
-			}
-		} 
-
-		return embed;
-	}
 }
-// function getJacobData(user, profileName) {
-// 	const profiles = user.dataValues?.profiledata?.profiles;
-
-// 	for (let i = 0; i < Object.keys(profiles).length; i++) {
-// 		let key = Object.keys(profiles)[i];
-// 		let profile = profiles[key];
-
-// 		if (profile.cute_name.toLowerCase() === profileName.toLowerCase()) {
-// 			profileName = profile.cute_name;
-// 			let p = profile?.members[Object.keys(profile?.members)[0]].jacob
-// 			return p ? p : user.dataValues?.contestdata;
-// 		}
-// 	}
-// 	profileName = undefined;
-// 	return user.dataValues?.contestdata;
-// }
 
 type JacobCMDArgs = {
 	playerName?: string,
 	profileName?: string
-	server?: ServerData,
 	ign?: string,
 }
+
+function getComponents(page: number) {
+	const components = [new ActionRowBuilder<ButtonBuilder>().addComponents(
+		new ButtonBuilder()
+			.setCustomId('overall')
+			.setLabel('Overall Stats')
+			.setStyle(ButtonStyle.Success)
+			.setDisabled(page !== 0),
+		new ButtonBuilder()
+			.setCustomId('recents')
+			.setLabel('Recent Contests')
+			.setStyle(ButtonStyle.Primary)
+			.setDisabled(page !== 1),
+	)] as unknown[];
+
+	if (page === 1) components.push(new ActionRowBuilder<StringSelectMenuBuilder>().addComponents( 
+		new StringSelectMenuBuilder()
+			.setCustomId('select')
+			.setPlaceholder('Filter by Crop!')
+			.addOptions(crops.map((crop, i) => ({
+				label: crop.name,
+				value: i.toString(),
+				emoji: crop.emoji,
+			}))),
+	));
+
+	return components as ActionRowBuilder<ButtonBuilder>[];
+}
+
+const crops = [
+	{
+		name: 'Cactus',
+		emoji: {
+			id: '1096113963512639528',
+			name: 'cactus',
+		}
+	},
+	{
+		name: 'Carrot',
+		emoji: {
+			id: '1096114031359701023',
+			name: 'carrot',
+		}
+	},
+	{
+		name: 'Cocoa Beans',
+		emoji: {
+			id: '1096206396707581973',
+			name: 'cocoa_beans',
+		}
+	},
+	{
+		name: 'Melon',
+		emoji: {
+			id: '1096108893735768094',
+			name: 'melon',
+		}
+	},
+	{
+		name: 'Mushroom',
+		emoji: {
+			id: '1109927720546226276',
+			name: 'mushrooms',
+		}
+	},
+	{
+		name: 'Nether Wart',
+		emoji: {
+			id: '1109927626899980429',
+			name: 'wart',
+		}
+	},
+	{
+		name: 'Potato',
+		emoji: {
+			id: '1109928158003736626',
+			name: 'potato',
+		}
+	},
+	{
+		name: 'Pumpkin',
+		emoji: {
+			id: '1096108959225610310',
+			name: 'pumpkin',
+		}
+	},
+	{
+		name: 'Sugar Cane',
+		emoji: {
+			id: '1096107156023033897',
+			name: 'sugarcane',
+		}
+	},
+	{
+		name: 'Wheat',
+		emoji: {
+			id: '1096108834663178350',
+			name: 'wheat',
+		}
+	},
+];
