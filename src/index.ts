@@ -1,17 +1,17 @@
-import { Client, GatewayIntentBits, Partials, Collection, ApplicationCommandDataResolvable, ApplicationCommandData, ActivityType } from 'discord.js';
-import { Command } from './classes/Command';
+import { Client, GatewayIntentBits, Collection, ApplicationCommandDataResolvable, ActivityType, RESTPostAPIChatInputApplicationCommandsJSONBody, Events } from 'discord.js';
+import { Command, CommandType } from './classes/Command';
 
 import fs from 'fs';
 import path from 'path';
 
 import dotenv from 'dotenv';
+import { GlobalFonts } from '@napi-rs/canvas';
 dotenv.config();
 
 const proccessArgs = process.argv.slice(2);
 
 export const client = new Client({ 
-	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.DirectMessages],
-	partials: [Partials.Channel]
+	intents: [GatewayIntentBits.Guilds]
 });
 
 export const commands = new Collection<string, Command>();
@@ -43,12 +43,16 @@ export const commands = new Collection<string, Command>();
 		const event = await import(`events/${file.replace('.ts', '')}`);
 		client.on(file.split('.')[0], event.default);
 	}
+
+	GlobalFonts.loadFontsFromDir(path.resolve('./src/assets/fonts/'));
 }()); 
 
 
-client.once('ready', async () => {
+client.once(Events.ClientReady, async () => {
+	const guildCount = Object.keys(client.guilds).length;
+
 	if (client.user) {
-		client.user.setActivity('skyblock players', { type: ActivityType.Watching });
+		client.user.setActivity(`${guildCount} farming guilds`, { type: ActivityType.Watching });
 	}
 
 	console.log('Ready!');
@@ -72,12 +76,12 @@ client.login(process.env.BOT_TOKEN);
 */
 
 function deploySlashCommands() {
-	const slashCommandsData: ApplicationCommandData[] = [];
+	const slashCommandsData: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
 
 	for (const [, command ] of commands) {
-		if (command.type === 'AUTOCOMPLETE' || command.type === 'BUTTON') continue;
+		if (command.type !== CommandType.Slash && command.type !== CommandType.Combo) continue;
 
-		if (command.slash) slashCommandsData.push(command.slash);
+		if (command.slash) slashCommandsData.push(command.slash.toJSON());
 	}
 
 	if (proccessArgs[1] === 'global') {
