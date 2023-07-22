@@ -1,15 +1,13 @@
-import { UserData } from "database/models/users";
-import { Guild, GuildBasedChannel, GuildMember, Snowflake, ThreadChannelTypes, Permissions, PermissionString } from "discord.js";
+import { Guild, GuildBasedChannel, GuildMember, Snowflake, PermissionFlagsBits, ChannelType } from "discord.js";
 import { client } from "../index";
 import { CommandAccess } from "./Command";
-import DataHandler from "./Database";
 
-export function isValidAccess(access: CommandAccess, type: 'DM' | 'GUILD_NEWS' | 'GUILD_TEXT' | ThreadChannelTypes): boolean {
-	if (access === 'ALL') return true;
+export function isValidAccess(access: CommandAccess, type: ChannelType): boolean {
+	if (access === CommandAccess.Everywhere) return true;
 	// If access is direct, return true if type is also a DM, else false
-	if (access === 'DIRECT') return (type === 'DM');
+	if (access === CommandAccess.DirectMessage) return (type === ChannelType.DM);
 	// Access has to be GUILD at this point, so return true as long as the channel isn't a DM
-	return (type !== 'DM');
+	return (type !== ChannelType.DM);
 }
 
 /**
@@ -51,39 +49,6 @@ export async function FindGuild(guildId: Snowflake): Promise<Guild | undefined> 
 	return guild ?? undefined;
 }
 /**
- * Returns `true` if the number of `minutes` have passed since the last time the user's data was fetched or `false` otherwise.
- * `minutes` defaults to 10.
- * 
- * @param  {UserData} user
- * @param  {number} minutes 10
- * @returns boolean
- */
-export function CanUpdate(user?: UserData, minutes = 10): boolean {
-	if (!user || !user.updatedat) return true;
-
-	// All of these are in milliseconds
-	const lastUpdated = parseInt(user.updatedat);
-	const updateInterval = minutes * 60 * 1000;
-	const currentTime = Date.now();
-
-	return lastUpdated + updateInterval < currentTime;
-}
-/**
- *  Returns `true` and updates the last updated time if the number of `minutes` have passed since the last time the user's data was fetched or `false` otherwise.
- * `minutes` defaults to 10.
- * 
- * @param  {UserData} user
- * @param  {number} minutes 10
- * @returns boolean
- */
-export async function CanUpdateAndFlag(user: UserData, minutes = 10) {
-	const canUpdate = CanUpdate(user, minutes);
-	if (!canUpdate) return false;
-	
-	await DataHandler.update({ updatedat: Date.now().toString() }, { uuid: user.uuid });
-	return canUpdate;
-}
-/**
  * Returns `true` if member has a role, or `false` otherwise. By default, a user having the ADMINISTRATOR permission will return `true` unless adminOverride is false.
  * 
  * @param  {GuildMember} member
@@ -94,11 +59,11 @@ export async function CanUpdateAndFlag(user: UserData, minutes = 10) {
 export function HasRole(member?: GuildMember, roleId?: Snowflake, adminOverride = true) {
 	if (!member || !roleId) return false;
 
-	const perms = ((member.permissions) as Readonly<Permissions>).toArray();
+	const perms = member.permissions
 	const roles = member.roles?.cache?.map((role) => role.id);
 
 	// If user has the admin perm and overide is true then return true 
-	if (adminOverride && perms && perms.includes('ADMINISTRATOR' as PermissionString)) return true;
+	if (adminOverride && perms && perms.has(PermissionFlagsBits.Administrator)) return true;
 
 	// Otherwise return whether or not the user has the role
 	return roles.includes(roleId) ?? false;
