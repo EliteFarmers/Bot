@@ -1,5 +1,5 @@
-import { Client, GatewayIntentBits, Collection, ApplicationCommandDataResolvable, ActivityType, RESTPostAPIChatInputApplicationCommandsJSONBody, Events } from 'discord.js';
-import { Command, CommandType } from './classes/Command';
+import { Client, GatewayIntentBits, Collection, ApplicationCommandDataResolvable, ActivityType, RESTPostAPIChatInputApplicationCommandsJSONBody, Events, PermissionsBitField } from 'discord.js';
+import { Command, CommandType } from './classes/Command.js';
 
 import fs from 'fs';
 import path from 'path';
@@ -21,26 +21,26 @@ export const commands = new Collection<string, Command>();
 * as it only runs once on startup and allows you to only create a new file.
 */
 (async function() {
-	const filter = (fileName: string) => fileName.endsWith('.ts');
+	const filter = (fileName: string) => fileName.endsWith('.ts') || fileName.endsWith('.js');
 
 	const commandFiles = fs.readdirSync(path.resolve('./src/commands/')).filter(filter);
-
+	
 	for (const file of commandFiles) {
-		const command = await import(`./commands/${file}`);
+		const command = await import(`./commands/${file.replace('.ts', '.js')}`);
 		commands.set(command.default.name, command.default);
 	}
 
-	const buttonFiles = fs.readdirSync('../buttons/').filter(filter);
+	const buttonFiles = fs.readdirSync('./src/buttons/').filter(filter);
 
 	for (const file of buttonFiles) {
-		const command = await import(`buttons/${file.replace('.ts', '')}`);
+		const command = await import(`./buttons/${file.replace('.ts', '.js')}`);
 		commands.set(command.default.name, command.default);
 	}
 	
-	const eventFiles = fs.readdirSync('../events/').filter(filter);
+	const eventFiles = fs.readdirSync('./src/events/').filter(filter);
 	
 	for (const file of eventFiles) {
-		const event = await import(`events/${file.replace('.ts', '')}`);
+		const event = await import(`./events/${file.replace('.ts', '.js')}`);
 		client.on(file.split('.')[0], event.default);
 	}
 
@@ -49,7 +49,7 @@ export const commands = new Collection<string, Command>();
 
 
 client.once(Events.ClientReady, async () => {
-	const guildCount = Object.keys(client.guilds).length;
+	const guildCount = client.guilds.cache.size;
 
 	if (client.user) {
 		client.user.setActivity(`${guildCount} farming guilds`, { type: ActivityType.Watching });
@@ -81,7 +81,15 @@ function deploySlashCommands() {
 	for (const [, command ] of commands) {
 		if (command.type !== CommandType.Slash && command.type !== CommandType.Combo) continue;
 
-		if (command.slash) slashCommandsData.push(command.slash.toJSON());
+		if (!command.slash) continue;
+
+		const slash = command.slash;
+		
+		if (command.permissions) {
+			slash.setDefaultMemberPermissions(PermissionsBitField.resolve(command.permissions));
+		}
+
+		slashCommandsData.push(command.slash.toJSON());
 	}
 
 	if (proccessArgs[1] === 'global') {
