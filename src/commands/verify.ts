@@ -1,7 +1,7 @@
-import { Command, CommandAccess, CommandType } from "../classes/Command";
+import { Command, CommandAccess, CommandType } from "../classes/Command.js";
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { EliteEmbed, ErrorEmbed, WarningEmbed } from "classes/embeds";
-import { LinkAccount } from "api/elite";
+import { EliteEmbed, ErrorEmbed, WarningEmbed } from "../classes/embeds.js";
+import { FetchAccount, FetchUpdateAccount, LinkAccount } from "../api/elite.js";
 
 const command: Command = {
 	name: 'verify',
@@ -35,6 +35,17 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		return interaction.editReply({ embeds: [embed] });
 	}
 
+	// Will create a new account/load stats if one doesn't exist already
+	await FetchAccount(playerName).catch(() => undefined);
+
+	const account = await FetchUpdateAccount(interaction.user, interaction.locale).then(res => res.data).catch(() => undefined);
+
+	if (!account) {
+		const embed = ErrorEmbed('Failed to Fetch Account!')
+			.setDescription('Please try again. If this issue persists, contact kaeso.dev on discord.');
+		return interaction.editReply({ embeds: [embed] });
+	}
+
 	try {
 		const { response } = await LinkAccount(interaction.user.id, playerName);
 
@@ -42,7 +53,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 			const error = await response.text().catch(() => undefined);
 
 			const embed = ErrorEmbed('Failed to Link Account!')
-				.setDescription((error || 'Please try again later.') + '\nEnsure your discord account is properly linked to your minecraft account on Hypixel. It should match your username exactly, case-sensitive.')
+				.setDescription((error || 'Please try again later.') + '\n⠀\nEnsure your Discord account is properly linked to your minecraft account on Hypixel. It should match your username exactly, case-sensitive.')
 				.addFields({ name: 'Proper Usage:', value: '`/verify` `player:`(player name)' })
 				.addFields({ name: 'Want to unlink your account?', value: 'Please go to [elitebot.dev/profile](https://elitebot.dev/profile) and remove your account there.' });
 			return interaction.editReply({ embeds: [embed] });
