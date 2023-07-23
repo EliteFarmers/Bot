@@ -3,7 +3,7 @@ import { components, paths } from './api.d';
 import { User } from 'discord.js';
 
 const { get, put, post, del, patch } = createClient<paths>({
-	baseUrl: 'https://api.elitebot.dev',
+	baseUrl: process.env.ELITE_API_URL,
 	headers: {
 		'User-Agent': 'EliteDiscordBot',
 		'Authorization': `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
@@ -61,10 +61,44 @@ export const FetchWeightLeaderboardRank = (playerUuid: string, profileUuid: stri
 	},
 });
 
-export const FetchLeaderboardSlice = (leaderboardId: Leaderboard, offset = 0, limit = 20) => get('/Leaderboard/{id}', {
+export const FetchLeaderboardRank = (leaderboardId: string, playerUuid: string, profileUuid: string) => get('/Leaderboard/rank/{leaderboardId}/{playerUuid}/{profileUuid}', {
+	params: {
+		path: {
+			leaderboardId,
+			playerUuid,
+			profileUuid,
+		},
+	},
+});
+
+export const FetchLeaderboardSlice = (leaderboardId: string, offset = 0, limit = 20) => get('/Leaderboard/{id}', {
 	params: {
 		path: {
 			id: leaderboardId,
+		},
+		query: {
+			offset,
+			limit,
+		},
+	},
+});
+
+export const FetchSkillLeaderboardSlice = (leaderboardId: string, offset = 0, limit = 20) => get('/Leaderboard/skill/{skillName}', {
+	params: {
+		path: {
+			skillName: leaderboardId,
+		},
+		query: {
+			offset,
+			limit,
+		},
+	},
+});
+
+export const FetchCollectionLeaderboardSlice = (leaderboardId: string, offset = 0, limit = 20) => get('/Leaderboard/collection/{collection}', {
+	params: {
+		path: {
+			collection: leaderboardId,
 		},
 		query: {
 			offset,
@@ -139,8 +173,3 @@ export const MakeAccountPrimary = (id: string, player: string) => post('/Bot/acc
 		},
 	},
 });
-
-
-export enum Leaderboard {
-	FarmingWeight = 'farmingweight',
-}
