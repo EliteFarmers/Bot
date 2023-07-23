@@ -1,9 +1,10 @@
-import { ChatInputCommandInteraction, AttachmentBuilder, SlashCommandBuilder } from 'discord.js';
-import { Command, CommandAccess, CommandType } from '../classes/Command';
+import { ChatInputCommandInteraction, AttachmentBuilder, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } from 'discord.js';
+import { Command, CommandAccess, CommandType } from '../classes/Command.js';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
-import { FetchAccount, FetchWeight, FetchWeightLeaderboardRank } from '../api/elite';
-import { ErrorEmbed, WarningEmbed } from 'classes/embeds';
-import { components } from 'api/api';
+import { FetchAccount, FetchWeight, FetchWeightLeaderboardRank } from '../api/elite.js';
+import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
+import { components } from '../api/api.js';
+import { GetCropEmoji } from '../classes/Util.js';
 
 const command: Command = {
 	name: 'weight',
@@ -42,7 +43,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		return;
 	}
 
-	playerName ??= account.name;
+	playerName = account.name;
 
 	const profile = _profileName 
 		? account.profiles?.find(p => p?.profileName?.toLowerCase() === _profileName.toLowerCase())
@@ -88,11 +89,69 @@ async function execute(interaction: ChatInputCommandInteraction) {
 
 	const img = await createWeightImage(playerName, account.id, profile.profileName, profileWeight, rank);
 
-	await interaction.editReply({ files: [img], allowedMentions: { repliedUser: false } }).catch(() => {
+	const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+		new ButtonBuilder()
+			.setCustomId('moreInfo')
+			.setLabel('More Info')
+			.setStyle(ButtonStyle.Success),
+		new ButtonBuilder()
+			.setLabel(`@${account.name}/${profile.profileName}`)
+			.setURL(`https://elitebot.dev/@${account.name}/${encodeURIComponent(profile.profileName)}`)
+			.setStyle(ButtonStyle.Link)
+	);
+
+	const reply = await interaction.editReply({ files: [img], components: [row], allowedMentions: { repliedUser: false } }).catch(() => {
 		const embed = ErrorEmbed('Something went wrong!')
 			.setDescription(`Weight image couldn't be sent in this channel. There is likely something wrong with the channel permissions.`);
 		interaction.followUp({ embeds: [embed], ephemeral: true });
 		return;
+	});
+
+	if (!reply) return;
+
+	const filter = (i: { customId: string }) => i.customId === 'moreInfo';
+	const collector = reply.createMessageComponentCollector({ filter, time: 60000, componentType: ComponentType.Button });
+
+	collector.on('collect', async i => {
+		if (i.user.id !== interaction.user.id) {
+			await i.reply({ content: 'This button is not for you!', ephemeral: true });
+			return;
+		}
+
+		const crops = Object.entries(profileWeight.cropWeight ?? {})
+			.filter(([,a]) => a && a >= 0.001)
+			.sort(([,a], [,b]) => ((b ?? 0) - (a ?? 0)));
+
+		const embed = EliteEmbed()
+			.setTitle(`Stats for ${playerName?.replace(/_/g, '\\_')} on ${profile.profileName}`)
+			.addFields({ 
+				name: 'Farming Weight', 
+				value: totalWeight.toLocaleString()
+			})
+			.addFields({
+				inline: true,
+				name: 'Breakdown', 
+				value: crops.map(([key, value]) => {
+					const percent = Math.round((value ?? 0) / totalWeight * 1000) / 10;
+					return `${GetCropEmoji(key)} ${value?.toLocaleString() ?? 0} ⠀${percent > 2 ? `[${percent}%]` : ''}`;
+				}).join('\n') || 'No notable collections!',
+			}, {
+				inline: true,
+				name: '⠀',
+				value: '⠀'
+			}, {
+				inline: true,
+				name: 'Bonus',
+				value: Object.entries(profileWeight.bonusWeight ?? {}).map(([key, value]) => {
+					return `${key} - ${value?.toLocaleString() ?? 0}`;
+				}).join('\n') || 'No bonus weight!',
+			}, {
+				name: '⠀',
+				value: `[Questions?](https://elitebot.dev/info)⠀ ⠀[@${account.name}/${profile.profileName}](https://elitebot.dev/@${account.name}/${encodeURIComponent(profile.profileName ?? '')})⠀ ⠀[SkyCrypt](https://sky.shiiyu.moe/stats/${account.name}/${encodeURIComponent(profile.profileName ?? '')})`
+			});
+
+		await i.update({ embeds: [embed], components: [] }).catch(() => undefined);
+		collector.stop();
 	});
 }
 
@@ -120,9 +179,9 @@ async function createWeightImage(ign: string, uuid: string, profile: string, wei
 	let imagePath;
 	if (sources) {
 		const topCollection = Object.entries(sources).sort(([,a], [,b]) => ((b ?? 0) - (a ?? 0)))[0][0];
-		imagePath = `./assets/images/${topCollection.toLowerCase().replace(' ', '_')}.png`;
+		imagePath = `./src/assets/images/${topCollection.toLowerCase().replace(' ', '_')}.png`;
 	} else {
-		imagePath = `./assets/images/wheat.png`
+		imagePath = `./src/assets/images/wheat.png`
 	}
 
 	// Load crop image and avatar
