@@ -3,7 +3,7 @@ import { EmbedBuilder } from "discord.js";
 export function EliteEmbed() {
 	return new EmbedBuilder()
 		.setColor('#03fc7b')
-		.setFooter({ text: 'Powered by Elite Farmers API - kaeso.dev', iconURL: 'https://elitebot.dev/favicon.ico' })
+		.setFooter({ text: 'Powered by Elite Farmers API - kaeso.dev', iconURL: 'https://elitebot.dev/favicon.webp' })
 }
 
 export function ErrorEmbed(title: string) {
