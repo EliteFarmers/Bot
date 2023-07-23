@@ -1,6 +1,6 @@
 // This is to allow the generic "Function" to be used, as it's the easiest way to allow both types of commandss
 /* eslint-disable @typescript-eslint/ban-types */
-import { ApplicationCommandOptionType, CommandInteractionOption, PermissionResolvable, SlashCommandBuilder } from "discord.js";
+import { PermissionsBitField, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
 
 export interface Command {
 	name: string,
@@ -9,19 +9,11 @@ export interface Command {
 	type: CommandType,
 	aliases?: string[],
 	usage?: string,
-	permissions?: PermissionResolvable[],
+	permissions?: PermissionsBitField,
 	adminRoleOverride?: boolean,
-	slash?: SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>
+	slash?: SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'> | SlashCommandSubcommandsOnlyBuilder
 
 	execute: Function
-}
-
-export interface CommandArgument extends CommandInteractionOption {
-	name: string,
-	type: ApplicationCommandOptionType,
-	description: string,
-	required: boolean,
-	choices?: {}[]
 }
 
 export enum CommandType {

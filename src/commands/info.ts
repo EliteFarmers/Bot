@@ -1,5 +1,5 @@
-import { EliteEmbed } from 'classes/embeds';
-import { Command, CommandAccess, CommandType } from '../classes/Command';
+import { EliteEmbed } from '../classes/embeds.js';
+import { Command, CommandAccess, CommandType } from '../classes/Command.js';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 const command: Command = {
@@ -18,7 +18,7 @@ export default command;
 async function execute(interaction: ChatInputCommandInteraction) {
 	const embed = EliteEmbed()
 		.setTitle('Farming Weight Information')
-		.setDescription('Farming weight is based off of multiple different factors to provide a number for comparsion between all farmers.\n**Info has been moved to [elitebot.dev](https://elitebot.dev/info)**')
+		.setDescription('Farming weight is based off of multiple different factors to provide a number for comparsion between all farmers.\n\n**Info has been moved to [elitebot.dev/info](https://elitebot.dev/info)**')
 		.addFields([
 			{ 
 				name: 'Crop Collections', 

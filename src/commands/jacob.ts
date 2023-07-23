@@ -1,14 +1,15 @@
-import { Command, CommandAccess, CommandType } from "../classes/Command";
+import { Command, CommandAccess, CommandType } from "../classes/Command.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, CommandInteraction, ComponentType, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder } from 'discord.js';
-import { EliteEmbed, ErrorEmbed, WarningEmbed } from "classes/embeds";
-import { FetchAccount, FetchProfile } from "api/elite";
-import Data from '../classes/Data';
+import { EliteEmbed, ErrorEmbed, WarningEmbed } from "../classes/embeds.js";
+import { FetchAccount, FetchProfile } from "../api/elite.js";
+import { GetReadableDate } from "../classes/SkyblockDate.js";
+import { GetCropEmoji } from "../classes/Util.js";
 
 const command: Command = {
 	name: 'jacob',
 	description: 'Get jacob\'s high scores or leaderboard!',
 	access: CommandAccess.Everywhere,
-	type: CommandType.Combo,
+	type: CommandType.Slash,
 	slash: new SlashCommandBuilder()
 		.setName('jacob')
 		.setDescription('Get the jacob\'s stats of a player!')
@@ -75,7 +76,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 		const embed = ErrorEmbed('Failed to Get Profile!')
 			.setDescription('Please try again later. If this issue persists, contact kaeso.dev on discord.')
 			.addFields({ name: 'Proper Usage:', value: '`/jacob` `player:`(player name) `profile:`(profile name)' })
-			.addFields({ name: 'Want to view online?', value: `Please go to [elitebot.dev/@${playerName}/${profileName}](https://elitebot.dev/@${playerName}/${profileName})` });
+			.addFields({ name: 'Want to view online?', value: `Please go to [elitebot.dev/@${playerName}/${profileName}](https://elitebot.dev/@${playerName}/${encodeURIComponent(profileName)})` });
 		await interaction.deleteReply().catch(() => undefined);
 		interaction.followUp({ embeds: [embed], ephemeral: true });
 		return;
@@ -88,15 +89,19 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 	const { earnedMedals: earned, medals } = jacob;
 
 	const partic = (jacob.participations && jacob.participations > 0 && jacob.contests && jacob.contests.length > 0)
-		? `Out of **${jacob.participations?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests, **${account.name?.replace(/_/g, '\\_')}** has been 1st **${jacob.contests?.filter(c => c.position === 1).length.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** times!`
+		? `Out of **${jacob.participations?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests, **${account.name?.replace(/_/g, '\\_')}** has been 1st **${jacob.contests?.filter(c => c.position === 0).length.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** times!`
 		: `**${account.name?.replace(/_/g, '\\_')}** has participated in **${jacob.participations?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests!`;
 
 	const embed = EliteEmbed()
 		.setTitle(`Jacob's Stats for ${playerName.replace(/_/g, '\\_')}${profileName ? ` on ${profileName}` : ``}`)
 		.setDescription(`🥇 ${medals?.gold} / **${earned?.gold}** 🥈 ${medals?.silver} / **${earned?.silver}** 🥉 ${medals?.bronze} / **${earned?.bronze}**\n${partic}\n⠀`)
+		.addFields(contests.slice(0, 3).map((contest) => ({
+			name: `${GetReadableDate(contest.timestamp ?? 0)}`,
+			value: `${GetCropEmoji(contest.crop ?? '')} ${(contest?.crop ?? 'ERROR')} - **${contest.collected?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** [⧉](https://elitebot.dev/contest/${contest.timestamp})`,
+		})))
 		.addFields({
 			name: '⠀',
-			value: `[elitebot.dev/@${playerName}/${profileName}](https://elitebot.dev/@${playerName}/${profileName})`
+			value: `[elitebot.dev/@${playerName}/${profileName}](https://elitebot.dev/@${playerName}/${encodeURIComponent(profileName)})`
 		});
 
 	let page = 0;
@@ -171,11 +176,12 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 	async function getRecents(selectedCrop?: string) {
 		
 		const newEmbed = new EmbedBuilder().setColor('#03fc7b')
-			.setTitle(`Recent ${selectedCrop ? selectedCrop : 'Jacob\'s'} Contests for ${playerName?.replace(/_/g, '\\_')}${profileName ? ` on ${profileName}` : ``}`);
+			.setTitle(`Recent ${selectedCrop ? selectedCrop : 'Jacob\'s'} Contests for ${playerName?.replace(/_/g, '\\_')}${profileName ? ` on ${profileName}` : ``}`)
+			.setDescription(`View all contests [online]!(https://elitebot.dev/@${playerName}/${encodeURIComponent(profileName ?? '')})`);
 
 		const entries = (selectedCrop) ? contests.filter(c => c.crop === selectedCrop) : contests;
 
-		const contestAmount = contests.length;
+		const contestAmount = entries.length;
 
 		if (contestAmount === 0) {
 			newEmbed.setDescription(`**${account?.name?.replace(/_/g, '\\_')}** hasn't participated in any contests!`);
@@ -185,17 +191,18 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 		let added = 0;
 		for (let i = 0; i < Math.min(10, contestAmount); i++) {
 			const contest = entries[i];
+			if (!contest) continue;
 
-			const details = (contest.participants && contest.position !== undefined) 
-				? `\`#${(contest.position + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${contest.participants.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` ${profileName ? ` on \`${profileName}\`!` : ` players!`}` 
+			const details = ((contest?.participants ?? 0) > 0 && contest.position !== undefined) 
+				? `\`#${(contest.position + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${contest.participants?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` ${profileName ? ` on \`${profileName}\`` : ` players!`}` 
 				: `${profileName ? `Unclaimed on \`${profileName}\`!` : `Contest Still Unclaimed!`}`;
 
 			if (!contest.collected) continue;
 			added++;
 
 			newEmbed.addFields({
-				name: `${Data.getReadableDate(contest.timestamp ?? 0)}`,
-				value: `${(selectedCrop) ? 'Collected ' : `${contest?.crop ?? 'ERROR'} - `}**${contest.collected.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}**\n` + details,
+				name: `${GetReadableDate(contest.timestamp ?? 0)}`,
+				value: `${GetCropEmoji(contest.crop ?? '')} ${(selectedCrop) ? 'Collected ' : `${contest?.crop ?? 'ERROR'} - `}**${contest.collected.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** [⧉](https://elitebot.dev/contest/${contest.timestamp})\n` + details,
 				inline: true
 			});
 
@@ -224,12 +231,12 @@ function getComponents(page: number) {
 			.setCustomId('overall')
 			.setLabel('Overall Stats')
 			.setStyle(ButtonStyle.Success)
-			.setDisabled(page !== 0),
+			.setDisabled(page === 0),
 		new ButtonBuilder()
 			.setCustomId('recents')
 			.setLabel('Recent Contests')
 			.setStyle(ButtonStyle.Primary)
-			.setDisabled(page !== 1),
+			.setDisabled(page === 1),
 	)] as unknown[];
 
 	if (page === 1) components.push(new ActionRowBuilder<StringSelectMenuBuilder>().addComponents( 

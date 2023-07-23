@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { Command, CommandAccess, CommandType } from "../classes/Command";
-import { commands } from "../index";
+import { Command, CommandAccess, CommandType } from "../classes/Command.js";
+import { commands } from "../index.js";
 
 const command: Command = {
 	name: 'help',

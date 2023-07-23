@@ -1,17 +1,16 @@
-import { ButtonInteraction, CommandInteraction, GuildMember, Interaction } from 'discord.js';
-import { commands } from '../index';
-import { Command, CommandType } from '../classes/Command';
-import { HasRole, isValidAccess } from '../classes/Util';
-import { FetchGuild } from 'api/elite';
+import { ButtonInteraction, ChatInputCommandInteraction, CommandInteraction, GuildMember, Interaction } from 'discord.js';
+import { commands } from '../index.js';
+import { Command, CommandType } from '../classes/Command.js';
+import { HasRole, isValidAccess } from '../classes/Util.js';
+import { FetchGuild } from '../api/elite.js';
 
 export default async function(interaction: Interaction) {
-	if (interaction.isCommand()) return OnCommandInteraction(interaction);
+	if (interaction.isChatInputCommand()) return OnCommandInteraction(interaction);
 	if (interaction.isButton()) return OnButtonInteraction(interaction);
 	//if (interaction.isAutocomplete()) return OnAutocompleteInteraction(interaction);
 }
 
-async function OnCommandInteraction(interaction: CommandInteraction) {
-
+async function OnCommandInteraction(interaction: ChatInputCommandInteraction) {
 	const command = GetCommand(interaction.commandName, CommandType.Slash);
 	if (!command) return;
 
@@ -52,7 +51,7 @@ function GetCommand(name: string, type: CommandType): Command | undefined {
 	// If type and command type are autocomplete it's valid
 	if (command.type === CommandType.Autocomplete && type === CommandType.Autocomplete) return command; 
 	// If the types don't match or the type isn't combo than it's invalid
-	if (command.type !== type || type !== CommandType.Combo) return undefined;
+	if (command.type !== type && type !== CommandType.Combo) return undefined;
 
 	return command;
 }
@@ -83,7 +82,7 @@ async function HasPermsAndAccess(command: Command, interaction: CommandInteracti
 	// Get user permissions
 	const perms = interaction.memberPermissions;
 	// Return if lacking one
-	if (!perms || !(command.permissions.every((perm) => perms.has(perm)))) {
+	if (!perms || !command.permissions.has(perms.bitfield)) {
 		await interaction.reply({ 
 			content: 'You don\'t have the required permissions for this command.', 
 			allowedMentions: { repliedUser: true }, 
@@ -94,3 +93,28 @@ async function HasPermsAndAccess(command: Command, interaction: CommandInteracti
 
 	return true;
 }
+
+/*
+import { BaseInteraction, ChatInputCommandInteraction, Events } from "discord.js";
+import { commands } from "../index.js";
+
+const settings = {
+	event: Events.InteractionCreate,
+	condition: (interaction: BaseInteraction) => interaction.isChatInputCommand(),
+	execute: execute
+}
+
+export default settings;
+
+async function execute(interaction: ChatInputCommandInteraction) {
+	const command = commands.get(interaction.commandName);
+	if (!command) return;
+
+	try {
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(error);
+		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => undefined);
+	}
+}
+*/
