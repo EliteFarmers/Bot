@@ -3,3 +3,4 @@ images/*.xcf
 .env
 .env.*
 !.env.example
+dist

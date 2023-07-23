@@ -8,7 +8,11 @@
   },
   "scripts": {
     "start": "ts-node src/index.ts",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint src --ext .ts",
+    "build": "tsc",
+    "dev": "npx nodemon --exec \"npx ts-node\" src/index.ts",
+    "slash": "ts-node src/index.ts deploy global",
+    "prod": "node dist/index.js",
     "generate-api-types": "npx openapi-typescript \"./src/api/swagger.json\" -o \"./src/api/api.d.ts\""
   },
   "devDependencies": {
@@ -16,7 +20,6 @@
     "@typescript-eslint/eslint-plugin": "^5.18.0",
     "dotenv": "^16.0.3",
     "eslint": "^8.13.0",
-    "throttled-queue": "^2.1.2",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.1"
   }
