@@ -154,6 +154,8 @@ async function execute(interaction: ButtonInteraction) {
 	const cropEmbeds = new Map<string, EmbedBuilder>();
 
 	validContests.sort((a, b) => (b.collected ?? 0) - (a.collected ?? 0));
+	let sendPing = false;
+
 	for (const contest of validContests) {
 		const { crop, collected } = contest;
 		if (!crop || !collected) continue;
@@ -171,12 +173,17 @@ async function execute(interaction: ButtonInteraction) {
 			continue;
 		}
 
-		const old = scores.find((s) => (s.record?.collected ?? 0) < collected);
+		const oldIndex = scores.findIndex((s) => (s.record?.collected ?? 0) < collected);
+		const old = oldIndex !== -1 ? scores[oldIndex] : undefined;
 
 		const embed = cropEmbeds.get(crop) ?? EliteEmbed()
 			.setColor(GetCropColor(crop))
 			.setThumbnail(GetCropURL(crop) ?? 'https://elitebot.dev/favicon.webp')
-			.setTitle(`New High Score for ${crop}!`)
+			.setTitle(`New Score for ${crop}!`)
+
+		if (oldIndex === 0) {
+			embed.setTitle(`New High Score for ${crop}!`);
+		}
 
 		if (old?.record?.collected) {
 			if (old.uuid !== account.id) {
@@ -184,17 +191,21 @@ async function execute(interaction: ButtonInteraction) {
 					+ `\n<@${interaction.user.id}> **(${account.name})** has beaten <@${old.discordId}> (${old.ign}) by **${(collected - old.record.collected).toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`
 				);
 			} else {
+				const improvement = collected - old.record.collected;
+				sendPing = sendPing || (oldIndex === 0 && (improvement >= 500 || (leaderboard.pingForSmallImprovements ?? false)));
+
 				embed.setDescription((embed.data.description ?? '') 
-					+ `\n<@${interaction.user.id}> **(${account.name})** improved their score by **${(collected - old.record.collected).toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`
+					+ `\n<@${interaction.user.id}> **(${account.name})** improved their score by **${improvement.toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`
 				);
 			}
-			
-			embed.setFooter({ text: `The previous score was: ${old.record.collected.toLocaleString()}` });
 		} else {
+			sendPing = true;
 			embed.setDescription((embed.data.description ?? '') 
-				+ `\n<@${interaction.user.id}> **(${account.name})** has set a new high score of **${collected.toLocaleString()}** collection! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`
+				+ `\n<@${interaction.user.id}> **(${account.name})** has set a new score of **${collected.toLocaleString()}** collection! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`
 			);
 		}
+
+		sendPing = sendPing || oldIndex === 0;
 
 		scores.push({
 			uuid: account.id,
@@ -205,15 +216,8 @@ async function execute(interaction: ButtonInteraction) {
 
 		scores.sort((a, b) => (b.record?.collected ?? 0) - (a.record?.collected ?? 0));
 
-		if (scores.length > 3) {
-			const removed = scores.pop();
-
-			const removedText = `<@${removed?.discordId}> (${removed?.ign}) - ${removed?.record?.collected?.toLocaleString() ?? 'Unknown'} [⧉](https://elitebot.dev/contest/${removed?.record?.timestamp ?? 0})`;
-			if (!embed.data.fields?.[0]) {
-				embed.addFields({ name: 'Pay Respects To', value: removedText });
-			} else {
-				embed.data.fields[0].value += `\n${embed.data.fields[0].value}`;
-			}
+		while (scores.length > 3) {
+			scores.pop();
 		}
 
 		cropEmbeds.set(crop, embed);
@@ -239,7 +243,7 @@ async function execute(interaction: ButtonInteraction) {
 
 		if (channel?.type === ChannelType.GuildText || channel?.type === ChannelType.GuildAnnouncement) {
 			channel.send({ 
-				content: leaderboard.updateRoleId ? `<@${leaderboard.updateRoleId}>` : undefined, 
+				content: (sendPing && leaderboard.updateRoleId) ? `<@${leaderboard.updateRoleId}>` : undefined, 
 				embeds: embedsToSend,
 				allowedMentions: { roles: [leaderboard.updateRoleId ?? ''] }
 			}).catch((e) => {
@@ -263,7 +267,7 @@ async function execute(interaction: ButtonInteraction) {
 	interaction.message.edit({ embeds: [getLeaderboardEmbed(leaderboard)] }).catch(() => undefined);
 }
 
-function getLeaderboardEmbed(lb: components['schemas']['GuildJacobLeaderboard']) {
+export function getLeaderboardEmbed(lb: components['schemas']['GuildJacobLeaderboard']) {
 	const { cactus, carrot, cocoaBeans, melon, mushroom, netherWart, potato, pumpkin, sugarCane, wheat } = lb.crops ?? {};
 
 	const embed = EliteEmbed()

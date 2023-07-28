@@ -2,7 +2,7 @@ import { components } from "../api/api.js";
 import { FetchAccount, FetchCollectionLeaderboardSlice, FetchLeaderboardRank, FetchLeaderboardSlice, FetchSkillLeaderboardSlice } from "../api/elite.js";
 import { Command, CommandAccess, CommandType } from "../classes/Command.js";
 import { EliteEmbed, ErrorEmbed } from "../classes/embeds.js";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, SlashCommandBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, SlashCommandBuilder, SlashCommandSubcommandGroupBuilder } from 'discord.js';
 
 const command: Command = {
 	name: 'leaderboard',
@@ -10,45 +10,7 @@ const command: Command = {
 	usage: '(username)',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
-	slash: new SlashCommandBuilder()
-		.setName('leaderboard')
-		.setDescription('Get a leaderboard!')
-		.addSubcommand(subcommand => subcommand
-			.setName('farmingweight')
-			.setDescription('Get the farming weight leaderboard!'))
-		.addSubcommandGroup(subcommandGroup => subcommandGroup
-			.setName('crop')
-			.setDescription('Get a crop leaderboard!')
-			.addSubcommand(subcommand => subcommand
-				.setName('cactus')
-				.setDescription('Get the Cactus collection leaderboard!'))
-			.addSubcommand(subcommand => subcommand
-				.setName('carrot')
-				.setDescription('Get the Carrot collection leaderboard!'))
-			.addSubcommand(subcommand => subcommand
-				.setName('cocoa')
-				.setDescription('Get the Cocoa collection leaderboard!'))
-			.addSubcommand(subcommand => subcommand
-				.setName('melon')
-				.setDescription('Get the Melon collection leaderboard!'))
-			.addSubcommand(subcommand => subcommand
-				.setName('mushroom')
-				.setDescription('Get the Mushroom collection leaderboard!'))
-			.addSubcommand(subcommand => subcommand
-				.setName('netherwart')
-				.setDescription('Get the Nether Wart collection leaderboard!'))
-			.addSubcommand(subcommand => subcommand
-				.setName('potato')
-				.setDescription('Get the Potato ollection leaderboard!'))
-			.addSubcommand(subcommand => subcommand
-				.setName('pumpkin')
-				.setDescription('Get the Pumpkin collection leaderboard!'))
-			.addSubcommand(subcommand => subcommand
-				.setName('sugarcane')
-				.setDescription('Get the sugarcane collection leaderboard!'))
-			.addSubcommand(subcommand => subcommand
-				.setName('wheat')
-				.setDescription('Get the Wheat collection leaderboard!'))),
+	slash: createLbSlashCommands(),
 	execute: execute
 }
 
@@ -80,15 +42,17 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		const rank = await FetchLeaderboardRank(leaderboardId, player?.id ?? '', selectedProfile?.profileId)
 			.then(res => { return res.data?.rank; }).catch(() => undefined);
 
+		console.log(rank);
+
 		if (player) {
 			givenIndex = rank ?? 0;
 			playerName = player.name;
 		}
 	} else {
-		givenIndex = interaction.options.getInteger('rank', false) ?? 0;
+		givenIndex = (interaction.options.getInteger('rank', false) ?? 0) - 1;
 	}
 
-	let index = Math.floor(givenIndex / 10) * 10;
+	let index = Math.max(Math.floor(givenIndex / 12) * 12, 0);
 	let maxIndex = 1000;
 	let entries: components['schemas']['LeaderboardEntryDto'][] = [];
 
@@ -176,7 +140,7 @@ async function getEmbed(index: number, maxIndex: number, leaderboardId: string, 
 
 	const embed = EliteEmbed()
 		.setTitle(title)
-		.setDescription(`Showing **${index + 1}** - **${index + entries.length}** of **${(maxIndex + 12).toLocaleString()}** ⠀ [View Online](https://elitebot.dev/leaderboard/${leaderboardId}/${index + 1})`)
+		.setDescription(`Showing **${index + 1}** - **${index + entries.length}** of **${(maxIndex + 12).toLocaleString()}** entries`)
 		.addFields(entries.map((entry, i) => ({
 			name: `#${index + i + 1} - ${entry.ign?.replaceAll('_', '\\_') ?? 'Unknown'}⠀`,
 			value: `[⧉](https://elitebot.dev/@${entry.ign}/${encodeURIComponent(entry.profile ?? '')}) ${(entry.amount ?? 0).toLocaleString()}`,
@@ -221,4 +185,58 @@ function FetchLeaderboard(category: string, leaderboardId: string, offset: numbe
 	if (category === 'crop') return FetchCollectionLeaderboardSlice(leaderboardId, offset, limit);
 
 	return FetchLeaderboardSlice(leaderboardId, offset, limit);
+}
+
+function createLbSlashCommands() {
+	const builder = new SlashCommandBuilder()
+		.setName('leaderboard')
+		.setDescription('Get a leaderboard!')
+		.addSubcommand(subcommand => subcommand
+			.setName('farmingweight')
+			.setDescription('Get the Farming Weight leaderboard!')
+			.addStringOption(option => option
+				.setName('player')
+				.setDescription('Jump to a specific player!')
+				.setRequired(false))
+			.addIntegerOption(option => option
+				.setName('rank')
+				.setDescription('Jump to a specific rank!')
+				.setMinValue(1)
+				.setRequired(false)));
+
+	const cropGroup = new SlashCommandSubcommandGroupBuilder()
+		.setName('crop')
+		.setDescription('Get a crop leaderboard!')
+	
+	const crops = {
+		cactus: 'Cactus',
+		carrot: 'Carrot',
+		cocoa: 'Cocoa',
+		melon: 'Melon',
+		mushroom: 'Mushroom',
+		potato: 'Potato',
+		pumpkin: 'Pumpkin',
+		sugarcane: 'Sugar Cane',
+		netherwart: 'Nether Wart',
+		wheat: 'Wheat'
+	};
+
+	for (const [ name, crop ] of Object.entries(crops)) {
+		cropGroup.addSubcommand(subcommand => subcommand
+			.setName(name)
+			.setDescription(`Get the ${crop} leaderboard!`)
+			.addStringOption(option => option
+				.setName('player')
+				.setDescription('Jump to a specific player!')
+				.setRequired(false))
+			.addIntegerOption(option => option
+				.setName('rank')
+				.setDescription('Jump to a specific rank!')
+				.setMinValue(1)
+				.setRequired(false)));
+	}
+
+	builder.addSubcommandGroup(cropGroup);
+
+	return builder;
 }

@@ -98,16 +98,12 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 		.addFields(contests.slice(0, 3).map((contest) => ({
 			name: `${GetReadableDate(contest.timestamp ?? 0)}`,
 			value: `${GetCropEmoji(contest.crop ?? '')} ${(contest?.crop ?? 'ERROR')} - **${contest.collected?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** [⧉](https://elitebot.dev/contest/${contest.timestamp})`,
-		})))
-		.addFields({
-			name: '⠀',
-			value: `[elitebot.dev/@${playerName}/${profileName}](https://elitebot.dev/@${playerName}/${encodeURIComponent(profileName)})`
-		});
+		})));
 
 	let page = 0;
 
 	const args = {
-		components: getComponents(page),
+		components: getComponents(page, playerName, profileName),
 		embeds: [embed],
 		allowedMentions: { repliedUser: false },
 		fetchReply: true
@@ -130,7 +126,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 		if (i.customId === 'overall') {
 			page = 0;
 
-			i.update({ embeds: [embed], components: getComponents(page) })
+			i.update({ embeds: [embed], components: getComponents(page, playerName, profileName) })
 				.catch(() => { collector.stop(); });
 		} else if (i.customId === 'recents') {
 			const recentsEmbed = await getRecents(undefined)
@@ -138,7 +134,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 
 			page = 1;
 
-			const updated = await i.update({ embeds: [recentsEmbed], components: getComponents(page), fetchReply: true });
+			const updated = await i.update({ embeds: [recentsEmbed], components: getComponents(page, playerName, profileName), fetchReply: true });
 			
 			const cropCollector = updated.createMessageComponentCollector({ 
 				componentType: ComponentType.StringSelect, 
@@ -160,7 +156,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 
 				const cropsEmbed = await getRecents(crop.name);
 				
-				inter.update({ embeds: [cropsEmbed], components: getComponents(page) }).catch(() => undefined);
+				inter.update({ embeds: [cropsEmbed], components: getComponents(page, playerName, profileName) }).catch(() => undefined);
 			});
 
 			cropCollector.on('end', () => {
@@ -173,13 +169,15 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 		interaction.editReply({ components: [] }).catch(() => undefined);
 	});
 
-	async function getRecents(selectedCrop?: string) {
-		
+	async function getRecents(selectedCrop?: string) {		
+		const entries = (selectedCrop) ? contests.filter(c => c.crop === selectedCrop) : contests;
+
 		const newEmbed = new EmbedBuilder().setColor('#03fc7b')
 			.setTitle(`Recent ${selectedCrop ? selectedCrop : 'Jacob\'s'} Contests for ${playerName?.replace(/_/g, '\\_')}${profileName ? ` on ${profileName}` : ``}`)
-			.setDescription(`View all contests [online!](https://elitebot.dev/@${playerName}/${encodeURIComponent(profileName ?? '')})`);
-
-		const entries = (selectedCrop) ? contests.filter(c => c.crop === selectedCrop) : contests;
+			.setDescription((entries.length !== 1 
+				? `Showing the most recent **${Math.min(10, entries.length)}** / **${entries.length.toLocaleString()}** contests${selectedCrop ? ` for ${selectedCrop}` : ``}!`
+				: `Showing the most recent contest${selectedCrop ? ` for ${selectedCrop}` : ``}!`
+			));
 
 		const contestAmount = entries.length;
 
@@ -225,7 +223,7 @@ type JacobCMDArgs = {
 	ign?: string,
 }
 
-function getComponents(page: number) {
+function getComponents(page: number, playerName?: string, profileName?: string) {
 	const components = [new ActionRowBuilder<ButtonBuilder>().addComponents(
 		new ButtonBuilder()
 			.setCustomId('overall')
@@ -237,6 +235,10 @@ function getComponents(page: number) {
 			.setLabel('Recent Contests')
 			.setStyle(ButtonStyle.Primary)
 			.setDisabled(page === 1),
+		new ButtonBuilder()
+			.setURL(`https://elitebot.dev/@${playerName}/${encodeURIComponent(profileName ?? '')}`)
+			.setLabel(`@${playerName}/${profileName ?? ''}`)
+			.setStyle(ButtonStyle.Link)
 	)] as unknown[];
 
 	if (page === 1) components.push(new ActionRowBuilder<StringSelectMenuBuilder>().addComponents( 
