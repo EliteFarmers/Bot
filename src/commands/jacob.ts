@@ -177,7 +177,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 		
 		const newEmbed = new EmbedBuilder().setColor('#03fc7b')
 			.setTitle(`Recent ${selectedCrop ? selectedCrop : 'Jacob\'s'} Contests for ${playerName?.replace(/_/g, '\\_')}${profileName ? ` on ${profileName}` : ``}`)
-			.setDescription(`View all contests [online]!(https://elitebot.dev/@${playerName}/${encodeURIComponent(profileName ?? '')})`);
+			.setDescription(`View all contests [online!](https://elitebot.dev/@${playerName}/${encodeURIComponent(profileName ?? '')})`);
 
 		const entries = (selectedCrop) ? contests.filter(c => c.crop === selectedCrop) : contests;
 

@@ -1,6 +1,6 @@
 // This is to allow the generic "Function" to be used, as it's the easiest way to allow both types of commandss
 /* eslint-disable @typescript-eslint/ban-types */
-import { PermissionsBitField, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
+import { SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
 
 export interface Command {
 	name: string,
@@ -9,7 +9,7 @@ export interface Command {
 	type: CommandType,
 	aliases?: string[],
 	usage?: string,
-	permissions?: PermissionsBitField,
+	permissions?: bigint,
 	adminRoleOverride?: boolean,
 	slash?: SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'> | SlashCommandSubcommandsOnlyBuilder
 

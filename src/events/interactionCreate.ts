@@ -82,7 +82,7 @@ async function HasPermsAndAccess(command: Command, interaction: CommandInteracti
 	// Get user permissions
 	const perms = interaction.memberPermissions;
 	// Return if lacking one
-	if (!perms || !command.permissions.has(perms.bitfield)) {
+	if (!perms || !perms.has(command.permissions)) {
 		await interaction.reply({ 
 			content: 'You don\'t have the required permissions for this command.', 
 			allowedMentions: { repliedUser: true }, 

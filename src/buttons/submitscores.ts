@@ -1,5 +1,5 @@
 import { Command, CommandAccess, CommandType } from "../classes/Command.js";
-import { ButtonInteraction, ChannelType } from 'discord.js';
+import { ButtonInteraction, ChannelType, EmbedBuilder } from 'discord.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from "../classes/embeds.js";
 import { FetchAccount, FetchGuildJacob, FetchProfile, UpdateGuildJacob } from "../api/elite.js";
 import { GetCropColor, GetCropEmoji, GetCropURL, GetEmbeddedTimestamp } from "../classes/Util.js";
@@ -37,11 +37,11 @@ async function execute(interaction: ButtonInteraction) {
 
 	const [, lbId ] = interaction.customId.split('|');
 
-	const leaderboard = guild.leaderboards?.find((lb) => lb.messageId === lbId);
+	const leaderboard = guild.leaderboards?.find((lb) => lb.id === lbId);
 
-	if (!leaderboard) {
+	if (!leaderboard?.crops) {
 		const embed = ErrorEmbed('Leaderboard not found!')
-			.setDescription('This leaderboard does not exist.\nIf you were expecting this to work, please contact "kaeso.dev" on Discord.\nThis feature is being remade currently, and will likely be a paid feature. Sorry for the inconvenience.');
+			.setDescription('This leaderboard does not exist.\n⠀\nIf you were expecting this to work, please contact "kaeso.dev" on Discord.\nThis feature is being remade currently, and will likely be a paid feature. Sorry for the inconvenience.');
 		interaction.editReply({ embeds: [embed] });
 		return;
 	}
@@ -117,7 +117,7 @@ async function execute(interaction: ButtonInteraction) {
 		if (!time) return false;
 
 		if (time < (leaderboard.startCutoff ?? 0)) return false;
-		if (leaderboard.endCutoff && time > leaderboard.endCutoff) return false;
+		if (leaderboard.endCutoff && leaderboard.endCutoff !== -1 && time > leaderboard.endCutoff) return false;
 
 		if (guild.excludedTimespans?.some((t) => {
 			if (!t.start || !t.end) return false;
@@ -132,60 +132,69 @@ async function execute(interaction: ButtonInteraction) {
 
 	if (validContests.length === 0) {
 		const embed = WarningEmbed('No Valid Contests Found!')
-			.setDescription(`No contests found fit the criteria for this leaderboard.\nIf you have participated in a valid contest, please wait until your profile can be fetched again <t:${profile.lastUpdated ?? ((Date.now() / 1000) + 600)}:r>` )
+			.setDescription(`No contests found fit the criteria for this leaderboard.\nIf you have participated in a valid contest, please wait until your profile can be fetched again <t:${(profile.lastUpdated ?? (Date.now() / 1000)) + 600}:R>` )
 			.addFields({ name: 'Selected Profile', value: selectedProfile.profileName ?? 'Unknown' });
 		interaction.editReply({ embeds: [embed] });
 		return;
 	}
 
 	const currentScores = {
-		'Cactus': leaderboard.cactus ??= [],
-		'Carrot': leaderboard.carrot ??= [],
-		'Cocoa Beans': leaderboard.cocoaBeans ??= [],
-		'Potato': leaderboard.potato ??= [],
-		'Pumpkin': leaderboard.pumpkin ??= [],
-		'Sugarcane': leaderboard.sugarCane ??= [],
-		'Wheat': leaderboard.wheat ??= [],
-		'Melon': leaderboard.melon ??= [],
-		'Nether Wart': leaderboard.netherWart ??= [],
-		'Mushroom': leaderboard.mushroom ??= [],
+		'Cactus': leaderboard.crops.cactus ??= [],
+		'Carrot': leaderboard.crops.carrot ??= [],
+		'Cocoa Beans': leaderboard.crops.cocoaBeans ??= [],
+		'Potato': leaderboard.crops.potato ??= [],
+		'Pumpkin': leaderboard.crops.pumpkin ??= [],
+		'Sugar Cane': leaderboard.crops.sugarCane ??= [],
+		'Wheat': leaderboard.crops.wheat ??= [],
+		'Melon': leaderboard.crops.melon ??= [],
+		'Nether Wart': leaderboard.crops.netherWart ??= [],
+		'Mushroom': leaderboard.crops.mushroom ??= [],
 	}
 
-	const embeds = [];
+	const cropEmbeds = new Map<string, EmbedBuilder>();
 
+	validContests.sort((a, b) => (b.collected ?? 0) - (a.collected ?? 0));
 	for (const contest of validContests) {
 		const { crop, collected } = contest;
 		if (!crop || !collected) continue;
 
 		const scores = currentScores[crop as keyof typeof currentScores];
-		if (!scores) continue;
+		if (scores === undefined) continue;
 
-		if (scores.every((s) => (s.record?.collected ?? 0) > collected)) {
+		if (scores.length === 3 && scores.every((s) => (s.record?.collected ?? 0) >= collected)) {
 			// Contest is not a new record
 			continue;
 		}
 
+		if (scores.some((s) => s.record?.collected === collected && s.discordId === interaction.user.id && s.record?.timestamp === contest.timestamp)) {
+			// Contest is a duplicate
+			continue;
+		}
+
 		const old = scores.find((s) => (s.record?.collected ?? 0) < collected);
-		if (!old) continue;
-			
-		const embed = EliteEmbed()
+
+		const embed = cropEmbeds.get(crop) ?? EliteEmbed()
 			.setColor(GetCropColor(crop))
 			.setThumbnail(GetCropURL(crop) ?? 'https://elitebot.dev/favicon.webp')
 			.setTitle(`New High Score for ${crop}!`)
 
 		if (old?.record?.collected) {
-			if (old.discordId !== interaction.user.id) {
-				embed.setDescription(`<@${interaction.user.id}> **(${account.name})** has beaten <@${old.discordId}> (${old.ign}) by **${(old.record.collected - collected).toLocaleString()}** collection for a total of ${collected.toLocaleString()}!`);
+			if (old.uuid !== account.id) {
+				embed.setDescription((embed.data.description ?? '') 
+					+ `\n<@${interaction.user.id}> **(${account.name})** has beaten <@${old.discordId}> (${old.ign}) by **${(collected - old.record.collected).toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`
+				);
 			} else {
-				embed.setDescription(`<@${interaction.user.id}> **(${account.name})** improved their score by **${(old.record.collected - collected).toLocaleString()}** collection for a total of ${collected.toLocaleString()}!`);
+				embed.setDescription((embed.data.description ?? '') 
+					+ `\n<@${interaction.user.id}> **(${account.name})** improved their score by **${(collected - old.record.collected).toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`
+				);
 			}
 			
 			embed.setFooter({ text: `The previous score was: ${old.record.collected.toLocaleString()}` });
 		} else {
-			embed.setDescription(`<@${interaction.user.id}> **(${account.name})** has set a new high score of **${collected.toLocaleString()}** collection!`);
+			embed.setDescription((embed.data.description ?? '') 
+				+ `\n<@${interaction.user.id}> **(${account.name})** has set a new high score of **${collected.toLocaleString()}** collection! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`
+			);
 		}
-
-		embeds.push(embed);
 
 		scores.push({
 			uuid: account.id,
@@ -199,8 +208,15 @@ async function execute(interaction: ButtonInteraction) {
 		if (scores.length > 3) {
 			const removed = scores.pop();
 
-			embed.addFields({ name: 'Pay Respects To', value: `<@${removed?.discordId}> (${removed?.ign}) - ${removed?.record?.collected?.toLocaleString() ?? 'Unknown'}` });
+			const removedText = `<@${removed?.discordId}> (${removed?.ign}) - ${removed?.record?.collected?.toLocaleString() ?? 'Unknown'} [⧉](https://elitebot.dev/contest/${removed?.record?.timestamp ?? 0})`;
+			if (!embed.data.fields?.[0]) {
+				embed.addFields({ name: 'Pay Respects To', value: removedText });
+			} else {
+				embed.data.fields[0].value += `\n${embed.data.fields[0].value}`;
+			}
 		}
+
+		cropEmbeds.set(crop, embed);
 
 		currentScores[crop as keyof typeof currentScores] = scores;
 	}
@@ -215,44 +231,58 @@ async function execute(interaction: ButtonInteraction) {
 		return;
 	}
 
-	if (embeds.length === 0) {
-		const embed = WarningEmbed('No New Records Set!')
-			.setDescription('You did not set any new records.\nIf you think this is a mistake, please wait 10 minutes and try again, otherwise contact `kaeso.dev` on Discord.');
-		interaction.editReply({ embeds: [embed] });
-		return;
-	}
+	const embedsToSend = Array.from(cropEmbeds.values());
+	const newRecords = embedsToSend.length > 0;
 
-	if (leaderboard.updateChannelId) {
+	if (leaderboard.updateChannelId && newRecords) {
 		const channel = await interaction.guild.channels.fetch(leaderboard.updateChannelId);
 
-		if (channel?.type === ChannelType.GuildText) {
+		if (channel?.type === ChannelType.GuildText || channel?.type === ChannelType.GuildAnnouncement) {
 			channel.send({ 
 				content: leaderboard.updateRoleId ? `<@${leaderboard.updateRoleId}>` : undefined, 
-				embeds: embeds 
-			}).catch(() => undefined);
+				embeds: embedsToSend,
+				allowedMentions: { roles: [leaderboard.updateRoleId ?? ''] }
+			}).catch((e) => {
+				console.error(e);
+			});
 		}
 	}
 
-	const embed = EliteEmbed()
-		.setTitle('Scores Submitted!')
-		.setDescription('Your scores were submitted! Congratulations!');
-	interaction.editReply({ embeds: [embed] });
+	if (!newRecords) {
+		const embed = WarningEmbed('No New Records Set!')
+			.setDescription('You did not set any new records.\nIf you think this is a mistake, please wait 10 minutes and try again, otherwise contact `kaeso.dev` on Discord.');
+		interaction.editReply({ embeds: [embed] });
+		// return; Update the leaderboard even if no new records were set (to update changes from the site)
+	} else {
+		const embed = EliteEmbed()
+			.setTitle('Scores Submitted!')
+			.setDescription('Your scores were submitted! Congratulations!');
+		interaction.editReply({ embeds: [embed] });
+	}
 
 	interaction.message.edit({ embeds: [getLeaderboardEmbed(leaderboard)] }).catch(() => undefined);
 }
 
 function getLeaderboardEmbed(lb: components['schemas']['GuildJacobLeaderboard']) {
-	const { cactus, carrot, cocoaBeans, melon, mushroom, netherWart, potato, pumpkin, sugarCane, wheat } = lb;
+	const { cactus, carrot, cocoaBeans, melon, mushroom, netherWart, potato, pumpkin, sugarCane, wheat } = lb.crops ?? {};
 
 	const embed = EliteEmbed()
-		.setTitle('Jacob\'s Contest Leaderboard')
+		.setTitle(lb.title ?? 'Jacob\'s Contest Leaderboard')
 		.setDescription('These are the highscores set by your fellow server members!')
 	
-	if (lb.startCutoff && !lb.endCutoff) {
-		embed.setFooter({ text: `Scores are only valid after ${GetReadableDate(lb.startCutoff)}` });
-	} else if (lb.startCutoff && lb.endCutoff) {
-		embed.setFooter({ text: `Scores are only valid between ${GetReadableDate(lb.startCutoff)} and ${GetReadableDate(lb.endCutoff)}` });
+	let footerText = 'Scores are valid from ';
+	if (!lb.startCutoff || lb.startCutoff === -1) {
+		footerText += 'the beginning of Skyblock';
 	}
+	if (lb.startCutoff && lb.startCutoff !== -1) {
+		footerText += GetReadableDate(lb.startCutoff);
+	}
+
+	if (lb.endCutoff && lb.endCutoff !== -1) {
+		footerText += ` to ${GetReadableDate(lb.endCutoff)}`;
+	}
+
+	embed.setFooter({ text: footerText });
 
 	embed.addFields([
 		getField('Cactus', cactus),
@@ -270,7 +300,6 @@ function getLeaderboardEmbed(lb: components['schemas']['GuildJacobLeaderboard'])
 	return embed;
 }
 
-
 function getField(crop: string, scores?: components['schemas']['GuildJacobLeaderboardEntry'][]) {
 	if (!scores || scores.length === 0) return {
 		name: crop,
@@ -278,9 +307,13 @@ function getField(crop: string, scores?: components['schemas']['GuildJacobLeader
 	};
 
 	const first = scores[0];
+	const otherScores = scores.slice(1).map((s, i) => {
+		return `**${i + 2}.**⠀<@${s.discordId}>⠀${s.record?.collected?.toLocaleString()}⠀${GetEmbeddedTimestamp(first.record?.timestamp ?? 0)} [⧉](https://elitebot.dev/contest/${s.record?.timestamp ?? 0})`
+	}).join('\n');
+
 	const value = `
-		${GetCropEmoji(crop)} <@${first.discordId}> - **${first.record?.collected?.toLocaleString()}** - [${GetEmbeddedTimestamp(first.record?.timestamp ?? 0)}] [View](https://elitebot.dev/contest/${first.record?.timestamp ?? 0})
-		${scores.slice(1).map((s) => `<@${s.discordId}> - ${s.record?.collected?.toLocaleString()} - [${GetEmbeddedTimestamp(s.record?.timestamp ?? 0)}] [View](https://elitebot.dev/contest/${s.record?.timestamp ?? 0})`).join('\n')}
+		${GetCropEmoji(crop)} <@${first.discordId}>⠀**${first.record?.collected?.toLocaleString()}**⠀${GetEmbeddedTimestamp(first.record?.timestamp ?? 0)} [⧉](https://elitebot.dev/contest/${first.record?.timestamp ?? 0})
+		${otherScores}
 	`;
 
 	return {
