@@ -49,11 +49,17 @@ export const commands = new Collection<string, Command>();
 
 
 client.once(Events.ClientReady, async () => {
-	const guildCount = client.guilds.cache.size;
 
 	if (client.user) {
-		client.user.setActivity(`${guildCount} farming guilds`, { type: ActivityType.Watching });
+		client.user.setActivity(`${client.guilds.cache.size} farming guilds`, { type: ActivityType.Watching });
 	}
+
+	// Update count every 2 hours
+	setInterval(() => {
+		if (client.user) {
+			client.user.setActivity(`${client.guilds.cache.size} farming guilds`, { type: ActivityType.Watching });
+		}
+	}, 1000 * 60 * 60 * 2);
 
 	console.log('Ready!');
 	

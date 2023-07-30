@@ -163,12 +163,16 @@ async function execute(interaction: ButtonInteraction) {
 		const scores = currentScores[crop as keyof typeof currentScores];
 		if (scores === undefined) continue;
 
-		if (scores.length === 3 && scores.every((s) => (s.record?.collected ?? 0) >= collected)) {
+		if (scores.length === 3 && !scores.some((s) => (s.record?.collected ?? 0) < collected)) {
 			// Contest is not a new record
 			continue;
 		}
 
-		if (scores.some((s) => s.record?.collected === collected && s.discordId === interaction.user.id && s.record?.timestamp === contest.timestamp)) {
+		if (scores.some((s) => 
+			s.record?.collected === collected 
+			&& s.discordId === interaction.user.id 
+			&& s.record?.timestamp === contest.timestamp
+			&& s.record.crop === crop)) {
 			// Contest is a duplicate
 			continue;
 		}
@@ -243,7 +247,7 @@ async function execute(interaction: ButtonInteraction) {
 
 		if (channel?.type === ChannelType.GuildText || channel?.type === ChannelType.GuildAnnouncement) {
 			channel.send({ 
-				content: (sendPing && leaderboard.updateRoleId) ? `<@${leaderboard.updateRoleId}>` : undefined, 
+				content: (sendPing && leaderboard.updateRoleId) ? `<@&${leaderboard.updateRoleId}>` : undefined, 
 				embeds: embedsToSend,
 				allowedMentions: { roles: [leaderboard.updateRoleId ?? ''] }
 			}).catch((e) => {
