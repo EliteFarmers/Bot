@@ -65,6 +65,13 @@ client.once(Events.ClientReady, async () => {
 
 client.login(process.env.BOT_TOKEN);
 
+process.on('unhandledRejection', (reason, p) => {
+	console.error(reason, 'Unhandled Rejection at Promise', p);
+}).on('uncaughtException', err => {
+	console.error(err, 'Uncaught Exception thrown');
+	process.exit(1);
+});
+
 /*
 *  ===================================================================
 *	Command arguments on startup of script to do one-time operations
