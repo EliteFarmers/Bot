@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+    bot:
+        env_file:
+            - .env
+        environment:
+            - NODE_ENV=production
+        build: .
+        restart: always
+        networks:
+            - elite-network
+
+networks:
+    elite-network:
+        name: elite-network
+        driver: bridge
