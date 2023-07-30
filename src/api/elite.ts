@@ -51,6 +51,14 @@ export const FetchSelectedProfile = (playerUuid: string) => get('/Profile/{uuid}
 	},
 });
 
+export const FetchContests = (playerUuid: string) => get('/Contests/{playerUuid}', {
+	params: {
+		path: {
+			playerUuid,
+		},
+	},
+});
+
 export const FetchWeightLeaderboardRank = (playerUuid: string, profileUuid: string) => get('/Leaderboard/rank/{leaderboardId}/{playerUuid}/{profileUuid}', {
 	params: {
 		path: {

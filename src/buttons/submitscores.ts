@@ -1,7 +1,7 @@
 import { Command, CommandAccess, CommandType } from "../classes/Command.js";
 import { ButtonInteraction, ChannelType, EmbedBuilder } from 'discord.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from "../classes/embeds.js";
-import { FetchAccount, FetchGuildJacob, FetchProfile, UpdateGuildJacob } from "../api/elite.js";
+import { FetchAccount, FetchContests, FetchGuildJacob, UpdateGuildJacob } from "../api/elite.js";
 import { GetCropColor, GetCropEmoji, GetCropURL, GetEmbeddedTimestamp } from "../classes/Util.js";
 import { components } from "../api/api.js";
 import { GetReadableDate } from "../classes/SkyblockDate.js";
@@ -94,10 +94,10 @@ async function execute(interaction: ButtonInteraction) {
 		return;
 	}
 
-	const profile = await FetchProfile(account.id, selectedProfile.profileId).then((data) => data.data).catch(() => undefined);
-	const contests = profile?.jacob?.contests;
+	const contestRespnse = await FetchContests(account.id).then((data) => data.data).catch(() => undefined);
+	const contests = contestRespnse ?? [];
 
-	if (!profile) {
+	if (!contestRespnse) {
 		const embed = ErrorEmbed('Profile not found!')
 			.setDescription('You must have a profile selected in SkyBlock before submitting scores.\nThis is a scary error to get, hopefully something went wrong and you can try again, otherwise your selected profile might be deleted.');
 		interaction.editReply({ embeds: [embed] });
@@ -132,7 +132,7 @@ async function execute(interaction: ButtonInteraction) {
 
 	if (validContests.length === 0) {
 		const embed = WarningEmbed('No Valid Contests Found!')
-			.setDescription(`No contests found fit the criteria for this leaderboard.\nIf you have participated in a valid contest, please wait until your profile can be fetched again <t:${(profile.lastUpdated ?? (Date.now() / 1000)) + 600}:R>` )
+			.setDescription(`No contests found fit the criteria for this leaderboard.\nIf you have participated in a valid contest, please wait up to 10 minutes (until your profile can be fetched again)`)
 			.addFields({ name: 'Selected Profile', value: selectedProfile.profileName ?? 'Unknown' });
 		interaction.editReply({ embeds: [embed] });
 		return;
