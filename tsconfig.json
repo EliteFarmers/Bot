@@ -1,11 +1,12 @@
 {
     "compilerOptions": {
         "target": "ESNext",
-        "module": "commonjs",
-        "rootDir": "./",
+        "module": "ES2022",
+        "rootDir": "./src",
+        "outDir": "./dist",
         "strict": true,
         "strictNullChecks": true,
-        "moduleResolution": "node",
+        "moduleResolution": "Node",
         "importHelpers": true,
         "experimentalDecorators": true,
         "esModuleInterop": true,
@@ -19,16 +20,15 @@
             "node_modules/@types"
         ],
         "sourceMap": false,
-        "baseUrl": "./"
+        "baseUrl": "./src"
     },
-    "files": [
-        "index.ts",
-    ],
     "include": [
-        "./**/*.ts", "./**/**/*.ts"
+        "./config.json", "./**/*.ts", "./**/**/*.ts"
     ],
     "exclude": [
         "node_modules",
-        "oldindex.ts"
     ],
+    "ts-node": {
+        "esm": true
+    }
 }

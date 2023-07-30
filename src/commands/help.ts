@@ -1,30 +1,26 @@
-import { ApplicationCommandOptionChoice, CommandInteraction, MessageEmbed } from "discord.js";
-import { Command } from "../classes/Command";
-import { commands } from "../index";
+import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { Command, CommandAccess, CommandType } from "../classes/Command.js";
+import { commands } from "../index.js";
 
 const command: Command = {
 	name: 'help',
 	description: 'All commands',
 	usage: '(command name)',
-	access: 'ALL',
-	type: 'SLASH',
+	access: CommandAccess.Everywhere,
+	type: CommandType.Slash,
+	slash: new SlashCommandBuilder()
+		.setName('help')
+		.setDescription('Get the help menu!')
+		.addStringOption(option => option.setName('command')
+			.setDescription('Specify a command for more info.')
+			.setRequired(false)
+			.addChoices(...generateCommandNameChoices())),
 	execute: execute,
-	slash: {
-		name: 'help',
-		description: 'Get the help menu!',
-		options: [{
-			name: 'command',
-			type: 'STRING',
-			description: 'Specify a command for more info.',
-			required: false,
-			choices: generateCommandNameChoices()
-		}]
-	},
 }
 
 export default command;
 
-async function execute(interaction: CommandInteraction) {
+async function execute(interaction: ChatInputCommandInteraction) {
 
 	const hCommand = interaction.options.getString('command', false) ?? undefined;
 
@@ -43,7 +39,7 @@ async function execute(interaction: CommandInteraction) {
 			return interaction.reply({ content: 'That\'s not a valid command! Here\'s the menu instead.', embeds: [embed], allowedMentions: { repliedUser: false }, ephemeral: true });
 		}
 
-		const embed = new MessageEmbed()
+		const embed = new EmbedBuilder()
 			.setColor('#03fc7b')
 			.setTitle(`Usage for ${command.name}`);
 		
@@ -53,7 +49,7 @@ async function execute(interaction: CommandInteraction) {
 		if (command.description) data.push(`**Description:** ${command.description}`);
 		if (command.usage) data.push(`**Usage:** ${newPrefix}${command.name} ${command.usage}`);
 
-		embed.fields.push({
+		embed.addFields({
 			name: 'Command Information',
 			value: `${data.join('\n')}`,
 			inline: false
@@ -63,13 +59,13 @@ async function execute(interaction: CommandInteraction) {
 	}
 
 	function getHelpEmbed() {
-		const helpMenu = new MessageEmbed().setColor('#03fc7b');
+		const helpMenu = new EmbedBuilder().setColor('#03fc7b');
 
 		helpMenu.setTitle('Here\'s a list of all the commands:')
 
 		commands.forEach(command => {
-			if (command.type === 'BUTTON') return;
-			helpMenu.fields.push({
+			if (command.type === CommandType.Button) return;
+			helpMenu.addFields({
 				name: `${newPrefix}${command.name}`,
 				value: `${command.description}\nUsage: ${newPrefix}${command.name} ${command.usage ? command.usage : ''}`,
 				inline: false
@@ -81,7 +77,7 @@ async function execute(interaction: CommandInteraction) {
 	}
 }
 
-function generateCommandNameChoices(): ApplicationCommandOptionChoice[] {
+function generateCommandNameChoices(): { name: string, value: string }[] {
 	const choices = [];
 
 	for (const cmdName in commands) {

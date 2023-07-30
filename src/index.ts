@@ -1,14 +1,17 @@
+import { Client, GatewayIntentBits, Collection, ApplicationCommandDataResolvable, ActivityType, RESTPostAPIChatInputApplicationCommandsJSONBody, Events, PermissionsBitField } from 'discord.js';
+import { Command, CommandType } from './classes/Command.js';
+
 import fs from 'fs';
-import { Client, Intents, Collection, ApplicationCommandDataResolvable, ApplicationCommandData } from 'discord.js';
-import * as config from './config.json';
-import { Command } from './classes/Command';
-import DataHandler from './classes/Database';
+import path from 'path';
+
+import dotenv from 'dotenv';
+import { GlobalFonts } from '@napi-rs/canvas';
+dotenv.config();
 
 const proccessArgs = process.argv.slice(2);
 
 export const client = new Client({ 
-	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES],
-	partials: ['CHANNEL']
+	intents: [GatewayIntentBits.Guilds]
 });
 
 export const commands = new Collection<string, Command>();
@@ -18,37 +21,39 @@ export const commands = new Collection<string, Command>();
 * as it only runs once on startup and allows you to only create a new file.
 */
 (async function() {
-	const filter = (fileName: string) => fileName.endsWith('.ts');
+	const filter = (fileName: string) => fileName.endsWith('.ts') || fileName.endsWith('.js');
 
-	const commandFiles = fs.readdirSync('./commands/').filter(filter);
-
+	const commandFiles = fs.readdirSync(path.resolve('./src/commands/')).filter(filter);
+	
 	for (const file of commandFiles) {
-		const command = await import(`./commands/${file}`);
+		const command = await import(`./commands/${file.replace('.ts', '.js')}`);
 		commands.set(command.default.name, command.default);
 	}
 
-	const buttonFiles = fs.readdirSync('./buttons/').filter(filter);
+	const buttonFiles = fs.readdirSync('./src/buttons/').filter(filter);
 
 	for (const file of buttonFiles) {
-		const command = await import(`./buttons/${file}`);
+		const command = await import(`./buttons/${file.replace('.ts', '.js')}`);
 		commands.set(command.default.name, command.default);
 	}
 	
-	const eventFiles = fs.readdirSync('./events/').filter(filter);
+	const eventFiles = fs.readdirSync('./src/events/').filter(filter);
 	
 	for (const file of eventFiles) {
-		const event = await import(`./events/${file}`);
+		const event = await import(`./events/${file.replace('.ts', '.js')}`);
 		client.on(file.split('.')[0], event.default);
 	}
+
+	GlobalFonts.loadFontsFromDir(path.resolve('./src/assets/fonts/'));
 }()); 
 
 
-client.once('ready', async () => {
-	if (client.user) {
-		client.user.setActivity('skyblock players', { type: 'WATCHING' });
-	}
+client.once(Events.ClientReady, async () => {
+	const guildCount = client.guilds.cache.size;
 
-	DataHandler.syncTables();
+	if (client.user) {
+		client.user.setActivity(`${guildCount} farming guilds`, { type: ActivityType.Watching });
+	}
 
 	console.log('Ready!');
 	
@@ -58,7 +63,7 @@ client.once('ready', async () => {
 	}
 });
 
-client.login(config.token);
+client.login(process.env.BOT_TOKEN);
 
 process.on('unhandledRejection', (reason, p) => {
 	console.error(reason, 'Unhandled Rejection at Promise', p);
@@ -78,12 +83,20 @@ process.on('unhandledRejection', (reason, p) => {
 */
 
 function deploySlashCommands() {
-	const slashCommandsData: ApplicationCommandData[] = [];
+	const slashCommandsData: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
 
 	for (const [, command ] of commands) {
-		if (command.type === 'AUTOCOMPLETE' || command.type === 'BUTTON') continue;
+		if (command.type !== CommandType.Slash && command.type !== CommandType.Combo) continue;
 
-		if (command.slash) slashCommandsData.push(command.slash);
+		if (!command.slash) continue;
+
+		const slash = command.slash;
+		
+		if (command.permissions) {
+			slash.setDefaultMemberPermissions(PermissionsBitField.resolve(command.permissions));
+		}
+
+		slashCommandsData.push(command.slash.toJSON());
 	}
 
 	if (proccessArgs[1] === 'global') {
