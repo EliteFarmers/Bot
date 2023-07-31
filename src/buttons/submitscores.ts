@@ -138,6 +138,13 @@ async function execute(interaction: ButtonInteraction) {
 		return;
 	}
 
+	const cropKeys = [ 'cactus', 'carrot', 'cocoaBeans', 'potato', 'pumpkin', 'sugarCane', 'wheat', 'melon', 'netherWart', 'mushroom' ];
+	for (const key of Object.keys(leaderboard.crops)) {
+		if (!cropKeys.includes(key)) {
+			delete leaderboard.crops[key as keyof typeof leaderboard.crops];
+		}
+	}
+
 	const currentScores = {
 		'Cactus': leaderboard.crops.cactus ??= [],
 		'Carrot': leaderboard.crops.carrot ??= [],
