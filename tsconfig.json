@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "ESNext",
-        "module": "ES2022",
+        "module": "CommonJS",
         "rootDir": "./src",
         "outDir": "./dist",
         "strict": true,
@@ -23,12 +23,13 @@
         "baseUrl": "./src"
     },
     "include": [
-        "./config.json", "./**/*.ts", "./**/**/*.ts"
+        "./**/*.ts", "./**/**/*.ts"
     ],
     "exclude": [
         "node_modules",
     ],
     "ts-node": {
-        "esm": true
+        "esm": true,
+        "experimentalSpecifierResolution": "node",
     }
 }
