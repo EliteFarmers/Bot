@@ -26,11 +26,11 @@ async function execute(interaction: ButtonInteraction) {
 
 	await interaction.deferReply({ ephemeral: true });
 
-	const guild = await FetchGuildJacob(interaction.guildId).then((data) => data.data).catch(() => undefined);
+	const { data: guild } = await FetchGuildJacob(interaction.guildId).catch(() => ({ data: null }));
 
 	if (!guild) {
 		const embed = ErrorEmbed('Jacob Leaderboards not available!')
-			.setDescription('This server does not have Jacob Leaderboards enabled.\nIf you were expecting this to work, please contact "kaeso.dev" on Discord.\nThis feature is being remade currently, and will likely be a paid feature. Sorry for the inconvenience.');
+			.setDescription('This server does not have Jacob Leaderboards enabled. (Or the Elite API is down)\n⠀\nIf you were expecting this to work, please contact "kaeso.dev" on Discord.\nThis feature is being remade currently, and will likely be a paid feature. Sorry for the inconvenience.');
 		interaction.editReply({ embeds: [embed] });
 		return;
 	}
@@ -167,7 +167,7 @@ async function execute(interaction: ButtonInteraction) {
 		const { crop, collected } = contest;
 		if (!crop || !collected) continue;
 
-		let scores = currentScores[crop as keyof typeof currentScores];
+		const scores = currentScores[crop as keyof typeof currentScores];
 		if (scores === undefined) continue;
 
 		if (scores.length === 3 && !scores.some((s) => (s.record?.collected ?? 0) < collected)) {
@@ -226,7 +226,11 @@ async function execute(interaction: ButtonInteraction) {
 		sendPing = sendPing || oldIndex === 0;
 
 		// Remove previous score of the user
-		scores = scores.filter((s) => s.discordId !== interaction.user.id);
+		for (let i = 0; i < scores.length; i++) {
+			if (scores[i].discordId === interaction.user.id) {
+				scores.splice(i, 1);
+			}
+		}
 
 		// Add new score
 		scores.push({
@@ -240,7 +244,7 @@ async function execute(interaction: ButtonInteraction) {
 		scores.sort((a, b) => (b.record?.collected ?? 0) - (a.record?.collected ?? 0));
 
 		// Remove any scores that are not in the top 3
-		scores = scores.slice(0, 3);
+		while (scores.length > 3) scores.pop();
 
 		cropEmbeds.set(crop, embed);
 		currentScores[crop as keyof typeof currentScores] = scores;
