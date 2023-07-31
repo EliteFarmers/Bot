@@ -15,8 +15,8 @@ dependencies:
     specifier: ^14.6.0
     version: 14.11.0
   openapi-fetch:
-    specifier: ^0.6.1
-    version: 0.6.1
+    specifier: ^0.7.1
+    version: 0.7.1
 
 devDependencies:
   '@types/node-fetch':
@@ -1314,8 +1314,8 @@ packages:
       wrappy: 1.0.2
     dev: true
 
-  /openapi-fetch@0.6.1:
-    resolution: {integrity: sha512-CGWPqqtL31uC2e4eEU9NHoqYMXnJ7Jk4H/4Yguil4tO22MIZi91hlQJ/51E8CiaKdSTODh03yF4ndjIOABVHUw==}
+  /openapi-fetch@0.7.1:
+    resolution: {integrity: sha512-yU2xMcPqk4mpgY03yXPsxbobDTTw0AGPzhv1i4dfELBrLonYMfLzQx2eGgdlY4b51GmnnAgWZE9FAnBbM9/NtA==}
     dev: false
 
   /optionator@0.9.1:
