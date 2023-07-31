@@ -3,14 +3,15 @@
 ![Verified](https://user-images.githubusercontent.com/24925519/142558888-665330c4-4652-49a2-a54a-01e03dfaa1d2.png)
 
 Elite is a **verified** discord bot made for Hypixel Skyblock farmers, providing a custom weight system to compare stats. 
-*Originally made for the Elite Skyblock Farmers discord.*
+*Originally made for the [Elite Skyblock Farmers](https://discord.gg/farms) discord.*
 
+### Website: https://elitebot.dev/
 
-The bot calculates farming weight by computing a player's collections[^1] from the api and a few sources of bonus points listed below. Farming XP couldn't be used as the main metric due to XP being different per crop, and just not being useful in the sense of farming weight. If you'd like to see the top farmers by XP there's plenty of places to see that. 
+The bot calculates farming weight by computing a player's collections[^1] from the API and a few sources of bonus points listed below. Farming XP couldn't be used as the main metric due to XP being different per crop, and just not being useful in the sense of farming weight.
 
 Farming weight shows a more accurate number that represents total time spent farming, as peak farming only averages around 7 weight per hour no matter which crop.
 
-### [Bot Invite Link](https://discord.com/api/oauth2/authorize?client_id=845065148997566486&permissions=277092550656&scope=applications.commands%20bot)
+### [Click Me To Invite The Bot!](https://elitebot.dev/invite)
 
 ## Commands
 
@@ -72,26 +73,37 @@ Link your Minecraft account so you no longer need to specify your player name! I
 ![verify](https://user-images.githubusercontent.com/24925519/142559304-3b211f68-19f8-4cf3-be4e-935126e304d0.png)
 
 ---
-## Setup
+## Contributing
 
-Requires a config.json file that looks like this:
-```
-{
-	"prefix": ".",
-	"token": "",
-	"hypixelApiKey": "",
-	"dbUri": "",
-	"secret": "",
-	"superusers": [
-		"",
-	]
-}
-```
-The secret can be generated from running generateSecret in auth.js and inputted into Google authenticator.
-Superusers is a list of discord ids
+Contributions are welcome! Please open an issue or pull request if you have any suggestions or bug fixes.
 
-The database is postgres based.
+### Running The Project
 
-Ignore this: HODG HOM SON
+1. Create a new application on the [Discord Developer Portal](https://discord.com/developers/applications) and add a bot user. Invite this bot to a server you own to test it out.
 
-[^1]: Based on the collection averages found [here](https://drive.google.com/file/d/16mZpN4OyRONEfrPdCrpuleVbZVwwT6_M/view?usp=sharing/).
+2. Create a copy of `.env.example` and rename it to `.env` in the root directory and edit the following:
+
+	```env
+	BOT_TOKEN="bot-token-here"
+
+	ELITE_API_URL="https://api.elitebot.dev"
+	```
+	Enter your bot token in the `BOT_TOKEN` field. The `ELITE_API_URL` field can be left as is, but if you want to use [your instance of the API](https://github.com/EliteFarmers/API), change it to your API's URL. 
+	
+	**Note:** When using the production API, authenticated routes such as for `/verify` will not work. You would need to run your own instance of the API to work on anything requiring auth.
+
+3. Install dependencies with `pnpm install`. (Run `npm install -g pnpm` if you don't have `pnpm` installed)
+
+4. Run `pnpm run slash` to register the commands to your bot. This will only work if you have the bot token set up correctly. They *could* take up to an hour to show up in Discord. (It usually takes only a minute)
+
+5. Run `pnpm run dev` to start the bot. This will run the bot in development mode, which will automatically restart the bot when you make changes to the code.
+
+6. Try out the commands in Discord!
+
+### Deployment - Docker
+
+1. Fill out the `.env` file as described above.
+
+2. Make sure you have an instance of the [API](https://github.com/EliteFarmers/API) running and the `ELITE_API_URL` is set to either your API's URL, or the local docker url (ex: `http://eliteapi:7008`). Remember to set the `DISCORD_BOT_TOKEN` in the API's `.env` file to the same value as the bot's `.env` file. Otherwise, the `/verify` command and other authenticated actions will not work.
+
+3. Run `docker-compose up -d` to start the bot. This should just work, but if you run into any issues, please open an issue. (`docker-compose down` to stop the bot)
