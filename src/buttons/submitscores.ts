@@ -160,7 +160,7 @@ async function execute(interaction: ButtonInteraction) {
 		const { crop, collected } = contest;
 		if (!crop || !collected) continue;
 
-		const scores = currentScores[crop as keyof typeof currentScores];
+		let scores = currentScores[crop as keyof typeof currentScores];
 		if (scores === undefined) continue;
 
 		if (scores.length === 3 && !scores.some((s) => (s.record?.collected ?? 0) < collected)) {
@@ -197,6 +197,7 @@ async function execute(interaction: ButtonInteraction) {
 
 		if (old?.record?.collected) {
 			let message = oldIndex === 0 ? '**New High Score!**' : oldIndex === 1 ? `**New 2nd Place Score!**` : `**New 3rd Place Score!**`;
+			
 			if (old.uuid !== account.id) {
 				message += `\n<@${interaction.user.id}> **(${account.name})** has beaten <@${old.discordId}> (${old.ign}) by **${(collected - old.record.collected).toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`
 			} else {
@@ -209,13 +210,18 @@ async function execute(interaction: ButtonInteraction) {
 			embed.setDescription((embed.data.description ?? '') + `\n${message}`);
 		} else {
 			sendPing = true;
+			const prefix = scores.length === 0 ? '' : scores.length === 1 ? '**New 2nd Place Score!**\n' : '**New 3rd Place Score!**\n';
 			embed.setDescription((embed.data.description ?? '') 
-				+ `\n<@${interaction.user.id}> **(${account.name})** has set a new score of **${collected.toLocaleString()}** collection! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`
+				+ `\n${prefix}<@${interaction.user.id}> **(${account.name})** has set a new score of **${collected.toLocaleString()}** collection! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`
 			);
 		}
 
 		sendPing = sendPing || oldIndex === 0;
 
+		// Remove previous score of the user
+		scores = scores.filter((s) => s.discordId !== interaction.user.id);
+
+		// Add new score
 		scores.push({
 			uuid: account.id,
 			ign: account.name,
@@ -223,14 +229,13 @@ async function execute(interaction: ButtonInteraction) {
 			record: contest
 		});
 
+		// Sort scores
 		scores.sort((a, b) => (b.record?.collected ?? 0) - (a.record?.collected ?? 0));
 
-		while (scores.length > 3) {
-			scores.pop();
-		}
+		// Remove any scores that are not in the top 3
+		scores = scores.slice(0, 3);
 
 		cropEmbeds.set(crop, embed);
-
 		currentScores[crop as keyof typeof currentScores] = scores;
 	}
 
