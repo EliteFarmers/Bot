@@ -153,6 +153,16 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		await i.update({ embeds: [embed], components: [] }).catch(() => undefined);
 		collector.stop();
 	});
+
+	collector.on('end', async () => {
+		const linkRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+			new ButtonBuilder()
+				.setLabel(`@${account.name}/${profile.profileName}`)
+				.setURL(`https://elitebot.dev/@${account.name}/${encodeURIComponent(profile.profileName ?? '')}`)
+				.setStyle(ButtonStyle.Link)
+		);
+		await reply.edit({ components: [linkRow] }).catch(() => undefined);
+	});
 }
 
 async function createWeightImage(ign: string, uuid: string, profile: string, weight: components['schemas']['FarmingWeightDto'], rank = -1) {
