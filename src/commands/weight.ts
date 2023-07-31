@@ -151,10 +151,12 @@ async function execute(interaction: ChatInputCommandInteraction) {
 			});
 
 		await i.update({ embeds: [embed], components: [] }).catch(() => undefined);
-		collector.stop();
+		collector.stop('done');
 	});
 
-	collector.on('end', async () => {
+	collector.on('end', async (_, reason) => {
+		if (reason === 'done') return;
+		
 		const linkRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			new ButtonBuilder()
 				.setLabel(`@${account.name}/${profile.profileName}`)
