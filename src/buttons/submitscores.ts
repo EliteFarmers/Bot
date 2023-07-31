@@ -1,5 +1,5 @@
 import { Command, CommandAccess, CommandType } from "../classes/Command.js";
-import { ButtonInteraction, ChannelType, EmbedBuilder } from 'discord.js';
+import { ButtonInteraction, ChannelType, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from "../classes/embeds.js";
 import { FetchAccount, FetchContests, FetchGuildJacob, UpdateGuildJacob } from "../api/elite.js";
 import { GetCropColor, GetCropEmoji, GetCropURL, GetEmbeddedTimestamp } from "../classes/Util.js";
@@ -44,6 +44,10 @@ async function execute(interaction: ButtonInteraction) {
 			.setDescription('This leaderboard does not exist.\n⠀\nIf you were expecting this to work, please contact "kaeso.dev" on Discord.\nThis feature is being remade currently, and will likely be a paid feature. Sorry for the inconvenience.');
 		interaction.editReply({ embeds: [embed] });
 		return;
+	}
+
+	if (interaction.memberPermissions.has(PermissionFlagsBits.Administrator)) {
+		await interaction.message.edit({ embeds: [getLeaderboardEmbed(leaderboard)] }).catch(() => undefined);
 	}
 
 	// Check if the user has a banned role
