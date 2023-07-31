@@ -299,9 +299,9 @@ export function getLeaderboardEmbed(lb: components['schemas']['GuildJacobLeaderb
 		.setTitle(lb.title ?? 'Jacob\'s Contest Leaderboard')
 		.setDescription('These are the highscores set by your fellow server members!')
 	
-	let footerText = 'Scores are valid from ';
+	let footerText = 'Scores are valid starting ';
 	if (!lb.startCutoff || lb.startCutoff === -1) {
-		footerText += 'the beginning of Skyblock';
+		footerText += 'from the beginning of Skyblock';
 	}
 	if (lb.startCutoff && lb.startCutoff !== -1) {
 		footerText += GetReadableDate(lb.startCutoff);
@@ -337,7 +337,7 @@ function getField(crop: string, scores?: components['schemas']['GuildJacobLeader
 
 	const first = scores[0];
 	const otherScores = scores.slice(1).map((s, i) => {
-		return `**${i + 2}.**⠀<@${s.discordId}>⠀${s.record?.collected?.toLocaleString()}⠀${GetEmbeddedTimestamp(first.record?.timestamp ?? 0)} [⧉](https://elitebot.dev/contest/${s.record?.timestamp ?? 0})`
+		return `**${i + 2}.**⠀<@${s.discordId}>⠀${s.record?.collected?.toLocaleString()}⠀${GetEmbeddedTimestamp(s.record?.timestamp ?? 0)} [⧉](https://elitebot.dev/contest/${s.record?.timestamp ?? 0})`
 	}).join('\n');
 
 	const value = `
