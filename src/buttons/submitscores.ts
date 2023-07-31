@@ -168,6 +168,12 @@ async function execute(interaction: ButtonInteraction) {
 			continue;
 		}
 
+		// Same user already has a better score for this crop
+		if (scores.some((s) => 
+			s.discordId === interaction.user.id 
+			&& (s.record?.collected ?? 0) >= collected
+		)) continue;
+
 		if (scores.some((s) => 
 			s.record?.collected === collected 
 			&& s.discordId === interaction.user.id 
@@ -190,18 +196,17 @@ async function execute(interaction: ButtonInteraction) {
 		}
 
 		if (old?.record?.collected) {
+			let message = oldIndex === 0 ? '**New High Score!**' : oldIndex === 1 ? `**New 2nd Place Score!**` : `**New 3rd Place Score!**`;
 			if (old.uuid !== account.id) {
-				embed.setDescription((embed.data.description ?? '') 
-					+ `\n<@${interaction.user.id}> **(${account.name})** has beaten <@${old.discordId}> (${old.ign}) by **${(collected - old.record.collected).toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`
-				);
+				message += `\n<@${interaction.user.id}> **(${account.name})** has beaten <@${old.discordId}> (${old.ign}) by **${(collected - old.record.collected).toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`
 			} else {
 				const improvement = collected - old.record.collected;
 				sendPing = sendPing || (oldIndex === 0 && (improvement >= 500 || (leaderboard.pingForSmallImprovements ?? false)));
 
-				embed.setDescription((embed.data.description ?? '') 
-					+ `\n<@${interaction.user.id}> **(${account.name})** improved their score by **${improvement.toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`
-				);
+				message += `\n<@${interaction.user.id}> **(${account.name})** improved their score by **${improvement.toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`
 			}
+
+			embed.setDescription((embed.data.description ?? '') + `\n${message}`);
 		} else {
 			sendPing = true;
 			embed.setDescription((embed.data.description ?? '') 
