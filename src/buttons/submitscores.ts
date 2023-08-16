@@ -88,22 +88,12 @@ async function execute(interaction: ButtonInteraction) {
 		return;
 	}
 
-	// Fetch the user's profile
-	const selectedProfile = account.profiles?.find((p) => p.selected);
-
-	if (!selectedProfile?.profileId) {
-		const embed = ErrorEmbed('Profile not found!')
-			.setDescription('You must have a profile selected in SkyBlock before submitting scores.\nThis is a scary error to get, hopefully something went wrong and you can try again, otherwise your selected profile might be deleted.');
-		interaction.editReply({ embeds: [embed] });
-		return;
-	}
-
 	const contestRespnse = await FetchContests(account.id).then((data) => data.data).catch(() => undefined);
 	const contests = contestRespnse ?? [];
 
 	if (!contestRespnse) {
-		const embed = ErrorEmbed('Profile not found!')
-			.setDescription('You must have a profile selected in SkyBlock before submitting scores.\nThis is a scary error to get, hopefully something went wrong and you can try again, otherwise your selected profile might be deleted.');
+		const embed = ErrorEmbed('Contests not found!')
+			.setDescription('Your data wasn\'t able to be fetched!\nThis is likely an issue with the Elite API, please try again later.');
 		interaction.editReply({ embeds: [embed] });
 		return;
 	}
@@ -111,7 +101,6 @@ async function execute(interaction: ButtonInteraction) {
 	if (!contests || contests.length === 0) {
 		const embed = WarningEmbed('Jacob Contests not Found!')
 			.setDescription('You must have participated in a Jacob Contest before submitting scores.\nIf you have participated in a contest, please wait a few minutes and try again.\nIf this issue persists, please contact "kaeso.dev" on Discord.')
-			.addFields({ name: 'Selected Profile', value: selectedProfile.profileName ?? 'Unknown' });
 		interaction.editReply({ embeds: [embed] });
 		return;
 	}
@@ -137,7 +126,6 @@ async function execute(interaction: ButtonInteraction) {
 	if (validContests.length === 0) {
 		const embed = WarningEmbed('No Valid Contests Found!')
 			.setDescription(`No contests found fit the criteria for this leaderboard.\nIf you have participated in a valid contest, please wait up to 10 minutes (until your profile can be fetched again)`)
-			.addFields({ name: 'Selected Profile', value: selectedProfile.profileName ?? 'Unknown' });
 		interaction.editReply({ embeds: [embed] });
 		return;
 	}
