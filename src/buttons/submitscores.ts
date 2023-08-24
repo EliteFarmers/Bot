@@ -39,14 +39,20 @@ async function execute(interaction: ButtonInteraction) {
 
 	const leaderboard = guild.leaderboards?.find((lb) => lb.id === lbId);
 
+	const isAdmin = interaction.memberPermissions.has(PermissionFlagsBits.Administrator);
+
 	if (!leaderboard?.crops) {
+		if (isAdmin) {
+			await interaction.message.edit({ components: [] }).catch(() => undefined);
+		}
+
 		const embed = ErrorEmbed('Leaderboard not found!')
 			.setDescription('This leaderboard does not exist.\n⠀\nIf you were expecting this to work, please contact "kaeso.dev" on Discord.\nThis feature is being remade currently, and will likely be a paid feature. Sorry for the inconvenience.');
 		interaction.editReply({ embeds: [embed] });
 		return;
 	}
 
-	if (interaction.memberPermissions.has(PermissionFlagsBits.Administrator)) {
+	if (isAdmin) {
 		await interaction.message.edit({ embeds: [getLeaderboardEmbed(leaderboard)] }).catch(() => undefined);
 	}
 
