@@ -1,6 +1,6 @@
-import { Signal, SignalRecieverOptions } from "classes/Signal";
-import { EliteEmbed } from "classes/embeds";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { Signal, SignalRecieverOptions } from '../classes/Signal.js';
+import { EliteEmbed } from '../classes/embeds.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 
 const settings: SignalRecieverOptions = {
 	name: 'leaderboardInit',
