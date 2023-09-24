@@ -38,5 +38,5 @@ async function execute(signal: Signal) {
 			.setStyle(ButtonStyle.Success)
 	);
 
-	channel?.send({ embeds: [embed], components: [row] });
+	channel?.send({ embeds: [embed], components: [row] }).catch(() => undefined);
 }

@@ -38,8 +38,6 @@ export async function ConnectToRMQ() {
 	channel.bindQueue(queue, queue, '');
 
 	channel.consume(queue, async (msg) => {
-		console.log('Recieved message from RabbitMQ');
-
 		if (!msg) return;
 		const signal = new Signal(msg.content.toString());
 
@@ -51,8 +49,6 @@ export async function ConnectToRMQ() {
 
 		if (!await hasPermissions(signal.authorId, signal.guildId, info.permissions)) return;
 
-		console.log(`Executing signal ${signal.name} from ${signal.authorId} in ${signal.guildId}`);
-		console.log(signal.data);
 		try {
 			info?.execute(signal, client);
 		} catch (error) {
