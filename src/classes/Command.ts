@@ -1,4 +1,4 @@
-// This is to allow the generic "Function" to be used, as it's the easiest way to allow both types of commandss
+// This is to allow the generic "Function" to be used, as it's the easiest way to allow both types of commands
 /* eslint-disable @typescript-eslint/ban-types */
 import { SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
 
