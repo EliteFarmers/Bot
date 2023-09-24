@@ -1,6 +1,6 @@
-import { connect } from "amqplib";
-import { Signal } from "classes/Signal";
-import { client, signals } from "index";
+import { connect } from 'amqplib';
+import { Signal } from '../classes/Signal.js';
+import { client, signals } from '../index.js';
 
 const errorMsg = 'Failed to connect to RabbitMQ, message queue from EliteAPI will not work.\nPlease check your RABBITMQ_URL env variable.\nThis is not an issue if you are not using EliteAPI\'s message queue.';
 

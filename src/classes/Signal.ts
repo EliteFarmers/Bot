@@ -1,5 +1,5 @@
-import { Client } from "discord.js";
-import { client } from "index";
+import { Client } from 'discord.js';
+import { client } from '../index.js';
 
 // RabbitMQ Message "Signal"
 // This is the message that is recieved from the RabbitMQ server.

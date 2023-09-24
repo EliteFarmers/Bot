@@ -1,7 +1,7 @@
 import { Client, GatewayIntentBits, Collection, ApplicationCommandDataResolvable, ActivityType, RESTPostAPIChatInputApplicationCommandsJSONBody, Events, PermissionsBitField } from 'discord.js';
 import { Command, CommandType } from './classes/Command.js';
 import { SignalRecieverOptions } from './classes/Signal.js';
-import { ConnectToRMQ } from 'api/rabbit.js';
+import { ConnectToRMQ } from './api/rabbit.js';
 import { GlobalFonts } from '@napi-rs/canvas';
 
 import fs from 'fs';
