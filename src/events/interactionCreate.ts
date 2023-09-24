@@ -1,10 +1,17 @@
-import { ButtonInteraction, ChatInputCommandInteraction, CommandInteraction, GuildMember, Interaction } from 'discord.js';
+import { ButtonInteraction, ChatInputCommandInteraction, CommandInteraction, Events, GuildMember, Interaction } from 'discord.js';
 import { commands } from '../index.js';
 import { Command, CommandType } from '../classes/Command.js';
 import { HasRole, isValidAccess } from '../classes/Util.js';
 import { FetchGuild } from '../api/elite.js';
 
-export default async function(interaction: Interaction) {
+const settings = {
+	event: Events.InteractionCreate,
+	execute: execute
+}
+
+export default settings;
+
+async function execute(interaction: Interaction) {
 	if (interaction.isChatInputCommand()) return OnCommandInteraction(interaction);
 	if (interaction.isButton()) return OnButtonInteraction(interaction);
 	//if (interaction.isAutocomplete()) return OnAutocompleteInteraction(interaction);
@@ -89,7 +96,7 @@ async function HasPermsAndAccess(command: Command, interaction: CommandInteracti
 			ephemeral: true 
 		});
 		return false;
-	}	
+	}
 
 	return true;
 }

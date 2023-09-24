@@ -1,13 +1,14 @@
 import { Client, GatewayIntentBits, Collection, ApplicationCommandDataResolvable, ActivityType, RESTPostAPIChatInputApplicationCommandsJSONBody, Events, PermissionsBitField } from 'discord.js';
 import { Command, CommandType } from './classes/Command.js';
+import { SignalRecieverOptions } from './classes/Signal.js';
+import { ConnectToRMQ } from 'api/rabbit.js';
+import { GlobalFonts } from '@napi-rs/canvas';
 
 import fs from 'fs';
 import path from 'path';
-
 import dotenv from 'dotenv';
-import { GlobalFonts } from '@napi-rs/canvas';
-dotenv.config();
 
+dotenv.config();
 const proccessArgs = process.argv.slice(2);
 
 export const client = new Client({ 
@@ -15,6 +16,7 @@ export const client = new Client({
 });
 
 export const commands = new Collection<string, Command>();
+export const signals = new Collection<string, SignalRecieverOptions>();
 
 /* 
 * There is surely a better way to load these, but this is fine for now
@@ -23,33 +25,36 @@ export const commands = new Collection<string, Command>();
 (async function() {
 	const filter = (fileName: string) => fileName.endsWith('.ts') || fileName.endsWith('.js');
 
-	const commandFiles = fs.readdirSync(path.resolve('./src/commands/')).filter(filter);
-	
-	for (const file of commandFiles) {
-		const command = await import(`./commands/${file.replace('.ts', '.js')}`);
-		commands.set(command.default.name, command.default);
-	}
+	registerFiles('commands', filter, (cmd) => {
+		commands.set(cmd.name, cmd);
+	});
 
-	const buttonFiles = fs.readdirSync('./src/buttons/').filter(filter);
+	registerFiles('buttons', filter, (btn) => {
+		commands.set(btn.name, btn);
+	});
 
-	for (const file of buttonFiles) {
-		const command = await import(`./buttons/${file.replace('.ts', '.js')}`);
-		commands.set(command.default.name, command.default);
-	}
-	
-	const eventFiles = fs.readdirSync('./src/events/').filter(filter);
-	
-	for (const file of eventFiles) {
-		const event = await import(`./events/${file.replace('.ts', '.js')}`);
-		client.on(file.split('.')[0], event.default);
-	}
+	registerFiles('events', filter, (event) => {
+		client.on(event.event, event.execute);
+	});
+
+	registerFiles('signals', filter, (signal) => {
+		signals.set(signal.name, signal);
+	});
 
 	GlobalFonts.loadFontsFromDir(path.resolve('./src/assets/fonts/'));
-}()); 
+}());
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function registerFiles(folder: string, filter: (fileName: string) => boolean, callback: (data: any) => void) {
+	const files = fs.readdirSync(`./src/${folder}`).filter(filter);
+
+	for (const file of files) {
+		const imported = await import(`./${folder}/${file.replace('.ts', '.js')}`);
+		callback(imported.default);
+	}
+}
 
 client.once(Events.ClientReady, async () => {
-
 	if (client.user) {
 		client.user.setActivity(`${client.guilds.cache.size} farming guilds`, { type: ActivityType.Watching });
 	}
@@ -62,6 +67,8 @@ client.once(Events.ClientReady, async () => {
 	}, 1000 * 60 * 60 * 2);
 
 	console.log('Ready!');
+
+	ConnectToRMQ();
 	
 	if (proccessArgs[0] === 'deploy') {
 		console.log('Deploying slash commands...');
