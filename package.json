@@ -1,9 +1,11 @@
 {
   "dependencies": {
     "@napi-rs/canvas": "^0.1.41",
+    "@types/amqplib": "^0.10.2",
     "@types/node": "^17.0.23",
+    "amqplib": "^0.10.3",
     "discord.js": "^14.6.0",
-    "openapi-fetch": "^0.7.1"
+    "openapi-fetch": "^0.7.6"
   },
   "scripts": {
     "start": "tsx --esm src/index.ts",
