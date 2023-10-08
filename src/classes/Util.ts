@@ -5,6 +5,8 @@ import {
 	Snowflake,
 	PermissionFlagsBits,
 	ChannelType,
+	ActionRowBuilder,
+	StringSelectMenuBuilder,
 } from 'discord.js';
 import { client } from '../index.js';
 import { CommandAccess } from './Command.js';
@@ -142,45 +144,62 @@ export function GetCropEmoji(crop: string) {
 	return '';
 }
 
+export function CropSelectRow(customId = 'crop-select', placeholder = 'Select a crop!') {
+	const options = Object.entries(CropEmojis).map(([name, emoji], i) => ({
+		label: name,
+		value: i.toString(),
+		emoji: emoji.id,
+	}));
+
+	const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+		new StringSelectMenuBuilder()
+			.addOptions(...options)
+			.setCustomId(customId)
+			.setPlaceholder(placeholder)
+	)
+
+	return row;
+}
+
 const CropEmojis = {
 	Cactus: {
-		id: '1096113963512639528',
+		id: '1158914561454387370',
 		name: 'cactus',
 	},
 	Carrot: {
-		id: '1096114031359701023',
+		id: '1158914559843766372',
 		name: 'carrot',
 	},
 	'Cocoa Beans': {
-		id: '1096206396707581973',
-		name: 'cocoa_beans',
+		id: '1158914476704284694',
+		name: 'cocoa',
 	},
 	Melon: {
-		id: '1096108893735768094',
+		id: '1158914475794112522',
 		name: 'melon',
 	},
 	Mushroom: {
-		id: '1109927720546226276',
+		id: '1158914474577768490',
 		name: 'mushrooms',
 	},
 	'Nether Wart': {
-		id: '1109927626899980429',
-		name: 'wart',
+		id: '1158914473252360282',
+		name: 'netherwart',
 	},
 	Potato: {
-		id: '1109928158003736626',
+		id: '1158914472329613433',
 		name: 'potato',
 	},
 	Pumpkin: {
-		id: '1096108959225610310',
+		id: '1158914471394279454',
 		name: 'pumpkin',
 	},
 	'Sugar Cane': {
-		id: '1096107156023033897',
+		id: '1158914469532016642',
 		name: 'sugarcane',
 	},
 	Wheat: {
-		id: '1096108834663178350',
+		id: '1158914469087432754',
 		name: 'wheat',
 	},
 };

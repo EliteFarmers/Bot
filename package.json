@@ -1,28 +1,29 @@
 {
   "dependencies": {
-    "@napi-rs/canvas": "^0.1.41",
+    "@napi-rs/canvas": "^0.1.44",
     "@types/amqplib": "^0.10.2",
-    "@types/node": "^17.0.23",
+    "@types/node": "^17.0.45",
     "amqplib": "^0.10.3",
-    "discord.js": "^14.6.0",
-    "openapi-fetch": "^0.7.6"
+    "discord.js": "^14.13.0",
+    "farming-weight": "^0.1.3",
+    "openapi-fetch": "^0.7.8"
   },
   "scripts": {
     "start": "tsx --esm src/index.ts",
     "lint": "eslint src --ext .ts",
     "build": "tsc",
     "dev": "npx nodemon --exec \"npx tsx\" src/index.ts",
-    "slash": "ts-node src/index.ts deploy global",
+    "slash": "tsx src/index.ts deploy global",
     "prod": "node dist/index.js",
     "generate-api-types": "npx openapi-typescript \"./src/api/swagger.json\" -o \"./src/api/api.d.ts\""
   },
   "devDependencies": {
-    "@types/node-fetch": "^2.6.1",
-    "@typescript-eslint/eslint-plugin": "^5.18.0",
-    "dotenv": "^16.0.3",
-    "eslint": "^8.13.0",
-    "tslib": "^2.6.0",
-    "tsx": "^3.12.7",
-    "typescript": "^5.1.6"
+    "@types/node-fetch": "^2.6.6",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "dotenv": "^16.3.1",
+    "eslint": "^8.50.0",
+    "tslib": "^2.6.2",
+    "tsx": "^3.13.0",
+    "typescript": "^5.2.2"
   }
 }
