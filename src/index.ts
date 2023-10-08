@@ -118,6 +118,24 @@ function deploySlashCommands() {
 			await client.application?.commands.set(slashCommandsData as ApplicationCommandDataResolvable[]);
 			console.log('Probably updated slash commands globally');
 		}, 3000);
+	} else if (proccessArgs[1] === 'single') {
+		const name = proccessArgs[2];
+		const command = slashCommandsData.find(cmd => cmd.name === name);
+
+		if (!command) return console.log('Could not find command with the name "' + name + '"');
+
+		setTimeout(async function() {
+			const current = await client.application?.commands.fetch();
+			const existing = current?.find(cmd => cmd.name === name);
+
+			if (!existing) {
+				await client.application?.commands.create(command);
+				console.log('Probably created that slash command globally');
+			} else {
+				await client.application?.commands.edit(existing, command);
+				console.log('Probably updated that slash command globally');
+			}
+		}, 3000);
 	} else if (proccessArgs[1]) {
 		setTimeout(async function() {
 			const guild = await client.guilds.fetch('' + proccessArgs[1]);

@@ -14,6 +14,7 @@
     "build": "tsc",
     "dev": "npx nodemon --exec \"npx tsx\" src/index.ts",
     "slash": "tsx src/index.ts deploy global",
+    "singleslash": "tsx src/index.ts deploy single",
     "prod": "node dist/index.js",
     "generate-api-types": "npx openapi-typescript \"./src/api/swagger.json\" -o \"./src/api/api.d.ts\""
   },
