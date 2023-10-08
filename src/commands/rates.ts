@@ -1,4 +1,4 @@
-import { EliteEmbed, EmptyField, NotYoursReply } from 'classes/embeds.js';
+import { EliteEmbed, EmptyField, NotYoursReply } from '../classes/embeds.js';
 import { Command, CommandAccess, CommandType } from '../classes/Command.js';
 import { CropSelectRow, GetCropEmoji } from '../classes/Util.js';
 import { ChatInputCommandInteraction, ComponentType, SlashCommandBuilder } from 'discord.js';
