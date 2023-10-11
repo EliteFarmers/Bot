@@ -85,7 +85,16 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		.addFields({
 			name: 'Crops',
 			value: text || 'Error!',
-		});
+			inline: true,
+		})
+
+	if (fortune) {
+		embed.addFields([{
+			name: 'Custom Fortune Warning',
+			value: 'The amount of fortune available varies depending on the crop.\nFor the best results, only look at the crop your entered fortune is for.',
+			inline: false,
+		}])
+	}
 
 	const row = CropSelectRow('crop-select-rates', 'Select a crop to view its rates!');
 
