@@ -35,10 +35,16 @@ async function execute(interaction: ChatInputCommandInteraction) {
 	const { data: account } = await FetchAccount(playerName ?? interaction.user.id).catch(() => ({ data: undefined }));
 
 	if (!account?.id || !account?.name) {
-		const embed = WarningEmbed('Specify a Username!')
-			.addFields({ name: 'Proper Usage:', value: '`/weight` `player:`(player name)' })
-			.setDescription('Checking for yourself?\nYou must use `/verify` `player:`(account name) before using this shortcut!')
-		interaction.deleteReply().catch(() => undefined);
+		const embed = WarningEmbed('Invalid Username!')
+			.addFields({ name: 'Proper Usage:', value: '`/weight` `player:`(player name)\nOr link your account with </verify:1135100641560248334> first!' });
+
+		if (playerName) {
+			embed.setDescription(`Player \`${playerName}\` does not exist (or an error occured)`);
+		} else {
+			embed.setDescription('You need to link your account or enter a playername!');
+		}
+
+		await interaction.deleteReply().catch(() => undefined);
 		interaction.followUp({ embeds: [embed], ephemeral: true });
 		return;
 	}
@@ -53,7 +59,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		const embed = ErrorEmbed('Invalid Profile!')
 			.setDescription(`Profile "${_profileName}" does not exist.`)
 			.addFields({ name: 'Proper Usage:', value: '`/weight` `player:`(player name) `profile:`(profile name)' });
-		interaction.deleteReply().catch(() => undefined);
+		await interaction.deleteReply().catch(() => undefined);
 		interaction.followUp({ embeds: [embed], ephemeral: true });
 		return;
 	}
@@ -65,7 +71,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		const embed = ErrorEmbed('Couldn\'t fetch data!')
 			.setDescription(`Something went wrong when getting data for "${playerName}".`)
 			.setFooter({ text: 'Contact kaeso.dev if this continues to happen' });
-		interaction.deleteReply().catch(() => undefined);
+		await interaction.deleteReply().catch(() => undefined);
 		interaction.followUp({ embeds: [embed], ephemeral: true });
 		return;
 	}
