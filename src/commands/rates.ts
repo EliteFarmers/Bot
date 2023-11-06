@@ -2,7 +2,7 @@ import { EliteEmbed, EmptyField, NotYoursReply } from '../classes/embeds.js';
 import { Command, CommandAccess, CommandType } from '../classes/Command.js';
 import { CropSelectRow, GetCropEmoji } from '../classes/Util.js';
 import { ChatInputCommandInteraction, ComponentType, SlashCommandBuilder } from 'discord.js';
-import { CalculateDetailedAverageDrops, Crop, CropDisplayName } from 'farming-weight';
+import { CalculateAverageSpecialCrops, CalculateDetailedAverageDrops, Crop, CropDisplayName } from 'farming-weight';
 
 const TIME_OPTIONS = {
 	24_000: 'Jacob Contest',
@@ -116,6 +116,11 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		const collections = Object.entries(cropInfo.otherCollection).sort((a, b) => b[1] - a[1]);
 		const cropName = CropDisplayName(crop as Crop);
 
+		const threeFourths = CalculateAverageSpecialCrops(blocks, crop as Crop, 3);
+		const fromSpecial = cropInfo.coinSources[threeFourths.type] ?? 0;
+		const specialDifference = fromSpecial - threeFourths.npc;
+		const threeFourthsTotal = cropInfo.npcCoins - specialDifference;
+
 		const cropEmbed = EliteEmbed()
 			.setTitle(`${cropName} Rates`)
 			.setDescription(`Expected rates for **${fortune?.toLocaleString() ?? `${cropInfo.fortune.toLocaleString()} (MAX)`}** Farming Fortune in **${timeName}**${details}`)
@@ -139,7 +144,10 @@ async function execute(interaction: ChatInputCommandInteraction) {
 					return `**${source}:** ${amount?.toLocaleString()}`;
 				}).join('\n'),
 				inline: true,
-			}, EmptyField() ]);
+			}, EmptyField(), {
+				name: '3/4ths Fermento Armor',
+				value: `:coin: ${(threeFourthsTotal)?.toLocaleString() ?? '0'} ⠀ ${(specialDifference).toLocaleString()} less coins (~${threeFourths.amount} ${threeFourths.type})`,
+			}]);
 
 		inter.update({ embeds: [cropEmbed] });
 	})
