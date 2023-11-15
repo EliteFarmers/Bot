@@ -1286,127 +1286,6 @@
         }
       }
     },
-    "/Bot/{guildId}/contests": {
-      "put": {
-        "tags": [
-          "Bot"
-        ],
-        "parameters": [
-          {
-            "name": "guildId",
-            "in": "path",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GuildContestPings"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GuildContestPings"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GuildContestPings"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Bot/Guilds/Contests": {
-      "get": {
-        "tags": [
-          "Bot"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "$ref": "#/components/schemas/GuildContestPings"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "$ref": "#/components/schemas/GuildContestPings"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "$ref": "#/components/schemas/GuildContestPings"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/Bot/account": {
       "patch": {
         "tags": [
@@ -1569,6 +1448,15 @@
             "schema": {
               "type": "integer",
               "format": "int32"
+            }
+          },
+          {
+            "name": "now",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "boolean",
+              "default": false
             }
           }
         ],
@@ -5186,6 +5074,23 @@
         },
         "additionalProperties": false
       },
+      "Crop": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "CropCollectionsDataPointDto": {
         "type": "object",
         "properties": {
@@ -5330,6 +5235,32 @@
             "format": "int32"
           },
           "color": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "EarnedMedalInventoryDto": {
+        "type": "object",
+        "properties": {
+          "bronze": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "silver": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "gold": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "platinum": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "diamond": {
             "type": "integer",
             "format": "int32"
           }
@@ -5606,7 +5537,7 @@
             "nullable": true
           },
           "startConditions": {
-            "$ref": "#/components/schemas/StartConditions"
+            "$ref": "#/components/schemas/EventMemberStartConditions"
           },
           "lastUpdated": {
             "type": "string",
@@ -5623,6 +5554,46 @@
         },
         "additionalProperties": false
       },
+      "EventMemberStartConditions": {
+        "type": "object",
+        "properties": {
+          "initialCollection": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "increasedCollection": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "countedCollection": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "toolStates": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/EventToolState"
+            }
+          },
+          "tools": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "EventMemberStatus": {
         "enum": [
           0,
@@ -5632,6 +5603,57 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "EventToolCounterState": {
+        "type": "object",
+        "properties": {
+          "initial": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "previous": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "current": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "uncounted": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "EventToolState": {
+        "type": "object",
+        "properties": {
+          "skyblockId": {
+            "type": "string"
+          },
+          "crop": {
+            "$ref": "#/components/schemas/Crop"
+          },
+          "firstSeen": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "lastSeen": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "counter": {
+            "$ref": "#/components/schemas/EventToolCounterState"
+          },
+          "cultivating": {
+            "$ref": "#/components/schemas/EventToolCounterState"
+          }
+        },
+        "additionalProperties": false
       },
       "ExcludedTimespan": {
         "type": "object",
@@ -5667,6 +5689,12 @@
             }
           },
           "equipment": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemDto"
+            }
+          },
+          "accessories": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ItemDto"
@@ -5835,26 +5863,6 @@
         },
         "additionalProperties": false
       },
-      "GuildContestPings": {
-        "type": "object",
-        "properties": {
-          "enabled": {
-            "type": "boolean"
-          },
-          "channelId": {
-            "type": "string",
-            "nullable": true
-          },
-          "cropRoles": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string",
-              "nullable": true
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "GuildDetailsDto": {
         "type": "object",
         "properties": {
@@ -5974,12 +5982,6 @@
           },
           "eventSettings": {
             "$ref": "#/components/schemas/GuildEventSettings"
-          },
-          "contestPingsEnabled": {
-            "type": "boolean"
-          },
-          "contestPings": {
-            "$ref": "#/components/schemas/GuildContestPings"
           }
         },
         "additionalProperties": false
@@ -6225,7 +6227,7 @@
             "$ref": "#/components/schemas/MedalInventoryDto"
           },
           "earnedMedals": {
-            "$ref": "#/components/schemas/MedalInventoryDto"
+            "$ref": "#/components/schemas/EarnedMedalInventoryDto"
           },
           "perks": {
             "$ref": "#/components/schemas/JacobPerksDto"
@@ -6781,12 +6783,6 @@
           },
           "eventSettings": {
             "$ref": "#/components/schemas/GuildEventSettings"
-          },
-          "contestPingsEnabled": {
-            "type": "boolean"
-          },
-          "contestPings": {
-            "$ref": "#/components/schemas/GuildContestPings"
           }
         },
         "additionalProperties": false
@@ -6972,26 +6968,6 @@
           "youtube": {
             "type": "string",
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "StartConditions": {
-        "type": "object",
-        "properties": {
-          "collection": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          "tools": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "integer",
-              "format": "int64"
-            }
           }
         },
         "additionalProperties": false

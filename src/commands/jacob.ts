@@ -3,7 +3,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatIn
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from "../classes/embeds.js";
 import { FetchAccount, FetchProfile } from "../api/elite.js";
 import { GetReadableDate } from "../classes/SkyblockDate.js";
-import { GetCropEmoji } from "../classes/Util.js";
+import { GetCropEmoji, GetMedalEmoji } from "../classes/Util.js";
 
 const command: Command = {
 	name: 'jacob',
@@ -94,10 +94,10 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 
 	const embed = EliteEmbed()
 		.setTitle(`Jacob's Stats for ${playerName.replace(/_/g, '\\_')}${profileName ? ` on ${profileName}` : ``}`)
-		.setDescription(`🥇 ${medals?.gold} / **${earned?.gold}** 🥈 ${medals?.silver} / **${earned?.silver}** 🥉 ${medals?.bronze} / **${earned?.bronze}**\n${partic}\n⠀`)
+		.setDescription(`${GetMedalEmoji('diamond')}**${earned?.diamond}** ${GetMedalEmoji('platinum')}**${earned?.platinum}** ${GetMedalEmoji('gold')} ${medals?.gold} / **${earned?.gold}** ${GetMedalEmoji('silver')} ${medals?.silver} / **${earned?.silver}** ${GetMedalEmoji('bronze')} ${medals?.bronze} / **${earned?.bronze}**\n${partic}\n⠀`)
 		.addFields(contests.slice(0, 3).map((contest) => ({
 			name: `${GetReadableDate(contest.timestamp ?? 0)}`,
-			value: `${GetCropEmoji(contest.crop ?? '')} ${(contest?.crop ?? 'ERROR')} - **${contest.collected?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** [⧉](https://elitebot.dev/contest/${contest.timestamp})`,
+			value: `${GetCropEmoji(contest.crop ?? '')} ${GetMedalEmoji(contest.medal ?? undefined)}${(contest?.crop ?? 'ERROR')} - **${contest.collected?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** [⧉](https://elitebot.dev/contest/${contest.timestamp})`,
 		})));
 
 	let page = 0;
@@ -191,7 +191,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 			const contest = entries[i];
 			if (!contest) continue;
 
-			const details = ((contest?.participants ?? 0) > 0 && contest.position !== undefined) 
+			const details = ((contest?.participants ?? 0) > 0 && contest.position !== undefined && contest.position > -1) 
 				? `\`#${(contest.position + 1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` of \`${contest.participants?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\` ${profileName ? ` on \`${profileName}\`` : ` players!`}` 
 				: `${profileName ? `Unclaimed on \`${profileName}\`!` : `Contest Still Unclaimed!`}`;
 
@@ -200,7 +200,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 
 			newEmbed.addFields({
 				name: `${GetReadableDate(contest.timestamp ?? 0)}`,
-				value: `${GetCropEmoji(contest.crop ?? '')} ${(selectedCrop) ? 'Collected ' : `${contest?.crop ?? 'ERROR'} - `}**${contest.collected.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** [⧉](https://elitebot.dev/contest/${contest.timestamp})\n` + details,
+				value: `${GetCropEmoji(contest.crop ?? '')} ${GetMedalEmoji(contest.medal ?? undefined)}${(selectedCrop) ? 'Collected ' : `${contest?.crop ?? 'ERROR'} - `}**${contest.collected.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** [⧉](https://elitebot.dev/contest/${contest.timestamp})\n` + details,
 				inline: true
 			});
 

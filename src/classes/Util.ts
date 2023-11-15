@@ -144,6 +144,22 @@ export function GetCropEmoji(crop: string) {
 	return '';
 }
 
+export function GetMedalEmoji(medal?: string) {
+	switch (medal) {
+	case 'bronze':
+		return '<:bronze:1174442233999667232> '; 
+	case 'silver':
+		return '<:silver:1174442242379886642> '; 
+	case 'gold':
+		return '<:gold:1174442237413826581> '; 
+	case 'platinum':
+		return '<:platinum:1174442239762628758> '; 
+	case 'diamond':
+		return '<:diamond:1174442234578468895> ';
+	}
+	return '';
+}
+
 export function CropSelectRow(customId = 'crop-select', placeholder = 'Select a crop!') {
 	const options = Object.entries(CropEmojis).map(([name, emoji], i) => ({
 		label: name,
