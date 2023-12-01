@@ -3,6 +3,7 @@ import { Command, CommandGroup, CommandGroupSettings, CommandType, SubCommand } 
 import { SignalRecieverOptions } from './classes/Signal.js';
 import { ConnectToRMQ } from './api/rabbit.js';
 import { GlobalFonts } from '@napi-rs/canvas';
+import { CronJob } from 'cron';
 
 import fs from 'fs';
 import path from 'path';
@@ -52,6 +53,14 @@ export const signals = new Collection<string, SignalRecieverOptions>();
 
 	registerFiles<SignalRecieverOptions>('signals', filter, (signal) => {
 		signals.set(signal.name, signal);
+	});
+
+	registerFiles('tasks', filter, (task) => {
+		CronJob.from({
+			cronTime: task.cron,
+			onTick: () => task.execute(client),
+			start: true
+		})
 	});
 
 	GlobalFonts.loadFontsFromDir(path.resolve('./src/assets/fonts/'));

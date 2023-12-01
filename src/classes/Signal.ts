@@ -1,5 +1,6 @@
-import { Client } from 'discord.js';
+import { Client, MessageCreateOptions } from 'discord.js';
 import { client } from '../index.js';
+import { ErrorEmbed } from './embeds.js';
 
 // RabbitMQ Message "Signal"
 // This is the message that is recieved from the RabbitMQ server.
@@ -42,6 +43,29 @@ export class Signal<T = unknown> {
 		if (!guild) return undefined;
 
 		return guild.members.cache.get(this.authorId) ?? await guild.members.fetch(this.authorId);
+	}
+
+	async dmUser(message: MessageCreateOptions) {
+		const member = await this.getMember();
+		if (!member) return;
+
+		return member.send(message).catch(() => undefined);
+	}
+
+	async success(title: string, content: string) {
+		const embed = ErrorEmbed(title)
+			.setDescription(content)
+			.setFooter({ text: 'This action was triggered online via elitebot.dev.' });
+			
+		return this.dmUser({ embeds: [embed] });
+	}
+
+	async fail(title: string, content: string) {
+		const embed = ErrorEmbed(title)
+			.setDescription(content)
+			.setFooter({ text: 'This action was triggered online via elitebot.dev.' });
+
+		return this.dmUser({ embeds: [embed] });
 	}
 
 	// This is used to check if the signal has a body.

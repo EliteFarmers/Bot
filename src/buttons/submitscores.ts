@@ -53,7 +53,10 @@ async function execute(interaction: ButtonInteraction) {
 	}
 
 	if (isAdmin) {
-		await interaction.message.edit({ embeds: [getLeaderboardEmbed(leaderboard)] }).catch(() => undefined);
+		await interaction.message.edit({ 
+			content: `||${uniqueUsers(leaderboard)}||`,
+			embeds: [getLeaderboardEmbed(leaderboard)] 
+		}).catch(() => undefined);
 	}
 
 	// Check if the user has a banned role
@@ -287,7 +290,11 @@ async function execute(interaction: ButtonInteraction) {
 		interaction.editReply({ embeds: [embed] });
 	}
 
-	interaction.message.edit({ embeds: [getLeaderboardEmbed(leaderboard)] }).catch(() => undefined);
+	interaction.message.edit({
+		content: `||${uniqueUsers(leaderboard)}||`,
+		embeds: [getLeaderboardEmbed(leaderboard)],
+		allowedMentions: { users: [] } 
+	}).catch(() => undefined);
 }
 
 export function getLeaderboardEmbed(lb: components['schemas']['GuildJacobLeaderboard']) {
@@ -346,4 +353,15 @@ function getField(crop: string, scores?: components['schemas']['GuildJacobLeader
 	return {
 		name: `${crop} - ${first.ign}`, value
 	};
+}
+
+function uniqueUsers(leaderboard: components['schemas']['GuildJacobLeaderboard']) {
+	const users = Object.values(leaderboard.crops ?? {}).map(records => 
+		records.map(record => `<@${record.discordId}>`)
+	);
+
+	// Remove duplicates
+	const unique = new Set(users);
+
+	return [...unique].join(' ');
 }

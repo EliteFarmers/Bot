@@ -577,6 +577,46 @@ export interface paths {
       };
     };
   };
+  "/Bot/ContestPings": {
+    get: {
+      responses: {
+        /** @description Success */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["ContestPingsFeatureDto"][];
+            "application/json": components["schemas"]["ContestPingsFeatureDto"][];
+            "text/json": components["schemas"]["ContestPingsFeatureDto"][];
+          };
+        };
+      };
+    };
+  };
+  "/Bot/ContestPings/{guildId}": {
+    delete: {
+      parameters: {
+        query?: {
+          reason?: string;
+        };
+        path: {
+          guildId: number;
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: {
+          content: never;
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
   "/Bot/account": {
     patch: {
       requestBody?: {
@@ -1993,6 +2033,84 @@ export interface paths {
       };
     };
   };
+  "/User/Guild/{guildId}/ContestPings": {
+    put: {
+      parameters: {
+        path: {
+          guildId: number;
+        };
+      };
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["ContestPingsFeatureDto"];
+          "text/json": components["schemas"]["ContestPingsFeatureDto"];
+          "application/*+json": components["schemas"]["ContestPingsFeatureDto"];
+        };
+      };
+      responses: {
+        /** @description Accepted */
+        202: {
+          content: never;
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+    delete: {
+      parameters: {
+        query?: {
+          reason?: string;
+        };
+        path: {
+          guildId: number;
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: {
+          content: never;
+        };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
   "/Weight/{playerUuid}": {
     get: {
       parameters: {
@@ -2197,6 +2315,29 @@ export interface components {
       position?: number;
       /** Format: int32 */
       participants?: number;
+    };
+    ContestPingsFeature: {
+      enabled?: boolean;
+      channelId?: string | null;
+      alwaysPingRole?: string | null;
+      cropPingRoles?: {
+        [key: string]: string | null;
+      };
+      /** Format: int32 */
+      delaySeconds?: number;
+      disabledReason?: string | null;
+    };
+    ContestPingsFeatureDto: {
+      enabled?: boolean;
+      guildId?: string | null;
+      channelId?: string | null;
+      alwaysPingRole?: string | null;
+      cropPingRoles?: {
+        [key: string]: string | null;
+      };
+      /** Format: int32 */
+      delaySeconds?: number;
+      disabledReason?: string | null;
     };
     /**
      * Format: int32
@@ -2487,6 +2628,8 @@ export interface components {
       verifiedRole?: components["schemas"]["VerifiedRoleFeature"];
       eventsEnabled?: boolean;
       eventSettings?: components["schemas"]["GuildEventSettings"];
+      contestPingsEnabled?: boolean;
+      contestPings?: components["schemas"]["ContestPingsFeature"];
     };
     GuildJacobLeaderboard: {
       id?: string;
@@ -2853,8 +2996,8 @@ export interface components {
         [key: string]: number | null;
       }) | null;
       tempStatBuffs?: components["schemas"]["TempStatBuff"][] | null;
-      accessoryBagSettings?: unknown;
-      bestiary?: unknown;
+      accessoryBagSettings?: Record<string, unknown> | null;
+      bestiary?: Record<string, unknown> | null;
     };
     UserGuildDto: {
       id?: string;
