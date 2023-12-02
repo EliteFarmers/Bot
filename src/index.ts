@@ -1,5 +1,5 @@
 import { Client, GatewayIntentBits, Collection, ApplicationCommandDataResolvable, ActivityType, RESTPostAPIChatInputApplicationCommandsJSONBody, Events, PermissionsBitField } from 'discord.js';
-import { Command, CommandType } from './classes/Command.js';
+import { Command, CommandGroup, CommandGroupSettings, CommandType, SubCommand } from './classes/Command.js';
 import { SignalRecieverOptions } from './classes/Signal.js';
 import { ConnectToRMQ } from './api/rabbit.js';
 import { GlobalFonts } from '@napi-rs/canvas';
@@ -15,7 +15,7 @@ export const client = new Client({
 	intents: [GatewayIntentBits.Guilds]
 });
 
-export const commands = new Collection<string, Command>();
+export const commands = new Collection<string, Command | CommandGroup>();
 export const signals = new Collection<string, SignalRecieverOptions>();
 
 /* 
@@ -25,32 +25,53 @@ export const signals = new Collection<string, SignalRecieverOptions>();
 (async function() {
 	const filter = (fileName: string) => fileName.endsWith('.ts') || fileName.endsWith('.js');
 
-	registerFiles('commands', filter, (cmd) => {
+	registerFiles<Command>('commands', filter, (cmd) => {
 		commands.set(cmd.name, cmd);
 	});
 
-	registerFiles('buttons', filter, (btn) => {
+	const subFilter = (fileName: string) => filter(fileName) && !fileName.includes('command');
+
+	registerCommandGroups('commands', (folder, group) => {
+		const command = new CommandGroup(group);
+
+		registerFiles<SubCommand>(folder, subFilter, (cmd) => {
+			command.addSubcommand(cmd);
+		});
+
+		commands.set(command.name, command);
+	});
+
+	registerFiles<Command>('buttons', filter, (btn) => {
 		commands.set(btn.name, btn);
 	});
 
-	registerFiles('events', filter, (event) => {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	registerFiles<any>('events', filter, (event) => {
 		client.on(event.event, event.execute);
 	});
 
-	registerFiles('signals', filter, (signal) => {
+	registerFiles<SignalRecieverOptions>('signals', filter, (signal) => {
 		signals.set(signal.name, signal);
 	});
 
 	GlobalFonts.loadFontsFromDir(path.resolve('./src/assets/fonts/'));
 }());
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function registerFiles(folder: string, filter: (fileName: string) => boolean, callback: (data: any) => void) {
-	const files = fs.readdirSync(`./src/${folder}`).filter(filter);
-
-	for (const file of files) {
+async function registerFiles<T>(folder: string, filter: (fileName: string) => boolean, callback: (data: T) => void) {
+	const files = fs.readdirSync(`./src/${folder}`);
+	
+	for (const file of files.filter(filter)) {
 		const imported = await import(`./${folder}/${file.replace('.ts', '.js')}`);
 		callback(imported.default);
+	}
+}
+
+async function registerCommandGroups(folder: string, callback: (folder: string, group: CommandGroupSettings) => void) {
+	const files = fs.readdirSync(`./src/${folder}`).filter(fileName => fs.lstatSync(`./src/${folder}/${fileName}`).isDirectory());
+
+	for (const file of files) {
+		const imported = await import(`./${folder}/${file}/command.js`);
+		callback(`${folder}/${file}`, imported.default);
 	}
 }
 
@@ -104,6 +125,14 @@ function deploySlashCommands() {
 		if (!command.slash) continue;
 
 		const slash = command.slash;
+
+		if (!slash.name) {
+			slash.setName(command.name);
+		}
+
+		if (!slash.description) {
+			slash.setDescription(command.description);
+		}
 		
 		if (command.permissions) {
 			slash.setDefaultMemberPermissions(PermissionsBitField.resolve(command.permissions));
@@ -122,11 +151,18 @@ function deploySlashCommands() {
 		const name = proccessArgs[2];
 		const command = slashCommandsData.find(cmd => cmd.name === name);
 
-		if (!command) return console.log('Could not find command with the name "' + name + '"');
-
 		setTimeout(async function() {
 			const current = await client.application?.commands.fetch();
 			const existing = current?.find(cmd => cmd.name === name);
+
+			if (!command && existing) {
+				await client.application?.commands.delete(existing);
+				console.log('Probably deleted that slash command globally');
+				return;
+			} else if (!command) {
+				console.log('Could not find command with the name "' + name + '"');
+				return;
+			}
 
 			if (!existing) {
 				await client.application?.commands.create(command);
