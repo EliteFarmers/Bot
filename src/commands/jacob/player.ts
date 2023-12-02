@@ -1,18 +1,16 @@
-import { Command, CommandAccess, CommandType } from "../classes/Command.js";
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, CommandInteraction, ComponentType, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder } from 'discord.js';
-import { EliteEmbed, ErrorEmbed, WarningEmbed } from "../classes/embeds.js";
-import { FetchAccount, FetchProfile } from "../api/elite.js";
-import { GetReadableDate } from "../classes/SkyblockDate.js";
-import { GetCropEmoji, GetMedalEmoji } from "../classes/Util.js";
+import { CommandAccess, CommandType, SubCommand } from "../../classes/Command.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, CommandInteraction, ComponentType, EmbedBuilder, StringSelectMenuBuilder, SlashCommandSubcommandBuilder } from 'discord.js';
+import { EliteEmbed, ErrorEmbed, WarningEmbed } from "../../classes/embeds.js";
+import { FetchAccount, FetchProfile } from "../../api/elite.js";
+import { GetReadableDate } from "../../classes/SkyblockDate.js";
+import { GetCropEmoji, GetMedalEmoji } from "../../classes/Util.js";
 
-const command: Command = {
-	name: 'jacob',
-	description: 'Get jacob\'s high scores or leaderboard!',
+const command: SubCommand = {
+	name: 'player',
+	description: 'Get jacob\'s stats of a player!',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
-	slash: new SlashCommandBuilder()
-		.setName('jacob')
-		.setDescription('Get the jacob\'s stats of a player!')
+	slash: new SlashCommandSubcommandBuilder()
 		.addStringOption(option => option.setName('player')
 			.setDescription('The player in question.')
 			.setRequired(false))
