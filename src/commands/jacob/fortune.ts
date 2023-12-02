@@ -136,7 +136,6 @@ async function execute(interaction: ChatInputCommandInteraction) {
 
 		lessButton.setDisabled(monthsIndex === 0);
 		moreButton.setDisabled(monthsIndex === monthsParam.length - 1);
-		console.log(monthsIndex, monthsParam[monthsIndex]);
 
 		const data = await FetchCurrentMonthlyBrackets(monthsParam[monthsIndex]).catch(() => ({ data: undefined }));
 
@@ -151,9 +150,6 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		}
 
 		brackets = data.data;
-
-		console.log(brackets.start);
-		
 		embed.setDescription(`Required collection is averaged using contests from <t:${+(brackets?.start ?? 0)}:R> until now.\nUsing an efficiency of **${bps} BPS** (${(ratio * 100).toFixed(1)}%)`);
 
 		await button.update({

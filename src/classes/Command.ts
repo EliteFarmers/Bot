@@ -92,8 +92,6 @@ export class CommandGroup implements CommandGroupSettings {
 		}
 
 		this.slash.addSubcommand(slash);
-
-		console.log(`Added subcommand ${subCommand.name} to ${this.name}`);
 		this.subcommands[subCommand.name] = subCommand;
 	}
 }
