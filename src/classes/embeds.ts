@@ -36,8 +36,9 @@ export function EmptyField(inline = true) {
 
 export function PrefixFooter(embed: EmbedBuilder, prefix: string) {
 	const current = embed.data.footer;
-	return embed.setFooter({
-		...current,
+	embed.setFooter({
+		iconURL: current?.icon_url ?? undefined,	
 		text: `${prefix}\n${current?.text ?? ''}`.trim(), 
 	});
+	return embed;
 }

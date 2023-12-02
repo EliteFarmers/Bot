@@ -42,8 +42,6 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		const rank = await FetchLeaderboardRank(leaderboardId, player?.id ?? '', selectedProfile?.profileId)
 			.then(res => { return res.data?.rank; }).catch(() => undefined);
 
-		console.log(rank);
-
 		if (player) {
 			givenIndex = rank ?? 0;
 			playerName = player.name;

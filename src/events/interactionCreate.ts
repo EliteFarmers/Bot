@@ -1,6 +1,6 @@
 import { ButtonInteraction, ChatInputCommandInteraction, CommandInteraction, Events, GuildMember, Interaction } from 'discord.js';
 import { commands } from '../index.js';
-import { Command, CommandType } from '../classes/Command.js';
+import { Command, CommandGroup, CommandType } from '../classes/Command.js';
 import { HasRole, isValidAccess } from '../classes/Util.js';
 import { FetchGuild } from '../api/elite.js';
 
@@ -51,8 +51,8 @@ async function OnButtonInteraction(interaction: ButtonInteraction) {
 	}
 }
 
-function GetCommand(name: string, type: CommandType): Command | undefined {
-	const command: Command | undefined = commands.get(name);
+function GetCommand(name: string, type: CommandType): Command | CommandGroup | undefined {
+	const command: Command | CommandGroup | undefined = commands.get(name);
 
 	if (!command) return undefined;
 	// If type and command type are autocomplete it's valid
@@ -63,12 +63,12 @@ function GetCommand(name: string, type: CommandType): Command | undefined {
 	return command;
 }
 
-async function HasPermsAndAccess(command: Command, interaction: CommandInteraction | ButtonInteraction) {
+async function HasPermsAndAccess(command: Command | CommandGroup, interaction: CommandInteraction | ButtonInteraction) {
 	if (interaction.channel && !isValidAccess(command.access, interaction.channel.type)) return false;
 
 	if (!interaction.guildId || !command.permissions || !(interaction.member instanceof GuildMember)) return true;
 
-	if (command.adminRoleOverride) {
+	if ('adminRoleOverride' in command && command.adminRoleOverride) {
 		const { data: server } = await FetchGuild(interaction.guildId).catch(() => ({ data: undefined }));
 
 		if (server && server.adminRole) {

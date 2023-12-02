@@ -234,3 +234,38 @@ export const MakeAccountPrimary = (id: string, player: string) =>
 			},
 		},
 	});
+
+export const FetchContestMonthlyBrackets = (year: number, month: number, months?: number) =>
+	GET('/Graph/Medals/{sbYear}/{sbMonth}', {
+		params: {
+			path: {
+				sbYear: year,
+				sbMonth: month
+			},
+			query: {
+				months
+			}
+		}
+	});
+
+export const FetchCurrentMonthlyBrackets = (months?: number) =>
+	GET('/Graph/Medals/now', {
+		params: {
+			query: {
+				months
+			}
+		}
+	});
+
+export const FetchContestYearlyMonthlyBrackets = (year: number, months?: number, years?: number) =>
+	GET('/Graph/Medals/{sbYear}', {
+		params: {
+			path: {
+				sbYear: year,
+			},
+			query: {
+				months,
+				years
+			}
+		}
+	});

@@ -1444,6 +1444,95 @@ export interface paths {
       };
     };
   };
+  "/Graph/Medals/now": {
+    get: {
+      parameters: {
+        query?: {
+          months?: number;
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["ContestBracketsDetailsDto"];
+            "application/json": components["schemas"]["ContestBracketsDetailsDto"];
+            "text/json": components["schemas"]["ContestBracketsDetailsDto"];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
+  "/Graph/Medals/{sbYear}/{sbMonth}": {
+    get: {
+      parameters: {
+        query?: {
+          months?: number;
+        };
+        path: {
+          sbYear: number;
+          sbMonth: number;
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["ContestBracketsDetailsDto"];
+            "application/json": components["schemas"]["ContestBracketsDetailsDto"];
+            "text/json": components["schemas"]["ContestBracketsDetailsDto"];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
+  "/Graph/Medals/{sbYear}": {
+    get: {
+      parameters: {
+        query?: {
+          years?: number;
+          months?: number;
+        };
+        path: {
+          sbYear: number;
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["ContestBracketsDetailsDto"][];
+            "application/json": components["schemas"]["ContestBracketsDetailsDto"][];
+            "text/json": components["schemas"]["ContestBracketsDetailsDto"][];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
   "/Player/{playerUuidOrIgn}": {
     get: {
       parameters: {
@@ -2033,6 +2122,30 @@ export interface components {
      * @enum {integer}
      */
     ChannelType: 0 | 1 | 2 | 3 | 4 | 5 | 10 | 11 | 12 | 13 | 14 | 15;
+    ContestBracketsDetailsDto: {
+      start?: string;
+      end?: string;
+      brackets?: {
+        [key: string]: components["schemas"]["ContestBracketsDto"];
+      };
+    };
+    ContestBracketsDto: {
+      /** Format: int32 */
+      bronze?: number;
+      /** Format: int32 */
+      silver?: number;
+      /** Format: int32 */
+      gold?: number;
+      /** Format: int32 */
+      platinum?: number;
+      /** Format: int32 */
+      diamond?: number;
+    };
+    /**
+     * Format: int32
+     * @enum {integer}
+     */
+    ContestMedal: 0 | 1 | 2 | 3 | 4 | 5;
     ContestParticipationDto: {
       crop?: string;
       /** Format: int64 */
@@ -2418,14 +2531,18 @@ export interface components {
       timestamp?: number;
       /** Format: int32 */
       participants?: number;
+      brackets?: components["schemas"]["ContestBracketsDto"];
       participations?: components["schemas"]["StrippedContestParticipationDto"][];
     };
     JacobDataDto: {
       medals?: components["schemas"]["MedalInventoryDto"];
       earnedMedals?: components["schemas"]["EarnedMedalInventoryDto"];
       perks?: components["schemas"]["JacobPerksDto"];
+      stats?: components["schemas"]["JacobStatsDto"];
       /** Format: int32 */
       participations?: number;
+      /** Format: int32 */
+      firstPlaceScores?: number;
       contests?: components["schemas"]["ContestParticipationDto"][];
     };
     JacobPerksDto: {
@@ -2433,6 +2550,14 @@ export interface components {
       doubleDrops?: number;
       /** Format: int32 */
       levelCap?: number;
+    };
+    JacobStatsDto: {
+      brackets?: {
+        [key: string]: components["schemas"]["ContestMedal"];
+      };
+      personalBests?: {
+        [key: string]: number;
+      };
     };
     LeaderboardDto: {
       id?: string;
@@ -2699,7 +2824,8 @@ export interface components {
         [key: string]: number | null;
       }) | null;
       tempStatBuffs?: components["schemas"]["TempStatBuff"][] | null;
-      accessoryBagSettings?: Record<string, unknown> | null;
+      accessoryBagSettings?: unknown;
+      bestiary?: unknown;
     };
     UserGuildDto: {
       id?: string;
