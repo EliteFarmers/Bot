@@ -5,16 +5,18 @@ import { Interaction, SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashC
 export interface CommandBase {
 	name: string,
 	description: string,
-	access: CommandAccess,
-	type: CommandType,
-	aliases?: string[],
-	usage?: string,
-	permissions?: bigint,
-	adminRoleOverride?: boolean,
 }
 
 export interface Command extends CommandBase {
 	slash?: SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'> | SlashCommandSubcommandsOnlyBuilder
+	
+	aliases?: string[],
+	usage?: string,
+	permissions?: bigint,
+	adminRoleOverride?: boolean,
+	access: CommandAccess,
+	type: CommandType,
+	
 	execute: Function
 }
 
@@ -25,17 +27,23 @@ export interface SubCommand extends CommandBase {
 
 export interface CommandGroupSettings extends CommandBase {
 	slash?: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder;
+
+	permissions?: bigint,
+	adminRoleOverride?: boolean,
+	access?: CommandAccess,
+	type?: CommandType,
+	
 	execute?: Function,
 	addSubcommand?: (subCommand: SubCommand) => void,
 }
+
 export class CommandGroup implements CommandGroupSettings {
 	declare public name: string;
 	declare public description: string;
 	declare public access: CommandAccess;
 	declare public type: CommandType;
-	declare public aliases?: string[];
-	declare public usage?: string;
 	declare public permissions?: bigint;
+
 	declare public slash: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder;
 
 	declare private selfExecute: Function;
@@ -44,10 +52,9 @@ export class CommandGroup implements CommandGroupSettings {
 	constructor(settings: CommandGroupSettings) {
 		this.name = settings.name;
 		this.description = settings.description;
-		this.access = settings.access;
-		this.type = settings.type;
-		this.aliases = settings.aliases;
-		this.usage = settings.usage;
+
+		this.access = settings.access ?? CommandAccess.Everywhere;
+		this.type = settings.type ?? CommandType.Slash;
 		this.permissions = settings.permissions;
 
 		this.slash = settings.slash ?? new SlashCommandBuilder()

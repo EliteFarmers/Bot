@@ -1,4 +1,4 @@
-import { CommandAccess, CommandType, SubCommand } from "../../classes/Command.js";
+import { SubCommand } from "../../classes/Command.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, CommandInteraction, ComponentType, EmbedBuilder, StringSelectMenuBuilder, SlashCommandSubcommandBuilder } from 'discord.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from "../../classes/embeds.js";
 import { FetchAccount, FetchProfile } from "../../api/elite.js";
@@ -8,8 +8,6 @@ import { GetCropEmoji, GetMedalEmoji } from "../../classes/Util.js";
 const command: SubCommand = {
 	name: 'player',
 	description: 'Get jacob\'s stats of a player!',
-	access: CommandAccess.Everywhere,
-	type: CommandType.Slash,
 	slash: new SlashCommandSubcommandBuilder()
 		.addStringOption(option => option.setName('player')
 			.setDescription('The player in question.')

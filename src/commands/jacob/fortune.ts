@@ -1,5 +1,5 @@
 import { EliteEmbed, ErrorEmbed, PrefixFooter } from '../../classes/embeds.js';
-import { CommandAccess, CommandType, SubCommand } from '../../classes/Command.js';
+import type { SubCommand } from '../../classes/Command.js';
 import { ChatInputCommandInteraction, SlashCommandSubcommandBuilder } from 'discord.js';
 import { FetchCurrentMonthlyBrackets } from '../../api/elite.js';
 import { GetCropEmoji } from '../../classes/Util.js';
@@ -9,8 +9,6 @@ import type { components } from '../../api/api.js';
 const command: SubCommand = {
 	name: 'fortune',
 	description: 'Get the farming fortune required for Jacob Contests!',
-	access: CommandAccess.Everywhere,
-	type: CommandType.Slash,
 	slash: new SlashCommandSubcommandBuilder()
 		.setName('fortune')
 		.setDescription('Get the farming fortune required for Jacob Contests!')
