@@ -1,6 +1,6 @@
-import { EliteEmbed, ErrorEmbed, PrefixFooter } from '../../classes/embeds.js';
+import { EliteEmbed, ErrorEmbed, NotYoursEmbed, PrefixFooter } from '../../classes/embeds.js';
 import type { SubCommand } from '../../classes/Command.js';
-import { ChatInputCommandInteraction, SlashCommandSubcommandBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, EmbedBuilder, SlashCommandSubcommandBuilder } from 'discord.js';
 import { FetchCurrentMonthlyBrackets } from '../../api/elite.js';
 import { GetCropEmoji } from '../../classes/Util.js';
 import { CropFromName, GetFortuneRequiredForCollection } from 'farming-weight';
@@ -41,9 +41,12 @@ async function execute(interaction: ChatInputCommandInteraction) {
 
 	const blocksBroken = Math.round(24_000 * ratio);
 
-	const { data: brackets } = await FetchCurrentMonthlyBrackets(3).catch(() => ({ data: undefined }));
+	const monthsParam = [ 1, 4, 8, 12 ];
+	let monthsIndex = 1;
 
-	if (!brackets) {
+	let { data: brackets } = await FetchCurrentMonthlyBrackets(monthsParam[monthsIndex]).catch(() => ({ data: undefined }));
+
+	if (brackets === undefined) {
 		const embed = ErrorEmbed('Failed to fetch brackets! Please try again later.');
 		await interaction.reply({
 			embeds: [embed],
@@ -55,32 +58,145 @@ async function execute(interaction: ChatInputCommandInteraction) {
 
 	const embed = EliteEmbed()
 		.setTitle('Jacob Contest Fortune Requirements')
-		.setDescription(`Required collection is averaged using contests from <t:${+(brackets?.start ?? 0)}:R> until now.\nUsing an efficiency of **${bps} BPS** (${(ratio * 100).toFixed(1)}%)`)
-		.addFields([
-			makeField(brackets, 'Diamond', blocksBroken, useDicers, useMooshroom),
-			makeField(brackets, 'Platinum', blocksBroken, useDicers, useMooshroom),
-			makeField(brackets, 'Gold', blocksBroken, useDicers, useMooshroom),
-		]);
+		.setDescription(`Requirements are averaged using contests from <t:${+(brackets?.start ?? 0)}:R> until now.\nUsing an efficiency of **${bps} BPS** (${(ratio * 100).toFixed(1)}%)`);
 
-	let footer = '';
+	PrefixFooter(embed, `Dicer RNG drops ${useDicers ? 'included' : 'not included'} • Mooshroom Cow mushrooms ${useMooshroom ? 'included' : 'not included'}`);
 
-	if (useDicers) footer += 'Dicer RNG drops included';
-	if (useDicers && useMooshroom) footer += ' • ';
-	if (useMooshroom) footer += 'Mooshroom Cow mushrooms included';
+	const lessButton = new ButtonBuilder()
+		.setCustomId('less')
+		.setLabel('Include Less')
+		.setStyle(ButtonStyle.Secondary);
 
-	if (footer) PrefixFooter(embed, footer);
+	const moreButton = new ButtonBuilder()
+		.setCustomId('more')
+		.setLabel('Include More')
+		.setStyle(ButtonStyle.Secondary);
 
-	await interaction.reply({
-		embeds: [embed],
-		allowedMentions: { repliedUser: false }
-	}).catch(() => console.log);
+	const silverRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+		new ButtonBuilder()
+			.setCustomId('lower')
+			.setLabel('Silver / Bronze')
+			.setStyle(ButtonStyle.Primary),
+		lessButton,
+		moreButton
+	);
+
+	const diamondRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+		new ButtonBuilder()
+			.setCustomId('higher')
+			.setLabel('Diamond / Platinum / Gold')
+			.setStyle(ButtonStyle.Primary),
+		lessButton,
+		moreButton
+	);
+
+	const reply = await interaction.reply({
+		embeds: [higherEmbed(embed, brackets, blocksBroken, useDicers, useMooshroom)],
+		components: [silverRow]
+	}).catch(() => undefined);
+
+	const collector = reply?.createMessageComponentCollector({
+		componentType: ComponentType.Button,
+		time: 60_000,
+	});
+
+	if (!collector) return;
+
+	collector.on('collect', async (button) => {
+		if (button.user.id !== interaction.user.id) {
+			await button.reply({ embeds: [NotYoursEmbed()], ephemeral: true }).catch(() => undefined);
+			return;
+		}
+
+		if (button.customId === 'higher') {
+			await button.update({
+				embeds: [higherEmbed(embed, brackets, blocksBroken, useDicers, useMooshroom)],
+				components: [silverRow]
+			}).catch(() => undefined);
+			return;
+		}
+
+		if (button.customId === 'lower') {
+			await button.update({
+				embeds: [lowerEmbed(embed, brackets, blocksBroken, useDicers, useMooshroom)],
+				components: [diamondRow]
+			}).catch(() => undefined);
+			return;
+		}
+
+		if (button.customId === 'less') {
+			if (monthsIndex === 0) return;
+			monthsIndex--;
+		}
+		
+		if (button.customId === 'more') {
+			if (monthsIndex === monthsParam.length - 1) return;
+			monthsIndex++;
+		}
+
+		lessButton.setDisabled(monthsIndex === 0);
+		moreButton.setDisabled(monthsIndex === monthsParam.length - 1);
+		console.log(monthsIndex, monthsParam[monthsIndex]);
+
+		const data = await FetchCurrentMonthlyBrackets(monthsParam[monthsIndex]).catch(() => ({ data: undefined }));
+
+		if (data?.data === undefined) {
+			const embed = ErrorEmbed('Failed to fetch brackets! Please try again later.');
+			await button.reply({
+				embeds: [embed],
+				allowedMentions: { repliedUser: false },
+				ephemeral: true
+			}).catch(() => undefined);
+			return;
+		}
+
+		brackets = data.data;
+
+		console.log(brackets.start);
+		
+		embed.setDescription(`Required collection is averaged using contests from <t:${+(brackets?.start ?? 0)}:R> until now.\nUsing an efficiency of **${bps} BPS** (${(ratio * 100).toFixed(1)}%)`);
+
+		await button.update({
+			embeds: [higherEmbed(embed, brackets, blocksBroken, useDicers, useMooshroom)],
+			components: [silverRow]
+		}).catch(() => undefined);
+	});
+
+	collector.on('end', async (collected, reason) => {
+		if (reason === 'time') {
+			await reply?.edit({ embeds: [embed], components: [] }).catch(() => undefined);
+		}
+	});
 }
 
 const fortuneEmoji = '<:fortune:1180353749076693092>';
 
-function makeField(data: components['schemas']['ContestBracketsDetailsDto'], bracket: string, blocksBroken: number, useDicers = true, useMooshroom = true) {
+function higherEmbed(embed: EmbedBuilder, brackets: components['schemas']['ContestBracketsDetailsDto'] | undefined, blocksBroken: number, useDicers = true, useMooshroom = true) {	
+	embed.setFields([
+		makeField(brackets, 'Diamond', blocksBroken, useDicers, useMooshroom),
+		makeField(brackets, 'Platinum', blocksBroken, useDicers, useMooshroom),
+		makeField(brackets, 'Gold', blocksBroken, useDicers, useMooshroom),
+	]);
 
-	const reqs = Object.entries(data.brackets ?? {}).map(([ cropName, medals ]) => {
+	return embed;
+}
+
+function lowerEmbed(embed: EmbedBuilder, brackets: components['schemas']['ContestBracketsDetailsDto'] | undefined, blocksBroken: number, useDicers = true, useMooshroom = true) {	
+	embed.setFields([
+		makeField(brackets, 'Silver', blocksBroken, useDicers, useMooshroom),
+		makeField(brackets, 'Bronze', blocksBroken, useDicers, useMooshroom),
+		{
+			name: 'Confused by Zeroes?',
+			value: 'Even with no fortune, you can still get these medals by farming for the whole contest!',
+			inline: true,
+		}
+	]);
+
+	return embed;
+}
+
+function makeField(data: components['schemas']['ContestBracketsDetailsDto'] | undefined, bracket: string, blocksBroken: number, useDicers = true, useMooshroom = true) {
+	const reqs = Object.entries(data?.brackets ?? {}).map(([ cropName, medals ]) => {
 		return { 
 			cropName, 
 			collection: medals[bracket.toLowerCase() as keyof typeof medals] ?? 0,
@@ -91,13 +207,13 @@ function makeField(data: components['schemas']['ContestBracketsDetailsDto'], bra
 		const crop = CropFromName(cropName);
 		if (!crop) return '';
 
-		const fortune = GetFortuneRequiredForCollection({
+		const fortune = Math.max(GetFortuneRequiredForCollection({
 			crop, 
 			collection, 
 			blocksBroken, 
 			useDicers,
 			useMooshroom,
-		});
+		}), 0);
 
 		let collect = collection.toLocaleString();
 		if (collect.length < 9) collect = collect.padStart(9, ' ');
