@@ -47,7 +47,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		data.push(`**Name:** ${command.name}`);
 
 		if (command.description) data.push(`**Description:** ${command.description}`);
-		if (command.usage) data.push(`**Usage:** ${newPrefix}${command.name} ${command.usage}`);
+		if ('usage' in command && command.usage) data.push(`**Usage:** ${newPrefix}${command.name} ${command.usage}`);
 
 		embed.addFields({
 			name: 'Command Information',
@@ -65,9 +65,15 @@ async function execute(interaction: ChatInputCommandInteraction) {
 
 		commands.forEach(command => {
 			if (command.type === CommandType.Button) return;
+			let value = command.description;
+
+			if ('usage' in command && command.usage) {
+				value += `\nUsage: ${newPrefix}${command.name} ${command.usage}`;
+			}
+			
 			helpMenu.addFields({
 				name: `${newPrefix}${command.name}`,
-				value: `${command.description}\nUsage: ${newPrefix}${command.name} ${command.usage ? command.usage : ''}`,
+				value,
 				inline: false
 			});
 		});

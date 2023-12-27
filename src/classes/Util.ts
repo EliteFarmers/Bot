@@ -138,9 +138,31 @@ export function GetCropColor(crop: string) {
 	return '#03fc7b';
 }
 
+const simpleCropNames = {
+	'cactus': 'Cactus',
+	'carrot': 'Carrot',
+	'cocoa': 'Cocoa Beans',
+	'melon': 'Melon',
+	'mushroom': 'Mushroom',
+	'wart': 'Nether Wart',
+	'potato': 'Potato',
+	'pumpkin': 'Pumpkin',
+	'cane': 'Sugar Cane',
+	'wheat': 'Wheat',
+};
+
 export function GetCropEmoji(crop: string) {
 	const emoji = CropEmojis[crop as keyof typeof CropEmojis];
+
 	if (emoji) return `<:${emoji.name}:${emoji.id}>`;
+	
+	const simpleCrop = simpleCropNames[crop.toLowerCase() as keyof typeof simpleCropNames];
+	if (simpleCrop) {
+		const emoji = CropEmojis[simpleCrop as keyof typeof CropEmojis];
+		if (!emoji) return '';
+		return `<:${emoji.name}:${emoji.id}>`;
+	}
+
 	return '';
 }
 

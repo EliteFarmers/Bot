@@ -6,6 +6,9 @@ const errorMsg = 'Failed to connect to RabbitMQ, message queue from EliteAPI wil
 
 export async function ConnectToRMQ() {
 	const url = process.env.RABBITMQ_HOSTNAME;
+
+	if (url === 'skip') return;
+
 	if (!url) {
 		console.error(errorMsg);
 		return;
