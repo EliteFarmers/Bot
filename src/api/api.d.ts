@@ -262,6 +262,32 @@ export interface paths {
       };
     };
   };
+  "/Admin/UpcomingContests": {
+    delete: {
+      responses: {
+        /** @description Success */
+        200: {
+          content: never;
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
   "/Event/create": {
     post: {
       requestBody?: {
@@ -2049,6 +2075,7 @@ export interface components {
       playerUuid?: string;
       playerName?: string;
       profileUuid?: string;
+      removed?: boolean;
       /** Format: int64 */
       timestamp?: number;
       /** Format: int32 */
@@ -2546,6 +2573,7 @@ export interface components {
       totalDailyRewards?: number;
       /** Format: int32 */
       totalRewards?: number;
+      prefix?: string | null;
       rank?: string | null;
       newPackageRank?: string | null;
       rankPlusColor?: string | null;
@@ -2682,6 +2710,7 @@ export interface components {
       /** Format: int32 */
       position?: number;
       medal?: string | null;
+      removed?: boolean;
       playerUuid?: string;
       playerName?: string;
     };

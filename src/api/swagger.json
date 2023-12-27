@@ -594,6 +594,58 @@
         }
       }
     },
+    "/Admin/UpcomingContests": {
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Event/create": {
       "post": {
         "tags": [
@@ -5055,6 +5107,9 @@
           "profileUuid": {
             "type": "string"
           },
+          "removed": {
+            "type": "boolean"
+          },
           "timestamp": {
             "type": "integer",
             "format": "int64"
@@ -6597,6 +6652,10 @@
             "type": "integer",
             "format": "int32"
           },
+          "prefix": {
+            "type": "string",
+            "nullable": true
+          },
           "rank": {
             "type": "string",
             "nullable": true
@@ -6986,6 +7045,9 @@
           "medal": {
             "type": "string",
             "nullable": true
+          },
+          "removed": {
+            "type": "boolean"
           },
           "playerUuid": {
             "type": "string"

@@ -116,6 +116,8 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		const collections = Object.entries(cropInfo.otherCollection).sort((a, b) => b[1] - a[1]);
 		const cropName = CropDisplayName(crop as Crop);
 
+		const cropDetails = `\nUsing **${reforge === 'bountiful' ? 'Bountiful' : 'Blessed'}**, **Mooshroom Cow**, and **${crop === Crop.Cactus ? '3' : '4'}/4ths Fermento Armor**!`;
+
 		const threeFourths = CalculateAverageSpecialCrops(blocks, crop as Crop, 3);
 		const fromSpecial = cropInfo.coinSources[threeFourths.type] ?? 0;
 		const specialDifference = fromSpecial - threeFourths.npc;
@@ -123,14 +125,14 @@ async function execute(interaction: ChatInputCommandInteraction) {
 
 		const cropEmbed = EliteEmbed()
 			.setTitle(`${cropName} Rates`)
-			.setDescription(`Expected rates for **${fortune?.toLocaleString() ?? `${cropInfo.fortune.toLocaleString()} (MAX)`}** Farming Fortune in **${timeName}**${details}`)
+			.setDescription(`Expected rates for **${fortune?.toLocaleString() ?? `${cropInfo.fortune.toLocaleString()} (MAX)`}** Farming Fortune in **${timeName}**${cropDetails}`)
 			.addFields([{
-				name: 'Collection Gain',
-				value: GetCropEmoji(cropName) + ' ' + cropInfo.collection.toLocaleString(),
-				inline: true,
-			}, {
 				name: 'Total NPC Profit',
 				value: ':coin: ' + cropInfo.npcCoins?.toLocaleString() ?? '0',
+				inline: true,
+			}, {
+				name: 'Collection Gain',
+				value: GetCropEmoji(cropName) + ' ' + cropInfo.collection.toLocaleString(),
 				inline: true,
 			}, EmptyField(), {
 				name: 'Profit Breakdown',
@@ -139,15 +141,30 @@ async function execute(interaction: ChatInputCommandInteraction) {
 				}).join('\n'),
 				inline: true,
 			}, {
-				name: 'Other Collection',
+				name: 'Collection Breakdown',
 				value: collections.map(([source, amount]) => {
 					return `**${source}:** ${amount?.toLocaleString()}`;
 				}).join('\n'),
 				inline: true,
-			}, EmptyField(), {
-				name: '3/4ths Fermento Armor',
-				value: `:coin: ${(threeFourthsTotal)?.toLocaleString() ?? '0'} ⠀ ${(specialDifference).toLocaleString()} less coins (~${threeFourths.amount} ${threeFourths.type})`,
 			}]);
+
+		if (crop !== Crop.Cactus) {
+			cropEmbed.addFields([
+				EmptyField(), 
+				{
+					name: '3/4ths Fermento Armor',
+					value: `:coin: ${(threeFourthsTotal)?.toLocaleString() ?? '0'} ⠀ ${(specialDifference).toLocaleString()} less coins (~${threeFourths.amount} ${threeFourths.type})`,
+				}
+			])
+		} else {
+			cropEmbed.addFields([
+				EmptyField(), 
+				{
+					name: 'Note',
+					value: 'Optimal cactus farming requires a Racing Helmet\ninstead of 4/4ths Fermento Armor.',
+				}
+			]);
+		}
 
 		inter.update({ embeds: [cropEmbed] });
 	})

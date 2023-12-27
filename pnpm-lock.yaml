@@ -21,8 +21,8 @@ dependencies:
     specifier: ^14.13.0
     version: 14.13.0
   farming-weight:
-    specifier: ^0.2.11
-    version: 0.2.11
+    specifier: ^0.2.13
+    version: 0.2.13
   openapi-fetch:
     specifier: ^0.7.8
     version: 0.7.8
@@ -1033,8 +1033,8 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /farming-weight@0.2.11:
-    resolution: {integrity: sha512-wIGHEbIuKNDvC82W0ZV05x0qSCDYIhM7tk103WGIBjPFmOfQxCh9a16SyVVVXk50eqMPTSjbysHVhhgZB2Zchw==}
+  /farming-weight@0.2.13:
+    resolution: {integrity: sha512-tEpnVcZspoOogQLPuFn/dLbYzGfPMYEWCFHgmYYDyclxePCMUWNXUwHmtRyP/JqH9YtmaDjUgeI1XZfFKr8hpQ==}
     dev: false
 
   /fast-deep-equal@3.1.3:
