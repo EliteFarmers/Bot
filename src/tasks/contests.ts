@@ -48,7 +48,7 @@ async function execute(client: Client) {
 		.reduce<Record<string, { gold: number, diamond: number }>>((acc, curr) => {
 			const [ simpleCrop, { gold = 0, diamond = 0 } ] = curr;
 			const crop = CropFromSimple(simpleCrop);
-			console.log(crop, gold, diamond);
+
 			if (!crop || !crops.includes(crop)) return acc;
 
 			acc[crop] = { gold, diamond };
@@ -118,7 +118,7 @@ async function execute(client: Client) {
 			} catch (err) {
 				DisableGuildContestPings(pings.guildId ?? '', 'Failed to send message');
 			}
-			return;
+			continue;
 		}
 
 		channel.send(msg).catch(() => DisableGuildContestPings(pings.guildId ?? '', 'Failed to send message'));
