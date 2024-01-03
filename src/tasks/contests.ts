@@ -4,12 +4,13 @@ import { EliteEmbed, PrefixFooter } from '../classes/embeds';
 import { AttachmentBuilder, Client, MessageCreateOptions, PermissionFlagsBits } from 'discord.js';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { Crop, CropFromName, GetFortuneRequiredForCollection } from 'farming-weight';
-import { GetSkyblockDate } from 'classes/SkyblockDate';
+import { GetSkyblockDate } from '../classes/SkyblockDate';
+import { CronTask } from '../classes/Command';
 
 const settings = {
 	cron: '0 10 * * * *',
 	execute: execute
-}
+} satisfies CronTask;
 
 export default settings;
 

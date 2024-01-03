@@ -1,5 +1,5 @@
 import { Client, GatewayIntentBits, Collection, ApplicationCommandDataResolvable, ActivityType, RESTPostAPIChatInputApplicationCommandsJSONBody, Events, PermissionsBitField } from 'discord.js';
-import { Command, CommandGroup, CommandGroupSettings, CommandType, SubCommand } from './classes/Command.js';
+import { Command, CommandGroup, CommandGroupSettings, CommandType, CronTask, SubCommand } from './classes/Command.js';
 import { SignalRecieverOptions } from './classes/Signal.js';
 import { ConnectToRMQ } from './api/rabbit.js';
 import { GlobalFonts } from '@napi-rs/canvas';
@@ -55,7 +55,7 @@ export const signals = new Collection<string, SignalRecieverOptions>();
 		signals.set(signal.name, signal);
 	});
 
-	registerFiles('tasks', filter, (task) => {
+	registerFiles<CronTask>('tasks', filter, (task) => {
 		CronJob.from({
 			cronTime: task.cron,
 			onTick: () => task.execute(client),
