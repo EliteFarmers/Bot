@@ -95,7 +95,7 @@ async function execute(client: Client) {
 			.filter(role => role);
 
 		const msg = {
-			content: (pings.alwaysPingRole ? `<@&${pings.alwaysPingRole}>` : '') + roles.map(role => `<@&${role}>`).join(' '),
+			content: (pings.alwaysPingRole ? `<@&${pings.alwaysPingRole}> ` : '') + roles.map(role => `<@&${role}>`).join(' '),
 			embeds: [ embed ],
 			allowedMentions: {
 				roles: roles
