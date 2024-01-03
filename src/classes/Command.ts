@@ -1,6 +1,6 @@
 // This is to allow the generic "Function" to be used, as it's the easiest way to allow both types of commands
 /* eslint-disable @typescript-eslint/ban-types */
-import { Interaction, SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
+import { Client, Interaction, SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
 
 export interface CommandBase {
 	name: string,
@@ -108,4 +108,9 @@ export enum CommandAccess {
 	Everywhere,
 	Guild,
 	DirectMessage
+}
+
+export interface CronTask {
+	cron: string, 
+	execute: (client: Client) => void
 }

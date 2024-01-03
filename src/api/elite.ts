@@ -185,23 +185,23 @@ export const UpdateGuildJacob = (
 		},
 	});
 
-// export const UpdateGuildContestPings = (
-// 	id: string,
-// 	data: components['schemas']['GuildContestPings']
-// ) =>
-// 	PUT('/Bot/{guildId}/contests', {
-// 		params: {
-// 			path: {
-// 				guildId: id as unknown as number,
-// 			},
-// 		},
-// 		body: data,
-// 		headers: {
-// 			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-// 		},
-// 	});
+export const GetGuildsToPing = () => GET('/Bot/ContestPings', {
+	headers: {
+		Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
+	},
+});
 
-// export const GetGuildsToPing = () => GET('/Bot/Guilds/Contests', {});
+export const DisableGuildContestPings = (id: string, reason: string) =>
+	DELETE('/Bot/ContestPings/{guildId}', {
+		params: {
+			path: {
+				guildId: id as unknown as number,
+			},
+			query: {
+				reason,
+			},
+		},
+	});
 
 export const GetCurrentContests = () => GET('/Contests/at/now', {});
 

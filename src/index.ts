@@ -1,8 +1,9 @@
 import { Client, GatewayIntentBits, Collection, ApplicationCommandDataResolvable, ActivityType, RESTPostAPIChatInputApplicationCommandsJSONBody, Events, PermissionsBitField } from 'discord.js';
-import { Command, CommandGroup, CommandGroupSettings, CommandType, SubCommand } from './classes/Command.js';
+import { Command, CommandGroup, CommandGroupSettings, CommandType, CronTask, SubCommand } from './classes/Command.js';
 import { SignalRecieverOptions } from './classes/Signal.js';
 import { ConnectToRMQ } from './api/rabbit.js';
 import { GlobalFonts } from '@napi-rs/canvas';
+import { CronJob } from 'cron';
 
 import fs from 'fs';
 import path from 'path';
@@ -52,6 +53,14 @@ export const signals = new Collection<string, SignalRecieverOptions>();
 
 	registerFiles<SignalRecieverOptions>('signals', filter, (signal) => {
 		signals.set(signal.name, signal);
+	});
+
+	registerFiles<CronTask>('tasks', filter, (task) => {
+		CronJob.from({
+			cronTime: task.cron,
+			onTick: () => task.execute(client),
+			start: true
+		})
 	});
 
 	GlobalFonts.loadFontsFromDir(path.resolve('./src/assets/fonts/'));
