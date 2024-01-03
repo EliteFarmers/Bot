@@ -5695,11 +5695,7 @@
             "nullable": true
           },
           "cropPingRoles": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string",
-              "nullable": true
-            }
+            "$ref": "#/components/schemas/StringCropSettings"
           },
           "delaySeconds": {
             "type": "integer",
@@ -5731,11 +5727,7 @@
             "nullable": true
           },
           "cropPingRoles": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string",
-              "nullable": true
-            }
+            "$ref": "#/components/schemas/StringCropSettings"
           },
           "delaySeconds": {
             "type": "integer",
@@ -7496,6 +7488,12 @@
           },
           "eventSettings": {
             "$ref": "#/components/schemas/GuildEventSettings"
+          },
+          "contestPingsEnabled": {
+            "type": "boolean"
+          },
+          "contestPings": {
+            "$ref": "#/components/schemas/ContestPingsFeatureDto"
           }
         },
         "additionalProperties": false
@@ -7679,6 +7677,52 @@
             "nullable": true
           },
           "youtube": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "StringCropSettings": {
+        "type": "object",
+        "properties": {
+          "cactus": {
+            "type": "string",
+            "nullable": true
+          },
+          "carrot": {
+            "type": "string",
+            "nullable": true
+          },
+          "potato": {
+            "type": "string",
+            "nullable": true
+          },
+          "wheat": {
+            "type": "string",
+            "nullable": true
+          },
+          "melon": {
+            "type": "string",
+            "nullable": true
+          },
+          "pumpkin": {
+            "type": "string",
+            "nullable": true
+          },
+          "mushroom": {
+            "type": "string",
+            "nullable": true
+          },
+          "cocoaBeans": {
+            "type": "string",
+            "nullable": true
+          },
+          "sugarCane": {
+            "type": "string",
+            "nullable": true
+          },
+          "netherWart": {
             "type": "string",
             "nullable": true
           }

@@ -2320,9 +2320,7 @@ export interface components {
       enabled?: boolean;
       channelId?: string | null;
       alwaysPingRole?: string | null;
-      cropPingRoles?: {
-        [key: string]: string | null;
-      };
+      cropPingRoles?: components["schemas"]["StringCropSettings"];
       /** Format: int32 */
       delaySeconds?: number;
       disabledReason?: string | null;
@@ -2332,9 +2330,7 @@ export interface components {
       guildId?: string | null;
       channelId?: string | null;
       alwaysPingRole?: string | null;
-      cropPingRoles?: {
-        [key: string]: string | null;
-      };
+      cropPingRoles?: components["schemas"]["StringCropSettings"];
       /** Format: int32 */
       delaySeconds?: number;
       disabledReason?: string | null;
@@ -2905,6 +2901,8 @@ export interface components {
       jacobLeaderboard?: components["schemas"]["PublicJacobLeaderboardFeatureDto"];
       eventsEnabled?: boolean;
       eventSettings?: components["schemas"]["GuildEventSettings"];
+      contestPingsEnabled?: boolean;
+      contestPings?: components["schemas"]["ContestPingsFeatureDto"];
     };
     PublicJacobLeaderboardDto: {
       id?: string;
@@ -2972,6 +2970,18 @@ export interface components {
       hypixel?: string | null;
       youtube?: string | null;
     };
+    StringCropSettings: {
+      cactus?: string | null;
+      carrot?: string | null;
+      potato?: string | null;
+      wheat?: string | null;
+      melon?: string | null;
+      pumpkin?: string | null;
+      mushroom?: string | null;
+      cocoaBeans?: string | null;
+      sugarCane?: string | null;
+      netherWart?: string | null;
+    };
     StrippedContestParticipationDto: {
       /** Format: int32 */
       collected?: number;
@@ -2996,8 +3006,8 @@ export interface components {
         [key: string]: number | null;
       }) | null;
       tempStatBuffs?: components["schemas"]["TempStatBuff"][] | null;
-      accessoryBagSettings?: Record<string, unknown> | null;
-      bestiary?: Record<string, unknown> | null;
+      accessoryBagSettings?: unknown;
+      bestiary?: unknown;
     };
     UserGuildDto: {
       id?: string;

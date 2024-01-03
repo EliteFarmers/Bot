@@ -185,7 +185,11 @@ export const UpdateGuildJacob = (
 		},
 	});
 
-export const GetGuildsToPing = () => GET('/Bot/ContestPings', {});
+export const GetGuildsToPing = () => GET('/Bot/ContestPings', {
+	headers: {
+		Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
+	},
+});
 
 export const DisableGuildContestPings = (id: string, reason: string) =>
 	DELETE('/Bot/ContestPings/{guildId}', {
