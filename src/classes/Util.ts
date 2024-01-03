@@ -97,29 +97,32 @@ export function GetEmbeddedTimestamp(unixSeconds: number, format = 'R') {
 }
 
 export function GetCropURL(crop: string) {
-	// Melon and cactus courtesy of https://github.com/thepotatoking55/2D-block-texture-pack/
-	if (crop === 'Wheat')
-		return 'https://media.discordapp.net/attachments/850812400747544657/958131911308488735/unknown.png';
-	if (crop === 'Melon')
-		return 'https://media.discordapp.net/attachments/850812400747544657/958131910310248518/unknown.png';
 	if (crop === 'Cactus')
-		return 'https://media.discordapp.net/attachments/850812400747544657/958131911543386192/unknown.png';
-	if (crop === 'Pumpkin')
-		return 'https://media.discordapp.net/attachments/850812400747544657/958131910721302588/unknown.png';
+		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978759197294602/cactus.png';
 	if (crop === 'Carrot')
-		return 'https://media.discordapp.net/attachments/850812400747544657/958131911916654622/unknown.png';
-	if (crop === 'Potato')
-		return 'https://media.discordapp.net/attachments/850812400747544657/958154868739153940/potato2.png';
-	if (crop === 'Sugar Cane')
-		return 'https://media.discordapp.net/attachments/850812400747544657/958131911757267035/unknown.png';
-	if (crop === 'Nether Wart')
-		return 'https://media.discordapp.net/attachments/850812400747544657/958131911111376937/unknown.png';
-	if (crop === 'Mushroom')
-		return 'https://media.discordapp.net/attachments/850812400747544657/958154868521058344/mushrooms.png';
+		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978766868697168/carrot.png';
 	if (crop === 'Cocoa Beans')
-		return 'https://media.discordapp.net/attachments/850812400747544657/958131912143167558/unknown.png';
-
+		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978774053535804/cocoa_beans.png';
+	if (crop === 'Melon')
+		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978782832214100/melon.png';
+	if (crop === 'Mushroom')
+		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978789526306846/mushroom.png';
+	if (crop === 'Nether Wart')
+		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978796912492564/nether_wart.png';
+	if (crop === 'Potato')
+		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978803854061638/potato.png';
+	if (crop === 'Pumpkin')
+		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978810653024256/pumpkin.png';
+	if (crop === 'Sugar Cane')
+		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978817150009355/sugar_cane.png';
+	if (crop === 'Wheat')
+		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978823630209024/wheat.png';
+	
 	return undefined;
+}
+
+export function GetCropPath(crop: string) {
+	return `./src/assets/crops/${crop.toLowerCase().replace(' ', '_')}.png`;
 }
 
 export function GetCropColor(crop: string) {
@@ -150,6 +153,10 @@ const simpleCropNames = {
 	'cane': 'Sugar Cane',
 	'wheat': 'Wheat',
 };
+
+export function CropFromSimple(name: string) {
+	return simpleCropNames[name.toLowerCase() as keyof typeof simpleCropNames] ?? undefined;
+}
 
 export function GetCropEmoji(crop: string) {
 	const emoji = CropEmojis[crop as keyof typeof CropEmojis];

@@ -22,7 +22,7 @@ const command: Command = {
 		.setDescription('Get NPC profit rates for a given amount of fortune!')
 		.addIntegerOption(option => option.setName('fortune')
 			.setDescription('The amount of fortune to calculate rates for!')
-			.setMinValue(100)
+			.setMinValue(0)
 			.setMaxValue(5000)
 			.setRequired(false))
 		.addIntegerOption(option => option.setName('time')
