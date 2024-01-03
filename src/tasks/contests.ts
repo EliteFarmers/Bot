@@ -7,7 +7,7 @@ import { Crop, CropFromName, GetFortuneRequiredForCollection } from 'farming-wei
 import { GetSkyblockDate } from 'classes/SkyblockDate';
 
 const settings = {
-	cron: '0 15 * * * *',
+	cron: '0 10 * * * *',
 	execute: execute
 }
 
