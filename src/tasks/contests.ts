@@ -116,12 +116,16 @@ async function execute(client: Client) {
 					setUrl = true;
 				}
 			} catch (err) {
-				DisableGuildContestPings(pings.guildId ?? '', 'Failed to send message');
+				console.log(`Failed to send message to ${channel.id} (${channel.guild.id})`)
+				// DisableGuildContestPings(pings.guildId ?? '', 'Failed to send message');
 			}
 			continue;
 		}
 
-		channel.send(msg).catch(() => DisableGuildContestPings(pings.guildId ?? '', 'Failed to send message'));
+		channel.send(msg).catch(() => {
+			console.log(`Failed to send message to ${channel.id} (${channel.guild.id})`)
+			// DisableGuildContestPings(pings.guildId ?? '', 'Failed to send message');
+		});
 	}
 }
 
