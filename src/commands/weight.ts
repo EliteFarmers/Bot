@@ -5,6 +5,7 @@ import { FetchAccount, FetchWeight, FetchWeightLeaderboardRank } from '../api/el
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 import { components } from '../api/api.js';
 import { GetCropEmoji } from '../classes/Util.js';
+import playerAutocomplete from 'autocomplete/player.js';
 
 const command: Command = {
 	name: 'weight',
@@ -17,11 +18,13 @@ const command: Command = {
 		.setDescription('Get a players farming weight!')
 		.addStringOption(option => option.setName('player')
 			.setDescription('The player in question.')
+			.setAutocomplete(true)
 			.setRequired(false))
 		.addStringOption(option => option.setName('profile')
 			.setDescription('Optionally specify a profile!')
 			.setRequired(false)),
-	execute: execute
+	execute: execute,
+	autocomplete: playerAutocomplete
 }
 
 export default command;

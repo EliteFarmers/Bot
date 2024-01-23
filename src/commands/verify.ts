@@ -2,6 +2,7 @@ import { Command, CommandAccess, CommandType } from "../classes/Command.js";
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from "../classes/embeds.js";
 import { FetchAccount, FetchUpdateAccount, LinkAccount } from "../api/elite.js";
+import playerAutocomplete from "autocomplete/player.js";
 
 const command: Command = {
 	name: 'verify',
@@ -14,8 +15,10 @@ const command: Command = {
 		.setDescription('Link your Minecraft account!')
 		.addStringOption(option => option.setName('player')
 			.setDescription('Your minecraft account name.')
+			.setAutocomplete(true)
 			.setRequired(true)),
-	execute: execute
+	execute: execute,
+	autocomplete: playerAutocomplete
 }
 
 export default command;

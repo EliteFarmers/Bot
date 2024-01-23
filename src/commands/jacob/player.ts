@@ -4,6 +4,7 @@ import { EliteEmbed, ErrorEmbed, WarningEmbed } from "../../classes/embeds.js";
 import { FetchAccount, FetchProfile } from "../../api/elite.js";
 import { GetReadableDate } from "../../classes/SkyblockDate.js";
 import { GetCropEmoji, GetMedalEmoji } from "../../classes/Util.js";
+import playerAutocomplete from "autocomplete/player.js";
 
 const command: SubCommand = {
 	name: 'player',
@@ -11,11 +12,13 @@ const command: SubCommand = {
 	slash: new SlashCommandSubcommandBuilder()
 		.addStringOption(option => option.setName('player')
 			.setDescription('The player in question.')
+			.setAutocomplete(true)
 			.setRequired(false))
 		.addStringOption(option => option.setName('profile')
 			.setDescription('Optionally specify a profile!')
 			.setRequired(false)),
-	execute: execute
+	execute: execute,
+	autocomplete: playerAutocomplete
 }
 
 export default command;
