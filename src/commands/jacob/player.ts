@@ -4,7 +4,7 @@ import { EliteEmbed, ErrorEmbed, WarningEmbed } from "../../classes/embeds.js";
 import { FetchAccount, FetchProfile } from "../../api/elite.js";
 import { GetReadableDate } from "../../classes/SkyblockDate.js";
 import { GetCropEmoji, GetMedalEmoji } from "../../classes/Util.js";
-import playerAutocomplete from "autocomplete/player.js";
+import playerAutocomplete from "../../autocomplete/player.js";
 
 const command: SubCommand = {
 	name: 'player',

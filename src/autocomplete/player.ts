@@ -1,5 +1,5 @@
-import { FetchLeaderboardSlice, SearchUsers } from "api/elite";
-import { AutocompleteInteraction } from "discord.js";
+import { FetchLeaderboardSlice, SearchUsers } from '../api/elite.js';
+import { AutocompleteInteraction } from 'discord.js';
 
 export default async function playerAutocomplete(interaction: AutocompleteInteraction) {
 	if (interaction.responded) return;

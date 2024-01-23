@@ -5,7 +5,7 @@ import { FetchAccount, FetchWeight, FetchWeightLeaderboardRank } from '../api/el
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 import { components } from '../api/api.js';
 import { GetCropEmoji } from '../classes/Util.js';
-import playerAutocomplete from 'autocomplete/player.js';
+import playerAutocomplete from '../autocomplete/player.js';
 
 const command: Command = {
 	name: 'weight',
