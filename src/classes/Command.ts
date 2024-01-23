@@ -1,6 +1,6 @@
 // This is to allow the generic "Function" to be used, as it's the easiest way to allow both types of commands
 /* eslint-disable @typescript-eslint/ban-types */
-import { Client, Interaction, SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
+import { AutocompleteInteraction, Client, Interaction, SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
 
 export interface CommandBase {
 	name: string,
@@ -18,11 +18,13 @@ export interface Command extends CommandBase {
 	type: CommandType,
 	
 	execute: Function
+	autocomplete?: (interaction: AutocompleteInteraction) => Promise<void>
 }
 
 export interface SubCommand extends CommandBase {
 	slash?: SlashCommandSubcommandBuilder | ((group: SlashCommandSubcommandBuilder) => SlashCommandSubcommandBuilder),
-	execute: Function
+	execute: Function,
+	autocomplete?: (interaction: AutocompleteInteraction) => Promise<void>
 }
 
 export interface CommandGroupSettings extends CommandBase {
@@ -77,6 +79,16 @@ export class CommandGroup implements CommandGroupSettings {
 		}
 
 		this.subcommands[category]?.execute(interaction, ...args);
+	}
+
+	public autocomplete(interaction: Interaction, ...args: unknown[]) {
+		if (!interaction.isAutocomplete()) {
+			return this.selfExecute(interaction, ...args);
+		}
+		
+		const category = interaction.options.getSubcommand() ?? '';
+		
+		this.subcommands[category]?.autocomplete?.(interaction);
 	}
 
 	public addSubcommand(subCommand: SubCommand) {
