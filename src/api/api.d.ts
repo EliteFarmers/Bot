@@ -27,6 +27,34 @@ export interface paths {
       };
     };
   };
+  "/Account/Search": {
+    get: {
+      parameters: {
+        query?: {
+          q?: string;
+          start?: string;
+        };
+      };
+      responses: {
+        /** @description Success */
+        200: {
+          content: {
+            "text/plain": string[];
+            "application/json": string[];
+            "text/json": string[];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
   "/Account/{discordId}": {
     get: {
       parameters: {

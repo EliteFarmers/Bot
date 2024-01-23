@@ -1,4 +1,4 @@
-import { ButtonInteraction, ChatInputCommandInteraction, CommandInteraction, Events, GuildMember, Interaction } from 'discord.js';
+import { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, CommandInteraction, Events, GuildMember, Interaction } from 'discord.js';
 import { commands } from '../index.js';
 import { Command, CommandGroup, CommandType } from '../classes/Command.js';
 import { HasRole, isValidAccess } from '../classes/Util.js';
@@ -14,7 +14,7 @@ export default settings;
 async function execute(interaction: Interaction) {
 	if (interaction.isChatInputCommand()) return OnCommandInteraction(interaction);
 	if (interaction.isButton()) return OnButtonInteraction(interaction);
-	//if (interaction.isAutocomplete()) return OnAutocompleteInteraction(interaction);
+	if (interaction.isAutocomplete()) return OnAutocompleteInteraction(interaction);
 }
 
 async function OnCommandInteraction(interaction: ChatInputCommandInteraction) {
@@ -51,12 +51,25 @@ async function OnButtonInteraction(interaction: ButtonInteraction) {
 	}
 }
 
+async function OnAutocompleteInteraction(interaction: AutocompleteInteraction) {
+	if (interaction.responded) return;
+	const command = GetCommand(interaction.commandName, CommandType.Autocomplete);
+
+	if (!command || !('autocomplete' in command)) return;
+
+	try {
+		await command.autocomplete?.(interaction);
+	} catch (error) {
+		console.log(error);
+	}
+}
+
 function GetCommand(name: string, type: CommandType): Command | CommandGroup | undefined {
 	const command: Command | CommandGroup | undefined = commands.get(name);
 
 	if (!command) return undefined;
 	// If type and command type are autocomplete it's valid
-	if (command.type === CommandType.Autocomplete && type === CommandType.Autocomplete) return command; 
+	if (type === CommandType.Autocomplete && 'autocomplete' in command) return command;
 	// If the types don't match or the type isn't combo than it's invalid
 	if (command.type !== type && type !== CommandType.Combo) return undefined;
 

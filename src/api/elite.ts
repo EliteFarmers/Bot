@@ -205,6 +205,15 @@ export const DisableGuildContestPings = (id: string, reason: string) =>
 
 export const GetCurrentContests = () => GET('/Contests/at/now', {});
 
+export const SearchUsers = (query: string) =>
+	GET('/Account/Search', {
+		params: {
+			query: {
+				q: query,
+			},
+		},
+	});
+
 export const LinkAccount = (id: string, player: string) =>
 	POST('/Bot/account/{discordId}/{playerIgnOrUuid}', {
 		params: {
