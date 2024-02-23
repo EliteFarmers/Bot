@@ -1,8 +1,7 @@
 import { DisableGuildContestPings, FetchCurrentMonthlyBrackets, GetCurrentContests, GetGuildsToPing } from '../api/elite';
-import { CropFromSimple, GetCropEmoji, GetCropURL, GetMedalEmoji } from '../classes/Util';
+import { CropFromSimple, GetCropEmoji, GetMedalEmoji } from '../classes/Util';
 import { EliteEmbed, PrefixFooter } from '../classes/embeds';
-import { AttachmentBuilder, Client, MessageCreateOptions, PermissionFlagsBits } from 'discord.js';
-import { createCanvas, loadImage } from '@napi-rs/canvas';
+import { Client, MessageCreateOptions, PermissionFlagsBits } from 'discord.js';
 import { Crop, CropFromName, GetFortuneRequiredForCollection } from 'farming-weight';
 import { GetSkyblockDate } from '../classes/SkyblockDate';
 import { CronTask } from '../classes/Command';
@@ -56,29 +55,27 @@ async function execute(client: Client) {
 			return acc;
 		}, {}) ?? [];
 
-	const attachment = await combineCropImages(crops);
-	if (!attachment) return;
-
 	const cropEmojis = crops.sort().map(crop => GetCropEmoji(crop)).join('');
 
 	const embed = EliteEmbed()
-		.setThumbnail('attachment://crops.webp')
 		.setTitle(GetSkyblockDate(+timestamp).Readable)
 		.setDescription(`${cropEmojis} **starts <t:${timestamp}:R>!** [⧉](<https://elitebot.dev/contest/${timestamp}>)`)
 		.setFields(getFields(reqs))
 
 	PrefixFooter(embed, 'Estimated bracket requirements shown for 19.8 BPS');
 
-	let setUrl = false;
-
 	for (const pings of guilds) {
-		if (!pings.guildId || !pings?.enabled || !pings.channelId) continue;
+		if (!pings.guildId || !pings?.enabled || !pings.channelId) {
+			console.log('Invalid pings config', pings);
+			continue;
+		}
 
 		const channel = client.channels.cache.get(pings.channelId)
 			?? await client.channels.fetch(pings.channelId) 
 			?? undefined;
 
 		if (!channel || !channel.isTextBased() || channel.isDMBased()) {
+			console.log(`Invalid channel (${pings.channelId}) for guild ${pings.guildId}`);
 			DisableGuildContestPings(pings.guildId, 'Channel not found');
 			return;
 		}
@@ -86,6 +83,7 @@ async function execute(client: Client) {
 		const me = channel.guild.members.me ?? await channel.guild.members.fetchMe();
 
 		if (!channel.permissionsFor(me)?.has(PermissionFlagsBits.SendMessages)) {
+			console.log(`Missing send message permissions in ${channel.id} (${pings.guildId})`);
 			DisableGuildContestPings(pings.guildId, 'Missing send message permissions');
 			return;
 		}
@@ -102,51 +100,11 @@ async function execute(client: Client) {
 			}
 		} as MessageCreateOptions;
 
-		if (!setUrl) {
-			msg.files = [ attachment ];
-			try {
-				const sent = await channel.send(msg);
-
-				// Get attachment URL from embed
-				const url = sent.embeds[0]?.thumbnail?.url?.split('?')?.[0];
-
-				if (url) {
-					embed.setThumbnail(url);
-					msg.files = undefined;
-					setUrl = true;
-				}
-			} catch (err) {
-				console.log(`Failed to send message to ${channel.id} (${channel.guild.id})`)
-				// DisableGuildContestPings(pings.guildId ?? '', 'Failed to send message');
-			}
-			continue;
-		}
-
 		channel.send(msg).catch(() => {
 			console.log(`Failed to send message to ${channel.id} (${channel.guild.id})`)
 			// DisableGuildContestPings(pings.guildId ?? '', 'Failed to send message');
 		});
 	}
-}
-
-async function combineCropImages(crops: string[]) {
-	const urls = crops
-		.sort()
-		.map(crop => GetCropURL(crop))
-		.filter(url => url) as string[];
-
-	const images = await Promise.all(urls.map(url => loadImage(url)));
-	if (images.length === 0) return undefined;
-
-	const canvas = createCanvas(256 * 2, 256);
-	const ctx = canvas.getContext('2d');
-	ctx.imageSmoothingEnabled = false;
-
-	ctx.drawImage(images[0], 0, 0, images[0].width * 2, images[0].height * 2);
-	ctx.drawImage(images[2], 2 * images[0].width, 0, images[0].width * 2, images[0].height * 2);
-	ctx.drawImage(images[1], images[0].width, 0, images[0].width * 2, images[0].height * 2);
-
-	return new AttachmentBuilder(canvas.toBuffer("image/webp"), { name: 'crops.webp' });
 }
 
 function getFields(reqs: Record<string, { gold: number; diamond: number; }>): { name: string, value: string, inline: boolean }[] {
