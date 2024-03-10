@@ -2,7 +2,7 @@ import { EliteEmbed, EmptyField, NotYoursReply } from '../classes/embeds.js';
 import { Command, CommandAccess, CommandType } from '../classes/Command.js';
 import { CropSelectRow, GetCropEmoji } from '../classes/Util.js';
 import { ChatInputCommandInteraction, ComponentType, SlashCommandBuilder } from 'discord.js';
-import { CalculateAverageSpecialCrops, CalculateDetailedAverageDrops, Crop, CropDisplayName } from 'farming-weight';
+import { calculateAverageSpecialCrops, calculateDetailedAverageDrops, Crop, getCropDisplayName } from 'farming-weight';
 
 const TIME_OPTIONS = {
 	24_000: 'Jacob Contest',
@@ -44,12 +44,12 @@ async function execute(interaction: ChatInputCommandInteraction) {
 	const reforge = interaction.options.getString('reforge', false) ?? 'bountiful';
 	const timeName = TIME_OPTIONS[blocks as keyof typeof TIME_OPTIONS];
 
-	const expectedDrops = CalculateDetailedAverageDrops({
+	const expectedDrops = calculateDetailedAverageDrops({
 		farmingFortune: fortune,
 		blocksBroken: blocks,
 		bountiful: reforge === 'bountiful',
 		mooshroom: true,
-	}) as Partial<ReturnType<typeof CalculateDetailedAverageDrops>>;
+	}) as Partial<ReturnType<typeof calculateDetailedAverageDrops>>;
 
 	delete expectedDrops[Crop.Seeds];
 
@@ -57,7 +57,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 	let profitLength = 0;
 
 	const formatted = Object.entries(expectedDrops).map(([crop, details]) => {
-		const cropName = CropDisplayName(crop as Crop);
+		const cropName = getCropDisplayName(crop as Crop);
 		const profit = details.npcCoins ?? 0;
 
 		if (profit.toLocaleString().length > amountLength) amountLength = profit.toLocaleString().length;
@@ -114,11 +114,11 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		const [ crop, cropInfo ] = Object.entries(expectedDrops)[selected];
 		const coinSources = Object.entries(cropInfo.coinSources).sort((a, b) => b[1] - a[1]);
 		const collections = Object.entries(cropInfo.otherCollection).sort((a, b) => b[1] - a[1]);
-		const cropName = CropDisplayName(crop as Crop);
+		const cropName = getCropDisplayName(crop as Crop);
 
 		const cropDetails = `\nUsing **${reforge === 'bountiful' ? 'Bountiful' : 'Blessed'}**, **Mooshroom Cow**, and **${crop === Crop.Cactus ? '3' : '4'}/4ths Fermento Armor**!`;
 
-		const threeFourths = CalculateAverageSpecialCrops(blocks, crop as Crop, 3);
+		const threeFourths = calculateAverageSpecialCrops(blocks, crop as Crop, 3);
 		const fromSpecial = cropInfo.coinSources[threeFourths.type] ?? 0;
 		const specialDifference = fromSpecial - threeFourths.npc;
 		const threeFourthsTotal = cropInfo.npcCoins - specialDifference;

@@ -2,7 +2,7 @@ import { DisableGuildContestPings, FetchCurrentMonthlyBrackets, GetCurrentContes
 import { CropFromSimple, GetCropEmoji, GetMedalEmoji } from '../classes/Util';
 import { EliteEmbed, PrefixFooter } from '../classes/embeds';
 import { Client, MessageCreateOptions, PermissionFlagsBits } from 'discord.js';
-import { Crop, CropFromName, GetFortuneRequiredForCollection } from 'farming-weight';
+import { Crop, getCropFromName, getFortuneRequiredForCollection } from 'farming-weight';
 import { GetSkyblockDate } from '../classes/SkyblockDate';
 import { CronTask } from '../classes/Command';
 
@@ -115,16 +115,16 @@ function getFields(reqs: Record<string, { gold: number; diamond: number; }>): { 
 	const fortuneEmoji = '<:fortune:1180353749076693092>';
 
 	return entries.map(([ crop, { gold, diamond } ]) => {
-		const goldFortune = Math.max(GetFortuneRequiredForCollection({
-			crop: CropFromName(crop) as Crop, 
+		const goldFortune = Math.max(getFortuneRequiredForCollection({
+			crop: getCropFromName(crop) as Crop, 
 			collection: gold, 
 			blocksBroken: Math.floor(24_000 * (19.8 / 20)), 
 			useDicers: true,
 			useMooshroom: true,
 		}), 0);
 
-		const diamondFortune = Math.max(GetFortuneRequiredForCollection({
-			crop: CropFromName(crop) as Crop, 
+		const diamondFortune = Math.max(getFortuneRequiredForCollection({
+			crop: getCropFromName(crop) as Crop, 
 			collection: diamond, 
 			blocksBroken: Math.floor(24_000 * (19.8 / 20)), 
 			useDicers: true,

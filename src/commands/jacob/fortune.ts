@@ -3,7 +3,7 @@ import type { SubCommand } from '../../classes/Command.js';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, EmbedBuilder, SlashCommandSubcommandBuilder } from 'discord.js';
 import { FetchCurrentMonthlyBrackets } from '../../api/elite.js';
 import { GetCropEmoji } from '../../classes/Util.js';
-import { CropFromName, GetFortuneRequiredForCollection } from 'farming-weight';
+import { getCropFromName, getFortuneRequiredForCollection } from 'farming-weight';
 import type { components } from '../../api/api.js';
 
 const command: SubCommand = {
@@ -200,10 +200,10 @@ function makeField(data: components['schemas']['ContestBracketsDetailsDto'] | un
 	}).sort((a, b) => a.cropName.localeCompare(b.cropName));
 
 	const cropNames = reqs.map(({ cropName, collection }) => {
-		const crop = CropFromName(cropName);
+		const crop = getCropFromName(cropName);
 		if (!crop) return '';
 
-		const fortune = Math.max(GetFortuneRequiredForCollection({
+		const fortune = Math.max(getFortuneRequiredForCollection({
 			crop, 
 			collection, 
 			blocksBroken, 
