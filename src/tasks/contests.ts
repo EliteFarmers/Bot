@@ -70,40 +70,44 @@ async function execute(client: Client) {
 			continue;
 		}
 
-		const channel = client.channels.cache.get(pings.channelId)
-			?? await client.channels.fetch(pings.channelId) 
-			?? undefined;
+		try {
+			const channel = client.channels.cache.get(pings.channelId)
+				?? await client.channels.fetch(pings.channelId).catch(() => undefined)
+				?? undefined;
 
-		if (!channel || !channel.isTextBased() || channel.isDMBased()) {
-			console.log(`Invalid channel (${pings.channelId}) for guild ${pings.guildId}`);
-			DisableGuildContestPings(pings.guildId, 'Channel not found');
-			return;
-		}
-
-		const me = channel.guild.members.me ?? await channel.guild.members.fetchMe();
-
-		if (!channel.permissionsFor(me)?.has(PermissionFlagsBits.SendMessages)) {
-			console.log(`Missing send message permissions in ${channel.id} (${pings.guildId})`);
-			DisableGuildContestPings(pings.guildId, 'Missing send message permissions');
-			return;
-		}
-
-		const roles = crops
-			.map(crop => pings.cropPingRoles?.[cropKeys[crop] as keyof typeof pings.cropPingRoles] ?? undefined)
-			.filter(role => role);
-
-		const msg = {
-			content: (pings.alwaysPingRole ? `<@&${pings.alwaysPingRole}> ` : '') + roles.map(role => `<@&${role}>`).join(' '),
-			embeds: [ embed ],
-			allowedMentions: {
-				roles: roles
+			if (!channel || !channel.isTextBased() || channel.isDMBased()) {
+				console.log(`Invalid channel (${pings.channelId}) for guild ${pings.guildId}`);
+				DisableGuildContestPings(pings.guildId, 'Channel not found');
+				return;
 			}
-		} as MessageCreateOptions;
 
-		channel.send(msg).catch(() => {
-			console.log(`Failed to send message to ${channel.id} (${channel.guild.id})`)
-			// DisableGuildContestPings(pings.guildId ?? '', 'Failed to send message');
-		});
+			const me = channel.guild.members.me ?? await channel.guild.members.fetchMe();
+
+			if (!channel.permissionsFor(me)?.has(PermissionFlagsBits.SendMessages)) {
+				console.log(`Missing send message permissions in ${channel.id} (${pings.guildId})`);
+				DisableGuildContestPings(pings.guildId, 'Missing send message permissions');
+				return;
+			}
+
+			const roles = crops
+				.map(crop => pings.cropPingRoles?.[cropKeys[crop] as keyof typeof pings.cropPingRoles] ?? undefined)
+				.filter(role => role);
+
+			const msg = {
+				content: (pings.alwaysPingRole ? `<@&${pings.alwaysPingRole}> ` : '') + roles.map(role => `<@&${role}>`).join(' '),
+				embeds: [ embed ],
+				allowedMentions: {
+					roles: roles
+				}
+			} as MessageCreateOptions;
+
+			channel.send(msg).catch(() => {
+				console.log(`Failed to send message to ${channel.id} (${channel.guild.id})`)
+				// DisableGuildContestPings(pings.guildId ?? '', 'Failed to send message');
+			});
+		} catch (e) {
+			console.log(e);
+		}
 	}
 }
 
