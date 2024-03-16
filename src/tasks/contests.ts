@@ -78,7 +78,7 @@ async function execute(client: Client) {
 			if (!channel || !channel.isTextBased() || channel.isDMBased()) {
 				console.log(`Invalid channel (${pings.channelId}) for guild ${pings.guildId}`);
 				DisableGuildContestPings(pings.guildId, 'Channel not found');
-				return;
+				continue;
 			}
 
 			const me = channel.guild.members.me ?? await channel.guild.members.fetchMe();
@@ -86,7 +86,7 @@ async function execute(client: Client) {
 			if (!channel.permissionsFor(me)?.has(PermissionFlagsBits.SendMessages)) {
 				console.log(`Missing send message permissions in ${channel.id} (${pings.guildId})`);
 				DisableGuildContestPings(pings.guildId, 'Missing send message permissions');
-				return;
+				continue;
 			}
 
 			const roles = crops
