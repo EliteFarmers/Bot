@@ -6639,6 +6639,9 @@
           },
           "requirements": {
             "type": "string"
+          },
+          "tieToAccount": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

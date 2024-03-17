@@ -2715,6 +2715,7 @@ export interface components {
       name?: string;
       description?: string;
       requirements?: string;
+      tieToAccount?: boolean;
     };
     /**
      * Format: int32
