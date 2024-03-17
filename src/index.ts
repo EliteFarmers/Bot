@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, Collection, ApplicationCommandDataResolvable, ActivityType, RESTPostAPIChatInputApplicationCommandsJSONBody, Events, PermissionsBitField } from 'discord.js';
+import { Client, GatewayIntentBits, Collection, ApplicationCommandDataResolvable, ActivityType, RESTPostAPIChatInputApplicationCommandsJSONBody, Events, PermissionsBitField, SlashCommandBuilder } from 'discord.js';
 import { Command, CommandGroup, CommandGroupSettings, CommandType, CronTask, SubCommand } from './classes/Command.js';
 import { SignalRecieverOptions } from './classes/Signal.js';
 import { ConnectToRMQ } from './api/rabbit.js';
@@ -131,7 +131,11 @@ function deploySlashCommands() {
 	for (const [, command ] of commands) {
 		if (command.type !== CommandType.Slash && command.type !== CommandType.Combo) continue;
 
-		if (!command.slash) continue;
+		if (!command.slash && command.type === CommandType.Slash) {
+			command.slash = new SlashCommandBuilder();
+		} else if (!command.slash) {
+			continue;
+		}
 
 		const slash = command.slash;
 

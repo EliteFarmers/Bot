@@ -278,3 +278,13 @@ export const FetchContestYearlyMonthlyBrackets = (year: number, months?: number,
 			}
 		}
 	});
+
+export const GrantUserBadge = (playerUuid: string, badgeId: number) =>
+	POST('/Bot/Badges/{playerUuid}/{badgeId}', {
+		params: {
+			path: {
+				playerUuid,
+				badgeId
+			}
+		}
+	});
