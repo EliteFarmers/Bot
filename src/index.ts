@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, Collection, ApplicationCommandDataResolvable, ActivityType, RESTPostAPIChatInputApplicationCommandsJSONBody, Events, PermissionsBitField, SlashCommandBuilder } from 'discord.js';
+import { Client, GatewayIntentBits, Collection, ApplicationCommandDataResolvable, ActivityType, Events, PermissionsBitField, SlashCommandBuilder, RESTPostAPIApplicationCommandsJSONBody } from 'discord.js';
 import { Command, CommandGroup, CommandGroupSettings, CommandType, CronTask, SubCommand } from './classes/Command.js';
 import { SignalRecieverOptions } from './classes/Signal.js';
 import { ConnectToRMQ } from './api/rabbit.js';
@@ -126,10 +126,13 @@ process.on('unhandledRejection', (reason, p) => {
 */
 
 function deploySlashCommands() {
-	const slashCommandsData: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
+	const slashCommandsData: RESTPostAPIApplicationCommandsJSONBody[] = [];
 
 	for (const [, command ] of commands) {
-		if (command.type !== CommandType.Slash && command.type !== CommandType.Combo) continue;
+		if (command.type !== CommandType.Slash 
+			&& command.type !== CommandType.Combo 
+			&& command.type !== CommandType.ContextMenu) 
+			continue;
 
 		if (!command.slash && command.type === CommandType.Slash) {
 			command.slash = new SlashCommandBuilder();
@@ -143,7 +146,7 @@ function deploySlashCommands() {
 			slash.setName(command.name);
 		}
 
-		if (!slash.description) {
+		if ('setDescription' in slash && !slash.description) {
 			slash.setDescription(command.description);
 		}
 		

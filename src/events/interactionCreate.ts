@@ -1,4 +1,4 @@
-import { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, CommandInteraction, Events, GuildMember, Interaction } from 'discord.js';
+import { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, CommandInteraction, ContextMenuCommandInteraction, Events, GuildMember, Interaction, StringSelectMenuInteraction } from 'discord.js';
 import { commands } from '../index.js';
 import { Command, CommandGroup, CommandType } from '../classes/Command.js';
 import { HasRole, isValidAccess } from '../classes/Util.js';
@@ -12,13 +12,20 @@ const settings = {
 export default settings;
 
 async function execute(interaction: Interaction) {
-	if (interaction.isChatInputCommand()) return OnCommandInteraction(interaction);
-	if (interaction.isButton()) return OnButtonInteraction(interaction);
+	if (interaction.isChatInputCommand() || interaction.isContextMenuCommand()) {
+		return OnCommandInteraction(interaction);
+	}
+	if (interaction.isButton() || interaction.isStringSelectMenu()) {
+		return OnButtonInteraction(interaction);
+	}
 	if (interaction.isAutocomplete()) return OnAutocompleteInteraction(interaction);
 }
 
-async function OnCommandInteraction(interaction: ChatInputCommandInteraction) {
-	const command = GetCommand(interaction.commandName, CommandType.Slash);
+async function OnCommandInteraction(interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction) {
+	const command = (interaction.isChatInputCommand()) 
+		? GetCommand(interaction.commandName, CommandType.Slash)
+		: GetCommand(interaction.commandName, CommandType.ContextMenu);
+		
 	if (!command) return;
 
 	const hasPerms = await HasPermsAndAccess(command, interaction);
@@ -34,7 +41,7 @@ async function OnCommandInteraction(interaction: ChatInputCommandInteraction) {
 	}
 }
 
-async function OnButtonInteraction(interaction: ButtonInteraction) {
+async function OnButtonInteraction(interaction: ButtonInteraction | StringSelectMenuInteraction) {
 	const args = interaction.customId.split('|');
 	const commandName = args[0];
 
@@ -76,7 +83,7 @@ function GetCommand(name: string, type: CommandType): Command | CommandGroup | u
 	return command;
 }
 
-async function HasPermsAndAccess(command: Command | CommandGroup, interaction: CommandInteraction | ButtonInteraction) {
+async function HasPermsAndAccess(command: Command | CommandGroup, interaction: CommandInteraction | ButtonInteraction | StringSelectMenuInteraction) {
 	if (interaction.channel && !isValidAccess(command.access, interaction.channel.type)) return false;
 
 	if (!interaction.guildId || !command.permissions || !(interaction.member instanceof GuildMember)) return true;

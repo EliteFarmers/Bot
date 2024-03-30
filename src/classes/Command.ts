@@ -1,6 +1,6 @@
 // This is to allow the generic "Function" to be used, as it's the easiest way to allow both types of commands
 /* eslint-disable @typescript-eslint/ban-types */
-import { AutocompleteInteraction, Client, Interaction, SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
+import { AutocompleteInteraction, BaseInteraction, Client, ContextMenuCommandBuilder, Interaction, SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
 
 export interface CommandBase {
 	name: string,
@@ -8,7 +8,7 @@ export interface CommandBase {
 }
 
 export interface Command extends CommandBase {
-	slash?: SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'> | SlashCommandSubcommandsOnlyBuilder
+	slash?: SlashCommandBuilder | ContextMenuCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'> | SlashCommandSubcommandsOnlyBuilder
 	
 	aliases?: string[],
 	usage?: string,
@@ -67,7 +67,7 @@ export class CommandGroup implements CommandGroupSettings {
 		this.subcommands = {};
 	}
 
-	public execute(interaction: Interaction, ...args: unknown[]) {
+	public execute(interaction: BaseInteraction, ...args: unknown[]) {
 		if (!interaction.isChatInputCommand()) {
 			return this.selfExecute(interaction, ...args);
 		}
@@ -113,7 +113,8 @@ export enum CommandType {
 	GuildSlash,
 	Button,
 	Combo,
-	Autocomplete
+	Autocomplete,
+	ContextMenu
 }
 
 export enum CommandAccess {
