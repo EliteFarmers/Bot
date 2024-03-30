@@ -1,6 +1,6 @@
 import { Command, CommandAccess, CommandType } from "../classes/Command.js";
 import { ApplicationCommandType, ContextMenuCommandBuilder, UserContextMenuCommandInteraction } from "discord.js";
-import { FetchAccount } from "api/elite.js";
+import { FetchAccount } from "../api/elite.js";
 
 const settings: Command = {
 	name: 'Get Linked Account',
