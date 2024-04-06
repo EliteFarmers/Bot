@@ -32,13 +32,13 @@ async function execute(client: Client) {
 	if (!contests?.complete) return;
 	
 	const now = Date.now() / 1000;
-	const upcomingContest = Object.entries(contests.contests ?? {}).find(([ k ]) => +k > now);
-	if (!upcomingContest) return;
 
-	const [ timestamp, crops ] = upcomingContest;
+	const [ timestamp, crops ] = Object.entries(contests.contests ?? {}).find(([ k ]) => +k > now) ?? []
+	if (!timestamp || !crops) return;
+
+	const nextContest = Object.entries(contests.contests ?? {}).find(([ k ]) => +k > +timestamp);
 
 	const { data: guilds } = await GetGuildsToPing().catch(() => ({ data: undefined, response: undefined }));
-	
 	if (!guilds || guilds.length === 0) return;
 
 	const { data: brackets } = await FetchCurrentMonthlyBrackets(3).catch(() => ({ data: undefined }));
@@ -55,12 +55,18 @@ async function execute(client: Client) {
 			return acc;
 		}, {}) ?? [];
 
-	const cropEmojis = crops.sort().map(crop => GetCropEmoji(crop)).join('');
+	const getCropEmojis = (crops: string[]) => crops.map(crop => GetCropEmoji(crop)).join('');
 
 	const embed = EliteEmbed()
 		.setTitle(GetSkyblockDate(+timestamp).Readable)
-		.setDescription(`${cropEmojis} **starts <t:${timestamp}:R>!** [⧉](<https://elitebot.dev/contest/${timestamp}>)`)
+		.setDescription(`${getCropEmojis(crops)} **starts <t:${timestamp}:R>!** [⧉](<https://elitebot.dev/contest/${timestamp}>)`)
 		.setFields(getFields(reqs))
+		.addFields([{
+			name: 'Next Contest',
+			value: nextContest 
+				? `${getCropEmojis(nextContest[1])} starts <t:${nextContest[0]}:R> [View All](<https://elitebot.dev/contests/upcoming#${nextContest[0]}>)` 
+				: 'Not available yet!',
+		}])
 
 	PrefixFooter(embed, 'Estimated bracket requirements shown for 19.8 BPS');
 
@@ -141,7 +147,7 @@ function getFields(reqs: Record<string, { gold: number; diamond: number; }>): { 
 
 		return {
 			name: crop,
-			value: `${goldStr}\n** **\n${diamondStr}`,
+			value: `${goldStr}\n${diamondStr}`,
 			inline: true,
 		}
 	});
