@@ -288,3 +288,29 @@ export const GrantUserBadge = (playerUuid: string, badgeId: number) =>
 			}
 		}
 	});
+
+export const FetchCollectionGraphs = (playerUuid: string, profileUuid: string, days?: number) =>
+	GET('/Graph/{playerUuid}/{profileUuid}/crops', {
+		params: {
+			path: {
+				playerUuid,
+				profileUuid
+			},
+			query: {
+				days
+			}
+		}
+	});
+
+export const FetchSkillGraphs = (playerUuid: string, profileUuid: string, days?: number) =>
+	GET('/Graph/{playerUuid}/{profileUuid}/skills', {
+		params: {
+			path: {
+				playerUuid,
+				profileUuid
+			},
+			query: {
+				days
+			}
+		}
+	})
