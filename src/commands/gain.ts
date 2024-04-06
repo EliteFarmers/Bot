@@ -146,8 +146,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 	}
 
 	// Remove last day if it's empty
-	if (days.length > 9 && Object.values(days.at(-1)?.crops ?? {}).every(c => c === 0)) {
-		console.log('pop');
+	if (days.length > 1 && Object.values(days.at(-1)?.crops ?? {}).every(c => c === 0)) {
 		days.pop();
 	}
 
