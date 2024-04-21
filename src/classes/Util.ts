@@ -189,8 +189,8 @@ export function GetMedalEmoji(medal?: string) {
 	return '';
 }
 
-export function UserHyperLink(userId?: Snowflake, name?: string) {
-	return `[@${name}](discord://-/users/${userId})`;
+export function UserHyperLink(userId?: Snowflake) {
+	return `<@${userId}>[⟳](discord://-/users/${userId})`;
 }
 
 export function CropSelectRow(customId = 'crop-select', placeholder = 'Select a crop!') {
