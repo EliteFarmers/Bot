@@ -2,7 +2,7 @@ import { Command, CommandAccess, CommandType } from "../classes/Command.js";
 import { ButtonInteraction, ChannelType, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from "../classes/embeds.js";
 import { FetchAccount, FetchContests, FetchGuildJacob, UpdateGuildJacob } from "../api/elite.js";
-import { GetCropColor, GetCropEmoji, GetCropURL, GetEmbeddedTimestamp } from "../classes/Util.js";
+import { GetCropColor, GetCropEmoji, GetCropURL, GetEmbeddedTimestamp, UserHyperLink } from "../classes/Util.js";
 import { components } from "../api/api.js";
 import { GetReadableDate } from "../classes/SkyblockDate.js";
 
@@ -340,11 +340,11 @@ function getField(crop: string, scores?: components['schemas']['GuildJacobLeader
 
 	const first = scores[0];
 	const otherScores = scores.slice(1).map((s, i) => {
-		return `**${i + 2}.**⠀<@${s.discordId}>⠀${s.record?.collected?.toLocaleString()}⠀${GetEmbeddedTimestamp(s.record?.timestamp ?? 0)} [⧉](https://elitebot.dev/contest/${s.record?.timestamp ?? 0})`
+		return `**${i + 2}.**⠀${UserHyperLink(s.discordId, s.ign)}⠀${s.record?.collected?.toLocaleString()}⠀${GetEmbeddedTimestamp(s.record?.timestamp ?? 0)} [⧉](https://elitebot.dev/contest/${s.record?.timestamp ?? 0})`
 	}).join('\n');
 
 	const value = `
-		${GetCropEmoji(crop)} <@${first.discordId}>⠀**${first.record?.collected?.toLocaleString()}**⠀${GetEmbeddedTimestamp(first.record?.timestamp ?? 0)} [⧉](https://elitebot.dev/contest/${first.record?.timestamp ?? 0})
+		${GetCropEmoji(crop)} ${UserHyperLink(first.discordId, first.ign)}⠀**${first.record?.collected?.toLocaleString()}**⠀${GetEmbeddedTimestamp(first.record?.timestamp ?? 0)} [⧉](https://elitebot.dev/contest/${first.record?.timestamp ?? 0})
 		${otherScores}
 	`;
 

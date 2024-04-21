@@ -189,6 +189,10 @@ export function GetMedalEmoji(medal?: string) {
 	return '';
 }
 
+export function UserHyperLink(userId?: Snowflake, name?: string) {
+	return `[@${name}](discord://-/users/${userId})`;
+}
+
 export function CropSelectRow(customId = 'crop-select', placeholder = 'Select a crop!') {
 	const options = Object.entries(CropEmojis).map(([name, emoji], i) => ({
 		label: name,
