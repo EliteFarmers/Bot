@@ -190,7 +190,7 @@ export function GetMedalEmoji(medal?: string) {
 }
 
 export function UserHyperLink(userId?: Snowflake) {
-	return `<@${userId}>[⟳](discord://-/users/${userId})`;
+	return `<@${userId}> [⟳](discord://-/users/${userId})`;
 }
 
 export function CropSelectRow(customId = 'crop-select', placeholder = 'Select a crop!') {
