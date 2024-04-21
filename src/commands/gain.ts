@@ -65,7 +65,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		return;
 	}
 
-	const { data: collections } = await FetchCollectionGraphs(account.id, profile.profileId)
+	const { data: collections } = await FetchCollectionGraphs(account.id, profile.profileId, 9, 1)
 		.catch(() => ({ data: undefined }));
 
 	// const { data: skills } = await FetchSkillGraphs(account.id, profile.profileId)
@@ -110,26 +110,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		const start = +(point.timestamp ?? 0)
 
 		// Find next point that's under 24 hours later
-		let lastPoint = point;
-		for (let j = i + 1; j < dataPoints.length; j++) {
-			const nextPoint = dataPoints[j];
-			const time = +(nextPoint.timestamp ?? 0);
-
-			const difference = time - start;
-
-			if (difference <= 24 * 60 * 60) {
-				lastPoint = nextPoint;
-				// Include this point in the current day
-				i++;
-			} else {
-				break;
-			}
-		}
-
-		// Use lastPoint as first point for next day
-		if (lastPoint !== point) {
-			i--;
-		}
+		const lastPoint = dataPoints.at(i + 1) ?? point;
 
 		const cropGains = Object.entries(lastPoint.crops ?? {})
 			.reduce<Record<string, number>>((gains, current) => {

@@ -152,6 +152,7 @@
             "required": true,
             "style": "simple",
             "schema": {
+              "minLength": 17,
               "type": "integer",
               "format": "int64"
             }
@@ -3321,10 +3322,12 @@
         "tags": [
           "Graph"
         ],
+        "summary": "Crop Collections Over Time",
         "parameters": [
           {
             "name": "playerUuid",
             "in": "path",
+            "description": "",
             "required": true,
             "style": "simple",
             "schema": {
@@ -3336,6 +3339,7 @@
           {
             "name": "profileUuid",
             "in": "path",
+            "description": "",
             "required": true,
             "style": "simple",
             "schema": {
@@ -3347,6 +3351,7 @@
           {
             "name": "days",
             "in": "query",
+            "description": "Amount of days after the \"from\" time to include",
             "style": "form",
             "schema": {
               "type": "integer",
@@ -3357,17 +3362,29 @@
           {
             "name": "from",
             "in": "query",
+            "description": "Unix timestamp in seconds for the start of the data to return",
             "style": "form",
             "schema": {
               "type": "integer",
               "format": "int64",
               "default": 0
             }
+          },
+          {
+            "name": "perDay",
+            "in": "query",
+            "description": "Data points returned per 24 hour period",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 4
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Returns the list of data points",
             "content": {
               "text/plain": {
                 "schema": {
@@ -3443,10 +3460,12 @@
         "tags": [
           "Graph"
         ],
+        "summary": "Skill XP Over Time",
         "parameters": [
           {
             "name": "playerUuid",
             "in": "path",
+            "description": "",
             "required": true,
             "style": "simple",
             "schema": {
@@ -3458,6 +3477,7 @@
           {
             "name": "profileUuid",
             "in": "path",
+            "description": "",
             "required": true,
             "style": "simple",
             "schema": {
@@ -3479,17 +3499,29 @@
           {
             "name": "from",
             "in": "query",
+            "description": "Unix timestamp in seconds for the start of the data to return",
             "style": "form",
             "schema": {
               "type": "integer",
               "format": "int64",
               "default": 0
             }
+          },
+          {
+            "name": "perDay",
+            "in": "query",
+            "description": "Data points returned per 24 hour period",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 4
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Returns the list of data points",
             "content": {
               "text/plain": {
                 "schema": {
@@ -3565,10 +3597,12 @@
         "tags": [
           "Graph"
         ],
+        "summary": "Admin: Crop Collections Over Time",
         "parameters": [
           {
             "name": "playerUuid",
             "in": "path",
+            "description": "",
             "required": true,
             "style": "simple",
             "schema": {
@@ -3580,6 +3614,7 @@
           {
             "name": "profileUuid",
             "in": "path",
+            "description": "",
             "required": true,
             "style": "simple",
             "schema": {
@@ -3591,6 +3626,7 @@
           {
             "name": "days",
             "in": "query",
+            "description": "",
             "style": "form",
             "schema": {
               "type": "integer",
@@ -3601,6 +3637,7 @@
           {
             "name": "from",
             "in": "query",
+            "description": "",
             "style": "form",
             "schema": {
               "type": "integer",
@@ -3707,10 +3744,12 @@
         "tags": [
           "Graph"
         ],
+        "summary": "Admin: Skill XP Over Time",
         "parameters": [
           {
             "name": "playerUuid",
             "in": "path",
+            "description": "",
             "required": true,
             "style": "simple",
             "schema": {
@@ -3722,6 +3761,7 @@
           {
             "name": "profileUuid",
             "in": "path",
+            "description": "",
             "required": true,
             "style": "simple",
             "schema": {
@@ -3733,6 +3773,7 @@
           {
             "name": "days",
             "in": "query",
+            "description": "",
             "style": "form",
             "schema": {
               "type": "integer",
@@ -3743,6 +3784,7 @@
           {
             "name": "from",
             "in": "query",
+            "description": "",
             "style": "form",
             "schema": {
               "type": "integer",
@@ -7807,6 +7849,13 @@
             "nullable": true
           },
           "attributes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "gems": {
             "type": "object",
             "additionalProperties": {
               "type": "string"

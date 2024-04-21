@@ -289,7 +289,7 @@ export const GrantUserBadge = (playerUuid: string, badgeId: number) =>
 		}
 	});
 
-export const FetchCollectionGraphs = (playerUuid: string, profileUuid: string, days?: number) =>
+export const FetchCollectionGraphs = (playerUuid: string, profileUuid: string, days?: number, perDay?: number) =>
 	GET('/Graph/{playerUuid}/{profileUuid}/crops', {
 		params: {
 			path: {
@@ -297,12 +297,13 @@ export const FetchCollectionGraphs = (playerUuid: string, profileUuid: string, d
 				profileUuid
 			},
 			query: {
-				days
+				days,
+				perDay
 			}
 		}
 	});
 
-export const FetchSkillGraphs = (playerUuid: string, profileUuid: string, days?: number) =>
+export const FetchSkillGraphs = (playerUuid: string, profileUuid: string, days?: number, perDay?: number) =>
 	GET('/Graph/{playerUuid}/{profileUuid}/skills', {
 		params: {
 			path: {
@@ -310,7 +311,8 @@ export const FetchSkillGraphs = (playerUuid: string, profileUuid: string, days?:
 				profileUuid
 			},
 			query: {
-				days
+				days,
+				perDay
 			}
 		}
 	})

@@ -1402,11 +1402,16 @@ export interface paths {
     };
   };
   "/Graph/{playerUuid}/{profileUuid}/crops": {
+    /** Crop Collections Over Time */
     get: {
       parameters: {
         query?: {
+          /** @description Amount of days after the "from" time to include */
           days?: number;
+          /** @description Unix timestamp in seconds for the start of the data to return */
           from?: number;
+          /** @description Data points returned per 24 hour period */
+          perDay?: number;
         };
         path: {
           playerUuid: string;
@@ -1414,7 +1419,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description Returns the list of data points */
         200: {
           content: {
             "text/plain": components["schemas"]["CropCollectionsDataPointDto"][];
@@ -1442,11 +1447,15 @@ export interface paths {
     };
   };
   "/Graph/{playerUuid}/{profileUuid}/skills": {
+    /** Skill XP Over Time */
     get: {
       parameters: {
         query?: {
           days?: number;
+          /** @description Unix timestamp in seconds for the start of the data to return */
           from?: number;
+          /** @description Data points returned per 24 hour period */
+          perDay?: number;
         };
         path: {
           playerUuid: string;
@@ -1454,7 +1463,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description Returns the list of data points */
         200: {
           content: {
             "text/plain": components["schemas"]["CropCollectionsDataPointDto"][];
@@ -1482,6 +1491,7 @@ export interface paths {
     };
   };
   "/Graph/Admin/{playerUuid}/{profileUuid}/crops": {
+    /** Admin: Crop Collections Over Time */
     get: {
       parameters: {
         query?: {
@@ -1530,6 +1540,7 @@ export interface paths {
     };
   };
   "/Graph/Admin/{playerUuid}/{profileUuid}/skills": {
+    /** Admin: Skill XP Over Time */
     get: {
       parameters: {
         query?: {
@@ -3089,6 +3100,9 @@ export interface components {
         [key: string]: number | null;
       }) | null;
       attributes?: {
+        [key: string]: string;
+      } | null;
+      gems?: {
         [key: string]: string;
       } | null;
     };
