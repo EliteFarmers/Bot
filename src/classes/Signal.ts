@@ -1,5 +1,5 @@
 import { Client, MessageCreateOptions } from 'discord.js';
-import { client } from '../index.js';
+import { client } from '../bot.js';
 import { ErrorEmbed } from './embeds.js';
 
 // RabbitMQ Message "Signal"

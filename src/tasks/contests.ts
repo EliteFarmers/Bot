@@ -27,7 +27,7 @@ const cropKeys: Record<string, string> = {
 }
 
 async function execute(client: Client) {
-	console.log('Running contest ping task');
+	console.log('Running contest ping task. Shard: ' + client.shard?.ids[0]);
 	const { data: contests } = await GetCurrentContests().catch(() => ({ data: undefined }));
 	if (!contests?.complete) return;
 	
@@ -77,9 +77,8 @@ async function execute(client: Client) {
 		}
 
 		try {
-			const channel = client.channels.cache.get(pings.channelId)
-				?? await client.channels.fetch(pings.channelId).catch(() => undefined)
-				?? undefined;
+			const channel = client.channels.cache.get(pings.channelId);
+			if (!channel) continue; // Channel on another shard (or invalid)
 
 			if (!channel || !channel.isTextBased() || channel.isDMBased()) {
 				console.log(`Invalid channel (${pings.channelId}) for guild ${pings.guildId}`);

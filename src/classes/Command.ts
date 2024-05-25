@@ -1,6 +1,7 @@
 // This is to allow the generic "Function" to be used, as it's the easiest way to allow both types of commands
 /* eslint-disable @typescript-eslint/ban-types */
 import { AutocompleteInteraction, BaseInteraction, Client, ContextMenuCommandBuilder, Interaction, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
+import fs from 'fs';
 
 export interface CommandBase {
 	name: string,
@@ -126,4 +127,22 @@ export enum CommandAccess {
 export interface CronTask {
 	cron: string, 
 	execute: (client: Client) => void
+}
+
+export async function registerFiles<T>(folder: string, filter: (fileName: string) => boolean, callback: (data: T) => void) {
+	const files = fs.readdirSync(`./src/${folder}`);
+	
+	for (const file of files.filter(filter)) {
+		const imported = await import(`../${folder}/${file.replace('.ts', '.js')}`);
+		callback(imported.default);
+	}
+}
+
+export async function registerCommandGroups(folder: string, callback: (folder: string, group: CommandGroupSettings) => void) {
+	const files = fs.readdirSync(`./src/${folder}`).filter(fileName => fs.lstatSync(`./src/${folder}/${fileName}`).isDirectory());
+
+	for (const file of files) {
+		const imported = await import(`../${folder}/${file}/command.js`);
+		callback(`${folder}/${file}`, imported.default);
+	}
 }

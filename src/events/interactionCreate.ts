@@ -1,5 +1,5 @@
 import { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, CommandInteraction, ContextMenuCommandInteraction, Events, GuildMember, Interaction, StringSelectMenuInteraction } from 'discord.js';
-import { commands } from '../index.js';
+import { commands } from '../bot.js';
 import { Command, CommandGroup, CommandType } from '../classes/Command.js';
 import { HasRole, isValidAccess } from '../classes/Util.js';
 import { FetchGuild } from '../api/elite.js';
@@ -123,7 +123,7 @@ async function HasPermsAndAccess(command: Command | CommandGroup, interaction: C
 
 /*
 import { BaseInteraction, ChatInputCommandInteraction, Events } from "discord.js";
-import { commands } from "../index.js";
+import { commands } from "../bot.js";
 
 const settings = {
 	event: Events.InteractionCreate,

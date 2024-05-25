@@ -1,6 +1,6 @@
 import { connect } from 'amqplib';
 import { Signal } from '../classes/Signal.js';
-import { client, signals } from '../index.js';
+import { client, signals } from '../bot.js';
 
 const errorMsg = 'Failed to connect to RabbitMQ, message queue from EliteAPI will not work.\nPlease check your RABBITMQ_URL env variable.\nThis is not an issue if you are not using EliteAPI\'s message queue.';
 
@@ -45,7 +45,7 @@ export async function ConnectToRMQ() {
 		const signal = new Signal(msg.content.toString());
 
 		if (!signal.name || !signal.authorId || !signal.guildId) return;
-		if (!client.guilds.cache.has(signal.guildId)) return;
+		if (!client.guilds.cache.has(signal.guildId)) return; // Wrong shard
 
 		const info = signals.get(signal.name);
 		if (!info) return;
