@@ -45,7 +45,7 @@ export async function ConnectToRMQ() {
 		const signal = new Signal(msg.content.toString());
 
 		if (!signal.name || !signal.authorId || !signal.guildId) return;
-		if (!client.guilds.cache.has(signal.guildId)) return;
+		if (!client.guilds.cache.has(signal.guildId)) return; // Wrong shard
 
 		const info = signals.get(signal.name);
 		if (!info) return;

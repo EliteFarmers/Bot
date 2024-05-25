@@ -64,21 +64,26 @@ export const signals = new Collection<string, SignalRecieverOptions>();
 }());
 
 client.once(Events.ClientReady, async () => {
-	if (client.user) {
-		client.user.setActivity(`${client.guilds.cache.size} farming guilds`, { type: ActivityType.Watching });
-	}
-
 	// Update count every 2 hours
-	setInterval(() => {
-		if (client.user) {
-			client.user.setActivity(`${client.guilds.cache.size} farming guilds`, { type: ActivityType.Watching });
-		}
-	}, 1000 * 60 * 60 * 2);
+	updateActivity();
+	setInterval(updateActivity, 1000 * 60 * 60 * 2);
 
 	console.log('Ready!');
 
 	ConnectToRMQ();
 });
+
+async function updateActivity() {
+	if (!client.user) return;
+	
+	let guilds = client.guilds.cache.size;
+	if (client.shard) {
+		const counts = await client.shard.fetchClientValues('guilds.cache.size');
+		guilds = counts.reduce<number>((acc, curr) => Number(acc) + Number(curr), 0);
+	}
+	
+	client.user.setActivity(`${guilds} guilds (${client.shard?.ids[0]})`, { type: ActivityType.Watching });
+}
 
 client.login(process.env.BOT_TOKEN);
 
