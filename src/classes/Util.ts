@@ -8,7 +8,7 @@ import {
 	ActionRowBuilder,
 	StringSelectMenuBuilder,
 } from 'discord.js';
-import { client } from '../index.js';
+import { client } from '../bot.js';
 import { CommandAccess } from './Command.js';
 
 export function isValidAccess(
