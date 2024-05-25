@@ -1,6 +1,6 @@
 // This is to allow the generic "Function" to be used, as it's the easiest way to allow both types of commands
 /* eslint-disable @typescript-eslint/ban-types */
-import { AutocompleteInteraction, BaseInteraction, Client, ContextMenuCommandBuilder, Interaction, SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
+import { AutocompleteInteraction, BaseInteraction, Client, ContextMenuCommandBuilder, Interaction, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
 
 export interface CommandBase {
 	name: string,
@@ -8,7 +8,7 @@ export interface CommandBase {
 }
 
 export interface Command extends CommandBase {
-	slash?: SlashCommandBuilder | ContextMenuCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'> | SlashCommandSubcommandsOnlyBuilder
+	slash?: SlashCommandBuilder | ContextMenuCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'> | SlashCommandSubcommandsOnlyBuilder | SlashCommandOptionsOnlyBuilder,
 	
 	aliases?: string[],
 	usage?: string,
