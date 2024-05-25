@@ -5,15 +5,24 @@
 
 
 export interface paths {
-  "/Account": {
+  "/account": {
+    /** Get logged in Minecraft account */
     get: {
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["AuthorizedAccountDto"];
             "application/json": components["schemas"]["AuthorizedAccountDto"];
             "text/json": components["schemas"]["AuthorizedAccountDto"];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
           };
         };
         /** @description Unauthorized */
@@ -27,16 +36,19 @@ export interface paths {
       };
     };
   };
-  "/Account/Search": {
+  "/account/search": {
+    /** Search for Minecraft IGNs */
     get: {
       parameters: {
         query?: {
+          /** @description Query string */
           q?: string;
+          /** @description Start of results for pagination */
           start?: string;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": string[];
@@ -55,7 +67,8 @@ export interface paths {
       };
     };
   };
-  "/Account/{discordId}": {
+  "/account/{discordId}": {
+    /** Get Minecraft account by Discord ID */
     get: {
       parameters: {
         path: {
@@ -63,7 +76,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["MinecraftAccountDto"];
@@ -90,7 +103,8 @@ export interface paths {
       };
     };
   };
-  "/Account/{playerUuidOrIgn}": {
+  "/account/{playerUuidOrIgn}": {
+    /** Get Minecraft account by IGN or UUID */
     get: {
       parameters: {
         path: {
@@ -98,7 +112,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["MinecraftAccountDto"];
@@ -116,6 +130,7 @@ export interface paths {
         };
       };
     };
+    /** Link a Minecraft account to a Discord account */
     post: {
       parameters: {
         path: {
@@ -123,7 +138,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -137,6 +152,7 @@ export interface paths {
         };
       };
     };
+    /** Unlink a Minecraft account from a Discord account */
     delete: {
       parameters: {
         path: {
@@ -144,7 +160,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -159,7 +175,8 @@ export interface paths {
       };
     };
   };
-  "/Account/primary/{playerUuidOrIgn}": {
+  "/account/primary/{playerUuidOrIgn}": {
+    /** Mark a Minecraft account as primary */
     post: {
       parameters: {
         path: {
@@ -167,7 +184,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -182,10 +199,11 @@ export interface paths {
       };
     };
   };
-  "/Admins": {
+  "/admins": {
+    /** Get list of members with roles */
     get: {
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["AccountWithPermsDto"][];
@@ -212,7 +230,8 @@ export interface paths {
       };
     };
   };
-  "/Admin/Permissions/{memberId}/{permission}": {
+  "/admin/permissions/{memberId}/{permission}": {
+    /** Add member permissions */
     post: {
       parameters: {
         path: {
@@ -221,7 +240,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -251,6 +270,7 @@ export interface paths {
         };
       };
     };
+    /** Remove member permissions */
     delete: {
       parameters: {
         path: {
@@ -259,7 +279,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -290,12 +310,17 @@ export interface paths {
       };
     };
   };
-  "/Admin/UpcomingContests": {
-    delete: {
+  "/roles": {
+    /** Get list of roles */
+    get: {
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
-          content: never;
+          content: {
+            "text/plain": string[];
+            "application/json": string[];
+            "text/json": string[];
+          };
         };
         /** @description Unauthorized */
         401: {
@@ -316,16 +341,19 @@ export interface paths {
       };
     };
   };
-  "/Admin/Badges/{playerUuid}/{badgeId}": {
+  "/admin/user/{userId}/roles/{role}": {
+    /** Add a role to a user */
     post: {
       parameters: {
         path: {
-          playerUuid: string;
-          badgeId: number;
+          /** @description Member id */
+          userId: string;
+          /** @description Role name */
+          role: string;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -355,15 +383,18 @@ export interface paths {
         };
       };
     };
+    /** Remove a role from a user */
     delete: {
       parameters: {
         path: {
-          playerUuid: string;
-          badgeId: number;
+          /** @description Member id */
+          userId: string;
+          /** @description Role name */
+          role: string;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -394,56 +425,11 @@ export interface paths {
       };
     };
   };
-  "/Admin/Badges": {
-    post: {
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["CreateBadgeDto"];
-          "text/json": components["schemas"]["CreateBadgeDto"];
-          "application/*+json": components["schemas"]["CreateBadgeDto"];
-        };
-      };
-      responses: {
-        /** @description Success */
-        200: {
-          content: never;
-        };
-        /** @description Unauthorized */
-        401: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-        /** @description Forbidden */
-        403: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-        /** @description Not Found */
-        404: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-      };
-    };
-  };
-  "/Admin/Badges/{badgeId}": {
+  "/admin/upcomingcontests": {
+    /** Delete cached upcoming contests */
     delete: {
-      parameters: {
-        path: {
-          badgeId: number;
-        };
-      };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -457,58 +443,6 @@ export interface paths {
         };
         /** @description Forbidden */
         403: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-        /** @description Not Found */
-        404: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-      };
-    };
-    patch: {
-      parameters: {
-        path: {
-          badgeId: number;
-        };
-      };
-      requestBody?: {
-        content: {
-          "application/json": components["schemas"]["EditBadgeDto"];
-          "text/json": components["schemas"]["EditBadgeDto"];
-          "application/*+json": components["schemas"]["EditBadgeDto"];
-        };
-      };
-      responses: {
-        /** @description Success */
-        200: {
-          content: never;
-        };
-        /** @description Unauthorized */
-        401: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-        /** @description Forbidden */
-        403: {
-          content: {
-            "text/plain": string;
-            "application/json": string;
-            "text/json": string;
-          };
-        };
-        /** @description Not Found */
-        404: {
           content: {
             "text/plain": string;
             "application/json": string;
@@ -518,15 +452,16 @@ export interface paths {
       };
     };
   };
-  "/Event/create": {
+  "/event/create": {
+    /** Create a Farming Weight Event */
     post: {
       requestBody?: {
         content: {
-          "application/json": components["schemas"]["EditEventDto"];
+          "application/json": components["schemas"]["CreateWeightEventDto"];
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["EventDetailsDto"];
@@ -561,7 +496,52 @@ export interface paths {
       };
     };
   };
-  "/Event/{eventId}/edit": {
+  "/event/create/medals": {
+    /** Create a Medal Collection Event */
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["CreateMedalEventDto"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["EventDetailsDto"];
+            "application/json": components["schemas"]["EventDetailsDto"];
+            "text/json": components["schemas"]["EventDetailsDto"];
+          };
+        };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
+  "/event/{eventId}/edit": {
+    /** Edit an Event */
     post: {
       parameters: {
         path: {
@@ -574,7 +554,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["EventDetailsDto"];
@@ -601,7 +581,8 @@ export interface paths {
       };
     };
   };
-  "/Event/{eventId}/bans": {
+  "/event/{eventId}/bans": {
+    /** Get banned members from an event */
     get: {
       parameters: {
         path: {
@@ -609,7 +590,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["EventMemberBannedDto"][];
@@ -636,7 +617,8 @@ export interface paths {
       };
     };
   };
-  "/Event/{eventId}/bans/{playerUuid}": {
+  "/event/{eventId}/bans/{playerUuid}": {
+    /** Ban a member from an event */
     post: {
       parameters: {
         path: {
@@ -652,7 +634,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["EventMemberBannedDto"][];
@@ -678,6 +660,7 @@ export interface paths {
         };
       };
     };
+    /** Unban a member from an event */
     delete: {
       parameters: {
         path: {
@@ -686,7 +669,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -709,10 +692,103 @@ export interface paths {
       };
     };
   };
-  "/Badges": {
+  "/auth/me": {
+    /**
+     * Get logged in account
+     * @description Used to get session information from the token
+     */
     get: {
       responses: {
-        /** @description Success */
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["AuthSessionDto"];
+            "application/json": components["schemas"]["AuthSessionDto"];
+            "text/json": components["schemas"]["AuthSessionDto"];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
+  "/auth/login": {
+    /**
+     * Login with Discord credentials
+     * @description Used for [the website](https://elitebot.dev/) to login users with Discord
+     */
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["DiscordLoginDto"];
+          "text/json": components["schemas"]["DiscordLoginDto"];
+          "application/*+json": components["schemas"]["DiscordLoginDto"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["AuthResponseDto"];
+            "application/json": components["schemas"]["AuthResponseDto"];
+            "text/json": components["schemas"]["AuthResponseDto"];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": components["schemas"]["ProblemDetails"];
+            "application/json": components["schemas"]["ProblemDetails"];
+            "text/json": components["schemas"]["ProblemDetails"];
+          };
+        };
+      };
+    };
+  };
+  "/auth/refresh": {
+    /**
+     * Refresh users tokens
+     * @description Used for [the website](https://elitebot.dev/) to refresh user logins
+     */
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["AuthResponseDto"];
+          "text/json": components["schemas"]["AuthResponseDto"];
+          "application/*+json": components["schemas"]["AuthResponseDto"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["AuthResponseDto"];
+            "application/json": components["schemas"]["AuthResponseDto"];
+            "text/json": components["schemas"]["AuthResponseDto"];
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": components["schemas"]["ProblemDetails"];
+            "application/json": components["schemas"]["ProblemDetails"];
+            "text/json": components["schemas"]["ProblemDetails"];
+          };
+        };
+      };
+    };
+  };
+  "/badges": {
+    /** Get all badges */
+    get: {
+      responses: {
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["BadgeDto"][];
@@ -723,15 +799,232 @@ export interface paths {
       };
     };
   };
-  "/Bot/{guildId}": {
+  "/badge/user/{playerUuid}/{badgeId}": {
+    /** Add a badge to a user */
+    post: {
+      parameters: {
+        path: {
+          /** @description Player UUID (no hyphens) */
+          playerUuid: string;
+          /** @description Badge ID */
+          badgeId: number;
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: never;
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+    /** Remove a badge from a user */
+    delete: {
+      parameters: {
+        path: {
+          /** @description Player UUID (no hyphens) */
+          playerUuid: string;
+          /** @description Badge ID */
+          badgeId: number;
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: never;
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
+  "/badge": {
+    /** Create a new badge */
+    post: {
+      /** @description Badge information */
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["CreateBadgeDto"];
+          "text/json": components["schemas"]["CreateBadgeDto"];
+          "application/*+json": components["schemas"]["CreateBadgeDto"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: never;
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
+  "/badge/{badgeId}": {
+    /** Delete a badge */
+    delete: {
+      parameters: {
+        path: {
+          /** @description Badge ID */
+          badgeId: number;
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: never;
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+    /** Edit a badge */
+    patch: {
+      parameters: {
+        path: {
+          /** @description Badge ID */
+          badgeId: number;
+        };
+      };
+      /** @description New values */
+      requestBody?: {
+        content: {
+          "application/json": components["schemas"]["EditBadgeDto"];
+          "text/json": components["schemas"]["EditBadgeDto"];
+          "application/*+json": components["schemas"]["EditBadgeDto"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: never;
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Forbidden */
+        403: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+      };
+    };
+  };
+  "/bot/{guildId}": {
+    /** Get a guild by ID */
     get: {
       parameters: {
         path: {
+          /** @description Discord server (guild) ID */
           guildId: number;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["GuildDto"];
@@ -750,7 +1043,8 @@ export interface paths {
       };
     };
   };
-  "/Bot/{guildId}/jacob": {
+  "/bot/{guildId}/jacob": {
+    /** Get Jacob Leaderboard feature for a guild */
     get: {
       parameters: {
         path: {
@@ -758,7 +1052,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["GuildJacobLeaderboardFeature"];
@@ -784,6 +1078,7 @@ export interface paths {
         };
       };
     };
+    /** Update Jacob Leaderboard feature for a guild */
     put: {
       parameters: {
         path: {
@@ -798,7 +1093,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -821,10 +1116,11 @@ export interface paths {
       };
     };
   };
-  "/Bot/ContestPings": {
+  "/bot/contestpings": {
+    /** Get list of guilds with Contest Pings enabled */
     get: {
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["ContestPingsFeatureDto"][];
@@ -835,7 +1131,8 @@ export interface paths {
       };
     };
   };
-  "/Bot/ContestPings/{guildId}": {
+  "/bot/contestpings/{guildId}": {
+    /** Delete Contest Pings feature for a guild */
     delete: {
       parameters: {
         query?: {
@@ -846,7 +1143,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -861,7 +1158,8 @@ export interface paths {
       };
     };
   };
-  "/Bot/account": {
+  "/bot/account": {
+    /** Update user's Discord account */
     patch: {
       requestBody?: {
         content: {
@@ -871,7 +1169,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["AuthorizedAccountDto"];
@@ -882,7 +1180,8 @@ export interface paths {
       };
     };
   };
-  "/Bot/Badges/{playerUuid}/{badgeId}": {
+  "/bot/badges/{playerUuid}/{badgeId}": {
+    /** Add a badge to a player */
     post: {
       parameters: {
         path: {
@@ -891,7 +1190,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -921,6 +1220,7 @@ export interface paths {
         };
       };
     };
+    /** Remove a badge from a player */
     delete: {
       parameters: {
         path: {
@@ -929,7 +1229,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -960,7 +1260,8 @@ export interface paths {
       };
     };
   };
-  "/Bot/account/{discordId}/{playerIgnOrUuid}": {
+  "/bot/account/{discordId}/{playerIgnOrUuid}": {
+    /** Link a Minecraft account to a Discord account */
     post: {
       parameters: {
         path: {
@@ -969,12 +1270,13 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
       };
     };
+    /** Unlink a Minecraft account from a Discord account */
     delete: {
       parameters: {
         path: {
@@ -983,14 +1285,15 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
       };
     };
   };
-  "/Bot/account/{discordId}/{playerIgnOrUuid}/primary": {
+  "/bot/account/{discordId}/{playerIgnOrUuid}/primary": {
+    /** Set a Minecraft account as primary */
     post: {
       parameters: {
         path: {
@@ -999,25 +1302,28 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
       };
     };
   };
-  "/Contests/at/{year}": {
+  "/contests/at/{year}": {
+    /** Get all contests in a year */
     get: {
       parameters: {
         query?: {
+          /** @description Use current year */
           now?: boolean;
         };
         path: {
+          /** @description Skyblock Year */
           year: number;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["YearlyContestsDto"];
@@ -1028,15 +1334,17 @@ export interface paths {
       };
     };
   };
-  "/Contests/Records/{year}": {
+  "/contests/records/{year}": {
+    /** Get contest records for a specific year */
     get: {
       parameters: {
         path: {
+          /** @description Skyblock Year */
           year: number;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["YearlyCropRecordsDto"];
@@ -1055,10 +1363,15 @@ export interface paths {
       };
     };
   };
-  "/Contests/at/now": {
+  "/contests/at/now": {
+    /**
+     * Get upcoming contests for the current year
+     * @description Uses crowd-sourced data, may be inaccurate.
+     * Data used and provided by [SkyHanni](https://github.com/hannibal002/SkyHanni/) to display upcoming contests.
+     */
     get: {
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["YearlyContestsDto"];
@@ -1068,6 +1381,11 @@ export interface paths {
         };
       };
     };
+    /**
+     * Upload upcoming contests for the current year
+     * @description Submit this Skyblock year's contests to the API.
+     * Used by [SkyHanni](https://github.com/hannibal002/SkyHanni/) to crowd-source upcoming contests.
+     */
     post: {
       requestBody?: {
         content: {
@@ -1083,7 +1401,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -1098,17 +1416,21 @@ export interface paths {
       };
     };
   };
-  "/Contests/at/{year}/{month}/{day}": {
+  "/contests/at/{year}/{month}/{day}": {
+    /** Get all contests in a day */
     get: {
       parameters: {
         path: {
+          /** @description Skyblock Year */
           year: number;
+          /** @description Skyblock Month */
           month: number;
+          /** @description Skyblock Day */
           day: number;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["JacobContestWithParticipationsDto"][];
@@ -1127,16 +1449,19 @@ export interface paths {
       };
     };
   };
-  "/Contests/at/{year}/{month}": {
+  "/contests/at/{year}/{month}": {
+    /** Get all contests in a month */
     get: {
       parameters: {
         path: {
+          /** @description Skyblock Year */
           year: number;
+          /** @description Skyblock Month */
           month: number;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": {
@@ -1161,15 +1486,17 @@ export interface paths {
       };
     };
   };
-  "/Contests/{timestamp}": {
+  "/contests/{timestamp}": {
+    /** Get the three contests for a specific skyblock day */
     get: {
       parameters: {
         path: {
+          /** @description Unix timestamp in seconds */
           timestamp: number;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["JacobContestWithParticipationsDto"][];
@@ -1188,7 +1515,11 @@ export interface paths {
       };
     };
   };
-  "/Contest/{contestKey}": {
+  "/contest/{contestKey}": {
+    /**
+     * Get contest from Hypixel contest key
+     * @description Example key: "285:2_11:CACTUS"
+     */
     get: {
       parameters: {
         path: {
@@ -1196,7 +1527,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["JacobContestWithParticipationsDto"];
@@ -1223,10 +1554,11 @@ export interface paths {
       };
     };
   };
-  "/Events": {
+  "/events": {
+    /** Get all upcoming events */
     get: {
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["EventDetailsDto"][];
@@ -1237,7 +1569,8 @@ export interface paths {
       };
     };
   };
-  "/Event/{eventId}": {
+  "/event/{eventId}": {
+    /** Get an event by ID */
     get: {
       parameters: {
         path: {
@@ -1245,7 +1578,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["EventDetailsDto"];
@@ -1264,7 +1597,8 @@ export interface paths {
       };
     };
   };
-  "/Event/{eventId}/members": {
+  "/event/{eventId}/members": {
+    /** Get members of an event */
     get: {
       parameters: {
         path: {
@@ -1272,12 +1606,12 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
-            "text/plain": components["schemas"]["EventMemberDto"][];
-            "application/json": components["schemas"]["EventMemberDto"][];
-            "text/json": components["schemas"]["EventMemberDto"][];
+            "text/plain": components["schemas"]["EventMemberDetailsDto"][];
+            "application/json": components["schemas"]["EventMemberDetailsDto"][];
+            "text/json": components["schemas"]["EventMemberDetailsDto"][];
           };
         };
         /** @description Not Found */
@@ -1291,7 +1625,8 @@ export interface paths {
       };
     };
   };
-  "/Event/{eventId}/member/{playerUuid}": {
+  "/event/{eventId}/member/{playerUuid}": {
+    /** Get a member of an event */
     get: {
       parameters: {
         path: {
@@ -1300,7 +1635,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["EventMemberDto"][];
@@ -1327,7 +1662,8 @@ export interface paths {
       };
     };
   };
-  "/Event/{eventId}/join": {
+  "/event/{eventId}/join": {
+    /** Join an event */
     post: {
       parameters: {
         query?: {
@@ -1339,7 +1675,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["EventDetailsDto"];
@@ -1366,7 +1702,8 @@ export interface paths {
       };
     };
   };
-  "/Event/{eventId}/leave": {
+  "/event/{eventId}/leave": {
+    /** Leave an event */
     post: {
       parameters: {
         path: {
@@ -1374,7 +1711,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["EventDetailsDto"];
@@ -1401,12 +1738,12 @@ export interface paths {
       };
     };
   };
-  "/Graph/{playerUuid}/{profileUuid}/crops": {
+  "/graph/{playerUuid}/{profileUuid}/crops": {
     /** Crop Collections Over Time */
     get: {
       parameters: {
         query?: {
-          /** @description Amount of days after the "from" time to include */
+          /** @description Amount of days after the "from" timestamp to include */
           days?: number;
           /** @description Unix timestamp in seconds for the start of the data to return */
           from?: number;
@@ -1446,11 +1783,12 @@ export interface paths {
       };
     };
   };
-  "/Graph/{playerUuid}/{profileUuid}/skills": {
+  "/graph/{playerUuid}/{profileUuid}/skills": {
     /** Skill XP Over Time */
     get: {
       parameters: {
         query?: {
+          /** @description Amount of days after the "from" timestamp to include */
           days?: number;
           /** @description Unix timestamp in seconds for the start of the data to return */
           from?: number;
@@ -1490,7 +1828,7 @@ export interface paths {
       };
     };
   };
-  "/Graph/Admin/{playerUuid}/{profileUuid}/crops": {
+  "/graph/admin/{playerUuid}/{profileUuid}/crops": {
     /** Admin: Crop Collections Over Time */
     get: {
       parameters: {
@@ -1504,7 +1842,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["CropCollectionsDataPointDto"][];
@@ -1539,7 +1877,7 @@ export interface paths {
       };
     };
   };
-  "/Graph/Admin/{playerUuid}/{profileUuid}/skills": {
+  "/graph/admin/{playerUuid}/{profileUuid}/skills": {
     /** Admin: Skill XP Over Time */
     get: {
       parameters: {
@@ -1553,7 +1891,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["SkillsDataPointDto"][];
@@ -1588,10 +1926,11 @@ export interface paths {
       };
     };
   };
-  "/Guilds": {
+  "/guilds": {
+    /** Get list of public guilds */
     get: {
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["GuildDetailsDto"][];
@@ -1602,15 +1941,17 @@ export interface paths {
       };
     };
   };
-  "/Guild/{guildId}": {
+  "/guild/{guildId}": {
+    /** Get guild by ID */
     get: {
       parameters: {
         path: {
+          /** @description Discord server (guild) ID */
           guildId: number;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["PublicGuildDto"];
@@ -1637,15 +1978,17 @@ export interface paths {
       };
     };
   };
-  "/Guild/{guildId}/Events": {
+  "/guild/{guildId}/events": {
+    /** Get guild events */
     get: {
       parameters: {
         path: {
+          /** @description Discord server (guild) ID */
           guildId: number;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["EventDetailsDto"][];
@@ -1672,19 +2015,38 @@ export interface paths {
       };
     };
   };
-  "/Leaderboard/{id}": {
+  "/leaderboards": {
+    /** Get a list of leaderboards */
+    get: {
+      responses: {
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["ConfigLeaderboardSettings"];
+            "application/json": components["schemas"]["ConfigLeaderboardSettings"];
+            "text/json": components["schemas"]["ConfigLeaderboardSettings"];
+          };
+        };
+      };
+    };
+  };
+  "/leaderboard/{id}": {
+    /** Get a leaderboard by ID */
     get: {
       parameters: {
         query?: {
+          /** @description Starting offset for returned entries */
           offset?: number;
+          /** @description Maximum amount of returned entries */
           limit?: number;
         };
         path: {
+          /** @description Any leaderboard ID */
           id: string;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["LeaderboardDto"];
@@ -1703,19 +2065,23 @@ export interface paths {
       };
     };
   };
-  "/Leaderboard/skill/{skillName}": {
+  "/leaderboard/skill/{skillName}": {
+    /** Get a skill leaderboard by name */
     get: {
       parameters: {
         query?: {
+          /** @description Starting offset for returned entries */
           offset?: number;
+          /** @description Maximum amount of returned entries */
           limit?: number;
         };
         path: {
+          /** @description A skill name */
           skillName: string;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["LeaderboardDto"];
@@ -1734,19 +2100,23 @@ export interface paths {
       };
     };
   };
-  "/Leaderboard/collection/{collection}": {
+  "/leaderboard/collection/{collection}": {
+    /** Get a crop collection leaderboard by name */
     get: {
       parameters: {
         query?: {
+          /** @description Starting offset for returned entries */
           offset?: number;
+          /** @description Maximum amount of returned entries */
           limit?: number;
         };
         path: {
+          /** @description A crop collection name */
           collection: string;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["LeaderboardDto"];
@@ -1765,16 +2135,19 @@ export interface paths {
       };
     };
   };
-  "/Leaderboard/ranks/{playerUuid}/{profileUuid}": {
+  "/leaderboard/ranks/{playerUuid}/{profileUuid}": {
+    /** Get a player's leaderboard ranks */
     get: {
       parameters: {
         path: {
+          /** @description Player Uuid (no hyphens) */
           playerUuid: string;
+          /** @description Profile Uuid (no hyphens) */
           profileUuid: string;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["LeaderboardPositionsDto"];
@@ -1793,21 +2166,27 @@ export interface paths {
       };
     };
   };
-  "/Leaderboard/rank/{leaderboardId}/{playerUuid}/{profileUuid}": {
+  "/leaderboard/rank/{leaderboardId}/{playerUuid}/{profileUuid}": {
+    /** Get a player's rank in a leaderboard */
     get: {
       parameters: {
         query?: {
+          /** @description Include upcoming players */
           includeUpcoming?: boolean;
+          /** @description Starting rank for upcoming players */
           atRank?: number;
         };
         path: {
+          /** @description Any leaderboard ID */
           leaderboardId: string;
+          /** @description Player Uuid (no hyphens) */
           playerUuid: string;
+          /** @description Profile Uuid (no hyphens) */
           profileUuid: string;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["LeaderboardPositionDto"];
@@ -1826,32 +2205,17 @@ export interface paths {
       };
     };
   };
-  "/Login/callback": {
+  "/graph/medals/now": {
+    /** Get current average medal brackets */
     get: {
       parameters: {
         query?: {
-          code?: string;
-          state?: string;
-          error?: string;
-        };
-      };
-      responses: {
-        /** @description Success */
-        200: {
-          content: never;
-        };
-      };
-    };
-  };
-  "/Graph/Medals/now": {
-    get: {
-      parameters: {
-        query?: {
+          /** @description Amount of previous Skyblock months to include */
           months?: number;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["ContestBracketsDetailsDto"];
@@ -1870,19 +2234,23 @@ export interface paths {
       };
     };
   };
-  "/Graph/Medals/{sbYear}/{sbMonth}": {
+  "/graph/medals/{sbYear}/{sbMonth}": {
+    /** Get medal brackets for a specific month */
     get: {
       parameters: {
         query?: {
+          /** @description Amount of previous Skyblock months to include */
           months?: number;
         };
         path: {
+          /** @description Skyblock Year */
           sbYear: number;
+          /** @description Skyblock Month */
           sbMonth: number;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["ContestBracketsDetailsDto"];
@@ -1901,19 +2269,23 @@ export interface paths {
       };
     };
   };
-  "/Graph/Medals/{sbYear}": {
+  "/graph/medals/{sbYear}": {
+    /** Get medal brackets for multiple years */
     get: {
       parameters: {
         query?: {
+          /** @description Amount of years to include */
           years?: number;
+          /** @description Amount of previous Skyblock months to include for each year */
           months?: number;
         };
         path: {
+          /** @description Starting Skyblock Year */
           sbYear: number;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["ContestBracketsDetailsDto"][];
@@ -1932,7 +2304,8 @@ export interface paths {
       };
     };
   };
-  "/Player/{playerUuidOrIgn}": {
+  "/player/{playerUuidOrIgn}": {
+    /** Get player data by UUID or IGN */
     get: {
       parameters: {
         path: {
@@ -1940,7 +2313,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["PlayerDataDto"];
@@ -1959,7 +2332,8 @@ export interface paths {
       };
     };
   };
-  "/Player/{discordId}": {
+  "/player/{discordId}": {
+    /** Get linked player data by Discord ID */
     get: {
       parameters: {
         path: {
@@ -1967,7 +2341,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["LinkedAccountsDto"];
@@ -1994,15 +2368,17 @@ export interface paths {
       };
     };
   };
-  "/Contests/{playerUuid}": {
+  "/contests/{playerUuid}": {
+    /** Get all contests of a player */
     get: {
       parameters: {
         path: {
+          /** @description Player UUID (no hyphens) */
           playerUuid: string;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["ContestParticipationDto"][];
@@ -2021,16 +2397,19 @@ export interface paths {
       };
     };
   };
-  "/Contests/{playerUuid}/{profileUuid}": {
+  "/contests/{playerUuid}/{profileUuid}": {
+    /** Get all contests for a profile member */
     get: {
       parameters: {
         path: {
+          /** @description Player UUID (no hyphens) */
           playerUuid: string;
+          /** @description Profile UUID (no hyphens) */
           profileUuid: string;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["ContestParticipationDto"][];
@@ -2049,15 +2428,17 @@ export interface paths {
       };
     };
   };
-  "/Contests/{playerUuid}/Selected": {
+  "/contests/{playerUuid}/selected": {
+    /** Get all contests for a selected profile member */
     get: {
       parameters: {
         path: {
+          /** @description Player UUID (no hyphens) */
           playerUuid: string;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["ContestParticipationDto"][];
@@ -2076,7 +2457,8 @@ export interface paths {
       };
     };
   };
-  "/Profile/{uuid}/Selected": {
+  "/profile/{uuid}/selected": {
+    /** Selected Profile Member */
     get: {
       parameters: {
         path: {
@@ -2084,7 +2466,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["ProfileMemberDto"];
@@ -2111,7 +2493,8 @@ export interface paths {
       };
     };
   };
-  "/Profile/{playerUuid}/{profileUuid}": {
+  "/profile/{playerUuid}/{profileUuid}": {
+    /** Profile Member */
     get: {
       parameters: {
         path: {
@@ -2120,7 +2503,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["ProfileMemberDto"];
@@ -2139,7 +2522,8 @@ export interface paths {
       };
     };
   };
-  "/Profile/{profileUuid}": {
+  "/profile/{profileUuid}": {
+    /** Get Profile Details */
     get: {
       parameters: {
         path: {
@@ -2147,7 +2531,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["ProfileDetailsDto"];
@@ -2166,7 +2550,8 @@ export interface paths {
       };
     };
   };
-  "/Profiles/{playerUuid}": {
+  "/profiles/{playerUuid}": {
+    /** Get List of Profile Details */
     get: {
       parameters: {
         path: {
@@ -2174,7 +2559,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["ProfileDetailsDto"][];
@@ -2193,10 +2578,31 @@ export interface paths {
       };
     };
   };
-  "/User/Guilds": {
+  "/profiles/{playerUuidOrIgn}/names": {
+    /** Get List of Profile Names */
+    get: {
+      parameters: {
+        path: {
+          playerUuidOrIgn: string;
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          content: {
+            "text/plain": components["schemas"]["ProfileNamesDto"][];
+            "application/json": components["schemas"]["ProfileNamesDto"][];
+            "text/json": components["schemas"]["ProfileNamesDto"][];
+          };
+        };
+      };
+    };
+  };
+  "/user/guilds": {
+    /** Get the user's guilds */
     get: {
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["UserGuildDto"][];
@@ -2204,10 +2610,19 @@ export interface paths {
             "text/json": components["schemas"]["UserGuildDto"][];
           };
         };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
       };
     };
   };
-  "/User/Guild/{guildId}": {
+  "/user/guild/{guildId}": {
+    /** Get the user's guild */
     get: {
       parameters: {
         path: {
@@ -2215,7 +2630,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["AuthorizedGuildDto"];
@@ -2223,10 +2638,35 @@ export interface paths {
             "text/json": components["schemas"]["AuthorizedGuildDto"];
           };
         };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
       };
     };
   };
-  "/User/Guild/{guildId}/Invite": {
+  "/user/guild/{guildId}/invite": {
+    /** Set the guild's Discord invite */
     put: {
       parameters: {
         path: {
@@ -2241,14 +2681,39 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
+        };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
         };
       };
     };
   };
-  "/User/Guild/{guildId}/Jacob": {
+  "/user/guild/{guildId}/jacob": {
+    /** Get the guild's Jacob Leaderboards */
     get: {
       parameters: {
         path: {
@@ -2256,7 +2721,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["GuildJacobLeaderboardFeature"];
@@ -2264,8 +2729,33 @@ export interface paths {
             "text/json": components["schemas"]["GuildJacobLeaderboardFeature"];
           };
         };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
       };
     };
+    /** Update the guild's Jacob Leaderboard feature */
     patch: {
       parameters: {
         path: {
@@ -2280,14 +2770,39 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
+        };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
         };
       };
     };
   };
-  "/User/Guild/{guildId}/Jacob/Leaderboard": {
+  "/user/guild/{guildId}/jacob/leaderboard": {
+    /** Add a guild Jacob Leaderboard */
     post: {
       parameters: {
         path: {
@@ -2302,14 +2817,39 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
+        };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
         };
       };
     };
   };
-  "/User/Guild/{guildId}/Jacob/{lbId}": {
+  "/user/guild/{guildId}/jacob/{lbId}": {
+    /** Replace a guild Jacob Leaderboard */
     put: {
       parameters: {
         path: {
@@ -2325,7 +2865,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["GuildJacobLeaderboardFeature"];
@@ -2333,8 +2873,33 @@ export interface paths {
             "text/json": components["schemas"]["GuildJacobLeaderboardFeature"];
           };
         };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
       };
     };
+    /** Delete a guild Jacob Leaderboard */
     delete: {
       parameters: {
         path: {
@@ -2343,14 +2908,39 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
+        };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
         };
       };
     };
   };
-  "/User/Guild/{guildId}/Jacob/{lbId}/Send": {
+  "/user/guild/{guildId}/jacob/{lbId}/send": {
+    /** Send a guild Jacob Leaderboard to Discord */
     post: {
       parameters: {
         path: {
@@ -2359,14 +2949,39 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
+        };
+        /** @description Bad Request */
+        400: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Unauthorized */
+        401: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
+        };
+        /** @description Not Found */
+        404: {
+          content: {
+            "text/plain": string;
+            "application/json": string;
+            "text/json": string;
+          };
         };
       };
     };
   };
-  "/User/Guild/{guildId}/ContestPings": {
+  "/user/guild/{guildId}/contestpings": {
+    /** Update the guild's contest ping feature */
     put: {
       parameters: {
         path: {
@@ -2403,6 +3018,7 @@ export interface paths {
         };
       };
     };
+    /** Remove the guild's contest ping feature */
     delete: {
       parameters: {
         query?: {
@@ -2413,7 +3029,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -2444,7 +3060,8 @@ export interface paths {
       };
     };
   };
-  "/User/Badges/{playerUuid}": {
+  "/user/badges/{playerUuid}": {
+    /** Update a user's badge settings */
     patch: {
       parameters: {
         path: {
@@ -2459,7 +3076,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: never;
         };
@@ -2490,15 +3107,17 @@ export interface paths {
       };
     };
   };
-  "/Weight/{playerUuid}": {
+  "/weight/{playerUuid}": {
+    /** Get farming weight for all profiles of a player */
     get: {
       parameters: {
         path: {
+          /** @description Player UUID */
           playerUuid: string;
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["FarmingWeightAllProfilesDto"];
@@ -2517,7 +3136,8 @@ export interface paths {
       };
     };
   };
-  "/Weight/{playerUuid}/Selected": {
+  "/weight/{playerUuid}/selected": {
+    /** Get farming weight for the selected profile of a player */
     get: {
       parameters: {
         path: {
@@ -2525,7 +3145,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["FarmingWeightDto"];
@@ -2544,7 +3164,8 @@ export interface paths {
       };
     };
   };
-  "/Weight/{playerUuid}/{profileUuid}": {
+  "/weight/{playerUuid}/{profileUuid}": {
+    /** Get farming weight for a specific profile of a player */
     get: {
       parameters: {
         path: {
@@ -2553,7 +3174,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["FarmingWeightDto"];
@@ -2572,10 +3193,15 @@ export interface paths {
       };
     };
   };
-  "/Weights": {
+  "/weights": {
+    /**
+     * Get crop weight constants
+     * @deprecated
+     * @description Use /weights/all instead
+     */
     get: {
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": {
@@ -2592,10 +3218,11 @@ export interface paths {
       };
     };
   };
-  "/Weights/All": {
+  "/weights/all": {
+    /** Get all farming weight constants */
     get: {
       responses: {
-        /** @description Success */
+        /** @description OK */
         200: {
           content: {
             "text/plain": components["schemas"]["WeightsDto"];
@@ -2613,11 +3240,10 @@ export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
     AccountWithPermsDto: {
-      id?: string;
-      displayName?: string;
-      username?: string;
-      /** Format: int32 */
-      permissions?: number;
+      id: string;
+      displayName: string;
+      username: string;
+      roles?: string[];
       discriminator?: string | null;
       avatar?: string | null;
     };
@@ -2626,6 +3252,26 @@ export interface components {
       collections?: boolean;
       skills?: boolean;
       vault?: boolean;
+    };
+    AuthResponseDto: {
+      /** @description Access token for the user */
+      access_token: string;
+      /** @description Expiry date of the access token in Unix timestamp seconds */
+      expires_in?: string | null;
+      /** @description Refresh token for the user */
+      refresh_token: string;
+    };
+    AuthSessionDto: {
+      /** @description Discord user ID */
+      id: string;
+      /** @description Discord username */
+      username: string;
+      /** @description Discord avatar hash */
+      avatar: string;
+      /** @description Primary Minecraft IGN */
+      ign: string;
+      /** @description List of user roles */
+      roles: string[];
     };
     AuthorizedAccountDto: {
       id?: string;
@@ -2643,8 +3289,8 @@ export interface components {
       minecraftAccounts?: components["schemas"]["MinecraftAccountDetailsDto"][];
     };
     AuthorizedGuildDto: {
-      id?: string;
-      permissions?: string;
+      id: string;
+      permissions: string;
       guild?: components["schemas"]["GuildDto"];
       discordGuild?: components["schemas"]["FullDiscordGuild"];
     };
@@ -2656,16 +3302,32 @@ export interface components {
     BadgeDto: {
       /** Format: int32 */
       id?: number;
-      imageId?: string;
-      name?: string;
-      description?: string;
-      requirements?: string;
+      imageId: string;
+      name: string;
+      description: string;
+      requirements: string;
     };
     /**
      * Format: int32
      * @enum {integer}
      */
     ChannelType: 0 | 1 | 2 | 3 | 4 | 5 | 10 | 11 | 12 | 13 | 14 | 15;
+    ConfigLeaderboardSettings: {
+      /** Format: int32 */
+      completeRefreshInterval?: number;
+      leaderboards?: {
+        [key: string]: components["schemas"]["Leaderboard"];
+      };
+      collectionLeaderboards?: {
+        [key: string]: components["schemas"]["Leaderboard"];
+      };
+      skillLeaderboards?: {
+        [key: string]: components["schemas"]["Leaderboard"];
+      };
+      pestLeaderboards?: {
+        [key: string]: components["schemas"]["Leaderboard"];
+      };
+    };
     ContestBracketsDetailsDto: {
       start?: string;
       end?: string;
@@ -2736,21 +3398,94 @@ export interface components {
       disabledReason?: string | null;
     };
     CreateBadgeDto: {
-      imageId?: string;
-      name?: string;
-      description?: string;
-      requirements?: string;
+      imageId: string;
+      name: string;
+      description: string;
+      requirements: string;
       tieToAccount?: boolean;
     };
-    /**
-     * Format: int32
-     * @enum {integer}
-     */
-    Crop: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+    CreateMedalEventDto: {
+      /** @description The name of the event */
+      name: string;
+      type?: components["schemas"]["EventType"];
+      /** @description The Discord server id as a string for the event */
+      guildId: string;
+      /** @description An optional description for the event */
+      description?: string | null;
+      /** @description An optional set of rules for the event */
+      rules?: string | null;
+      /** @description An optional description of prizes for the event */
+      prizeInfo?: string | null;
+      /** @description An image URL for the event banner */
+      banner?: string | null;
+      /** @description An image URL for the event thumbnail */
+      thumbnail?: string | null;
+      /**
+       * Format: int64
+       * @description Unix timestamp for the start time of the event in seconds
+       */
+      startTime: number;
+      /**
+       * Format: int64
+       * @description Unix timestamp for the end time of the event in seconds
+       */
+      endTime: number;
+      /**
+       * Format: int64
+       * @description Unix timestamp for the latest time a new member can join the event in seconds
+       */
+      joinTime?: number | null;
+      /** @description Currently unused */
+      dynamicStartTime?: boolean | null;
+      /** @description A Discord role id that is required to participate in the event */
+      requiredRole?: string | null;
+      /** @description A Discord role id that is blocked from participating in the event */
+      blockedRole?: string | null;
+      data?: components["schemas"]["MedalEventData"];
+    };
+    CreateWeightEventDto: {
+      /** @description The name of the event */
+      name: string;
+      type?: components["schemas"]["EventType"];
+      /** @description The Discord server id as a string for the event */
+      guildId: string;
+      /** @description An optional description for the event */
+      description?: string | null;
+      /** @description An optional set of rules for the event */
+      rules?: string | null;
+      /** @description An optional description of prizes for the event */
+      prizeInfo?: string | null;
+      /** @description An image URL for the event banner */
+      banner?: string | null;
+      /** @description An image URL for the event thumbnail */
+      thumbnail?: string | null;
+      /**
+       * Format: int64
+       * @description Unix timestamp for the start time of the event in seconds
+       */
+      startTime: number;
+      /**
+       * Format: int64
+       * @description Unix timestamp for the end time of the event in seconds
+       */
+      endTime: number;
+      /**
+       * Format: int64
+       * @description Unix timestamp for the latest time a new member can join the event in seconds
+       */
+      joinTime?: number | null;
+      /** @description Currently unused */
+      dynamicStartTime?: boolean | null;
+      /** @description A Discord role id that is required to participate in the event */
+      requiredRole?: string | null;
+      /** @description A Discord role id that is blocked from participating in the event */
+      blockedRole?: string | null;
+      data?: components["schemas"]["WeightEventData"];
+    };
     CropCollectionsDataPointDto: {
       /** Format: int64 */
       timestamp?: number;
-      crops?: {
+      crops: {
         [key: string]: number;
       };
     };
@@ -2767,8 +3502,8 @@ export interface components {
       netherWart?: components["schemas"]["GuildJacobLeaderboardEntry"][];
     };
     DiscordChannel: {
-      id?: string;
-      name?: string;
+      id: string;
+      name: string;
       type?: components["schemas"]["ChannelType"];
       /** Format: int32 */
       flags?: number;
@@ -2777,13 +3512,21 @@ export interface components {
       guild_id?: string | null;
       parent_id?: string | null;
     };
+    DiscordLoginDto: {
+      /** @description Discord access token from OAuth2 */
+      access_token: string;
+      /** @description Unix timestamp in seconds */
+      expires_in: string;
+      /** @description Discord refresh token from OAuth2 */
+      refresh_token: string;
+    };
     DiscordRole: {
-      name?: string;
-      id?: string;
+      name: string;
+      id: string;
     };
     DiscordRoleData: {
-      id?: string;
-      name?: string;
+      id: string;
+      name: string;
       permissions?: string | null;
       /** Format: int32 */
       position?: number;
@@ -2810,6 +3553,7 @@ export interface components {
     };
     EditEventDto: {
       name?: string | null;
+      type?: string | null;
       description?: string | null;
       rules?: string | null;
       prizeInfo?: string | null;
@@ -2817,6 +3561,8 @@ export interface components {
       thumbnail?: string | null;
       /** Format: int64 */
       startTime?: number | null;
+      /** Format: int64 */
+      joinTime?: number | null;
       /** Format: int64 */
       endTime?: number | null;
       dynamicStartTime?: boolean | null;
@@ -2850,88 +3596,84 @@ export interface components {
       hideDiscordTag?: boolean;
     };
     EventCreatedDto: {
-      id?: string;
+      id: string;
       /** Format: date-time */
       createdAt?: string;
     };
     EventDetailsDto: {
-      id?: string;
-      name?: string;
+      /** @description Event id as a string */
+      id: string;
+      /** @description Name of the event */
+      name: string;
+      type?: components["schemas"]["EventType"];
+      /** @description Event description */
       description?: string | null;
+      /** @description Event rules */
       rules?: string | null;
+      /** @description Event prize information */
       prizeInfo?: string | null;
+      /** @description Image URL for the event banner */
       banner?: string | null;
+      /** @description Image URL for the event thumbnail */
       thumbnail?: string | null;
+      /** @description Start time of the event as a string in Unix seconds */
       startTime?: string | null;
+      /** @description Join time of the event as a string in Unix seconds */
+      joinUntilTime?: string | null;
+      /** @description End time of the event as a string in Unix seconds */
       endTime?: string | null;
+      /** @description Currently unused */
       dynamicStartTime?: boolean;
+      /** @description Event status */
       active?: boolean;
+      /** @description Discord role id required to participate in the event */
       requiredRole?: string | null;
+      /** @description Discord role id blocked from participating in the event */
       blockedRole?: string | null;
+      /** @description Discord server id as a string */
       guildId?: string | null;
+      /** @description Data specific to the event */
+      data?: unknown;
     };
     EventMemberBannedDto: {
       playerUuid?: string | null;
       playerName?: string | null;
-      amountGained?: string | null;
+      score?: string | null;
       notes?: string | null;
       lastUpdated?: string | null;
+    };
+    EventMemberDetailsDto: {
+      playerUuid?: string | null;
+      profileId?: string | null;
+      playerName?: string | null;
+      eventId: string;
+      status?: components["schemas"]["EventMemberStatus"];
+      score?: string | null;
+      lastUpdated?: string | null;
+      data?: unknown;
     };
     EventMemberDto: {
       playerUuid?: string | null;
       playerName?: string | null;
       profileId?: string | null;
-      eventId?: string;
+      eventId: string;
       status?: components["schemas"]["EventMemberStatus"];
-      amountGained?: string | null;
-      startConditions?: components["schemas"]["EventMemberStartConditions"];
+      score?: string | null;
+      data?: unknown;
       lastUpdated?: string | null;
       disqualified?: boolean;
       notes?: string | null;
-    };
-    EventMemberStartConditions: {
-      initialCollection?: {
-        [key: string]: number;
-      };
-      increasedCollection?: {
-        [key: string]: number;
-      };
-      countedCollection?: {
-        [key: string]: number;
-      };
-      toolStates?: {
-        [key: string]: components["schemas"]["EventToolState"];
-      };
-      tools?: {
-        [key: string]: number;
-      };
     };
     /**
      * Format: int32
      * @enum {integer}
      */
     EventMemberStatus: 0 | 1 | 2 | 3;
-    EventToolCounterState: {
-      /** Format: int64 */
-      initial?: number;
-      /** Format: int64 */
-      previous?: number;
-      /** Format: int64 */
-      current?: number;
-      /** Format: int64 */
-      uncounted?: number;
-    };
-    EventToolState: {
-      skyblockId?: string;
-      crop?: components["schemas"]["Crop"];
-      /** Format: int64 */
-      firstSeen?: number;
-      /** Format: int64 */
-      lastSeen?: number;
-      isActive?: boolean;
-      counter?: components["schemas"]["EventToolCounterState"];
-      cultivating?: components["schemas"]["EventToolCounterState"];
-    };
+    /**
+     * Format: int32
+     * @enum {integer}
+     */
+    EventType: 0 | 1 | 2 | 3 | 4;
     ExcludedTimespan: {
       /** Format: int64 */
       start?: number;
@@ -2965,8 +3707,8 @@ export interface components {
       inventory?: components["schemas"]["FarmingInventoryDto"];
     };
     FarmingWeightWithProfileDto: {
-      profileId?: string;
-      profileName?: string;
+      profileId: string;
+      profileName: string;
       /** Format: double */
       totalWeight?: number;
       cropWeight?: {
@@ -2981,8 +3723,8 @@ export interface components {
       pests?: components["schemas"]["PestsDto"];
     };
     FullDiscordGuild: {
-      id?: string;
-      name?: string;
+      id: string;
+      name: string;
       icon?: string | null;
       description?: string | null;
       splash?: string | null;
@@ -3007,8 +3749,8 @@ export interface components {
       approximate_member_count?: number;
     };
     GuildDetailsDto: {
-      id?: string;
-      name?: string;
+      id: string;
+      name: string;
       icon?: string | null;
       banner?: string | null;
       inviteCode?: string | null;
@@ -3016,8 +3758,8 @@ export interface components {
       memberCount?: number;
     };
     GuildDto: {
-      id?: string;
-      name?: string;
+      id: string;
+      name: string;
       features?: components["schemas"]["GuildFeatures"];
       icon?: string | null;
       inviteCode?: string | null;
@@ -3025,7 +3767,7 @@ export interface components {
       description?: string | null;
       adminRole?: string | null;
       botPermissions?: string | null;
-      botPermissionsNew?: string;
+      botPermissionsNew: string;
       discordFeatures?: string[];
       /** Format: int32 */
       memberCount?: number;
@@ -3047,7 +3789,7 @@ export interface components {
       contestPings?: components["schemas"]["ContestPingsFeature"];
     };
     GuildJacobLeaderboard: {
-      id?: string;
+      id: string;
       channelId?: string | null;
       /** Format: int64 */
       startCutoff?: number;
@@ -3063,10 +3805,10 @@ export interface components {
       crops?: components["schemas"]["CropRecords"];
     };
     GuildJacobLeaderboardEntry: {
-      uuid?: string;
-      ign?: string;
-      discordId?: string;
-      record?: components["schemas"]["ContestParticipationDto"];
+      uuid: string;
+      ign: string;
+      discordId: string;
+      record: components["schemas"]["ContestParticipationDto"];
     };
     GuildJacobLeaderboardFeature: {
       /** Format: int32 */
@@ -3080,8 +3822,8 @@ export interface components {
     };
     IncomingAccountDto: {
       /** Format: int64 */
-      id?: number;
-      username?: string;
+      id: number;
+      username: string;
       displayName?: string | null;
       discriminator?: string | null;
       avatar?: string | null;
@@ -3107,14 +3849,14 @@ export interface components {
       } | null;
     };
     JacobContestDto: {
-      crop?: string;
+      crop: string;
       /** Format: int64 */
       timestamp?: number;
       /** Format: int32 */
       participants?: number;
     };
     JacobContestWithParticipationsDto: {
-      crop?: string;
+      crop: string;
       /** Format: int64 */
       timestamp?: number;
       /** Format: int32 */
@@ -3141,15 +3883,55 @@ export interface components {
     };
     JacobStatsDto: {
       brackets?: {
-        [key: string]: components["schemas"]["ContestMedal"];
+        Cactus?: components["schemas"]["ContestMedal"];
+        Carrot?: components["schemas"]["ContestMedal"];
+        CocoaBeans?: components["schemas"]["ContestMedal"];
+        Melon?: components["schemas"]["ContestMedal"];
+        Mushroom?: components["schemas"]["ContestMedal"];
+        NetherWart?: components["schemas"]["ContestMedal"];
+        Potato?: components["schemas"]["ContestMedal"];
+        Pumpkin?: components["schemas"]["ContestMedal"];
+        SugarCane?: components["schemas"]["ContestMedal"];
+        Wheat?: components["schemas"]["ContestMedal"];
+        Seeds?: components["schemas"]["ContestMedal"];
       };
       personalBests?: {
-        [key: string]: number;
+        /** Format: int64 */
+        Cactus?: number;
+        /** Format: int64 */
+        Carrot?: number;
+        /** Format: int64 */
+        CocoaBeans?: number;
+        /** Format: int64 */
+        Melon?: number;
+        /** Format: int64 */
+        Mushroom?: number;
+        /** Format: int64 */
+        NetherWart?: number;
+        /** Format: int64 */
+        Potato?: number;
+        /** Format: int64 */
+        Pumpkin?: number;
+        /** Format: int64 */
+        SugarCane?: number;
+        /** Format: int64 */
+        Wheat?: number;
+        /** Format: int64 */
+        Seeds?: number;
       };
     };
+    Leaderboard: {
+      id: string;
+      title: string;
+      /** Format: int32 */
+      limit?: number;
+      order: string;
+      /** Format: int32 */
+      scoreFormat?: number;
+    };
     LeaderboardDto: {
-      id?: string;
-      title?: string;
+      id: string;
+      title: string;
       /** Format: int32 */
       limit?: number;
       /** Format: int32 */
@@ -3167,6 +3949,8 @@ export interface components {
     LeaderboardPositionDto: {
       /** Format: int32 */
       rank?: number;
+      /** Format: double */
+      amount?: number;
       /** Format: int32 */
       upcomingRank?: number;
       upcomingPlayers?: components["schemas"]["LeaderboardEntryDto"][] | null;
@@ -3189,6 +3973,22 @@ export interface components {
       selectedUuid?: string | null;
       players?: components["schemas"]["PlayerDataDto"][];
     };
+    MedalEventData: {
+      medalWeights?: {
+        /** Format: int32 */
+        None?: number;
+        /** Format: int32 */
+        Bronze?: number;
+        /** Format: int32 */
+        Silver?: number;
+        /** Format: int32 */
+        Gold?: number;
+        /** Format: int32 */
+        Platinum?: number;
+        /** Format: int32 */
+        Diamond?: number;
+      };
+    };
     MedalInventoryDto: {
       /** Format: int32 */
       bronze?: number;
@@ -3198,8 +3998,8 @@ export interface components {
       gold?: number;
     };
     MemberDetailsDto: {
-      uuid?: string;
-      username?: string;
+      uuid: string;
+      username: string;
       profileName?: string | null;
       active?: boolean;
       /** Format: double */
@@ -3262,7 +4062,7 @@ export interface components {
     };
     PetDto: {
       uuid?: string | null;
-      type?: string;
+      type: string;
       /** Format: double */
       exp?: number;
       active?: boolean;
@@ -3273,7 +4073,7 @@ export interface components {
       skin?: string | null;
     };
     PlayerDataDto: {
-      uuid?: string;
+      uuid: string;
       displayname?: string | null;
       /** Format: int64 */
       firstLogin?: number;
@@ -3304,9 +4104,18 @@ export interface components {
       monthlyRankColor?: string | null;
       socialMedia?: components["schemas"]["SocialMediaLinksDto"];
     };
+    ProblemDetails: {
+      type?: string | null;
+      title?: string | null;
+      /** Format: int32 */
+      status?: number | null;
+      detail?: string | null;
+      instance?: string | null;
+      [key: string]: unknown;
+    };
     ProfileDetailsDto: {
-      profileId?: string;
-      profileName?: string;
+      profileId: string;
+      profileName: string;
       gameMode?: string;
       selected?: boolean;
       /** Format: double */
@@ -3314,9 +4123,9 @@ export interface components {
       members?: components["schemas"]["MemberDetailsDto"][];
     };
     ProfileMemberDto: {
-      profileId?: string;
-      playerUuid?: string;
-      profileName?: string;
+      profileId: string;
+      playerUuid: string;
+      profileName: string;
       api?: components["schemas"]["ApiAccessDto"];
       /** Format: int32 */
       skyblockXp?: number;
@@ -3335,17 +4144,22 @@ export interface components {
       };
       pets?: components["schemas"]["PetDto"][];
       unparsed?: components["schemas"]["UnparsedApiDataDto"];
-      jacob?: components["schemas"]["JacobDataDto"];
-      farmingWeight?: components["schemas"]["FarmingWeightDto"];
+      jacob: components["schemas"]["JacobDataDto"];
+      farmingWeight: components["schemas"]["FarmingWeightDto"];
       skills?: components["schemas"]["SkillsDto"];
       isSelected?: boolean;
       wasRemoved?: boolean;
       /** Format: int64 */
       lastUpdated?: number;
     };
+    ProfileNamesDto: {
+      id: string;
+      name: string;
+      selected?: boolean;
+    };
     PublicGuildDto: {
-      id?: string;
-      name?: string;
+      id: string;
+      name: string;
       icon?: string | null;
       banner?: string | null;
       inviteCode?: string | null;
@@ -3363,7 +4177,7 @@ export interface components {
       contestPings?: components["schemas"]["ContestPingsFeatureDto"];
     };
     PublicJacobLeaderboardDto: {
-      id?: string;
+      id: string;
       channelId?: string | null;
       /** Format: int64 */
       startCutoff?: number;
@@ -3387,15 +4201,15 @@ export interface components {
       leaderboards?: components["schemas"]["PublicJacobLeaderboardDto"][];
     };
     RedemptionDto: {
-      itemId?: string;
-      cost?: string;
+      itemId: string;
+      cost: string;
       /** Format: date-time */
       timestamp?: string;
     };
     SkillsDataPointDto: {
       /** Format: int64 */
       timestamp?: number;
-      skills?: {
+      skills: {
         [key: string]: number;
       };
     };
@@ -3470,25 +4284,52 @@ export interface components {
     UserBadgeDto: {
       /** Format: int32 */
       id?: number;
-      imageId?: string;
-      name?: string;
-      description?: string;
-      requirements?: string;
-      timestamp?: string;
+      imageId: string;
+      name: string;
+      description: string;
+      requirements: string;
+      timestamp: string;
       visible?: boolean;
       /** Format: int32 */
       order?: number;
     };
     UserGuildDto: {
-      id?: string;
-      name?: string;
+      id: string;
+      name: string;
       icon?: string | null;
       hasBot?: boolean;
-      permissions?: string;
+      permissions: string;
     };
     VerifiedRoleFeature: {
       enabled?: boolean;
       autoRoles?: components["schemas"]["AutoRoles"][];
+    };
+    WeightEventData: {
+      /** @description The weights of each crop in the event */
+      cropWeights?: {
+        /** Format: double */
+        Cactus?: number;
+        /** Format: double */
+        Carrot?: number;
+        /** Format: double */
+        CocoaBeans?: number;
+        /** Format: double */
+        Melon?: number;
+        /** Format: double */
+        Mushroom?: number;
+        /** Format: double */
+        NetherWart?: number;
+        /** Format: double */
+        Potato?: number;
+        /** Format: double */
+        Pumpkin?: number;
+        /** Format: double */
+        SugarCane?: number;
+        /** Format: double */
+        Wheat?: number;
+        /** Format: double */
+        Seeds?: number;
+      };
     };
     WeightsDto: {
       crops?: {

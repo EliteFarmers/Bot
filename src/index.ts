@@ -13,7 +13,8 @@ dotenv.config();
 const proccessArgs = process.argv.slice(2);
 
 export const client = new Client({ 
-	intents: [GatewayIntentBits.Guilds]
+	intents: [GatewayIntentBits.Guilds],
+	shards: 'auto' // Temporary
 });
 
 export const commands = new Collection<string, Command | CommandGroup>();

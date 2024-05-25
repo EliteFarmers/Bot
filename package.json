@@ -5,12 +5,12 @@
     "@types/node": "^17.0.45",
     "amqplib": "^0.10.3",
     "cron": "^3.1.6",
-    "discord.js": "^14.14.1",
+    "discord.js": "^14.15.2",
     "farming-weight": "^0.3.7",
     "openapi-fetch": "^0.7.8"
   },
   "scripts": {
-    "start": "tsx --esm src/index.ts",
+    "start": "tsx src/index.ts",
     "lint": "eslint src --ext .ts",
     "build": "tsc",
     "dev": "npx nodemon --exec \"npx tsx\" src/index.ts",

@@ -11,7 +11,7 @@ const { GET, PUT, POST, DELETE, PATCH } = createClient<paths>({
 });
 
 export const FetchAccount = (id: string) =>
-	GET('/Account/{playerUuidOrIgn}', {
+	GET('/account/{playerUuidOrIgn}', {
 		params: {
 			path: {
 				playerUuidOrIgn: id,
@@ -20,7 +20,7 @@ export const FetchAccount = (id: string) =>
 	});
 
 export const FetchUpdateAccount = (user: User, locale?: string) =>
-	PATCH('/Bot/account', {
+	PATCH('/bot/account', {
 		body: {
 			id: user.id as unknown as number,
 			username: user.username,
@@ -31,14 +31,14 @@ export const FetchUpdateAccount = (user: User, locale?: string) =>
 	});
 
 export const FetchWeight = (playerUuid: string) =>
-	GET('/Weight/{playerUuid}', {
+	GET('/weight/{playerUuid}', {
 		params: {
 			path: { playerUuid },
 		},
 	});
 
 export const FetchProfile = (playerUuid: string, profileUuid: string) =>
-	GET('/Profile/{playerUuid}/{profileUuid}', {
+	GET('/profile/{playerUuid}/{profileUuid}', {
 		params: {
 			path: {
 				playerUuid,
@@ -48,7 +48,7 @@ export const FetchProfile = (playerUuid: string, profileUuid: string) =>
 	});
 
 export const FetchSelectedProfile = (playerUuid: string) =>
-	GET('/Profile/{uuid}/Selected', {
+	GET('/profile/{uuid}/selected', {
 		params: {
 			path: {
 				uuid: playerUuid,
@@ -57,7 +57,7 @@ export const FetchSelectedProfile = (playerUuid: string) =>
 	});
 
 export const FetchContests = (playerUuid: string) =>
-	GET('/Contests/{playerUuid}', {
+	GET('/contests/{playerUuid}', {
 		params: {
 			path: {
 				playerUuid,
@@ -69,7 +69,7 @@ export const FetchWeightLeaderboardRank = (
 	playerUuid: string,
 	profileUuid: string
 ) =>
-	GET('/Leaderboard/rank/{leaderboardId}/{playerUuid}/{profileUuid}', {
+	GET('/leaderboard/rank/{leaderboardId}/{playerUuid}/{profileUuid}', {
 		params: {
 			path: {
 				leaderboardId: 'farmingweight',
@@ -84,7 +84,7 @@ export const FetchLeaderboardRank = (
 	playerUuid: string,
 	profileUuid: string
 ) =>
-	GET('/Leaderboard/rank/{leaderboardId}/{playerUuid}/{profileUuid}', {
+	GET('/leaderboard/rank/{leaderboardId}/{playerUuid}/{profileUuid}', {
 		params: {
 			path: {
 				leaderboardId,
@@ -99,7 +99,7 @@ export const FetchLeaderboardSlice = (
 	offset = 0,
 	limit = 20
 ) =>
-	GET('/Leaderboard/{id}', {
+	GET('/leaderboard/{id}', {
 		params: {
 			path: {
 				id: leaderboardId,
@@ -116,7 +116,7 @@ export const FetchSkillLeaderboardSlice = (
 	offset = 0,
 	limit = 20
 ) =>
-	GET('/Leaderboard/skill/{skillName}', {
+	GET('/leaderboard/skill/{skillName}', {
 		params: {
 			path: {
 				skillName: leaderboardId,
@@ -133,7 +133,7 @@ export const FetchCollectionLeaderboardSlice = (
 	offset = 0,
 	limit = 20
 ) =>
-	GET('/Leaderboard/collection/{collection}', {
+	GET('/leaderboard/collection/{collection}', {
 		params: {
 			path: {
 				collection: leaderboardId,
@@ -146,7 +146,7 @@ export const FetchCollectionLeaderboardSlice = (
 	});
 
 export const FetchGuild = (id: string) =>
-	GET('/Bot/{guildId}', {
+	GET('/bot/{guildId}', {
 		params: {
 			path: {
 				guildId: id as unknown as number,
@@ -158,7 +158,7 @@ export const FetchGuild = (id: string) =>
 	});
 
 export const FetchGuildJacob = (id: string) =>
-	GET('/Bot/{guildId}/jacob', {
+	GET('/bot/{guildId}/jacob', {
 		params: {
 			path: {
 				guildId: id as unknown as number,
@@ -173,7 +173,7 @@ export const UpdateGuildJacob = (
 	id: string,
 	data: components['schemas']['GuildJacobLeaderboardFeature']
 ) =>
-	PUT('/Bot/{guildId}/jacob', {
+	PUT('/bot/{guildId}/jacob', {
 		params: {
 			path: {
 				guildId: id as unknown as number,
@@ -185,14 +185,14 @@ export const UpdateGuildJacob = (
 		},
 	});
 
-export const GetGuildsToPing = () => GET('/Bot/ContestPings', {
+export const GetGuildsToPing = () => GET('/bot/contestpings', {
 	headers: {
 		Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
 	},
 });
 
 export const DisableGuildContestPings = (id: string, reason: string) =>
-	DELETE('/Bot/ContestPings/{guildId}', {
+	DELETE('/bot/contestpings/{guildId}', {
 		params: {
 			path: {
 				guildId: id as unknown as number,
@@ -203,10 +203,10 @@ export const DisableGuildContestPings = (id: string, reason: string) =>
 		},
 	});
 
-export const GetCurrentContests = () => GET('/Contests/at/now', {});
+export const GetCurrentContests = () => GET('/contests/at/now', {});
 
 export const SearchUsers = (query: string) =>
-	GET('/Account/Search', {
+	GET('/account/search', {
 		params: {
 			query: {
 				q: query,
@@ -215,7 +215,7 @@ export const SearchUsers = (query: string) =>
 	});
 
 export const LinkAccount = (id: string, player: string) =>
-	POST('/Bot/account/{discordId}/{playerIgnOrUuid}', {
+	POST('/bot/account/{discordId}/{playerIgnOrUuid}', {
 		params: {
 			path: {
 				discordId: id as unknown as number,
@@ -225,7 +225,7 @@ export const LinkAccount = (id: string, player: string) =>
 	});
 
 export const UnlinkAccount = (id: string, player: string) =>
-	DELETE('/Bot/account/{discordId}/{playerIgnOrUuid}', {
+	DELETE('/bot/account/{discordId}/{playerIgnOrUuid}', {
 		params: {
 			path: {
 				discordId: id as unknown as number,
@@ -235,7 +235,7 @@ export const UnlinkAccount = (id: string, player: string) =>
 	});
 
 export const MakeAccountPrimary = (id: string, player: string) =>
-	POST('/Bot/account/{discordId}/{playerIgnOrUuid}/primary', {
+	POST('/bot/account/{discordId}/{playerIgnOrUuid}/primary', {
 		params: {
 			path: {
 				discordId: id as unknown as number,
@@ -245,7 +245,7 @@ export const MakeAccountPrimary = (id: string, player: string) =>
 	});
 
 export const FetchContestMonthlyBrackets = (year: number, month: number, months?: number) =>
-	GET('/Graph/Medals/{sbYear}/{sbMonth}', {
+	GET('/graph/medals/{sbYear}/{sbMonth}', {
 		params: {
 			path: {
 				sbYear: year,
@@ -258,7 +258,7 @@ export const FetchContestMonthlyBrackets = (year: number, month: number, months?
 	});
 
 export const FetchCurrentMonthlyBrackets = (months?: number) =>
-	GET('/Graph/Medals/now', {
+	GET('/graph/medals/now', {
 		params: {
 			query: {
 				months
@@ -267,7 +267,7 @@ export const FetchCurrentMonthlyBrackets = (months?: number) =>
 	});
 
 export const FetchContestYearlyMonthlyBrackets = (year: number, months?: number, years?: number) =>
-	GET('/Graph/Medals/{sbYear}', {
+	GET('/graph/medals/{sbYear}', {
 		params: {
 			path: {
 				sbYear: year,
@@ -280,7 +280,7 @@ export const FetchContestYearlyMonthlyBrackets = (year: number, months?: number,
 	});
 
 export const GrantUserBadge = (playerUuid: string, badgeId: number) =>
-	POST('/Bot/Badges/{playerUuid}/{badgeId}', {
+	POST('/bot/badges/{playerUuid}/{badgeId}', {
 		params: {
 			path: {
 				playerUuid,
@@ -290,7 +290,7 @@ export const GrantUserBadge = (playerUuid: string, badgeId: number) =>
 	});
 
 export const FetchCollectionGraphs = (playerUuid: string, profileUuid: string, days?: number, perDay?: number) =>
-	GET('/Graph/{playerUuid}/{profileUuid}/crops', {
+	GET('/graph/{playerUuid}/{profileUuid}/crops', {
 		params: {
 			path: {
 				playerUuid,
@@ -304,7 +304,7 @@ export const FetchCollectionGraphs = (playerUuid: string, profileUuid: string, d
 	});
 
 export const FetchSkillGraphs = (playerUuid: string, profileUuid: string, days?: number, perDay?: number) =>
-	GET('/Graph/{playerUuid}/{profileUuid}/skills', {
+	GET('/graph/{playerUuid}/{profileUuid}/skills', {
 		params: {
 			path: {
 				playerUuid,
