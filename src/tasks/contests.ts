@@ -115,8 +115,11 @@ async function execute(client: Client) {
 				.map(crop => pings.cropPingRoles?.[cropKeys[crop] as keyof typeof pings.cropPingRoles] ?? undefined)
 				.filter(role => role);
 
+			// Make sure alwaysPingRole at least seems valid
+			const alwaysPing = !!pings.alwaysPingRole && pings.alwaysPingRole.length > 10;
+
 			const msg = {
-				content: (pings.alwaysPingRole ? `<@&${pings.alwaysPingRole}> ` : '') + roles.map(role => `<@&${role}>`).join(' '),
+				content: (alwaysPing ? `<@&${pings.alwaysPingRole}> ` : '') + roles.map(role => `<@&${role}>`).join(' '),
 				embeds: [ embed ],
 				allowedMentions: {
 					roles: roles

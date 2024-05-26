@@ -64,9 +64,8 @@ export const signals = new Collection<string, SignalRecieverOptions>();
 }());
 
 client.once(Events.ClientReady, async () => {
-	// Update count every 2 hours
-	updateActivity();
-	setInterval(updateActivity, 1000 * 60 * 60 * 2);
+	setTimeout(updateActivity, 1000 * 30); // 30 seconds to wait for shards to be ready
+	setInterval(updateActivity, 1000 * 60 * 60 * 2); // Update count every 2 hours
 
 	console.log('Ready!');
 
