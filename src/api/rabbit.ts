@@ -34,13 +34,13 @@ export async function ConnectToRMQ() {
 	}
 
 	const channel = await connection.createChannel();
-	const queue = 'eliteapi';
+	const exchange = 'eliteapi';
 
-	channel.assertExchange(queue, 'fanout', { durable: false });
-	channel.assertQueue(queue, { durable: false });
-	channel.bindQueue(queue, queue, '');
+	channel.assertExchange(exchange, 'fanout', { durable: false });
+	const queue = await channel.assertQueue('', { durable: false });
+	channel.bindQueue(queue.queue, exchange, '');
 
-	channel.consume(queue, async (msg) => {
+	channel.consume(queue.queue, async (msg) => {
 		if (!msg) return;
 		const signal = new Signal(msg.content.toString());
 

@@ -29,17 +29,26 @@ const cropKeys: Record<string, string> = {
 async function execute(client: Client) {
 	console.log('Running contest ping task. Shard: ' + client.shard?.ids[0]);
 	const { data: contests } = await GetCurrentContests().catch(() => ({ data: undefined }));
-	if (!contests?.complete) return;
+	if (!contests?.complete) {
+		console.log('Upcoming contests not available yet! Shard: ' + client.shard?.ids[0]);
+		return;
+	}
 	
 	const now = Date.now() / 1000;
 
 	const [ timestamp, crops ] = Object.entries(contests.contests ?? {}).find(([ k ]) => +k > now) ?? []
-	if (!timestamp || !crops) return;
+	if (!timestamp || !crops) {
+		console.log('No upcoming contests found! Shard: ' + client.shard?.ids[0]);
+		return;
+	}
 
 	const nextContest = Object.entries(contests.contests ?? {}).find(([ k ]) => +k > +timestamp);
 
 	const { data: guilds } = await GetGuildsToPing().catch(() => ({ data: undefined, response: undefined }));
-	if (!guilds || guilds.length === 0) return;
+	if (!guilds || guilds.length === 0) {
+		console.log('No guilds to ping! Shard: ' + client.shard?.ids[0]);
+		return;
+	}
 
 	const { data: brackets } = await FetchCurrentMonthlyBrackets(3).catch(() => ({ data: undefined }));
 
@@ -76,8 +85,15 @@ async function execute(client: Client) {
 			continue;
 		}
 
+		const guild = client.guilds.cache.get(pings.guildId);
+		if (!guild) {
+			console.log(`Guild ${pings.guildId} not found on Shard ${client.shard?.ids[0]}`);
+			continue;
+		}
+
 		try {
-			const channel = client.channels.cache.get(pings.channelId);
+			const channel = client.channels.cache.get(pings.channelId)
+				?? await client.channels.fetch(pings.channelId).catch(() => undefined);
 			if (!channel) continue; // Channel on another shard (or invalid)
 
 			if (!channel || !channel.isTextBased() || channel.isDMBased()) {
