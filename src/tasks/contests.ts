@@ -28,6 +28,7 @@ const cropKeys: Record<string, string> = {
 
 async function execute(client: Client) {
 	console.log('Running contest ping task. Shard: ' + client.shard?.ids[0]);
+	
 	const { data: contests } = await GetCurrentContests().catch(() => ({ data: undefined }));
 	if (!contests?.complete) {
 		console.log('Upcoming contests not available yet! Shard: ' + client.shard?.ids[0]);
@@ -129,6 +130,8 @@ async function execute(client: Client) {
 		} catch (e) {
 			console.log(e);
 		}
+
+		console.log(`Sent contest ping to ${pings.guildId} (${pings.channelId})`);
 	}
 }
 
