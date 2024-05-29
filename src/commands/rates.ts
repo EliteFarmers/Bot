@@ -82,7 +82,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		return `${emoji} \`${amountStr}\` :coin: \`${profitStr}\``;
 	}).join('\n');
 
-	const details = `\nUsing **${reforge === 'bountiful' ? 'Bountiful' : 'Blessed'}**,`
+	const details = `\nUsing **${reforge === 'bountiful' ? 'Bountiful' : 'Blessed'}**, `
 		+ `**${pet === 'mooshroom' ? 'Mooshroom Cow' : 'Elephant'}**, and **4/4ths Fermento Armor**!`;
 
 	const embed = EliteEmbed()
@@ -122,7 +122,9 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		const collections = Object.entries(cropInfo.otherCollection).sort((a, b) => b[1] - a[1]);
 		const cropName = getCropDisplayName(crop as Crop);
 
-		const cropDetails = `\nUsing **${reforge === 'bountiful' ? 'Bountiful' : 'Blessed'}**, **Mooshroom Cow**, and **${crop === Crop.Cactus ? '3' : '4'}/4ths Fermento Armor**!`;
+		const cropDetails = `\nUsing **${reforge === 'bountiful' ? 'Bountiful' : 'Blessed'}**, `
+			+ `**${pet === 'mooshroom' ? 'Mooshroom Cow' : 'Elephant'}**, `
+			+ `and **${crop === Crop.Cactus ? '3' : '4'}/4ths Fermento Armor**!`;
 
 		const threeFourths = calculateAverageSpecialCrops(blocks, crop as Crop, 3);
 		const fromSpecial = cropInfo.coinSources[threeFourths.type] ?? 0;
