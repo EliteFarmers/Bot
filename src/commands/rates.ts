@@ -82,7 +82,8 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		return `${emoji} \`${amountStr}\` :coin: \`${profitStr}\``;
 	}).join('\n');
 
-	const details = `\nUsing **${reforge === 'bountiful' ? 'Bountiful' : 'Blessed'}**, **Mooshroom Cow**, and **4/4ths Fermento Armor**!`;
+	const details = `\nUsing **${reforge === 'bountiful' ? 'Bountiful' : 'Blessed'}**,`
+		+ `**${pet === 'mooshroom' ? 'Mooshroom Cow' : 'Elephant'}**, and **4/4ths Fermento Armor**!`;
 
 	const embed = EliteEmbed()
 		.setTitle('NPC Profit Calculator')
