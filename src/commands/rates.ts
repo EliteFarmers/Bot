@@ -32,6 +32,10 @@ const command: Command = {
 		.addStringOption(option => option.setName('reforge')
 			.setDescription('The reforge to calculate rates for!')
 			.addChoices({ name: 'Bountiful', value: 'bountiful' }, { name: 'Blessed', value: 'blessed' })
+			.setRequired(false))
+		.addStringOption(option => option.setName('pet')
+			.setDescription('The pet to calculate rates for!')
+			.addChoices({ name: 'Mooshroom Cow', value: 'mooshroom' }, { name: 'Elephant', value: 'elephant' })
 			.setRequired(false)),
 	execute: execute
 }
@@ -42,13 +46,14 @@ async function execute(interaction: ChatInputCommandInteraction) {
 	const fortune = interaction.options.getInteger('fortune', false) ?? undefined;
 	const blocks = interaction.options.getInteger('time', false) ?? 72_000;
 	const reforge = interaction.options.getString('reforge', false) ?? 'bountiful';
+	const pet = interaction.options.getString('pet', false) ?? 'mooshroom';
 	const timeName = TIME_OPTIONS[blocks as keyof typeof TIME_OPTIONS];
 
 	const expectedDrops = calculateDetailedAverageDrops({
 		farmingFortune: fortune,
 		blocksBroken: blocks,
 		bountiful: reforge === 'bountiful',
-		mooshroom: true,
+		mooshroom: pet === 'mooshroom',
 	}) as Partial<ReturnType<typeof calculateDetailedAverageDrops>>;
 
 	delete expectedDrops[Crop.Seeds];
