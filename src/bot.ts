@@ -81,7 +81,7 @@ async function updateActivity() {
 		guilds = counts.reduce<number>((acc, curr) => Number(acc) + Number(curr), 0);
 	}
 	
-	client.user.setActivity(`${guilds} guilds (${client.shard?.ids[0]})`, { type: ActivityType.Watching });
+	client.user.setActivity(`${guilds} guilds (𝚫${client.shard?.ids[0] ?? '0'})`, { type: ActivityType.Watching });
 }
 
 client.login(process.env.BOT_TOKEN);
