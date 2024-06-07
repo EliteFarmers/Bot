@@ -13,7 +13,7 @@
     "start": "tsx src/index.ts",
     "lint": "eslint src --ext .ts",
     "build": "tsc",
-    "dev": "npx nodemon --exec \"npx tsx\" src/index.ts",
+    "dev": "npx nodemon --exec \"npx tsx\" src/bot.ts",
     "slash": "tsx src/deploy.ts",
     "singleslash": "tsx src/index.ts deploy single",
     "prod": "node dist/index.js",

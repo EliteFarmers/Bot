@@ -201,6 +201,9 @@ export const DisableGuildContestPings = (id: string, reason: string) =>
 				reason,
 			},
 		},
+		headers: {
+			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
+		},
 	});
 
 export const GetCurrentContests = () => GET('/contests/at/now', {});
@@ -222,6 +225,9 @@ export const LinkAccount = (id: string, player: string) =>
 				playerIgnOrUuid: player,
 			},
 		},
+		headers: {
+			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
+		},
 	});
 
 export const UnlinkAccount = (id: string, player: string) =>
@@ -232,6 +238,9 @@ export const UnlinkAccount = (id: string, player: string) =>
 				playerIgnOrUuid: player,
 			},
 		},
+		headers: {
+			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
+		},
 	});
 
 export const MakeAccountPrimary = (id: string, player: string) =>
@@ -241,6 +250,9 @@ export const MakeAccountPrimary = (id: string, player: string) =>
 				discordId: id as unknown as number,
 				playerIgnOrUuid: player,
 			},
+		},
+		headers: {
+			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
 		},
 	});
 
@@ -286,7 +298,10 @@ export const GrantUserBadge = (playerUuid: string, badgeId: number) =>
 				playerUuid,
 				badgeId
 			}
-		}
+		},
+		headers: {
+			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
+		},
 	});
 
 export const FetchCollectionGraphs = (playerUuid: string, profileUuid: string, days?: number, perDay?: number) =>
@@ -316,3 +331,55 @@ export const FetchSkillGraphs = (playerUuid: string, profileUuid: string, days?:
 			}
 		}
 	})
+
+export const RequestGuildUpdate = (guildId: string) =>
+	POST('/bot/guild/{guildId}', {
+		params: {
+			path: {
+				guildId: guildId as unknown as number,
+			},
+		},
+		headers: {
+			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
+		},
+	});
+
+export const UpdateGuildChannel = (guildId: string, channel: components['schemas']['IncomingGuildChannelDto']) =>
+	POST('/bot/guild/{guildId}/channels', {
+		params: {
+			path: {
+				guildId: guildId as unknown as number,
+			},
+		},
+		body: channel,
+		headers: {
+			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
+		},
+	});
+
+export const UpdateGuildRole = (guildId: string, role: components['schemas']['IncomingGuildRoleDto']) =>
+	POST('/bot/guild/{guildId}/roles', {
+		params: {
+			path: {
+				guildId: guildId as unknown as number,
+			},
+		},
+		body: role,
+		headers: {
+			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
+		},
+	});
+
+export const UpdateGuildMemberRoles = (guildId: string, userId: string, roles: string[]) =>
+	PUT('/bot/guild/{guildId}/members/{userId}/roles', {
+		params: {
+			path: {
+				guildId: guildId as unknown as number,
+				userId: userId,
+			},
+		},
+		body: roles,
+		headers: {
+			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
+		},
+	});

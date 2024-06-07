@@ -59,7 +59,7 @@ const rest = new REST().setToken(process.env.BOT_TOKEN);
 
 		setTimeout(async function() {
 			const existing = existingCommands?.find(cmd => cmd.name === name);
-
+			
 			if (!command && existing) {
 				await rest.delete(Routes.applicationCommand(process.env.CLIENT_ID, existing.id));
 				console.log('Probably deleted that slash command globally');
