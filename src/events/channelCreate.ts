@@ -1,4 +1,4 @@
-import { UpdateGuildChannel } from "api/elite";
+import { UpdateGuildChannel } from "../api/elite.js";
 import { Events, GuildChannel } from "discord.js";
 
 const settings = {
