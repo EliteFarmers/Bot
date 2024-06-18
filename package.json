@@ -6,7 +6,7 @@
     "amqplib": "^0.10.3",
     "cron": "^3.1.6",
     "discord.js": "^14.15.2",
-    "farming-weight": "^0.3.7",
+    "farming-weight": "^0.4.0",
     "openapi-fetch": "^0.7.8"
   },
   "scripts": {

@@ -36,7 +36,13 @@ const command: Command = {
 		.addStringOption(option => option.setName('pet')
 			.setDescription('The pet to calculate rates for!')
 			.addChoices({ name: 'Mooshroom Cow', value: 'mooshroom' }, { name: 'Elephant', value: 'elephant' })
-			.setRequired(false)),
+			.setRequired(false))
+		.addNumberOption(option => 
+			option.setName('bps')
+				.setDescription('Your blocks broken per second! (10-20)')
+				.setMinValue(10)
+				.setMaxValue(20)
+				.setRequired(false)),
 	execute: execute
 }
 
@@ -47,11 +53,12 @@ async function execute(interaction: ChatInputCommandInteraction) {
 	const blocks = interaction.options.getInteger('time', false) ?? 72_000;
 	const reforge = interaction.options.getString('reforge', false) ?? 'bountiful';
 	const pet = interaction.options.getString('pet', false) ?? 'mooshroom';
+	const bps = interaction.options.getNumber('bps', false) ?? 20;
 	const timeName = TIME_OPTIONS[blocks as keyof typeof TIME_OPTIONS];
 
 	const expectedDrops = calculateDetailedAverageDrops({
 		farmingFortune: fortune,
-		blocksBroken: blocks,
+		blocksBroken: Math.round(blocks * (bps / 20)),
 		bountiful: reforge === 'bountiful',
 		mooshroom: pet === 'mooshroom',
 	}) as Partial<ReturnType<typeof calculateDetailedAverageDrops>>;
@@ -82,12 +89,15 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		return `${emoji} \`${amountStr}\` :coin: \`${profitStr}\``;
 	}).join('\n');
 
-	const details = `\nUsing **${reforge === 'bountiful' ? 'Bountiful' : 'Blessed'}**, `
-		+ `**${pet === 'mooshroom' ? 'Mooshroom Cow' : 'Elephant'}**, and **4/4ths Fermento Armor**!`;
+	const bpsText = `**${bps % 1 === 0 ? bps : bps.toFixed(2)}**/20 BPS (${((bps / 20) * 100).toFixed(1)}%)`;
+	const description = `Expected rates for **${fortune?.toLocaleString() ?? 'MAX'}** Farming Fortune in **${timeName}**! `
+		+ `\nUsing **${reforge === 'bountiful' ? 'Bountiful' : 'Blessed'}**, `
+		+ `**${pet === 'mooshroom' ? 'Mooshroom Cow' : 'Elephant'}**, and **4/4ths Fermento Armor**!\n`
+		+ bpsText;
 
 	const embed = EliteEmbed()
 		.setTitle('NPC Profit Calculator')
-		.setDescription(`Expected rates for **${fortune?.toLocaleString() ?? 'MAX'}** Farming Fortune in **${timeName}**${details}`)
+		.setDescription(description)
 		.addFields({
 			name: 'Crops',
 			value: text || 'Error!',
@@ -133,7 +143,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 
 		const cropEmbed = EliteEmbed()
 			.setTitle(`${cropName} Rates`)
-			.setDescription(`Expected rates for **${fortune?.toLocaleString() ?? `${cropInfo.fortune.toLocaleString()} (MAX)`}** Farming Fortune in **${timeName}**${cropDetails}`)
+			.setDescription(`Expected rates for **${fortune?.toLocaleString() ?? `${cropInfo.fortune.toLocaleString()} (MAX)`}** Farming Fortune in **${timeName}**!${cropDetails}\n${bpsText}`)
 			.addFields([{
 				name: 'Total NPC Profit',
 				value: ':coin: ' + cropInfo.npcCoins?.toLocaleString() ?? '0',
