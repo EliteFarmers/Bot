@@ -244,7 +244,7 @@ async function createWeightImage(ign: string, uuid: string, badgeId: string, wei
 	const badgeXPos = canvas.width * 0.771 - badgeWidth;
 	const badgeYPos = 14;
 	const cornerRadius = 15;
-	let finalXPos = 0;
+	let finalXPos = badgeXPos;
 
 	if (rank > 0) {
 		ctx.save();
