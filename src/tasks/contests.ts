@@ -65,7 +65,7 @@ async function execute(client: Client) {
 			return acc;
 		}, {}) ?? [];
 
-	const getCropEmojis = (crops: string[]) => crops.map(crop => GetCropEmoji(crop)).join('');
+	const getCropEmojis = (crops?: string[]) => crops?.map(crop => GetCropEmoji(crop)).join('') ?? '';
 
 	const embed = EliteEmbed()
 		.setTitle(GetSkyblockDate(+timestamp).Readable)
