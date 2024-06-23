@@ -192,7 +192,7 @@ function lowerEmbed(embed: EmbedBuilder, brackets: components['schemas']['Contes
 }
 
 function makeField(data: components['schemas']['ContestBracketsDetailsDto'] | undefined, bracket: string, blocksBroken: number, useDicers = true, useMooshroom = true) {
-	const reqs = Object.entries(data?.brackets ?? {}).map(([ cropName, medals ]) => {
+	const reqs = Object.entries(data?.brackets ?? {}).map(([ cropName, medals = {} ]) => {
 		return { 
 			cropName, 
 			collection: medals[bracket.toLowerCase() as keyof typeof medals] ?? 0,

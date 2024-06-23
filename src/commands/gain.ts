@@ -114,7 +114,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 
 		const cropGains = Object.entries(lastPoint.crops ?? {})
 			.reduce<Record<string, number>>((gains, current) => {
-				const [ crop, last ] = current;
+				const [ crop, last = 0 ] = current;
 				gains[crop] = last - (point.crops?.[crop] ?? 0);
 				return gains;
 			}, {});

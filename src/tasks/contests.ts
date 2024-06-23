@@ -55,7 +55,7 @@ async function execute(client: Client) {
 
 	const reqs = Object.entries(brackets?.brackets ?? {})
 		.reduce<Record<string, { gold: number, diamond: number }>>((acc, curr) => {
-			const [ simpleCrop, { gold = 0, diamond = 0 } ] = curr;
+			const [ simpleCrop, { gold = 0, diamond = 0 } = {} ] = curr;
 			const crop = CropFromSimple(simpleCrop);
 
 			if (!crop || !crops.includes(crop)) return acc;
