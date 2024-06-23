@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, AttachmentBuilder, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } from 'discord.js';
 import { Command, CommandAccess, CommandType } from '../classes/Command.js';
-import { createCanvas, loadImage } from '@napi-rs/canvas';
+import { type SKRSContext2D, createCanvas, loadImage } from '@napi-rs/canvas';
 import { FetchAccount, FetchWeight, FetchWeightLeaderboardRank } from '../api/elite.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 import { components } from '../api/api.js';
@@ -96,7 +96,17 @@ async function execute(interaction: ChatInputCommandInteraction) {
 	const { data: ranking } = await FetchWeightLeaderboardRank(account.id, profile.profileId).catch(() => ({ data: undefined }));
 	const rank = ranking?.rank ?? -1;
 
-	const img = await createWeightImage(playerName, account.id, profile.profileName, profileWeight, rank);
+	const badge = account.badges?.filter(b => b?.visible).sort((a, b) => (b.order ?? 0) - (a.order ?? 0))[0];
+	const badgeId = badge?.imageId ? `https://cdn.elitebot.dev/u/${badge.imageId}.png` : '';
+
+	const img = await createWeightImage(playerName, account.id, badgeId, profileWeight, rank);
+
+	if (!img) {
+		const embed = ErrorEmbed('Something went wrong!')
+			.setDescription('Weight image couldn\'t be generated.');
+		interaction.followUp({ embeds: [embed], ephemeral: true });
+		return;
+	}
 
 	const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 		new ButtonBuilder()
@@ -176,7 +186,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 	});
 }
 
-async function createWeightImage(ign: string, uuid: string, profile: string, weight: components['schemas']['FarmingWeightDto'], rank = -1) {
+async function createWeightImage(ign: string, uuid: string, badgeId: string, weight: components['schemas']['FarmingWeightDto'], rank = -1) {
 	let result = "Hey what's up?";
 	const rWeight = Math.round((weight.totalWeight ?? 0) * 100) / 100;
 
@@ -206,21 +216,74 @@ async function createWeightImage(ign: string, uuid: string, profile: string, wei
 	}
 
 	// Load crop image and avatar
-	const background = await loadImage(imagePath)
-	const avatar = await loadImage(`https://mc-heads.net/head/${uuid}/left`).catch(() => {
+	const images = [
+		loadImage(imagePath),
+		loadImage(`https://mc-heads.net/head/${uuid}/left`).catch(() => {
+			return null;
+		}),
+		badgeId !== '' ? loadImage(badgeId).catch(() => {
+			return null;
+		}) : null
+	];
+
+	const [ background, avatar, badge ] = await Promise.all(images);
+	if (!background || !avatar) {
 		return null;
-	});
+	}
 
 	// Create our canvas and draw the crop image
 	const canvas = createCanvas(background.width, background.height);
 	const ctx = canvas.getContext('2d');
 
+	createRoundCornerPath(ctx, 0, 0, canvas.width, canvas.height, 5);
+	ctx.clip();
 	ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
-	//Add name and rank, then resize to fit
-	let name = ign ?? 'N/A';
+	const badgeWidth = canvas.width * 0.15;
+	const badgeHeight = badgeWidth / 3;
+	const badgeXPos = canvas.width * 0.771 - badgeWidth;
+	const badgeYPos = 14;
+	const cornerRadius = 15;
+	let finalXPos = 0;
+
 	if (rank > 0) {
-		name = (`${ign} - #${rank}`);
+		ctx.save();
+		ctx.fillStyle = '#09090b';
+
+		const rankText = `  ${rank}`;
+
+		ctx.font = '80px "Open Sans"';
+		let fontSize = 80;
+		do {
+			fontSize--;
+			ctx.font = fontSize + 'px ' + "Open Sans";
+		} while (ctx.measureText(rankText).width > badgeWidth - 50);
+
+		const metrics = ctx.measureText(rankText);
+		const fontHeight = metrics.actualBoundingBoxAscent //+ metrics.actualBoundingBoxDescent;
+	
+		const width = metrics.width + 30;
+		const x = badge ? badgeXPos - width - 15 : badgeXPos + badgeWidth - width - 15;
+		finalXPos = x;
+
+		createRoundCornerPath(ctx, x, badgeYPos, width, badgeHeight, cornerRadius);
+		ctx.clip();
+		ctx.fillRect(x, badgeYPos, width, badgeHeight);
+
+		ctx.fillStyle = '#dddddd';
+		ctx.fillText(rankText, x + 15, badgeHeight + badgeYPos - (badgeHeight - fontHeight) / 2);
+		ctx.font = `${fontSize - 16}px "Open Sans"`
+		ctx.fillText('#', x + 15, badgeHeight + badgeYPos - (badgeHeight - fontHeight) / 2);
+
+		ctx.restore();
+	}
+
+	if (badge) {
+		ctx.save();
+		createRoundCornerPath(ctx, badgeXPos, badgeYPos, badgeWidth, badgeHeight, cornerRadius);
+		ctx.clip();
+		ctx.drawImage(badge, badgeXPos, badgeYPos, badgeWidth, badgeHeight);
+		ctx.restore();
 	}
 
 	ctx.font = '100px "Open Sans"';
@@ -228,13 +291,13 @@ async function createWeightImage(ign: string, uuid: string, profile: string, wei
 	do {
 		fontSize--;
 		ctx.font = fontSize + 'px ' + "Open Sans";
-	} while (ctx.measureText(name).width > canvas.width * 0.66);
+	} while (ctx.measureText(ign).width > finalXPos - 100);
 
-	const metrics = ctx.measureText(name) as unknown as { emHeightAscent: number, emHeightDescent: number };
+	const metrics = ctx.measureText(ign) as unknown as { emHeightAscent: number, emHeightDescent: number };
 	const fontHeight = metrics.emHeightAscent + metrics.emHeightDescent;
 
 	ctx.fillStyle = '#dddddd';
-	ctx.fillText(name, 55, 90 - (90 - fontHeight) / 2);
+	ctx.fillText(ign, 55, 90 - (90 - fontHeight) / 2);
 	ctx.save();
 
 	//Add weight and label, then resize to fit
@@ -250,24 +313,42 @@ async function createWeightImage(ign: string, uuid: string, profile: string, wei
 	ctx.fillStyle = '#dddddd';
 	ctx.fillText(result, 50, canvas.height * 0.9);
 
-	ctx.font = '64px "Open Sans"';
-	fontSize = 64;
+	ctx.font = '56px "Open Sans"';
+	fontSize = 56;
 
 	do {
 		fontSize--;
 		ctx.font = fontSize + 'px ' + "Open Sans";
-	} while (ctx.measureText('Weight').width + weightWidth > canvas.width - 515);
+	} while (ctx.measureText('Weight').width + weightWidth > canvas.width - 530);
 
 	ctx.fillStyle = '#dddddd';
-	ctx.fillText('Weight', weightWidth + 75, canvas.height * 0.9);
+	ctx.fillText('Weight', weightWidth + 60, canvas.height * 0.92);
 	const mes = ctx.measureText('Weight') as unknown as { emHeightAscent: number, emHeightDescent: number };
-	ctx.fillText('Farming', weightWidth + 75, canvas.height * 0.9 - (mes.emHeightAscent + mes.emHeightDescent));
+	ctx.fillText('Farming', weightWidth + 60, canvas.height * 0.92 - (mes.emHeightAscent + mes.emHeightDescent));
 
-	//Draw avatar
-	if (avatar) {
-		ctx.drawImage(avatar, canvas.width - (canvas.height * 0.8) - 50, (canvas.height - canvas.height * 0.8) / 2, canvas.height * 0.8, canvas.height * 0.8);
+	// Draw avatar
+	if (avatar) {	
+		const avatarSize = canvas.height * 0.8;
+		const xOffset = canvas.width - (avatarSize) - 50;
+		const yOffset = (canvas.height - avatarSize) / 2;
+	
+		ctx.drawImage(avatar, xOffset, yOffset, avatarSize, avatarSize);
 		ctx.restore();
 	}
 
 	return new AttachmentBuilder(canvas.toBuffer("image/webp"), { name: 'weight.webp' });
+}
+
+function createRoundCornerPath(ctx: SKRSContext2D, x: number, y: number, width: number, height: number, cornerRadius: number) {
+	ctx.beginPath();
+	ctx.moveTo(x + cornerRadius, y);
+	ctx.lineTo(x + width - cornerRadius, y);
+	ctx.quadraticCurveTo(x + width, y, x + width, y + cornerRadius);
+	ctx.lineTo(x + width, y + height - cornerRadius);
+	ctx.quadraticCurveTo(x + width, y + height, x + width - cornerRadius, y + height);
+	ctx.lineTo(x + cornerRadius, y + height);
+	ctx.quadraticCurveTo(x, y + height, x, y + height - cornerRadius);
+	ctx.lineTo(x, y + cornerRadius);
+	ctx.quadraticCurveTo(x, y, x + cornerRadius, y);
+	ctx.closePath();
 }
