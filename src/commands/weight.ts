@@ -96,7 +96,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 	const { data: ranking } = await FetchWeightLeaderboardRank(account.id, profile.profileId).catch(() => ({ data: undefined }));
 	const rank = ranking?.rank ?? -1;
 
-	const badge = account.badges?.filter(b => b?.visible).sort((a, b) => (b.order ?? 0) - (a.order ?? 0))[0];
+	const badge = account.badges?.filter(b => b?.visible).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))[0];
 	const badgeId = badge?.imageId ? `https://cdn.elitebot.dev/u/${badge.imageId}.png` : '';
 
 	const img = await createWeightImage(playerName, account.id, badgeId, profileWeight, rank);
