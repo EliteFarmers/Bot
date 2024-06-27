@@ -162,7 +162,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		const weight = calc.getWeightInfo().cropWeight;
 
 		embed.addFields({
-			name: `<t:${day.end}:d>`,
+			name: `<t:${day.start}:d>`,
 			value: `**Weight:** ${weight.toFixed(2)}\n` + crops.slice(0, 3)
 				.map(([crop, amount]) => `${GetCropEmoji(crop)} ${amount.toLocaleString()}`)
 				.join('\n'),
