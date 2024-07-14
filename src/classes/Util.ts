@@ -7,6 +7,7 @@ import {
 	ChannelType,
 	ActionRowBuilder,
 	StringSelectMenuBuilder,
+	Client,
 } from 'discord.js';
 import { client } from '../bot.js';
 import { CommandAccess } from './Command.js';
@@ -252,3 +253,9 @@ const CropEmojis = {
 		name: 'wheat',
 	},
 };
+
+export async function GetPurchaseUpdateChannel(client: Client) {
+	const channel = client.channels.cache.get(process.env.ENTITLEMENT_CHANNEL);
+	if (!channel || !channel.isTextBased()) return undefined;
+	return channel;
+}

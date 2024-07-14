@@ -383,3 +383,14 @@ export const UpdateGuildMemberRoles = (guildId: string, userId: string, roles: s
 			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
 		},
 	});
+
+export const RefreshUserEntitlements = (discordId: string) => POST('/bot/account/{discordId}/purchases', {
+	params: {
+		path: {
+			discordId: discordId as unknown as number,
+		},
+	},
+	headers: {
+		Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
+	},
+});
