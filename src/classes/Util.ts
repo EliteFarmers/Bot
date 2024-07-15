@@ -11,6 +11,7 @@ import {
 } from 'discord.js';
 import { client } from '../bot.js';
 import { CommandAccess } from './Command.js';
+import { SKRSContext2D } from '@napi-rs/canvas';
 
 export function isValidAccess(
 	access: CommandAccess,
@@ -258,4 +259,24 @@ export async function GetPurchaseUpdateChannel(client: Client) {
 	const channel = client.channels.cache.get(process.env.ENTITLEMENT_CHANNEL);
 	if (!channel || !channel.isTextBased()) return undefined;
 	return channel;
+}
+
+export function CreateRoundCornerPath(ctx: SKRSContext2D, x: number, y: number, width: number, height: number, cornerRadius: number) {
+	ctx.beginPath();
+	ctx.moveTo(x + cornerRadius, y);
+	ctx.lineTo(x + width - cornerRadius, y);
+	ctx.quadraticCurveTo(x + width, y, x + width, y + cornerRadius);
+	ctx.lineTo(x + width, y + height - cornerRadius);
+	ctx.quadraticCurveTo(x + width, y + height, x + width - cornerRadius, y + height);
+	ctx.lineTo(x + cornerRadius, y + height);
+	ctx.quadraticCurveTo(x, y + height, x, y + height - cornerRadius);
+	ctx.lineTo(x, y + cornerRadius);
+	ctx.quadraticCurveTo(x, y, x + cornerRadius, y);
+	ctx.closePath();
+}
+
+export function commandMd(client: Client, name: string) {
+	const command = client.application?.commands.cache.find(c => c.name === name);
+	if (!command) return '`/' + name + '`';
+	return `</${name}:${command.id}>`;
 }

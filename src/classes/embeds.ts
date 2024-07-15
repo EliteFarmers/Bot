@@ -1,9 +1,14 @@
 import { EmbedBuilder, RepliableInteraction } from "discord.js";
 
-export function EliteEmbed() {
-	return new EmbedBuilder()
+export function EliteEmbed(footer = true) {
+	const embed = new EmbedBuilder()
 		.setColor('#03fc7b')
-		.setFooter({ text: 'Powered by Elite Farmers API - kaeso.dev', iconURL: 'https://elitebot.dev/favicon.webp' });
+
+	if (footer) {
+		embed.setFooter({ text: 'Powered by Elite Farmers API - kaeso.dev', iconURL: 'https://elitebot.dev/favicon.webp' });
+	}
+
+	return embed;
 }
 
 export function ErrorEmbed(title: string) {
