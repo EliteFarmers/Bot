@@ -2,7 +2,7 @@ import { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction
 import { commands } from '../bot.js';
 import { Command, CommandGroup, CommandType } from '../classes/Command.js';
 import { HasRole, isValidAccess } from '../classes/Util.js';
-import { FetchGuild } from '../api/elite.js';
+import { FetchGuild, FetchUserSettings } from '../api/elite.js';
 
 const settings = {
 	event: Events.InteractionCreate,
@@ -32,7 +32,13 @@ async function OnCommandInteraction(interaction: ChatInputCommandInteraction | C
 	if (!hasPerms) return;
 
 	try {
-		command.execute(interaction);
+		if (interaction.entitlements.size > 0) {
+			const { data: settings } = await FetchUserSettings(interaction.user.id).catch(() => ({ data: undefined }));
+
+			command.execute(interaction, settings);
+		} else {
+			command.execute(interaction);
+		}
 	} catch (error) {
 		await interaction.reply({ 
 			content: 'There was an error while executing this command!', 

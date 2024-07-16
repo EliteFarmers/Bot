@@ -1,5 +1,5 @@
 import { components } from "../api/api.js";
-import { FetchAccount, FetchCollectionLeaderboardSlice, FetchLeaderboardRank, FetchLeaderboardSlice, FetchSkillLeaderboardSlice } from "../api/elite.js";
+import { FetchAccount, FetchCollectionLeaderboardSlice, FetchLeaderboardRank, FetchLeaderboardSlice, FetchSkillLeaderboardSlice, UserSettings } from "../api/elite.js";
 import { Command, CommandAccess, CommandType } from "../classes/Command.js";
 import { EliteEmbed, ErrorEmbed } from "../classes/embeds.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, SlashCommandBuilder, SlashCommandSubcommandGroupBuilder } from 'discord.js';
@@ -16,7 +16,7 @@ const command: Command = {
 
 export default command;
     
-async function execute(interaction: ChatInputCommandInteraction) {
+async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	let playerName = interaction.options.getString('player', false) ?? undefined;
 
 	const category = interaction.options.getSubcommandGroup() ?? '';
@@ -69,7 +69,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 	maxIndex = (lb.maxEntries ?? 1000) - 12;
 	entries = lb.entries ?? [];
 
-	const embed = await getEmbed(index, maxIndex, leaderboardId, category, title, entries);
+	const embed = await getEmbed(settings, index, maxIndex, leaderboardId, category, title, entries);
 	if (!embed) {
 		const errorEmbed = ErrorEmbed('Failed to Fetch Leaderboard!')
 			.setDescription('Please try again later. If this issue persists, contact `kaeso.dev` on Discord.')
@@ -103,7 +103,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 				}
 			}
 
-			const newEmbed = await getEmbed(index, maxIndex, leaderboardId, category, title);
+			const newEmbed = await getEmbed(settings, index, maxIndex, leaderboardId, category, title);
 
 			if (!newEmbed) {
 				const errorEmbed = ErrorEmbed('Failed to Fetch Leaderboard!')
@@ -128,7 +128,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 	});
 }
 
-async function getEmbed(index: number, maxIndex: number, leaderboardId: string, category: string, title: string, entries?: components['schemas']['LeaderboardEntryDto'][]) {
+async function getEmbed(settings: UserSettings | undefined = undefined, index: number, maxIndex: number, leaderboardId: string, category: string, title: string, entries?: components['schemas']['LeaderboardEntryDto'][]) {
 	if (!entries) {
 		entries = await FetchLeaderboard(category, leaderboardId, index, 12)
 			.then(res => { return res.data?.entries; }).catch(() => undefined);
@@ -136,7 +136,7 @@ async function getEmbed(index: number, maxIndex: number, leaderboardId: string, 
 
 	if (!entries) return undefined; 
 
-	const embed = EliteEmbed()
+	const embed = EliteEmbed(settings)
 		.setTitle(title)
 		.setDescription(`Showing **${index + 1}** - **${index + entries.length}** of **${(maxIndex + 12).toLocaleString()}** entries`)
 		.addFields(entries.map((entry, i) => ({

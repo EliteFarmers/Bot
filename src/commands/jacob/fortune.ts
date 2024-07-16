@@ -1,7 +1,7 @@
 import { EliteEmbed, ErrorEmbed, NotYoursEmbed, PrefixFooter } from '../../classes/embeds.js';
 import type { SubCommand } from '../../classes/Command.js';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, EmbedBuilder, SlashCommandSubcommandBuilder } from 'discord.js';
-import { FetchCurrentMonthlyBrackets } from '../../api/elite.js';
+import { FetchCurrentMonthlyBrackets, UserSettings } from '../../api/elite.js';
 import { GetCropEmoji } from '../../classes/Util.js';
 import { getCropFromName, getFortuneRequiredForCollection } from 'farming-weight';
 import type { components } from '../../api/api.js';
@@ -31,7 +31,7 @@ const command: SubCommand = {
 
 export default command;
 
-async function execute(interaction: ChatInputCommandInteraction) {
+async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	const useDicers = interaction.options.getBoolean('dicer', false) ?? true;
 	const useMooshroom = interaction.options.getBoolean('mooshroom', false) ?? true;
 
@@ -56,7 +56,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		return;
 	}
 
-	const embed = EliteEmbed()
+	const embed = EliteEmbed(settings)
 		.setTitle('Jacob Contest Fortune Requirements')
 		.setDescription(`Requirements are averaged using contests from <t:${+(brackets?.start ?? 0)}:R> until now.\nUsing an efficiency of **${bps} BPS** (${(ratio * 100).toFixed(1)}%)`);
 
@@ -216,8 +216,11 @@ function makeField(data: components['schemas']['ContestBracketsDetailsDto'] | un
 		let fort = fortune.toLocaleString();
 		if (fort.length < 9) fort = fort.padStart(9, ' ');
 
+		const emote = GetCropEmoji(cropName);
+		if (emote === '') return '';
+
 		return `${GetCropEmoji(cropName)} \`${collection.toLocaleString().padStart(9, ' ')}\` ${fortuneEmoji} \`${fortune.toLocaleString().padStart(5, ' ')}\``;
-	});
+	}).filter(a => a !== '');
 
 	return {
 		name: bracket + ' Bracket',

@@ -1,7 +1,7 @@
 import { EliteEmbed, ErrorEmbed } from '../classes/embeds.js';
 import { Command, CommandAccess, CommandType } from '../classes/Command.js';
 import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, Interaction } from 'discord.js';
-import { FetchAccount, GrantUserBadge } from '../api/elite.js';
+import { FetchAccount, GrantUserBadge, UserSettings } from '../api/elite.js';
 
 const command: Command = {
 	name: 'badges',
@@ -13,8 +13,8 @@ const command: Command = {
 
 export default command;
 
-async function execute(interaction: ChatInputCommandInteraction) {
-	const embed = EliteEmbed()
+async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
+	const embed = EliteEmbed(settings)
 		.setTitle('Elite Badges')
 		.addFields([
 			{ 

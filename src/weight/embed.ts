@@ -26,7 +26,7 @@ export async function createWeightEmbed({ account, profile, profileId, weightRan
 
 	const topCrop = Object.entries(profile.cropWeight ?? {}).sort(([,a], [,b]) => ((b ?? 0) - (a ?? 0)))[0][0];
 
-	const embed = EliteEmbed(false)
+	const embed = EliteEmbed(undefined, false)
 		.setAuthor({ 
 			name: `${ign} (${profileName})`, 
 			url: `https://elitebot.dev/@${uuid}/${profileId}`,

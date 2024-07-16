@@ -1,6 +1,7 @@
 import { EliteEmbed } from '../classes/embeds.js';
 import { Command, CommandAccess, CommandType } from '../classes/Command.js';
 import { ChatInputCommandInteraction } from 'discord.js';
+import { UserSettings } from '../api/elite.js';
 
 const command: Command = {
 	name: 'shop',
@@ -12,8 +13,8 @@ const command: Command = {
 
 export default command;
 
-async function execute(interaction: ChatInputCommandInteraction) {
-	const embed = EliteEmbed()
+async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
+	const embed = EliteEmbed(settings)
 		.setTitle('Elite Farmers Shop');
 
 	await interaction.reply({

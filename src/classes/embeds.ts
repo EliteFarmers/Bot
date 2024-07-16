@@ -1,8 +1,14 @@
-import { EmbedBuilder, RepliableInteraction } from "discord.js";
+import { UserSettings } from "../api/elite.js";
+import { ColorResolvable, EmbedBuilder, RepliableInteraction } from "discord.js";
 
-export function EliteEmbed(footer = true) {
+export function EliteEmbed(settings?: UserSettings, footer = true) {
 	const embed = new EmbedBuilder()
-		.setColor('#03fc7b')
+
+	if (settings?.features?.embedColor) {
+		embed.setColor('#' + settings.features.embedColor as ColorResolvable);
+	} else {
+		embed.setColor('#03fc7b')
+	}
 
 	if (footer) {
 		embed.setFooter({ text: 'Powered by Elite Farmers API - kaeso.dev', iconURL: 'https://elitebot.dev/favicon.webp' });

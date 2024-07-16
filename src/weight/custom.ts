@@ -17,15 +17,12 @@ const formatters: Record<string, CustomFormatter> = {
 	'default': createDefaultWeightImage
 }
 
-export function getCustomFormatter(options: CustomFormatterOptions): Promise<AttachmentBuilder | EmbedBuilder | null> | AttachmentBuilder | EmbedBuilder | null {
-	const weightImage = options.account.settings?.weightImage ?? 'embed';
-	if (!weightImage) {
-		return formatters['default'](options);
-	}
+export function getCustomFormatter(options: CustomFormatterOptions, style: string | undefined = undefined): Promise<AttachmentBuilder | EmbedBuilder | null> | AttachmentBuilder | EmbedBuilder | null {
+	const weightImage = style ?? options.account.settings?.features?.weightStyle ?? 'default';
 
 	const formatter = formatters[weightImage];
 	if (!formatter) {
-		return formatters['default'](options);
+		return createDefaultWeightImage(options);
 	}
 
 	return formatter(options);

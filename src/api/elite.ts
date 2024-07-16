@@ -10,6 +10,16 @@ const { GET, PUT, POST, DELETE, PATCH } = createClient<paths>({
 	},
 });
 
+export type UserSettings = components['schemas']['UserSettingsDto'];
+export const FetchUserSettings = (id: string) =>
+	GET('/account/{discordId}/settings', {
+		params: {
+			path: {
+				discordId: id as unknown as number,
+			},
+		},
+	});
+
 export const FetchAccount = (id: string) =>
 	GET('/account/{playerUuidOrIgn}', {
 		params: {

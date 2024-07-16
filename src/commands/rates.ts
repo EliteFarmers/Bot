@@ -3,6 +3,7 @@ import { Command, CommandAccess, CommandType } from '../classes/Command.js';
 import { CropSelectRow, GetCropEmoji } from '../classes/Util.js';
 import { ChatInputCommandInteraction, ComponentType, SlashCommandBuilder } from 'discord.js';
 import { calculateAverageSpecialCrops, calculateDetailedAverageDrops, Crop, getCropDisplayName } from 'farming-weight';
+import { UserSettings } from '../api/elite.js';
 
 const TIME_OPTIONS = {
 	24_000: 'Jacob Contest',
@@ -48,7 +49,7 @@ const command: Command = {
 
 export default command;
 
-async function execute(interaction: ChatInputCommandInteraction) {
+async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	const fortune = interaction.options.getInteger('fortune', false) ?? undefined;
 	const blocks = interaction.options.getInteger('time', false) ?? 72_000;
 	const reforge = interaction.options.getString('reforge', false) ?? 'bountiful';
@@ -95,15 +96,15 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		+ `**${pet === 'mooshroom' ? 'Mooshroom Cow' : 'Elephant'}**, and **4/4ths Fermento Armor**!\n`
 		+ bpsText;
 
-	const embed = EliteEmbed()
+	const embed = EliteEmbed(settings)
 		.setTitle('NPC Profit Calculator')
 		.setDescription(description)
 		.addFields({
 			name: 'Crops',
 			value: text || 'Error!',
 			inline: true,
-		})
-
+		});
+	
 	if (fortune) {
 		embed.addFields([{
 			name: 'Custom Fortune Warning',
@@ -141,7 +142,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		const specialDifference = fromSpecial - threeFourths.npc;
 		const threeFourthsTotal = cropInfo.npcCoins - specialDifference;
 
-		const cropEmbed = EliteEmbed()
+		const cropEmbed = EliteEmbed(settings)
 			.setTitle(`${cropName} Rates`)
 			.setDescription(`Expected rates for **${fortune?.toLocaleString() ?? `${cropInfo.fortune.toLocaleString()} (MAX)`}** Farming Fortune in **${timeName}**!${cropDetails}\n${bpsText}`)
 			.addFields([{

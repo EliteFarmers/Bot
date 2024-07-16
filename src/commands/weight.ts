@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, EmbedBuilder } from 'discord.js';
 import { Command, CommandAccess, CommandType } from '../classes/Command.js';
-import { FetchAccount, FetchWeight, FetchWeightLeaderboardRank } from '../api/elite.js';
+import { FetchAccount, FetchWeight, FetchWeightLeaderboardRank, UserSettings } from '../api/elite.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 import { GetCropEmoji } from '../classes/Util.js';
 import playerAutocomplete from '../autocomplete/player.js';
@@ -28,7 +28,7 @@ const command: Command = {
 
 export default command;
 
-async function execute(interaction: ChatInputCommandInteraction) {
+async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	let playerName = interaction.options.getString('player', false)?.trim();
 	const _profileName = interaction.options.getString('profile', false)?.trim();
 
@@ -98,13 +98,18 @@ async function execute(interaction: ChatInputCommandInteraction) {
 	const badge = account.badges?.filter(b => b?.visible).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))[0];
 	const badgeId = badge?.imageId ? `https://cdn.elitebot.dev/u/${badge.imageId}.png` : '';
 
+	// Apply override if set
+	const style = settings?.features?.weightStyleOverride
+		? settings.features?.weightStyle ?? undefined
+		: undefined;
+
 	const custom = await getCustomFormatter({ 
 		account, 
 		profile: profileWeight,
 		profileId: profile.profileId,
 		weightRank: rank,
 		badgeUrl: badgeId
-	});
+	}, style);
 
 	if (!custom) {
 		const embed = ErrorEmbed('Something went wrong!')
@@ -113,19 +118,34 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		return;
 	}
 
-	const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-		new ButtonBuilder()
-			.setCustomId('moreInfo')
-			.setLabel('More Info')
-			.setStyle(ButtonStyle.Success),
+	const isEmbed = custom instanceof EmbedBuilder;
+
+	let moreInfo = undefined;
+	if (settings?.features?.moreInfoDefault) {
+		moreInfo = moreInfoEmbed();
+	}
+
+	const row = new ActionRowBuilder<ButtonBuilder>();
+	
+	if (!moreInfo) {
+		row.addComponents(
+			new ButtonBuilder()
+				.setCustomId('moreInfo')
+				.setLabel('More Info')
+				.setStyle(ButtonStyle.Success)
+		);
+	}
+
+	row.addComponents(
 		new ButtonBuilder()
 			.setLabel(`@${account.name}/${profile.profileName}`)
 			.setURL(`https://elitebot.dev/@${account.name}/${encodeURIComponent(profile.profileName)}`)
 			.setStyle(ButtonStyle.Link)
 	);
 
-	const isEmbed = custom instanceof EmbedBuilder;
-	const payload = isEmbed ? { embeds: [custom] } : { files: [custom] };
+	const payload = isEmbed 
+		? (moreInfo ? { embeds: [custom, moreInfo] } : { embeds: [custom] }) 
+		: (moreInfo ? { files: [custom], embeds: [moreInfo] } : { files: [custom] });
 
 	const reply = await interaction.editReply({ 
 		components: [row], 
@@ -138,7 +158,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		return;
 	});
 
-	if (!reply) return;
+	if (!reply || moreInfo) return;
 
 	const filter = (i: { customId: string }) => i.customId === 'moreInfo';
 	const collector = reply.createMessageComponentCollector({ filter, time: 60000, componentType: ComponentType.Button });
@@ -149,14 +169,36 @@ async function execute(interaction: ChatInputCommandInteraction) {
 			return;
 		}
 
-		const crops = Object.entries(profileWeight.cropWeight ?? {})
+		const embed = moreInfoEmbed();
+
+		await i.update({ 
+			embeds: isEmbed ? [custom, embed] : [embed], 
+			components: [] 
+		}).catch(() => undefined);
+		collector.stop('done');
+	});
+
+	collector.on('end', async (_, reason) => {
+		if (reason === 'done') return;
+		
+		const linkRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+			new ButtonBuilder()
+				.setLabel(`@${account.name}/${profile.profileName}`)
+				.setURL(`https://elitebot.dev/@${account.name}/${encodeURIComponent(profile.profileName ?? '')}`)
+				.setStyle(ButtonStyle.Link)
+		);
+		await reply.edit({ components: [linkRow] }).catch(() => undefined);
+	});
+
+	function moreInfoEmbed() {
+		const crops = Object.entries(profileWeight?.cropWeight ?? {})
 			.filter(([,a]) => a && a >= 0.001)
 			.sort(([,a], [,b]) => ((b ?? 0) - (a ?? 0)));
 
-		const embed = EliteEmbed()
+		const embed = EliteEmbed(settings)
 
 		if (!isEmbed) {
-			embed.setTitle(`Stats for ${playerName?.replace(/_/g, '\\_')} on ${profile.profileName}`);
+			embed.setTitle(`Stats for ${playerName?.replace(/_/g, '\\_')} on ${profile?.profileName}`);
 			embed.addFields({ 
 				name: 'Farming Weight', 
 				value: totalWeight.toLocaleString()
@@ -179,30 +221,14 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		}, {
 			inline: true,
 			name: 'Bonus',
-			value: Object.entries(profileWeight.bonusWeight ?? {}).map(([key, value]) => {
+			value: Object.entries(profileWeight?.bonusWeight ?? {}).map(([key, value]) => {
 				return `${key} - ${value?.toLocaleString() ?? 0}`;
 			}).join('\n') || 'No bonus weight!',
 		}, {
 			name: '⠀',
-			value: `[Questions?](https://elitebot.dev/info)⠀ ⠀[@${account.name}/${profile.profileName}](https://elitebot.dev/@${account.name}/${encodeURIComponent(profile.profileName ?? '')})⠀ ⠀[SkyCrypt](https://sky.shiiyu.moe/stats/${account.name}/${encodeURIComponent(profile.profileName ?? '')})`
+			value: `[Questions?](https://elitebot.dev/info)⠀ ⠀[@${account?.name}/${profile?.profileName}](https://elitebot.dev/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')})⠀ ⠀[SkyCrypt](https://sky.shiiyu.moe/stats/${account?.name}/${encodeURIComponent(profile?.profileName ?? '')})`
 		});
 
-		await i.update({ 
-			embeds: isEmbed ? [custom, embed] : [embed], 
-			components: [] 
-		}).catch(() => undefined);
-		collector.stop('done');
-	});
-
-	collector.on('end', async (_, reason) => {
-		if (reason === 'done') return;
-		
-		const linkRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-			new ButtonBuilder()
-				.setLabel(`@${account.name}/${profile.profileName}`)
-				.setURL(`https://elitebot.dev/@${account.name}/${encodeURIComponent(profile.profileName ?? '')}`)
-				.setStyle(ButtonStyle.Link)
-		);
-		await reply.edit({ components: [linkRow] }).catch(() => undefined);
-	});
+		return embed;
+	}
 }

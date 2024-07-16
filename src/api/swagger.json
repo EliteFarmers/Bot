@@ -250,6 +250,89 @@
         }
       }
     },
+    "/account/{discordId}/settings": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Get account settings",
+        "parameters": [
+          {
+            "name": "discordId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "minLength": 17,
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSettingsDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSettingsDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSettingsDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/account/{playerUuidOrIgn}": {
       "get": {
         "tags": [
@@ -10551,6 +10634,38 @@
         },
         "additionalProperties": false
       },
+      "ConfiguredProductFeaturesDto": {
+        "type": "object",
+        "properties": {
+          "weightStyle": {
+            "type": "string",
+            "description": "Name of weight style to use.",
+            "nullable": true
+          },
+          "weightStyleOverride": {
+            "type": "boolean",
+            "description": "Ability to override other's weight styles.",
+            "nullable": true
+          },
+          "embedColor": {
+            "maxLength": 6,
+            "type": "string",
+            "description": "Embed color for the bot.",
+            "nullable": true
+          },
+          "moreInfoDefault": {
+            "type": "boolean",
+            "description": "Show \"More Info\" on weight command by default.",
+            "nullable": true
+          },
+          "hideShopPromotions": {
+            "type": "boolean",
+            "description": "If shop promotions should be hidden.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "ContestBracketsDetailsDto": {
         "type": "object",
         "properties": {
@@ -13147,36 +13262,12 @@
             "$ref": "#/components/schemas/ProductCategory"
           },
           "features": {
-            "$ref": "#/components/schemas/ProductFeaturesDto"
+            "$ref": "#/components/schemas/UnlockedProductFeaturesDto"
           },
           "flags": {
             "type": "integer",
             "description": "Discord flags",
             "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ProductFeaturesDto": {
-        "type": "object",
-        "properties": {
-          "maxMonthlyEvents": {
-            "type": "integer",
-            "description": "Maximum number of events per month",
-            "format": "int32",
-            "nullable": true
-          },
-          "maxJacobLeaderboards": {
-            "type": "integer",
-            "description": "Maximum number of Jacob leaderboards",
-            "format": "int32",
-            "nullable": true
-          },
-          "badgeId": {
-            "type": "integer",
-            "description": "Badge ID to grant",
-            "format": "int32",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -13714,6 +13805,62 @@
         },
         "additionalProperties": false
       },
+      "UnlockedProductFeaturesDto": {
+        "type": "object",
+        "properties": {
+          "badgeId": {
+            "type": "integer",
+            "description": "ID of unlocked badge.",
+            "format": "int32",
+            "nullable": true
+          },
+          "weightStyles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Name of weight style to unlock.",
+            "nullable": true
+          },
+          "weightStyleOverride": {
+            "type": "boolean",
+            "description": "Ability to override other's weight styles.",
+            "nullable": true
+          },
+          "embedColors": {
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Embed color for the bot.",
+            "nullable": true
+          },
+          "hideShopPromotions": {
+            "type": "boolean",
+            "description": "Ability to hide shop promotions.",
+            "nullable": true
+          },
+          "moreInfoDefault": {
+            "type": "boolean",
+            "description": "Show \"More Info\" on weight command by default.",
+            "nullable": true
+          },
+          "maxMonthlyEvents": {
+            "type": "integer",
+            "description": "Maximum number of events that can be created in a month. (For guilds)",
+            "format": "int32",
+            "nullable": true
+          },
+          "maxJacobLeaderboards": {
+            "type": "integer",
+            "description": "Maximum number of jacob leaderboard that can be active at once. (For guilds)",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "UnparsedApiDataDto": {
         "type": "object",
         "properties": {
@@ -13825,28 +13972,7 @@
             "nullable": true
           },
           "features": {
-            "$ref": "#/components/schemas/UpdateProductFeaturesDto"
-          }
-        },
-        "additionalProperties": false
-      },
-      "UpdateProductFeaturesDto": {
-        "type": "object",
-        "properties": {
-          "maxMonthlyEvents": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "maxJacobLeaderboards": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "badgeId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "$ref": "#/components/schemas/UnlockedProductFeaturesDto"
           }
         },
         "additionalProperties": false
@@ -13948,11 +14074,8 @@
       "UserSettingsDto": {
         "type": "object",
         "properties": {
-          "weightImage": {
-            "maxLength": 256,
-            "type": "string",
-            "description": "Default weight image for the bot",
-            "nullable": true
+          "features": {
+            "$ref": "#/components/schemas/ConfiguredProductFeaturesDto"
           }
         },
         "additionalProperties": false
