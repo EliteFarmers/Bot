@@ -1,6 +1,8 @@
 import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { Command, CommandAccess, CommandType } from "../classes/Command.js";
 import { commands } from "../bot.js";
+import { UserSettings } from "../api/elite.js";
+import { EliteEmbed } from "../classes/embeds.js";
 
 const command: Command = {
 	name: 'help',
@@ -20,7 +22,7 @@ const command: Command = {
 
 export default command;
 
-async function execute(interaction: ChatInputCommandInteraction) {
+async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 
 	const hCommand = interaction.options.getString('command', false) ?? undefined;
 
@@ -59,7 +61,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 	}
 
 	function getHelpEmbed() {
-		const helpMenu = new EmbedBuilder().setColor('#03fc7b');
+		const helpMenu = EliteEmbed(settings)
 
 		helpMenu.setTitle('Here\'s a list of all the commands:')
 

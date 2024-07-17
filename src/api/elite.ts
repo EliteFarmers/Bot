@@ -10,6 +10,16 @@ const { GET, PUT, POST, DELETE, PATCH } = createClient<paths>({
 	},
 });
 
+export type UserSettings = components['schemas']['UserSettingsDto'];
+export const FetchUserSettings = (id: string) =>
+	GET('/account/{discordId}/settings', {
+		params: {
+			path: {
+				discordId: id as unknown as number,
+			},
+		},
+	});
+
 export const FetchAccount = (id: string) =>
 	GET('/account/{playerUuidOrIgn}', {
 		params: {
@@ -30,10 +40,11 @@ export const FetchUpdateAccount = (user: User, locale?: string) =>
 		},
 	});
 
-export const FetchWeight = (playerUuid: string) =>
+export const FetchWeight = (playerUuid: string, collections = false) =>
 	GET('/weight/{playerUuid}', {
 		params: {
 			path: { playerUuid },
+			query: { collections },
 		},
 	});
 
@@ -78,6 +89,17 @@ export const FetchWeightLeaderboardRank = (
 			},
 		},
 	});
+
+export const FetchLeaderboardRankings = (playerUuid: string, profileUuid: string) =>
+	GET('/leaderboard/ranks/{playerUuid}/{profileUuid}', {
+		params: {
+			path: {
+				playerUuid,
+				profileUuid
+			}
+		}
+	});
+
 
 export const FetchLeaderboardRank = (
 	leaderboardId: string,
@@ -383,3 +405,14 @@ export const UpdateGuildMemberRoles = (guildId: string, userId: string, roles: s
 			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
 		},
 	});
+
+export const RefreshUserEntitlements = (discordId: string) => POST('/bot/account/{discordId}/purchases', {
+	params: {
+		path: {
+			discordId: discordId as unknown as number,
+		},
+	},
+	headers: {
+		Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
+	},
+});

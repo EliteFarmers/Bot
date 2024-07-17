@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { Command, CommandAccess, CommandType } from '../classes/Command.js';
-import { FetchAccount, FetchCollectionGraphs } from '../api/elite.js';
+import { FetchAccount, FetchCollectionGraphs, UserSettings } from '../api/elite.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 import { GetCropEmoji } from '../classes/Util.js';
 import playerAutocomplete from '../autocomplete/player.js';
@@ -26,7 +26,7 @@ const command: Command = {
 
 export default command;
 
-async function execute(interaction: ChatInputCommandInteraction) {
+async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	let playerName = interaction.options.getString('player', false)?.trim();
 	const _profileName = interaction.options.getString('profile', false)?.trim();
 
@@ -136,7 +136,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		days.shift();
 	}
 
-	const embed = EliteEmbed()
+	const embed = EliteEmbed(settings)
 		.setTitle(`Crop Gain for ${discordPlayerName} (${profile.profileName})`)
 		// .setDescription(`From <t:${first?.timestamp}:d> to <t:${last?.timestamp}:d>`)
 

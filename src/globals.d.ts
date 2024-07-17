@@ -6,6 +6,7 @@ namespace NodeJS {
 		CLIENT_ID: string;
 
 		ELITE_API_URL: string;
+		ENTITLEMENT_CHANNEL: string;
 
 		REDIS_URL: string;
 		REDIS_PASSWORD: string;

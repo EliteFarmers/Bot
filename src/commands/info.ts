@@ -1,6 +1,7 @@
 import { EliteEmbed } from '../classes/embeds.js';
 import { Command, CommandAccess, CommandType } from '../classes/Command.js';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { UserSettings } from '../api/elite.js';
 
 const command: Command = {
 	name: 'info',
@@ -15,8 +16,8 @@ const command: Command = {
 
 export default command;
 
-async function execute(interaction: ChatInputCommandInteraction) {
-	const embed = EliteEmbed()
+async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
+	const embed = EliteEmbed(settings)
 		.setTitle('Farming Weight Information')
 		.setDescription('Farming weight is based off of multiple different factors to provide a number for comparsion between all farmers.\n\n**Info has been moved to [elitebot.dev/info](https://elitebot.dev/info)**')
 		.addFields([

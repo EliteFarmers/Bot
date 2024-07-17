@@ -25,15 +25,17 @@ async function loadCommands() {
 
 	const subFilter = (fileName: string) => filter(fileName) && !fileName.includes('command');
 
-	await registerCommandGroups('commands', (folder, group) => {
+	await registerCommandGroups('commands', async (folder, group) => {
 		const command = new CommandGroup(group);
 
-		registerFiles<SubCommand>(folder, subFilter, (cmd) => {
+		await registerFiles<SubCommand>(folder, subFilter, (cmd) => {
 			command.addSubcommand(cmd);
 		});
 
 		commands.set(command.name, command);
 	});
+
+	await new Promise<void>(resolve => setTimeout(resolve, 3000));
 }
 
 const rest = new REST().setToken(process.env.BOT_TOKEN);
@@ -87,6 +89,10 @@ const rest = new REST().setToken(process.env.BOT_TOKEN);
 })();
 
 function getCommandJSON(command?: Command | CommandGroup): RESTPostAPIApplicationCommandsJSONBody | undefined {
+	if (command instanceof CommandGroup) {
+		return command.getCommandJSON();
+	}
+
 	if (!command) return;
 	if (command.type !== CommandType.Slash && command.type !== CommandType.Combo && command.type !== CommandType.ContextMenu) {
 		return;

@@ -1,11 +1,10 @@
-import { ChatInputCommandInteraction, AttachmentBuilder, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, EmbedBuilder } from 'discord.js';
 import { Command, CommandAccess, CommandType } from '../classes/Command.js';
-import { type SKRSContext2D, createCanvas, loadImage } from '@napi-rs/canvas';
-import { FetchAccount, FetchWeight, FetchWeightLeaderboardRank } from '../api/elite.js';
+import { FetchAccount, FetchWeight, FetchWeightLeaderboardRank, UserSettings } from '../api/elite.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
-import { components } from '../api/api.js';
 import { GetCropEmoji } from '../classes/Util.js';
 import playerAutocomplete from '../autocomplete/player.js';
+import { getCustomFormatter } from '../weight/custom.js';
 
 const command: Command = {
 	name: 'weight',
@@ -29,7 +28,7 @@ const command: Command = {
 
 export default command;
 
-async function execute(interaction: ChatInputCommandInteraction) {
+async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	let playerName = interaction.options.getString('player', false)?.trim();
 	const _profileName = interaction.options.getString('profile', false)?.trim();
 
@@ -99,34 +98,67 @@ async function execute(interaction: ChatInputCommandInteraction) {
 	const badge = account.badges?.filter(b => b?.visible).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))[0];
 	const badgeId = badge?.imageId ? `https://cdn.elitebot.dev/u/${badge.imageId}.png` : '';
 
-	const img = await createWeightImage(playerName, account.id, badgeId, profileWeight, rank);
+	// Apply override if set
+	const style = settings?.features?.weightStyleOverride
+		? settings.features?.weightStyle ?? undefined
+		: undefined;
 
-	if (!img) {
+	const custom = await getCustomFormatter({ 
+		account, 
+		profile: profileWeight,
+		profileId: profile.profileId,
+		weightRank: rank,
+		badgeUrl: badgeId
+	}, style);
+
+	if (!custom) {
 		const embed = ErrorEmbed('Something went wrong!')
-			.setDescription('Weight image couldn\'t be generated.');
+			.setDescription('Failed to generated weight image/response.');
 		interaction.followUp({ embeds: [embed], ephemeral: true });
 		return;
 	}
 
-	const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-		new ButtonBuilder()
-			.setCustomId('moreInfo')
-			.setLabel('More Info')
-			.setStyle(ButtonStyle.Success),
+	const isEmbed = custom instanceof EmbedBuilder;
+
+	let moreInfo = undefined;
+	if (settings?.features?.moreInfoDefault) {
+		moreInfo = moreInfoEmbed();
+	}
+
+	const row = new ActionRowBuilder<ButtonBuilder>();
+	
+	if (!moreInfo) {
+		row.addComponents(
+			new ButtonBuilder()
+				.setCustomId('moreInfo')
+				.setLabel('More Info')
+				.setStyle(ButtonStyle.Success)
+		);
+	}
+
+	row.addComponents(
 		new ButtonBuilder()
 			.setLabel(`@${account.name}/${profile.profileName}`)
 			.setURL(`https://elitebot.dev/@${account.name}/${encodeURIComponent(profile.profileName)}`)
 			.setStyle(ButtonStyle.Link)
 	);
 
-	const reply = await interaction.editReply({ files: [img], components: [row], allowedMentions: { repliedUser: false } }).catch(() => {
+	const payload = isEmbed 
+		? (moreInfo ? { embeds: [custom, moreInfo] } : { embeds: [custom] }) 
+		: (moreInfo ? { files: [custom], embeds: [moreInfo] } : { files: [custom] });
+
+	const reply = await interaction.editReply({ 
+		components: [row], 
+		allowedMentions: { repliedUser: false }, 
+		...payload 
+	}).catch(() => {
 		const embed = ErrorEmbed('Something went wrong!')
 			.setDescription(`Weight image couldn't be sent in this channel. There is likely something wrong with the channel permissions.`);
 		interaction.followUp({ embeds: [embed], ephemeral: true });
 		return;
 	});
 
-	if (!reply) return;
+	if (!reply || moreInfo) return;
 
 	const filter = (i: { customId: string }) => i.customId === 'moreInfo';
 	const collector = reply.createMessageComponentCollector({ filter, time: 60000, componentType: ComponentType.Button });
@@ -137,39 +169,12 @@ async function execute(interaction: ChatInputCommandInteraction) {
 			return;
 		}
 
-		const crops = Object.entries(profileWeight.cropWeight ?? {})
-			.filter(([,a]) => a && a >= 0.001)
-			.sort(([,a], [,b]) => ((b ?? 0) - (a ?? 0)));
+		const embed = moreInfoEmbed();
 
-		const embed = EliteEmbed()
-			.setTitle(`Stats for ${playerName?.replace(/_/g, '\\_')} on ${profile.profileName}`)
-			.addFields({ 
-				name: 'Farming Weight', 
-				value: totalWeight.toLocaleString()
-			})
-			.addFields({
-				inline: true,
-				name: 'Breakdown', 
-				value: crops.map(([key, value]) => {
-					const percent = Math.round((value ?? 0) / totalWeight * 1000) / 10;
-					return `${GetCropEmoji(key)} ${value?.toLocaleString() ?? 0} ⠀${percent > 2 ? `[${percent}%]` : ''}`;
-				}).join('\n') || 'No notable collections!',
-			}, {
-				inline: true,
-				name: '⠀',
-				value: '⠀'
-			}, {
-				inline: true,
-				name: 'Bonus',
-				value: Object.entries(profileWeight.bonusWeight ?? {}).map(([key, value]) => {
-					return `${key} - ${value?.toLocaleString() ?? 0}`;
-				}).join('\n') || 'No bonus weight!',
-			}, {
-				name: '⠀',
-				value: `[Questions?](https://elitebot.dev/info)⠀ ⠀[@${account.name}/${profile.profileName}](https://elitebot.dev/@${account.name}/${encodeURIComponent(profile.profileName ?? '')})⠀ ⠀[SkyCrypt](https://sky.shiiyu.moe/stats/${account.name}/${encodeURIComponent(profile.profileName ?? '')})`
-			});
-
-		await i.update({ embeds: [embed], components: [] }).catch(() => undefined);
+		await i.update({ 
+			embeds: isEmbed ? [custom, embed] : [embed], 
+			components: [] 
+		}).catch(() => undefined);
 		collector.stop('done');
 	});
 
@@ -184,171 +189,46 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		);
 		await reply.edit({ components: [linkRow] }).catch(() => undefined);
 	});
-}
 
-async function createWeightImage(ign: string, uuid: string, badgeId: string, weight: components['schemas']['FarmingWeightDto'], rank = -1) {
-	let result = "Hey what's up?";
-	const rWeight = Math.round((weight.totalWeight ?? 0) * 100) / 100;
+	function moreInfoEmbed() {
+		const crops = Object.entries(profileWeight?.cropWeight ?? {})
+			.filter(([,a]) => a && a >= 0.001)
+			.sort(([,a], [,b]) => ((b ?? 0) - (a ?? 0)));
 
-	if (rWeight > 1) {
-		result = rWeight.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-	} else if (rWeight === -1) {
-		result = 'This player has collections API off!';
-	} else {
-		result = rWeight.toString();
+		const embed = EliteEmbed(settings)
+
+		if (!isEmbed) {
+			embed.setTitle(`Stats for ${playerName?.replace(/_/g, '\\_')} on ${profile?.profileName}`);
+			embed.addFields({ 
+				name: 'Farming Weight', 
+				value: totalWeight.toLocaleString()
+			});
+		} else if (custom.data.color) {
+			embed.setColor(custom.data.color);
+		}
+		
+		embed.addFields({
+			inline: true,
+			name: 'Breakdown', 
+			value: crops.map(([key, value]) => {
+				const percent = Math.round((value ?? 0) / totalWeight * 1000) / 10;
+				return `${GetCropEmoji(key)} ${value?.toLocaleString() ?? 0} ⠀${percent > 2 ? `[${percent}%]` : ''}`;
+			}).join('\n') || 'No notable collections!',
+		}, {
+			inline: true,
+			name: '⠀',
+			value: '⠀'
+		}, {
+			inline: true,
+			name: 'Bonus',
+			value: Object.entries(profileWeight?.bonusWeight ?? {}).map(([key, value]) => {
+				return `${key} - ${value?.toLocaleString() ?? 0}`;
+			}).join('\n') || 'No bonus weight!',
+		}, {
+			name: '⠀',
+			value: `[Questions?](https://elitebot.dev/info)⠀ ⠀[@${account?.name}/${profile?.profileName}](https://elitebot.dev/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')})⠀ ⠀[SkyCrypt](https://sky.shiiyu.moe/stats/${account?.name}/${encodeURIComponent(profile?.profileName ?? '')})`
+		});
+
+		return embed;
 	}
-
-	/*
-	The below code is not fun at all and just generally awful, but basically the only way to do all this so yeah.
-
-	Different sections are commented but you sort of need to know what you're looking at already.
-	*/
-
-	const sources = weight.cropWeight;
-
-	//Get image relating to their top collection
-	let imagePath;
-	if (sources) {
-		const topCollection = Object.entries(sources).sort(([,a], [,b]) => ((b ?? 0) - (a ?? 0)))[0][0];
-		imagePath = `./src/assets/images/${topCollection.toLowerCase().replace(' ', '_')}.png`;
-	} else {
-		imagePath = `./src/assets/images/wheat.png`
-	}
-
-	// Load crop image and avatar
-	const images = [
-		loadImage(imagePath),
-		loadImage(`https://mc-heads.net/head/${uuid}/left`).catch(() => {
-			return null;
-		}),
-		badgeId !== '' ? loadImage(badgeId).catch(() => {
-			return null;
-		}) : null
-	];
-
-	const [ background, avatar, badge ] = await Promise.all(images);
-	if (!background || !avatar) {
-		return null;
-	}
-
-	// Create our canvas and draw the crop image
-	const canvas = createCanvas(background.width, background.height);
-	const ctx = canvas.getContext('2d');
-
-	createRoundCornerPath(ctx, 0, 0, canvas.width, canvas.height, 5);
-	ctx.clip();
-	ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
-
-	const badgeWidth = canvas.width * 0.15;
-	const badgeHeight = badgeWidth / 3;
-	const badgeXPos = canvas.width * 0.771 - badgeWidth;
-	const badgeYPos = 14;
-	const cornerRadius = 15;
-	let finalXPos = badgeXPos;
-
-	if (rank > 0) {
-		ctx.save();
-		ctx.fillStyle = '#09090b';
-
-		const rankText = `  ${rank}`;
-
-		ctx.font = '80px "Open Sans"';
-		let fontSize = 80;
-		do {
-			fontSize--;
-			ctx.font = fontSize + 'px ' + "Open Sans";
-		} while (ctx.measureText(rankText).width > badgeWidth - 50);
-
-		const metrics = ctx.measureText(rankText);
-		const fontHeight = metrics.actualBoundingBoxAscent //+ metrics.actualBoundingBoxDescent;
-	
-		const width = metrics.width + 30;
-		const x = badge ? badgeXPos - width - 15 : badgeXPos + badgeWidth - width - 15;
-		finalXPos = x;
-
-		createRoundCornerPath(ctx, x, badgeYPos, width, badgeHeight, cornerRadius);
-		ctx.clip();
-		ctx.fillRect(x, badgeYPos, width, badgeHeight);
-
-		ctx.fillStyle = '#dddddd';
-		ctx.fillText(rankText, x + 15, badgeHeight + badgeYPos - (badgeHeight - fontHeight) / 2);
-		ctx.font = `${fontSize - 16}px "Open Sans"`
-		ctx.fillText('#', x + 15, badgeHeight + badgeYPos - (badgeHeight - fontHeight) / 2);
-
-		ctx.restore();
-	}
-
-	if (badge) {
-		ctx.save();
-		createRoundCornerPath(ctx, badgeXPos, badgeYPos, badgeWidth, badgeHeight, cornerRadius);
-		ctx.clip();
-		ctx.drawImage(badge, badgeXPos, badgeYPos, badgeWidth, badgeHeight);
-		ctx.restore();
-	}
-
-	ctx.font = '100px "Open Sans"';
-	let fontSize = 100;
-	do {
-		fontSize--;
-		ctx.font = fontSize + 'px ' + "Open Sans";
-	} while (ctx.measureText(ign).width > finalXPos - 100);
-
-	const metrics = ctx.measureText(ign) as unknown as { emHeightAscent: number, emHeightDescent: number };
-	const fontHeight = metrics.emHeightAscent + metrics.emHeightDescent;
-
-	ctx.fillStyle = '#dddddd';
-	ctx.fillText(ign, 55, 90 - (90 - fontHeight) / 2);
-	ctx.save();
-
-	//Add weight and label, then resize to fit
-	ctx.font = '256px "Open Sans"';
-	fontSize = 256;
-
-	do {
-		fontSize--;
-		ctx.font = fontSize + 'px ' + "Open Sans";
-	} while (ctx.measureText(result).width > canvas.width * 0.66);
-	const weightWidth = ctx.measureText(result).width;
-
-	ctx.fillStyle = '#dddddd';
-	ctx.fillText(result, 50, canvas.height * 0.9);
-
-	ctx.font = '56px "Open Sans"';
-	fontSize = 56;
-
-	do {
-		fontSize--;
-		ctx.font = fontSize + 'px ' + "Open Sans";
-	} while (ctx.measureText('Weight').width + weightWidth > canvas.width - 530);
-
-	ctx.fillStyle = '#dddddd';
-	ctx.fillText('Weight', weightWidth + 60, canvas.height * 0.92);
-	const mes = ctx.measureText('Weight') as unknown as { emHeightAscent: number, emHeightDescent: number };
-	ctx.fillText('Farming', weightWidth + 60, canvas.height * 0.92 - (mes.emHeightAscent + mes.emHeightDescent));
-
-	// Draw avatar
-	if (avatar) {	
-		const avatarSize = canvas.height * 0.8;
-		const xOffset = canvas.width - (avatarSize) - 50;
-		const yOffset = (canvas.height - avatarSize) / 2;
-	
-		ctx.drawImage(avatar, xOffset, yOffset, avatarSize, avatarSize);
-		ctx.restore();
-	}
-
-	return new AttachmentBuilder(canvas.toBuffer("image/webp"), { name: 'weight.webp' });
-}
-
-function createRoundCornerPath(ctx: SKRSContext2D, x: number, y: number, width: number, height: number, cornerRadius: number) {
-	ctx.beginPath();
-	ctx.moveTo(x + cornerRadius, y);
-	ctx.lineTo(x + width - cornerRadius, y);
-	ctx.quadraticCurveTo(x + width, y, x + width, y + cornerRadius);
-	ctx.lineTo(x + width, y + height - cornerRadius);
-	ctx.quadraticCurveTo(x + width, y + height, x + width - cornerRadius, y + height);
-	ctx.lineTo(x + cornerRadius, y + height);
-	ctx.quadraticCurveTo(x, y + height, x, y + height - cornerRadius);
-	ctx.lineTo(x, y + cornerRadius);
-	ctx.quadraticCurveTo(x, y, x + cornerRadius, y);
-	ctx.closePath();
 }

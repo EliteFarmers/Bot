@@ -1,6 +1,6 @@
 // This is to allow the generic "Function" to be used, as it's the easiest way to allow both types of commands
 /* eslint-disable @typescript-eslint/ban-types */
-import { AutocompleteInteraction, BaseInteraction, Client, ContextMenuCommandBuilder, Interaction, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
+import { AutocompleteInteraction, BaseInteraction, Client, ContextMenuCommandBuilder, Interaction, PermissionsBitField, RESTPostAPIApplicationCommandsJSONBody, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "discord.js";
 import fs from 'fs';
 
 export interface CommandBase {
@@ -61,8 +61,8 @@ export class CommandGroup implements CommandGroupSettings {
 		this.permissions = settings.permissions;
 
 		this.slash = settings.slash ?? new SlashCommandBuilder()
-			.setName(this.name)
-			.setDescription(this.description);
+			.setName(this.name);
+		// .setDescription(this.description);
 
 		this.selfExecute = settings.execute ?? (() => undefined);
 		this.subcommands = {};
@@ -106,6 +106,29 @@ export class CommandGroup implements CommandGroupSettings {
 
 		this.slash.addSubcommand(slash);
 		this.subcommands[subCommand.name] = subCommand;
+	}
+
+	public getCommandJSON(): RESTPostAPIApplicationCommandsJSONBody | undefined {
+		if (this.type !== CommandType.Slash && this.type !== CommandType.Combo && this.type !== CommandType.ContextMenu) {
+			return;
+		}
+		
+		this.slash ??= new SlashCommandBuilder();
+		const slash = this.slash;
+	
+		if (!slash.name) {
+			slash.setName(this.name);
+		}
+	
+		if ('setDescription' in slash && !slash.description) {
+			slash.setDescription(this.description);
+		}
+		
+		if (this.permissions) {
+			slash.setDefaultMemberPermissions(PermissionsBitField.resolve(this.permissions));
+		}
+
+		return this.slash.toJSON();
 	}
 }
 

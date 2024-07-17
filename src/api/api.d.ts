@@ -180,6 +180,68 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/account/{discordId}/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get account settings */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    discordId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["UserSettingsDto"];
+                        "application/json": components["schemas"]["UserSettingsDto"];
+                        "text/json": components["schemas"]["UserSettingsDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/account/{playerUuidOrIgn}": {
         parameters: {
             query?: never;
@@ -340,7 +402,103 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/admins": {
+    "/account/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update user settings */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UserSettingsDto"];
+                    "text/json": components["schemas"]["UserSettingsDto"];
+                    "application/*+json": components["schemas"]["UserSettingsDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/account/purchases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refresh purchases */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admins": {
         parameters: {
             query?: never;
             header?: never;
@@ -395,136 +553,6 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/admin/permissions/{memberId}/{permission}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Add member permissions
-         * @deprecated
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    memberId: number;
-                    permission: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": string;
-                        "application/json": string;
-                        "text/json": string;
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": string;
-                        "application/json": string;
-                        "text/json": string;
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": string;
-                        "application/json": string;
-                        "text/json": string;
-                    };
-                };
-            };
-        };
-        /**
-         * Remove member permissions
-         * @deprecated
-         */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    memberId: number;
-                    permission: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": string;
-                        "application/json": string;
-                        "text/json": string;
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": string;
-                        "application/json": string;
-                        "text/json": string;
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": string;
-                        "application/json": string;
-                        "text/json": string;
-                    };
-                };
-            };
-        };
         options?: never;
         head?: never;
         patch?: never;
@@ -2767,6 +2795,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/bot/account/{discordId}/purchases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refresh user purchases */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    discordId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/contests/at/{year}": {
         parameters: {
             query?: never;
@@ -3178,6 +3242,148 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/{accountId}/entitlements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all entitlements for a user or guild */
+        get: {
+            parameters: {
+                query?: {
+                    target?: components["schemas"]["EntitlementTarget"];
+                };
+                header?: never;
+                path: {
+                    accountId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["EntitlementDto"][];
+                        "application/json": components["schemas"]["EntitlementDto"][];
+                        "text/json": components["schemas"]["EntitlementDto"][];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/{accountId}/entitlement/{productId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Grant a test entitlement to a user or guild */
+        post: {
+            parameters: {
+                query?: {
+                    target?: components["schemas"]["EntitlementTarget"];
+                };
+                header?: never;
+                path: {
+                    accountId: number;
+                    productId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/{accountId}/entitlement/{entitlementId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a test entitlement from a user or guild */
+        delete: {
+            parameters: {
+                query?: {
+                    target?: components["schemas"]["EntitlementTarget"];
+                };
+                header?: never;
+                path: {
+                    accountId: number;
+                    entitlementId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
@@ -4612,6 +4818,79 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/guild/{guildId}/lock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Set the guild's locked status */
+        post: {
+            parameters: {
+                query?: {
+                    /** @description If server subscriptions should overwrite feature values. */
+                    locked?: boolean;
+                };
+                header?: never;
+                path: {
+                    /** @description Discord server (guild) ID */
+                    guildId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/leaderboard/leaderboards": {
         parameters: {
             query?: never;
@@ -5371,6 +5650,84 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all products */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProductDto"][];
+                        "application/json": components["schemas"]["ProductDto"][];
+                        "text/json": components["schemas"]["ProductDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/product/{productId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update a product */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    productId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateProductDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         trace?: never;
     };
     "/profile/{uuid}/selected": {
@@ -6571,6 +6928,53 @@ export interface paths {
         };
         trace?: never;
     };
+    "/user/guild/{guildId}/purchases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refresh purchases */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    guildId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string;
+                        "application/json": string;
+                        "text/json": string;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/weight/{playerUuid}": {
         parameters: {
             query?: never;
@@ -6581,7 +6985,9 @@ export interface paths {
         /** Get farming weight for all profiles of a player */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    collections?: boolean;
+                };
                 header?: never;
                 path: {
                     /** @description Player UUID */
@@ -6633,7 +7039,9 @@ export interface paths {
         /** Get farming weight for the selected profile of a player */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    collections?: boolean;
+                };
                 header?: never;
                 path: {
                     playerUuid: string;
@@ -6684,7 +7092,9 @@ export interface paths {
         /** Get farming weight for a specific profile of a player */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    collections?: boolean;
+                };
                 header?: never;
                 path: {
                     playerUuid: string;
@@ -6859,18 +7269,24 @@ export interface components {
             roles: string[];
         };
         AuthorizedAccountDto: {
+            /** @description Discord user ID */
             id?: string;
+            /** @description Discord display name */
             displayName?: string;
+            /** @description Discord username (unique) */
             username?: string;
-            /** Format: int32 */
-            permissions?: number;
+            /** @deprecated */
             discriminator?: string | null;
+            /** @description Discord email, not asked for normally */
             email?: string | null;
+            /** @description Discord user locale */
             locale?: string | null;
+            /** @description Discord avatar URL hash */
             avatar?: string | null;
-            redemptions?: components["schemas"]["RedemptionDto"][];
-            inventory?: components["schemas"]["EliteInventoryDto"];
-            settings?: components["schemas"]["EliteSettingsDto"];
+            settings?: components["schemas"]["UserSettingsDto"];
+            /** @description Purchased entitlements from the Discord store */
+            entitlements?: components["schemas"]["EntitlementDto"][];
+            /** @description Linked Minecraft accounts */
             minecraftAccounts?: components["schemas"]["MinecraftAccountDetailsDto"][];
         };
         AuthorizedGuildDto: {
@@ -6940,6 +7356,18 @@ export interface components {
             pestLeaderboards?: {
                 [key: string]: components["schemas"]["Leaderboard"] | undefined;
             };
+        };
+        ConfiguredProductFeaturesDto: {
+            /** @description Name of weight style to use. */
+            weightStyle?: string | null;
+            /** @description Ability to override other's weight styles. */
+            weightStyleOverride?: boolean | null;
+            /** @description Embed color for the bot. */
+            embedColor?: string | null;
+            /** @description Show "More Info" on weight command by default. */
+            moreInfoDefault?: boolean | null;
+            /** @description If shop promotions should be hidden. */
+            hideShopPromotions?: boolean | null;
         };
         ContestBracketsDetailsDto: {
             start?: string;
@@ -7200,23 +7628,38 @@ export interface components {
             /** Format: int32 */
             order?: number | null;
         };
-        EliteInventoryDto: {
-            totalEarnedMedals?: components["schemas"]["MedalInventoryDto"];
-            spentMedals?: components["schemas"]["MedalInventoryDto"];
-            /** Format: int32 */
-            eventTokens?: number;
-            /** Format: int32 */
-            eventTokensSpent?: number;
-            /** Format: int32 */
-            leaderboardTokens?: number;
-            /** Format: int32 */
-            leaderboardTokensSpent?: number;
-            unlockedCosmetics?: string[];
+        EntitlementDto: {
+            /** @description Entitlement ID */
+            id: string;
+            type?: components["schemas"]["EntitlementType"];
+            target?: components["schemas"]["EntitlementTarget"];
+            /** @description SKU ID of the product */
+            productId: string;
+            product: components["schemas"]["ProductDto"];
+            deleted?: boolean;
+            /** @description Consumed status of the entitlement if applicable */
+            consumed?: boolean | null;
+            /**
+             * Format: date-time
+             * @description Start date of the entitlement
+             */
+            startDate?: string | null;
+            /**
+             * Format: date-time
+             * @description End date of the entitlement
+             */
+            endDate?: string | null;
         };
-        EliteSettingsDto: {
-            defaultPlayerUuid?: string;
-            hideDiscordTag?: boolean;
-        };
+        /**
+         * Format: int32
+         * @enum {integer}
+         */
+        EntitlementTarget: 0 | 1 | 2;
+        /**
+         * Format: int32
+         * @enum {integer}
+         */
+        EntitlementType: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
         EventCreatedDto: {
             id: string;
             /** Format: date-time */
@@ -7347,6 +7790,9 @@ export interface components {
         FarmingWeightDto: {
             /** Format: double */
             totalWeight?: number;
+            crops?: {
+                [key: string]: (number | null) | undefined;
+            } | null;
             cropWeight?: {
                 [key: string]: number | undefined;
             };
@@ -7364,6 +7810,9 @@ export interface components {
             profileName: string;
             /** Format: double */
             totalWeight?: number;
+            crops?: {
+                [key: string]: (number | null) | undefined;
+            } | null;
             cropWeight?: {
                 [key: string]: number | undefined;
             };
@@ -7399,6 +7848,7 @@ export interface components {
             createdEvents?: components["schemas"]["EventCreatedDto"][];
         };
         GuildFeatures: {
+            locked?: boolean;
             jacobLeaderboardEnabled?: boolean;
             jacobLeaderboard?: components["schemas"]["GuildJacobLeaderboardFeature"];
             verifiedRoleEnabled?: boolean;
@@ -7679,6 +8129,7 @@ export interface components {
             discordId?: string | null;
             discordUsername?: string | null;
             discordAvatar?: string | null;
+            settings?: components["schemas"]["UserSettingsDto"];
             properties?: components["schemas"]["MinecraftAccountPropertyDto"][];
             profiles?: components["schemas"]["ProfileDetailsDto"][];
             badges?: components["schemas"]["UserBadgeDto"][];
@@ -7791,6 +8242,36 @@ export interface components {
             instance?: string | null;
             [key: string]: unknown;
         };
+        /**
+         * Format: int32
+         * @enum {integer}
+         */
+        ProductCategory: 0 | 1 | 2;
+        ProductDto: {
+            /** @description Product ID */
+            id: string;
+            /** @description Product name */
+            name: string;
+            /** @description Slug of the product */
+            slug: string;
+            /** @description Icon URL */
+            icon?: string | null;
+            /** @description Product description */
+            description?: string | null;
+            type?: components["schemas"]["ProductType"];
+            category?: components["schemas"]["ProductCategory"];
+            features?: components["schemas"]["UnlockedProductFeaturesDto"];
+            /**
+             * Format: int32
+             * @description Discord flags
+             */
+            flags?: number;
+        };
+        /**
+         * Format: int32
+         * @enum {integer}
+         */
+        ProductType: 2 | 3 | 5 | 6;
         ProfileDetailsDto: {
             profileId: string;
             profileName: string;
@@ -7799,6 +8280,18 @@ export interface components {
             /** Format: double */
             bankBalance?: number;
             members?: components["schemas"]["MemberDetailsDto"][];
+        };
+        ProfileEventMemberDto: {
+            eventId: string;
+            eventName: string;
+            teamId?: string | null;
+            status?: components["schemas"]["EventMemberStatus"];
+            /**
+             * Format: int32
+             * @description Currently not populated
+             */
+            rank?: number;
+            score?: string | null;
         };
         ProfileMemberDto: {
             profileId: string;
@@ -7826,7 +8319,7 @@ export interface components {
             farmingWeight: components["schemas"]["FarmingWeightDto"];
             skills?: components["schemas"]["SkillsDto"];
             chocolateFactory?: components["schemas"]["ChocolateFactoryDto"];
-            events?: components["schemas"]["EventMemberDto"][];
+            events?: components["schemas"]["ProfileEventMemberDto"][];
             isSelected?: boolean;
             wasRemoved?: boolean;
             /** Format: int64 */
@@ -7879,12 +8372,6 @@ export interface components {
             requiredRoles?: components["schemas"]["DiscordRole"][];
             excludedTimespans?: components["schemas"]["ExcludedTimespan"][];
             leaderboards?: components["schemas"]["PublicJacobLeaderboardDto"][];
-        };
-        RedemptionDto: {
-            itemId: string;
-            cost: string;
-            /** Format: date-time */
-            timestamp?: string;
         };
         SkillsDataPointDto: {
             /** Format: int64 */
@@ -7953,6 +8440,33 @@ export interface components {
             /** Format: int64 */
             expire_at?: number;
         };
+        UnlockedProductFeaturesDto: {
+            /**
+             * Format: int32
+             * @description ID of unlocked badge.
+             */
+            badgeId?: number | null;
+            /** @description Name of weight style to unlock. */
+            weightStyles?: string[] | null;
+            /** @description Ability to override other's weight styles. */
+            weightStyleOverride?: boolean | null;
+            /** @description Embed color for the bot. */
+            embedColors?: string[] | null;
+            /** @description Ability to hide shop promotions. */
+            hideShopPromotions?: boolean | null;
+            /** @description Show "More Info" on weight command by default. */
+            moreInfoDefault?: boolean | null;
+            /**
+             * Format: int32
+             * @description Maximum number of events that can be created in a month. (For guilds)
+             */
+            maxMonthlyEvents?: number | null;
+            /**
+             * Format: int32
+             * @description Maximum number of jacob leaderboard that can be active at once. (For guilds)
+             */
+            maxJacobLeaderboards?: number | null;
+        };
         UnparsedApiDataDto: {
             perks?: {
                 [key: string]: (number | null) | undefined;
@@ -7979,6 +8493,12 @@ export interface components {
             updateRoleId?: string | null;
             pingForSmallImprovements?: boolean | null;
         };
+        UpdateProductDto: {
+            category?: components["schemas"]["ProductCategory"];
+            icon?: string | null;
+            description?: string | null;
+            features?: components["schemas"]["UnlockedProductFeaturesDto"];
+        };
         UserBadgeDto: {
             /** Format: int32 */
             id?: number;
@@ -7990,6 +8510,9 @@ export interface components {
             visible?: boolean;
             /** Format: int32 */
             order?: number;
+        };
+        UserSettingsDto: {
+            features?: components["schemas"]["ConfiguredProductFeaturesDto"];
         };
         VerifiedRoleFeature: {
             enabled?: boolean;

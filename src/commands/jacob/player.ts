@@ -1,7 +1,7 @@
 import { SubCommand } from "../../classes/Command.js";
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, CommandInteraction, ComponentType, EmbedBuilder, StringSelectMenuBuilder, SlashCommandSubcommandBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, CommandInteraction, ComponentType, StringSelectMenuBuilder, SlashCommandSubcommandBuilder } from 'discord.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from "../../classes/embeds.js";
-import { FetchAccount, FetchProfile } from "../../api/elite.js";
+import { FetchAccount, FetchProfile, UserSettings } from "../../api/elite.js";
 import { GetReadableDate } from "../../classes/SkyblockDate.js";
 import { GetCropEmoji, GetMedalEmoji } from "../../classes/Util.js";
 import playerAutocomplete from "../../autocomplete/player.js";
@@ -23,21 +23,24 @@ const command: SubCommand = {
 
 export default command;
 
-async function execute(interaction: ButtonInteraction | ChatInputCommandInteraction) {
+async function execute(interaction: ButtonInteraction | ChatInputCommandInteraction, settings?: UserSettings) {
+	console.log(settings);
 	if (interaction instanceof CommandInteraction) {
 
 		const args: JacobCMDArgs = {
 			playerName: interaction.options.getString('player', false) ?? undefined,
-			profileName: interaction.options.getString('profile', false) ?? undefined
+			profileName: interaction.options.getString('profile', false) ?? undefined,
+			settings
 		}
 
 		return await commandExecute(interaction, args);
 		
-	} else return await commandExecute(interaction, { playerName: interaction.customId.split('|')[1] });
+	} else return await commandExecute(interaction, { playerName: interaction.customId.split('|')[1], settings });
 }
 
 async function commandExecute(interaction: ChatInputCommandInteraction | ButtonInteraction, cmdArgs: JacobCMDArgs) {
 	let { playerName, profileName } = cmdArgs;
+	const settings = cmdArgs.settings;
 
 	await interaction.deferReply();
 
@@ -91,7 +94,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 		? `Out of **${jacob.participations?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests, **${account.name?.replace(/_/g, '\\_')}** has been 1st **${jacob.contests?.filter(c => c.position === 0).length.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** times!`
 		: `**${account.name?.replace(/_/g, '\\_')}** has participated in **${jacob.participations?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests!`;
 
-	const embed = EliteEmbed()
+	const embed = EliteEmbed(settings)
 		.setTitle(`Jacob's Stats for ${playerName.replace(/_/g, '\\_')}${profileName ? ` on ${profileName}` : ``}`)
 		.setDescription(`${GetMedalEmoji('diamond')}**${earned?.diamond}** ${GetMedalEmoji('platinum')}**${earned?.platinum}** ${GetMedalEmoji('gold')} ${medals?.gold} / **${earned?.gold}** ${GetMedalEmoji('silver')} ${medals?.silver} / **${earned?.silver}** ${GetMedalEmoji('bronze')} ${medals?.bronze} / **${earned?.bronze}**\n${partic}\n⠀`)
 		.addFields(contests.slice(0, 3).map((contest) => ({
@@ -171,7 +174,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 	async function getRecents(selectedCrop?: string) {		
 		const entries = (selectedCrop) ? contests.filter(c => c.crop === selectedCrop) : contests;
 
-		const newEmbed = new EmbedBuilder().setColor('#03fc7b')
+		const newEmbed = EliteEmbed(settings)
 			.setTitle(`Recent ${selectedCrop ? selectedCrop : 'Jacob\'s'} Contests for ${playerName?.replace(/_/g, '\\_')}${profileName ? ` on ${profileName}` : ``}`)
 			.setDescription((entries.length !== 1 
 				? `Showing the most recent **${Math.min(10, entries.length)}** / **${entries.length.toLocaleString()}** contests${selectedCrop ? ` for ${selectedCrop}` : ``}!`
@@ -220,6 +223,7 @@ type JacobCMDArgs = {
 	playerName?: string,
 	profileName?: string
 	ign?: string,
+	settings?: UserSettings
 }
 
 function getComponents(page: number, playerName?: string, profileName?: string) {
