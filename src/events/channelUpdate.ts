@@ -14,13 +14,11 @@ async function execute(channel: GuildChannel) {
 	const me = channel.guild.members.me ?? await channel.guild.members.fetchMe();
 	const ownPermissions = channel.permissionsFor(me).bitfield.toString();
 
-	const { response } = await UpdateGuildChannel(channel.guild.id, {
+	await UpdateGuildChannel(channel.guild.id, {
 		id: channel.id,
 		name: channel.name,
 		type: channel.type,
 		position: channel.position,
 		permissions: ownPermissions,
 	});
-
-	console.log(`Response: ${response.status}`);
 }

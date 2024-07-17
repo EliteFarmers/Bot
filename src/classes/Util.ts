@@ -256,7 +256,8 @@ const CropEmojis = {
 };
 
 export async function GetPurchaseUpdateChannel(client: Client) {
-	const channel = client.channels.cache.get(process.env.ENTITLEMENT_CHANNEL);
+	const channel = client.channels.cache.get(process.env.ENTITLEMENT_CHANNEL)
+		?? await client.channels.fetch(process.env.ENTITLEMENT_CHANNEL);
 	if (!channel || !channel.isTextBased()) return undefined;
 	return channel;
 }
