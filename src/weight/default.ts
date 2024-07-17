@@ -1,7 +1,7 @@
 import { AttachmentBuilder } from "discord.js";
 import { CustomFormatterOptions } from "./custom.js";
 import { createCanvas, loadImage } from "@napi-rs/canvas";
-import { CreateRoundCornerPath } from "classes/Util.js";
+import { CreateRoundCornerPath } from "../classes/Util.js";
 
 export async function createDefaultWeightImage({ account, profile, weightRank = -1, badgeUrl = '' }: CustomFormatterOptions) {
 	const ign = account.name ?? 'Unknown';
