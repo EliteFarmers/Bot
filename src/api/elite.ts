@@ -40,10 +40,11 @@ export const FetchUpdateAccount = (user: User, locale?: string) =>
 		},
 	});
 
-export const FetchWeight = (playerUuid: string) =>
+export const FetchWeight = (playerUuid: string, collections = false) =>
 	GET('/weight/{playerUuid}', {
 		params: {
 			path: { playerUuid },
+			query: { collections },
 		},
 	});
 
@@ -88,6 +89,17 @@ export const FetchWeightLeaderboardRank = (
 			},
 		},
 	});
+
+export const FetchLeaderboardRankings = (playerUuid: string, profileUuid: string) =>
+	GET('/leaderboard/ranks/{playerUuid}/{profileUuid}', {
+		params: {
+			path: {
+				playerUuid,
+				profileUuid
+			}
+		}
+	});
+
 
 export const FetchLeaderboardRank = (
 	leaderboardId: string,
