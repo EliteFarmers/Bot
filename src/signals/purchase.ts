@@ -18,7 +18,7 @@ async function execute(signal: Signal) {
 	if (!signal.isExpected<Data>()) return;
 
 	const { guild, data } = signal;
-	const channelId = process.env.ENTITLEMENT_CHANNEL_ID;
+	const channelId = process.env.ENTITLEMENT_CHANNEL;
 
 	if (!guild || !channelId) return;
 
