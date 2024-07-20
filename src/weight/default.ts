@@ -3,7 +3,7 @@ import { CustomFormatterOptions } from "./custom.js";
 import { createCanvas, loadImage } from "@napi-rs/canvas";
 import { CreateRoundCornerPath } from "../classes/Util.js";
 
-export async function createDefaultWeightImage({ account, profile, weightRank = -1, badgeUrl = '' }: CustomFormatterOptions) {
+export async function createDefaultWeightImage({ settings, account, profile, weightRank = -1, badgeUrl = '' }: CustomFormatterOptions) {
 	const ign = account.name ?? 'Unknown';
 	const uuid = account.id ?? 'Unknown';
 
@@ -58,6 +58,14 @@ export async function createDefaultWeightImage({ account, profile, weightRank = 
 	CreateRoundCornerPath(ctx, 0, 0, canvas.width, canvas.height, 5);
 	ctx.clip();
 	ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+	
+	let stripeColor = settings?.features?.weightStyleOverride ? settings.features?.embedColor : undefined;
+	stripeColor ??= account.settings?.features?.embedColor;
+
+	if (stripeColor) {
+		ctx.fillStyle = '#' + stripeColor;
+		ctx.fillRect(0, 0, 20, canvas.height);
+	}
 
 	const badgeWidth = canvas.width * 0.15;
 	const badgeHeight = badgeWidth / 3;

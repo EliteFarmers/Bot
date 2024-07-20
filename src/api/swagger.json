@@ -10721,6 +10721,66 @@
         },
         "additionalProperties": false
       },
+      "ComposterDto": {
+        "type": "object",
+        "properties": {
+          "organic_matter": {
+            "type": "number",
+            "format": "double"
+          },
+          "fuel_units": {
+            "type": "number",
+            "format": "double"
+          },
+          "compost_units": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "compost_items": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "conversion_ticks": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "upgrades": {
+            "$ref": "#/components/schemas/ComposterUpgrades"
+          },
+          "lastSave": {
+            "type": "integer",
+            "description": "Last save time in unix seconds",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ComposterUpgrades": {
+        "type": "object",
+        "properties": {
+          "speed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "multi_drop": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fuel_cap": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "organic_matter_cap": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cost_reduction": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "ConfigLeaderboardSettings": {
         "type": "object",
         "properties": {
@@ -12065,6 +12125,62 @@
         },
         "additionalProperties": false
       },
+      "GardenDto": {
+        "required": [
+          "profileId"
+        ],
+        "type": "object",
+        "properties": {
+          "profileId": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Profile ID"
+          },
+          "experience": {
+            "type": "integer",
+            "description": "Garden experience",
+            "format": "int32"
+          },
+          "completedVisitors": {
+            "type": "integer",
+            "description": "Total completed visitors",
+            "format": "int32"
+          },
+          "uniqueVisitors": {
+            "type": "integer",
+            "description": "Unique visitors unlocked",
+            "format": "int32"
+          },
+          "crops": {
+            "$ref": "#/components/schemas/StringCropSettings"
+          },
+          "cropUpgrades": {
+            "$ref": "#/components/schemas/Int32CropSettings"
+          },
+          "plots": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of unlocked plots"
+          },
+          "composter": {
+            "$ref": "#/components/schemas/ComposterDto"
+          },
+          "visitors": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/VisitorDto"
+            },
+            "description": "Visitor data"
+          },
+          "lastSave": {
+            "type": "string",
+            "description": "Last save time in unix seconds"
+          }
+        },
+        "additionalProperties": false
+      },
       "GuildChannelDto": {
         "required": [
           "id",
@@ -12498,6 +12614,52 @@
             "type": "string"
           },
           "position": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Int32CropSettings": {
+        "type": "object",
+        "properties": {
+          "cactus": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "carrot": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "potato": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "wheat": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "melon": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pumpkin": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mushroom": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cocoaBeans": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sugarCane": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "netherWart": {
             "type": "integer",
             "format": "int32"
           }
@@ -13618,6 +13780,9 @@
           "farmingWeight": {
             "$ref": "#/components/schemas/FarmingWeightDto"
           },
+          "garden": {
+            "$ref": "#/components/schemas/GardenDto"
+          },
           "skills": {
             "$ref": "#/components/schemas/SkillsDto"
           },
@@ -14023,7 +14188,6 @@
             "nullable": true
           },
           "embedColors": {
-            "maxItems": 6,
             "type": "array",
             "items": {
               "type": "string"
@@ -14059,6 +14223,24 @@
       "UnparsedApiDataDto": {
         "type": "object",
         "properties": {
+          "copper": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "consumed": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "levelCaps": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
           "perks": {
             "type": "object",
             "additionalProperties": {
@@ -14236,6 +14418,20 @@
             "items": {
               "$ref": "#/components/schemas/AutoRoles"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "VisitorDto": {
+        "type": "object",
+        "properties": {
+          "visits": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "accepted": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

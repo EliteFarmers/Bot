@@ -7341,6 +7341,36 @@ export interface components {
             /** Format: int32 */
             divine?: number;
         };
+        ComposterDto: {
+            /** Format: double */
+            organic_matter?: number;
+            /** Format: double */
+            fuel_units?: number;
+            /** Format: int32 */
+            compost_units?: number;
+            /** Format: int32 */
+            compost_items?: number;
+            /** Format: int32 */
+            conversion_ticks?: number;
+            upgrades?: components["schemas"]["ComposterUpgrades"];
+            /**
+             * Format: int64
+             * @description Last save time in unix seconds
+             */
+            lastSave?: number;
+        };
+        ComposterUpgrades: {
+            /** Format: int32 */
+            speed?: number;
+            /** Format: int32 */
+            multi_drop?: number;
+            /** Format: int32 */
+            fuel_cap?: number;
+            /** Format: int32 */
+            organic_matter_cap?: number;
+            /** Format: int32 */
+            cost_reduction?: number;
+        };
         ConfigLeaderboardSettings: {
             /** Format: int32 */
             completeRefreshInterval?: number;
@@ -7824,6 +7854,36 @@ export interface components {
             };
             pests?: components["schemas"]["PestsDto"];
         };
+        GardenDto: {
+            /** @description Profile ID */
+            profileId: string;
+            /**
+             * Format: int32
+             * @description Garden experience
+             */
+            experience?: number;
+            /**
+             * Format: int32
+             * @description Total completed visitors
+             */
+            completedVisitors?: number;
+            /**
+             * Format: int32
+             * @description Unique visitors unlocked
+             */
+            uniqueVisitors?: number;
+            crops?: components["schemas"]["StringCropSettings"];
+            cropUpgrades?: components["schemas"]["Int32CropSettings"];
+            /** @description List of unlocked plots */
+            plots?: string[];
+            composter?: components["schemas"]["ComposterDto"];
+            /** @description Visitor data */
+            visitors?: {
+                [key: string]: components["schemas"]["VisitorDto"] | undefined;
+            };
+            /** @description Last save time in unix seconds */
+            lastSave?: string;
+        };
         GuildChannelDto: {
             id: string;
             name: string;
@@ -7938,6 +7998,28 @@ export interface components {
             name: string;
             /** Format: int32 */
             position?: number;
+        };
+        Int32CropSettings: {
+            /** Format: int32 */
+            cactus?: number;
+            /** Format: int32 */
+            carrot?: number;
+            /** Format: int32 */
+            potato?: number;
+            /** Format: int32 */
+            wheat?: number;
+            /** Format: int32 */
+            melon?: number;
+            /** Format: int32 */
+            pumpkin?: number;
+            /** Format: int32 */
+            mushroom?: number;
+            /** Format: int32 */
+            cocoaBeans?: number;
+            /** Format: int32 */
+            sugarCane?: number;
+            /** Format: int32 */
+            netherWart?: number;
         };
         ItemDto: {
             /** Format: int32 */
@@ -8317,6 +8399,7 @@ export interface components {
             unparsed?: components["schemas"]["UnparsedApiDataDto"];
             jacob: components["schemas"]["JacobDataDto"];
             farmingWeight: components["schemas"]["FarmingWeightDto"];
+            garden?: components["schemas"]["GardenDto"];
             skills?: components["schemas"]["SkillsDto"];
             chocolateFactory?: components["schemas"]["ChocolateFactoryDto"];
             events?: components["schemas"]["ProfileEventMemberDto"][];
@@ -8468,6 +8551,14 @@ export interface components {
             maxJacobLeaderboards?: number | null;
         };
         UnparsedApiDataDto: {
+            /** Format: int32 */
+            copper?: number;
+            consumed?: {
+                [key: string]: number | undefined;
+            };
+            levelCaps?: {
+                [key: string]: number | undefined;
+            };
             perks?: {
                 [key: string]: (number | null) | undefined;
             } | null;
@@ -8517,6 +8608,12 @@ export interface components {
         VerifiedRoleFeature: {
             enabled?: boolean;
             autoRoles?: components["schemas"]["AutoRoles"][];
+        };
+        VisitorDto: {
+            /** Format: int32 */
+            visits?: number;
+            /** Format: int32 */
+            accepted?: number;
         };
         WeightEventData: {
             /** @description The weights of each crop in the event */

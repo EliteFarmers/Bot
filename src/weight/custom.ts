@@ -2,8 +2,10 @@ import { components } from "../api/api.js";
 import { AttachmentBuilder, EmbedBuilder } from "discord.js";
 import { createDefaultWeightImage } from "./default.js";
 import { createWeightEmbed } from "./embed.js";
+import { UserSettings } from "../api/elite.js";
 
 export interface CustomFormatterOptions {
+	settings?: UserSettings;
 	account: components['schemas']['MinecraftAccountDto'];
 	profile: components['schemas']['FarmingWeightDto'];
 	profileId: string;

@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, EmbedBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, EmbedBuilder, ColorResolvable } from 'discord.js';
 import { Command, CommandAccess, CommandType } from '../classes/Command.js';
 import { FetchAccount, FetchWeight, FetchWeightLeaderboardRank, UserSettings } from '../api/elite.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
@@ -104,6 +104,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		: undefined;
 
 	const custom = await getCustomFormatter({ 
+		settings,
 		account, 
 		profile: profileWeight,
 		profileId: profile.profileId,
@@ -196,6 +197,10 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			.sort(([,a], [,b]) => ((b ?? 0) - (a ?? 0)));
 
 		const embed = EliteEmbed(settings)
+
+		if (!settings?.features?.weightStyleOverride && account?.settings?.features?.embedColor) {
+			embed.setColor(('#' + account?.settings?.features?.embedColor) as ColorResolvable);
+		}
 
 		if (!isEmbed) {
 			embed.setTitle(`Stats for ${playerName?.replace(/_/g, '\\_')} on ${profile?.profileName}`);
