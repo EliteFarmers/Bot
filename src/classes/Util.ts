@@ -119,7 +119,7 @@ export function GetCropURL(crop: string) {
 		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978817150009355/sugar_cane.png';
 	if (crop === 'Wheat')
 		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978823630209024/wheat.png';
-	
+
 	return undefined;
 }
 
@@ -144,28 +144,32 @@ export function GetCropColor(crop: string) {
 }
 
 const simpleCropNames = {
-	'cactus': 'Cactus',
-	'carrot': 'Carrot',
-	'cocoa': 'Cocoa Beans',
-	'melon': 'Melon',
-	'mushroom': 'Mushroom',
-	'wart': 'Nether Wart',
-	'potato': 'Potato',
-	'pumpkin': 'Pumpkin',
-	'cane': 'Sugar Cane',
-	'wheat': 'Wheat',
+	cactus: 'Cactus',
+	carrot: 'Carrot',
+	cocoa: 'Cocoa Beans',
+	melon: 'Melon',
+	mushroom: 'Mushroom',
+	wart: 'Nether Wart',
+	potato: 'Potato',
+	pumpkin: 'Pumpkin',
+	cane: 'Sugar Cane',
+	wheat: 'Wheat',
 };
 
 export function CropFromSimple(name: string) {
-	return simpleCropNames[name.toLowerCase() as keyof typeof simpleCropNames] ?? undefined;
+	return (
+		simpleCropNames[name.toLowerCase() as keyof typeof simpleCropNames] ??
+		undefined
+	);
 }
 
 export function GetCropEmoji(crop: string) {
 	const emoji = CropEmojis[crop as keyof typeof CropEmojis];
 
 	if (emoji) return `<:${emoji.name}:${emoji.id}>`;
-	
-	const simpleCrop = simpleCropNames[crop.toLowerCase() as keyof typeof simpleCropNames];
+
+	const simpleCrop =
+		simpleCropNames[crop.toLowerCase() as keyof typeof simpleCropNames];
 	if (simpleCrop) {
 		const emoji = CropEmojis[simpleCrop as keyof typeof CropEmojis];
 		if (!emoji) return '';
@@ -195,7 +199,10 @@ export function UserHyperLink(userId?: Snowflake) {
 	return `<@${userId}> [⟳](discord://-/users/${userId})`;
 }
 
-export function CropSelectRow(customId = 'crop-select', placeholder = 'Select a crop!') {
+export function CropSelectRow(
+	customId = 'crop-select',
+	placeholder = 'Select a crop!'
+) {
 	const options = Object.entries(CropEmojis).map(([name, emoji], i) => ({
 		label: name,
 		value: i.toString(),
@@ -207,7 +214,7 @@ export function CropSelectRow(customId = 'crop-select', placeholder = 'Select a 
 			.addOptions(...options)
 			.setCustomId(customId)
 			.setPlaceholder(placeholder)
-	)
+	);
 
 	return row;
 }
@@ -256,19 +263,32 @@ const CropEmojis = {
 };
 
 export async function GetPurchaseUpdateChannel(client: Client) {
-	const channel = client.channels.cache.get(process.env.ENTITLEMENT_CHANNEL)
-		?? await client.channels.fetch(process.env.ENTITLEMENT_CHANNEL);
+	const channel =
+		client.channels.cache.get(process.env.ENTITLEMENT_CHANNEL) ??
+		(await client.channels.fetch(process.env.ENTITLEMENT_CHANNEL));
 	if (!channel || !channel.isTextBased()) return undefined;
 	return channel;
 }
 
-export function CreateRoundCornerPath(ctx: SKRSContext2D, x: number, y: number, width: number, height: number, cornerRadius: number) {
+export function CreateRoundCornerPath(
+	ctx: SKRSContext2D,
+	x: number,
+	y: number,
+	width: number,
+	height: number,
+	cornerRadius: number
+) {
 	ctx.beginPath();
 	ctx.moveTo(x + cornerRadius, y);
 	ctx.lineTo(x + width - cornerRadius, y);
 	ctx.quadraticCurveTo(x + width, y, x + width, y + cornerRadius);
 	ctx.lineTo(x + width, y + height - cornerRadius);
-	ctx.quadraticCurveTo(x + width, y + height, x + width - cornerRadius, y + height);
+	ctx.quadraticCurveTo(
+		x + width,
+		y + height,
+		x + width - cornerRadius,
+		y + height
+	);
 	ctx.lineTo(x + cornerRadius, y + height);
 	ctx.quadraticCurveTo(x, y + height, x, y + height - cornerRadius);
 	ctx.lineTo(x, y + cornerRadius);
@@ -277,7 +297,19 @@ export function CreateRoundCornerPath(ctx: SKRSContext2D, x: number, y: number, 
 }
 
 export function commandMd(client: Client, name: string) {
-	const command = client.application?.commands.cache.find(c => c.name === name);
+	const command = client.application?.commands.cache.find(
+		(c) => c.name === name
+	);
 	if (!command) return '`/' + name + '`';
 	return `</${name}:${command.id}>`;
 }
+
+export const LEVELING_XP = [
+	50, 125, 200, 300, 500, 750, 1000, 1500, 2000, 3500, 5000, 7500, 10000,
+	15000, 20000, 30000, 50000, 75000, 100000, 200000, 300000, 400000, 500000,
+	600000, 700000, 800000, 900000, 1000000, 1100000, 1200000, 1300000, 1400000,
+	1500000, 1600000, 1700000, 1800000, 1900000, 2000000, 2100000, 2200000,
+	2300000, 2400000, 2500000, 2600000, 2750000, 2900000, 3100000, 3400000,
+	3700000, 4000000, 4300000, 4600000, 4900000, 5200000, 5500000, 5800000,
+	6100000, 6400000, 6700000, 7000000,
+];

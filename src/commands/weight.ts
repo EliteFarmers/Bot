@@ -1,11 +1,11 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, EmbedBuilder, ColorResolvable } from 'discord.js';
 import { Command, CommandAccess, CommandType } from '../classes/Command.js';
-import { FetchAccount, FetchLeaderboardRankings, FetchWeight, UserSettings } from '../api/elite.js';
+import { FetchAccount, FetchLeaderboardRankings, FetchProfile, UserSettings } from '../api/elite.js';
 import { EliteEmbed, EmptyField, EmptyString, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
-import { GetCropEmoji } from '../classes/Util.js';
+import { GetCropEmoji, LEVELING_XP } from '../classes/Util.js';
 import playerAutocomplete from '../autocomplete/player.js';
 import { getCustomFormatter } from '../weight/custom.js';
-import { getCropFromName } from 'farming-weight';
+import { getCropFromName, getLevel } from 'farming-weight';
 
 const command: Command = {
 	name: 'weight',
@@ -67,10 +67,10 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		return;
 	}
 
-	const { data: weight } = await FetchWeight(account.id, true).catch(() => ({ data: undefined }));
-	const profileWeight = weight?.profiles?.find(p => p?.profileId === profile.profileId);
+	const { data: member } = await FetchProfile(account.id, profile.profileId).catch(() => ({ data: undefined }));
+	const profileWeight = member?.farmingWeight;
 
-	if (!weight || !profileWeight) {
+	if (!member || !profileWeight) {
 		const embed = ErrorEmbed('Couldn\'t fetch data!')
 			.setDescription(`Something went wrong when getting data for "${playerName}".`)
 			.setFooter({ text: 'Contact kaeso.dev if this continues to happen' });
@@ -171,7 +171,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			return;
 		}
 
-		const embed = moreInfoEmbed();
+		const embed = await moreInfoEmbed();
 
 		await i.update({ 
 			embeds: isEmbed ? [custom, embed] : [embed], 
@@ -205,13 +205,29 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		if (!isEmbed) {
 			embed.setTitle(`Stats for ${playerName?.replace(/_/g, '\\_')} on ${profile?.profileName}`);
-			embed.addFields({ 
-				name: 'Farming Weight', 
-				value: totalWeight.toLocaleString()
-			});
 		} else if (custom.data.color) {
 			embed.setColor(custom.data.color);
 		}
+
+		const weightRankText = weightRank > -1
+			? `[#${weightRank}](https://elitebot.dev/leaderboard/farmingweight/${account?.id}-${profile?.profileId}) • `
+			: '';
+
+		const farmingRank = rankings?.skills?.farming ?? -1;
+		const farmingLevel = getLevel(member?.skills?.farming ?? 0, LEVELING_XP, 50 + (member?.jacob.perks?.levelCap ?? 0));		
+		const farmingRankText = farmingRank > -1 
+			? `[#${farmingRank}](https://elitebot.dev/leaderboard/farming/${account?.id}-${profile?.profileId}) • ` 
+			: ''; 
+
+		embed.addFields({ 
+			name: 'Farming Weight', 
+			value: `-# ${weightRankText}${totalWeight.toLocaleString()} Total Weight`,
+			inline: true
+		}, EmptyField(), {
+			name: `Farming Level • ${farmingLevel.level}`,
+			value: `-# ${farmingRankText}${farmingLevel.total.toLocaleString()} Total XP`,
+			inline: true
+		});
 
 		const cropRanks = Object.entries(rankings?.collections ?? {})
 			.map(([key, value]) => ({
@@ -222,7 +238,9 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		const formattedCrops = crops.map(([key, value]) => {
 			const crop = getCropFromName(key);
-			const collection = profileWeight?.crops?.[key];
+			if (!crop) return '';
+
+			const collection = member?.collections?.[crop];
 			const percent = Math.round((value ?? 0) / totalWeight * 1000) / 10;
 
 			const { rank = -1, key: lb } = cropRanks.find(c => c.crop === crop) ?? {};
