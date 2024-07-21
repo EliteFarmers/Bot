@@ -84,7 +84,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const embed = WarningEmbed(`Crop Gain for ${discordPlayerName} (${profile.profileName})`)
 			.setDescription(
 				`No collection data found. ${discordPlayerName} may not have farmed recently or has collections API disabled.`
-				+ `[Check Online Profile](https://elitebot.dev/@${account.id})`
+				+ ` [Check Online Profile](https://elitebot.dev/@${account.id})`
 			)
 			.setThumbnail(`https://mc-heads.net/head/${account.id}/left`);
 
