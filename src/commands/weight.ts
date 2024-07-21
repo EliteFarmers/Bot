@@ -1,10 +1,11 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, EmbedBuilder, ColorResolvable } from 'discord.js';
 import { Command, CommandAccess, CommandType } from '../classes/Command.js';
-import { FetchAccount, FetchWeight, FetchWeightLeaderboardRank, UserSettings } from '../api/elite.js';
-import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
+import { FetchAccount, FetchLeaderboardRankings, FetchWeight, UserSettings } from '../api/elite.js';
+import { EliteEmbed, EmptyField, EmptyString, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 import { GetCropEmoji } from '../classes/Util.js';
 import playerAutocomplete from '../autocomplete/player.js';
 import { getCustomFormatter } from '../weight/custom.js';
+import { getCropFromName } from 'farming-weight';
 
 const command: Command = {
 	name: 'weight',
@@ -66,7 +67,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		return;
 	}
 
-	const { data: weight } = await FetchWeight(account.id).catch(() => ({ data: undefined }));
+	const { data: weight } = await FetchWeight(account.id, true).catch(() => ({ data: undefined }));
 	const profileWeight = weight?.profiles?.find(p => p?.profileId === profile.profileId);
 
 	if (!weight || !profileWeight) {
@@ -92,8 +93,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		return;
 	}
 
-	const { data: ranking } = await FetchWeightLeaderboardRank(account.id, profile.profileId).catch(() => ({ data: undefined }));
-	const rank = ranking?.rank ?? -1;
+	const { data: rankings } = await FetchLeaderboardRankings(account.id, profile.profileId).catch(() => ({ data: undefined }));
+	const weightRank = rankings?.misc?.farmingweight ?? -1;
 
 	const badge = account.badges?.filter(b => b?.visible).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))[0];
 	const badgeId = badge?.imageId ? `https://cdn.elitebot.dev/u/${badge.imageId}.png` : '';
@@ -108,7 +109,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		account, 
 		profile: profileWeight,
 		profileId: profile.profileId,
-		weightRank: rank,
+		weightRank: weightRank,
 		badgeUrl: badgeId
 	}, style);
 
@@ -211,23 +212,50 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		} else if (custom.data.color) {
 			embed.setColor(custom.data.color);
 		}
+
+		const cropRanks = Object.entries(rankings?.collections ?? {})
+			.map(([key, value]) => ({
+				crop: getCropFromName(key),
+				key, 
+				rank: value ?? -1 
+			}))
+
+		const formattedCrops = crops.map(([key, value]) => {
+			const crop = getCropFromName(key);
+			const collection = profileWeight?.crops?.[key];
+			const percent = Math.round((value ?? 0) / totalWeight * 1000) / 10;
+
+			const { rank = -1, key: lb } = cropRanks.find(c => c.crop === crop) ?? {};
+			const rankString = rank > -1 
+				? `[#${rank}](https://elitebot.dev/leaderboard/${lb}/${account?.id}-${profile?.profileId}) • ` : '';
+
+			return `${GetCropEmoji(key)} **${(+(value?.toFixed(2) ?? 0))?.toLocaleString() ?? 0}** ⠀${percent > 2 ? `${percent}%` : ''}`
+					+ `${collection ? `\n-# ${rankString}${collection.toLocaleString()} ${key}` : ''}`;
+		});
 		
+		const cropWeight = +crops.reduce((acc, [, value]) => acc + (value ?? 0), 0).toFixed(2);
+
 		embed.addFields({
 			inline: true,
-			name: 'Breakdown', 
-			value: crops.map(([key, value]) => {
-				const percent = Math.round((value ?? 0) / totalWeight * 1000) / 10;
-				return `${GetCropEmoji(key)} ${value?.toLocaleString() ?? 0} ⠀${percent > 2 ? `[${percent}%]` : ''}`;
-			}).join('\n') || 'No notable collections!',
-		}, {
-			inline: true,
-			name: '⠀',
-			value: '⠀'
-		}, {
-			inline: true,
-			name: 'Bonus',
+			name: `Crop Weight • ${cropWeight.toLocaleString()}`, 
+			value: formattedCrops.slice(0, 5).join('\n') || 'No crop weight!'
+		}, EmptyField());
+		
+		if (formattedCrops.length > 5) {
+			embed.addFields({
+				inline: true,
+				name: EmptyString,
+				value: formattedCrops.slice(5).join('\n')
+			});
+		}
+
+		const bonusWeight = Object.values(profileWeight?.bonusWeight ?? {})
+			.reduce((acc, value) => (acc ?? 0) + (value ?? 0), 0) ?? 0;
+
+		embed.addFields({
+			name: 'Bonus Weight • ' + bonusWeight.toLocaleString(),
 			value: Object.entries(profileWeight?.bonusWeight ?? {}).map(([key, value]) => {
-				return `${key} - ${value?.toLocaleString() ?? 0}`;
+				return `${key} • **${value?.toLocaleString() ?? 0}**`;
 			}).join('\n') || 'No bonus weight!',
 		}, {
 			name: '⠀',
