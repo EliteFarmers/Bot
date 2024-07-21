@@ -11,7 +11,10 @@ export function EliteEmbed(settings?: UserSettings, footer = true) {
 	}
 
 	if (footer) {
-		embed.setFooter({ text: 'Powered by Elite Farmers API - kaeso.dev', iconURL: 'https://elitebot.dev/favicon.webp' });
+		embed.setFooter({ 
+			text: 'Powered by Elite Farmers API • kaeso.dev', 
+			iconURL: 'https://elitebot.dev/favicon.webp'
+		});
 	}
 
 	return embed;

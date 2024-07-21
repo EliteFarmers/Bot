@@ -1,10 +1,10 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } from 'discord.js';
 import { Command, CommandAccess, CommandType } from '../classes/Command.js';
 import { FetchAccount, FetchProfile, UserSettings } from '../api/elite.js';
-import { EliteEmbed, EmptyField, EmptyString, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
+import { EliteEmbed, EmptyField, EmptyString, ErrorEmbed, NotYoursReply, PrefixFooter, WarningEmbed } from '../classes/embeds.js';
 import { GetCropEmoji } from '../classes/Util.js';
 import playerAutocomplete from '../autocomplete/player.js';
-import { Crop, getCropDisplayName, getCropFromName, getCropMilestones, getCropUpgrades, getGardenLevel } from 'farming-weight';
+import { compareRarity, Crop, getCropDisplayName, getCropFromName, getCropMilestones, getCropUpgrades, getGardenLevel, groupGardenVisitors, Rarity } from 'farming-weight';
 
 const command: Command = {
 	name: 'garden',
@@ -115,95 +115,214 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		return;
 	}
 
-	const embed = EliteEmbed(settings)
-		.setTitle(`Garden Stats for ${playerName.replace(/_/g, '\\_')} (${profile.profileName})`)
-
-	const gardenLevel = getGardenLevel(garden.experience ?? 0);
-	
-	const rejectedVisitors = Object.values(garden.visitors ?? {})
+	const rejectedVisitors = Object.values(garden?.visitors ?? {})
 		.reduce((acc, v) => acc + ((v?.visits ?? 0) - (v?.accepted ?? 0)), 0);
+	
+	const reply = await interaction.editReply(getGardenPayload());
 
-	let levelText = '';
-	if (gardenLevel.goal) {
-		levelText += `\n${(gardenLevel.ratio * 100).toFixed(2)}% to level **${gardenLevel.next}**`;
-	}
-	levelText += `\n-# ${(garden.experience ?? 0).toLocaleString()} Total XP`;
+	const collector = reply.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60_000 });
 
-	levelText += `\n\n**Visitors**`;
-	levelText += `\nUnique • **${garden.uniqueVisitors ?? 0}**/84`;
-	levelText += `\nAccepted • **${garden.completedVisitors ?? 0}**`;
-	levelText += `\nRejected • **${rejectedVisitors ?? 0}**`;
+	collector.on('collect', async (button) => {
+		collector.resetTimer();
 
-	embed.addFields({
-		name: `Garden Level **${gardenLevel.level}**`,
-		value: levelText,
-		inline: true
+		if (button.user.id !== interaction.user.id) {
+			NotYoursReply(button);
+			return;
+		}
+
+		if (button.customId === 'garden') {
+			await button.update(getGardenPayload());
+		}
+
+		if (button.customId === 'visitors') {
+			await button.update(getVisitorsPayload());
+		}
+
+		if (button.customId === 'uncommon') {
+			await button.update(getVisitorsPayload(true));
+		}
 	});
 
-	embed.addFields(EmptyField());
+	collector.on('end', () => {
+		const linkRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+			new ButtonBuilder()
+				.setLabel(`@${account?.name}/${profile?.profileName}`)
+				.setURL(`https://elitebot.dev/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')}`)
+				.setStyle(ButtonStyle.Link)
+		);
 
-	const unlockedPlots = [
-		[ '⬛', '⬛', '⬛', '⬛', '⬛' ],
-		[ '⬛', '⬛', '⬛', '⬛', '⬛' ],
-		[ '⬛', '⬛', '🏡', '⬛', '⬛' ],
-		[ '⬛', '⬛', '⬛', '⬛', '⬛' ],
-		[ '⬛', '⬛', '⬛', '⬛', '⬛' ],
-	];
-
-	for (const plotname of (garden.plots ?? [])) {
-		const plot = plots[plotname as keyof typeof plots];
-		if (!plot) return;
-		const [ x, y ] = plot;
-		unlockedPlots[y][x] = '🟩';
-	}
-
-	const plotText = unlockedPlots.map(row => row.join('')).join('\n');
-
-	embed.addFields({
-		name: `Plots (${garden.plots?.length ?? 0}/24)`,
-		value: plotText,
-		inline: true
+		reply.edit({ components: [linkRow] }).catch(() => undefined);
 	});
 
-	const cropUpgrades = getCropUpgrades((garden.cropUpgrades ?? {}) as Record<string, number>);
-	const milestones = getCropMilestones((garden.crops ?? {}) as Record<string, number>);
-	const cropText = Object.entries(milestones)
-		.sort(([, a], [, b]) => {
-			if (a.level === b.level) return b.total - a.total;
-			return b.level - a.level;
-		})
-		.map(([ key, value ]) => {
-			const crop = getCropFromName(key) ?? Crop.Wheat;
-			const name = getCropDisplayName(crop);
-			const emoji = GetCropEmoji(name);
-			const upgrade = cropUpgrades[crop] ?? 0;
+	function getGardenPayload() {
+		const embed = EliteEmbed(settings)
+			.setTitle(`Garden Stats for ${playerName?.replace(/_/g, '\\_')} (${profile?.profileName})`)
 
-			return `${emoji} **${value.level}** ${EmptyString} ${EmptyString} **${upgrade}**/9`
-				+ `\n-# ${value.total.toLocaleString()} ${name}`;
-		});
+		const gardenLevel = getGardenLevel(garden?.experience ?? 0);
 
-	embed.addFields({
-		name: 'Crop Milestones',
-		value: cropText.slice(0, 5).join('\n') || 'No crop milestone progress yet!',
-		inline: true
-	});
+		let levelText = '';
+		if (gardenLevel.goal) {
+			levelText += `\n${(gardenLevel.ratio * 100).toFixed(2)}% to level **${gardenLevel.next}**`;
+		}
+		levelText += `\n-# ${(garden?.experience ?? 0).toLocaleString()} Total XP`;
 
-	embed.addFields(EmptyField());
+		levelText += `\n\n**Visitors**`;
+		levelText += `\nUnique • **${garden?.uniqueVisitors ?? 0}**/84`;
+		levelText += `\nAccepted • **${garden?.completedVisitors ?? 0}**`;
+		levelText += `\nRejected • **${rejectedVisitors ?? 0}**`;
 
-	if (cropText.length > 5) {
 		embed.addFields({
-			name: EmptyString,
-			value: cropText.slice(5).join('\n'),
+			name: `Garden Level **${gardenLevel.level}**`,
+			value: levelText,
 			inline: true
 		});
+
+		embed.addFields(EmptyField());
+
+		const unlockedPlots = [
+			[ '⬛', '⬛', '⬛', '⬛', '⬛' ],
+			[ '⬛', '⬛', '⬛', '⬛', '⬛' ],
+			[ '⬛', '⬛', '🏡', '⬛', '⬛' ],
+			[ '⬛', '⬛', '⬛', '⬛', '⬛' ],
+			[ '⬛', '⬛', '⬛', '⬛', '⬛' ],
+		];
+
+		for (const plotname of (garden?.plots ?? [])) {
+			const plot = plots[plotname as keyof typeof plots];
+			if (!plot) continue;
+			const [ x, y ] = plot;
+			unlockedPlots[y][x] = '🟩';
+		}
+
+		const plotText = unlockedPlots.map(row => row.join('')).join('\n');
+
+		embed.addFields({
+			name: `Plots • ${garden?.plots?.length ?? 0}/24`,
+			value: plotText,
+			inline: true
+		});
+
+		const cropUpgrades = getCropUpgrades((garden?.cropUpgrades ?? {}) as Record<string, number>);
+		const milestones = getCropMilestones((garden?.crops ?? {}) as Record<string, number>);
+		const cropText = Object.entries(milestones)
+			.sort(([, a], [, b]) => {
+				if (a.level === b.level) return b.total - a.total;
+				return b.level - a.level;
+			})
+			.map(([ key, value ]) => {
+				const crop = getCropFromName(key) ?? Crop.Wheat;
+				const name = getCropDisplayName(crop);
+				const emoji = GetCropEmoji(name);
+				const upgrade = cropUpgrades[crop] ?? 0;
+
+				return `${emoji} **${value.level}** ${EmptyString} ${EmptyString} **${upgrade}**/9`
+					+ `\n-# ${value.total.toLocaleString()} ${name}`;
+			});
+
+		embed.addFields({
+			name: 'Crop Milestones',
+			value: cropText.slice(0, 5).join('\n') || 'No crop milestone progress yet!',
+			inline: true
+		});
+
+		embed.addFields(EmptyField());
+
+		if (cropText.length > 5) {
+			embed.addFields({
+				name: EmptyString,
+				value: cropText.slice(5).join('\n'),
+				inline: true
+			});
+		}
+
+		const linkRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+			new ButtonBuilder()
+				.setLabel('Visitor Stats')
+				.setCustomId('visitors')
+				.setStyle(ButtonStyle.Success),
+			new ButtonBuilder()
+				.setLabel(`@${account?.name}/${profile?.profileName}`)
+				.setURL(`https://elitebot.dev/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')}`)
+				.setStyle(ButtonStyle.Link)
+		);
+
+		return { embeds: [embed], components: [linkRow] };
 	}
 
-	const linkRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-		new ButtonBuilder()
-			.setLabel(`@${account.name}/${profile.profileName}`)
-			.setURL(`https://elitebot.dev/@${account.name}/${encodeURIComponent(profile.profileName ?? '')}`)
-			.setStyle(ButtonStyle.Link)
-	);
-	
-	interaction.editReply({ embeds: [embed], components: [linkRow] });
+	function getVisitorsPayload(uncommon = false) {
+		const visitorsByRarity = groupGardenVisitors((garden?.visitors ?? {}) as Record<string, { visits: number; accepted: number; }>);
+
+		let fieldCount = 0;
+		const visitorsList = Object.entries(visitorsByRarity)
+			.sort(([ a ], [ b ]) => compareRarity(b as Rarity, a as Rarity))
+			.map(([ rarity, visitors ], i) => {
+				if (uncommon && rarity !== Rarity.Uncommon) return undefined;
+
+				const accepted = visitors.reduce((acc, v) => acc + v.accepted, 0);
+				const visits = visitors.reduce((acc, v) => acc + v.visits, 0);
+
+				const skipText = rarity === Rarity.Uncommon && !uncommon;
+				const splitBy = visitors.length > 5 ? Math.ceil(visitors.length / 3) : 5;
+				const result = [];
+
+				if (rarity === Rarity.Legendary && i > 0) {
+					fieldCount++;
+					result.push(EmptyField());
+				}
+
+				if (!uncommon && rarity === Rarity.Uncommon && fieldCount < 3) {
+					fieldCount++;
+					result.push(EmptyField());
+					if (fieldCount < 3) {
+						fieldCount++;
+						result.push(EmptyField());
+					}
+				}
+
+				for (let i = 0; i < visitors.length; i += splitBy) {
+					const chunk = visitors.slice(i, i + splitBy);
+
+					fieldCount++;
+					result.push({
+						name: i === 0 ? `**${rarity}** • **${accepted}**/${visits}` : EmptyString,
+						value: skipText 
+							? '-# Click "Uncommon Visitors" to see these!'
+							: chunk.map(v => `-# ${v.short ?? v.name} • **${v.accepted}**/${v.visits}`).join('\n'),
+						inline: true
+					});
+
+					if (skipText) break;
+				}
+
+				return result;
+			}).filter(a => a).flat() as { name: string; value: string; inline: boolean }[];
+		
+		const embed = EliteEmbed(settings)
+			.setTitle(`Visitors for ${playerName?.replace(/_/g, '\\_')} (${profile?.profileName})`)
+			.setDescription(
+				`Unique • **${garden?.uniqueVisitors ?? 0}**/84 ${EmptyString} • ${EmptyString} Accepted • **${garden?.completedVisitors ?? 0}** ${EmptyString} • ${EmptyString} Rejected • **${rejectedVisitors ?? 0}**`
+				+ '\nAcceptance Rate • **' + ((garden?.completedVisitors ?? 0) / ((garden?.completedVisitors ?? 0) + rejectedVisitors) * 100).toFixed(2) + '%**'
+			)
+
+		embed.addFields(visitorsList);
+
+		PrefixFooter(embed, 'Numbers are (accepted/visits) for each visitor and rarity');
+
+		const linkRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+			new ButtonBuilder()
+				.setLabel('Garden Stats')
+				.setCustomId('garden')
+				.setStyle(ButtonStyle.Success),
+			new ButtonBuilder()
+				.setLabel(uncommon ? 'Back' : 'Uncommon Visitors')
+				.setCustomId(uncommon ? 'visitors' : 'uncommon')
+				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
+				.setLabel(`@${account?.name}/${profile?.profileName}`)
+				.setURL(`https://elitebot.dev/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')}`)
+				.setStyle(ButtonStyle.Link),
+		);
+
+		return { embeds: [embed], components: [linkRow] };
+	}
 }

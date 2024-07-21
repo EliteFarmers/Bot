@@ -7,7 +7,7 @@
     "bufferutil": "^4.0.8",
     "cron": "^3.1.7",
     "discord.js": "^14.15.3",
-    "farming-weight": "^0.4.3",
+    "farming-weight": "^0.4.4",
     "openapi-fetch": "^0.7.10",
     "utf-8-validate": "^6.0.4",
     "zlib-sync": "^0.1.9"
