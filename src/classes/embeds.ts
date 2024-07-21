@@ -41,6 +41,7 @@ export function NotYoursReply(interaction: RepliableInteraction) {
 	});
 }
 
+export const EmptyString = '\u200b';
 export function EmptyField(inline = true) {
 	return { name: '\u200b', value: '\u200b', inline };
 }

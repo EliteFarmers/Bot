@@ -74,7 +74,7 @@ const rest = new REST().setToken(process.env.BOT_TOKEN);
 			if (!existing) {
 				await rest.post(
 					Routes.applicationCommands(process.env.CLIENT_ID),
-					{ body: [command] },
+					{ body: command },
 				);
 				console.log('Probably created that slash command globally');
 			} else {
