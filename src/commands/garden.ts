@@ -264,16 +264,16 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				const skipText = rarity === Rarity.Uncommon && !uncommon;
 				const splitBy = visitors.length > 5 ? Math.ceil(visitors.length / 3) : 5;
 				const result = [];
-
+				
 				if (rarity === Rarity.Legendary && i > 0) {
-					fieldCount++;
-					result.push(EmptyField());
+					while (fieldCount < 3) {
+						fieldCount++;
+						result.push(EmptyField());
+					}
 				}
 
 				if (!uncommon && rarity === Rarity.Uncommon && fieldCount < 3) {
-					fieldCount++;
-					result.push(EmptyField());
-					if (fieldCount < 3) {
+					while (fieldCount < 3) {
 						fieldCount++;
 						result.push(EmptyField());
 					}
