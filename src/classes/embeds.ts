@@ -20,10 +20,20 @@ export function EliteEmbed(settings?: UserSettings, footer = true) {
 	return embed;
 }
 
-export function ErrorEmbed(title: string) {
-	return EliteEmbed()
+export function ErrorEmbed(title: string, description?: string) {
+	const embed = EliteEmbed()
 		.setTitle(`Error: ${title}`)
-		.setColor('#ff0000');
+		.setColor('#ff0000')
+		.addFields({ 
+			name: 'Contact',
+			value: '[Support Server](https://elitebot.dev/support)'
+		});
+	
+	if (description) {
+		embed.setDescription(description);
+	}
+
+	return embed;
 }
 
 export function WarningEmbed(title: string) {

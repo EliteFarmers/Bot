@@ -58,7 +58,13 @@ async function OnButtonInteraction(interaction: ButtonInteraction | StringSelect
 	if (!hasPerms) return;
 
 	try {
-		command.execute(interaction);
+		if (command.fetchSettings && interaction.entitlements.size > 0) {
+			const { data: settings } = await FetchUserSettings(interaction.user.id).catch(() => ({ data: undefined }));
+
+			command.execute(interaction, settings);
+		} else {
+			command.execute(interaction);
+		}
 	} catch (error) {
 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => undefined);
 	}

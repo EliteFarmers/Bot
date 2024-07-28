@@ -6,6 +6,7 @@ import fs from 'fs';
 export interface CommandBase {
 	name: string,
 	description: string,
+	fetchSettings?: boolean
 }
 
 export interface Command extends CommandBase {
@@ -46,6 +47,7 @@ export class CommandGroup implements CommandGroupSettings {
 	declare public access: CommandAccess;
 	declare public type: CommandType;
 	declare public permissions?: bigint;
+	declare public fetchSettings?: boolean | undefined;
 
 	declare public slash: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder;
 
@@ -55,6 +57,7 @@ export class CommandGroup implements CommandGroupSettings {
 	constructor(settings: CommandGroupSettings) {
 		this.name = settings.name;
 		this.description = settings.description;
+		this.fetchSettings = settings.fetchSettings ?? false;
 
 		this.access = settings.access ?? CommandAccess.Everywhere;
 		this.type = settings.type ?? CommandType.Slash;

@@ -5,6 +5,7 @@ import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 import { GetCropEmoji } from '../classes/Util.js';
 import playerAutocomplete from '../autocomplete/player.js';
 import { Crop, createFarmingWeightCalculator, getCropFromName } from 'farming-weight';
+import { fromUnixTime, getUnixTime, startOfDay } from 'date-fns';
 
 const command: Command = {
 	name: 'gain',
@@ -94,6 +95,10 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 		new ButtonBuilder()
+			.setLabel('Information')
+			.setCustomId('GAININFO|')
+			.setStyle(ButtonStyle.Secondary),
+		new ButtonBuilder()
 			.setLabel(`@${account.name}/${profile.profileName}`)
 			.setURL(`https://elitebot.dev/@${account.name}/${encodeURIComponent(profile.profileName)}`)
 			.setStyle(ButtonStyle.Link)
@@ -101,7 +106,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const dataPoints = collections.sort((a, b) => +(a.timestamp ?? 0) - +(b.timestamp ?? 0));
 
-	type dayProgress = { start: number, end: number, crops: Record<string, number> };
+	type dayProgress = { start: number, crops: Record<string, number> };
 
 	const days = [] as dayProgress[];
 
@@ -120,8 +125,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			}, {});
 
 		days.push({
-			start: start,
-			end: +(lastPoint.timestamp ?? 0),
+			start: getUnixTime(startOfDay(fromUnixTime(start))),
 			crops: cropGains
 		});
 	}
@@ -138,14 +142,14 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const embed = EliteEmbed(settings)
 		.setTitle(`Crop Gain for ${discordPlayerName} (${profile.profileName})`)
-		// .setDescription(`From <t:${first?.timestamp}:d> to <t:${last?.timestamp}:d>`)
+		.setDescription(`-# View charts and older data for ${discordPlayerName} [here!](https://elitebot.dev/@${account.id}/${profile.profileId}/charts)`)
 
 	for (const day of days) {
 		const crops = Object.entries(day.crops).filter(([, amount]) => amount > 0).sort((a, b) => b[1] - a[1]);
 
 		if (crops.length <= 0) {
 			embed.addFields({
-				name: `<t:${day.end}:d>`,
+				name: `<t:${day.start}:d>`,
 				value: 'None!',
 				inline: true
 			});

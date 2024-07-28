@@ -23,6 +23,9 @@ dependencies:
   cron:
     specifier: ^3.1.7
     version: 3.1.7
+  date-fns:
+    specifier: ^3.6.0
+    version: 3.6.0
   discord.js:
     specifier: ^14.15.3
     version: 14.15.3(bufferutil@4.0.8)(utf-8-validate@6.0.4)
@@ -38,6 +41,9 @@ dependencies:
   zlib-sync:
     specifier: ^0.1.9
     version: 0.1.9
+  zod:
+    specifier: ^3.23.8
+    version: 3.23.8
 
 devDependencies:
   '@types/node-fetch':
@@ -856,6 +862,10 @@ packages:
       shebang-command: 2.0.0
       which: 2.0.2
     dev: true
+
+  /date-fns@3.6.0:
+    resolution: {integrity: sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==}
+    dev: false
 
   /debug@4.3.5:
     resolution: {integrity: sha512-pt0bNEmneDIvdL1Xsd9oDQ/wrQRkXDT4AUWlNZNPKvW5x/jyO9VFXkJUP07vQ2upmw5PlaITaPKc31jK13V+jg==}
@@ -1710,4 +1720,8 @@ packages:
     requiresBuild: true
     dependencies:
       nan: 2.20.0
+    dev: false
+
+  /zod@3.23.8:
+    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
     dev: false

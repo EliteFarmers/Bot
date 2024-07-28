@@ -62,6 +62,11 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const embed = ErrorEmbed('Invalid Profile!')
 			.setDescription(`Profile "${_profileName}" does not exist.`)
 			.addFields({ name: 'Proper Usage:', value: '`/weight` `player:`(player name) `profile:`(profile name)' });
+
+		if (!_profileName) {
+			embed.setDescription('This player has no profiles!');
+		}
+
 		await interaction.deleteReply().catch(() => undefined);
 		interaction.followUp({ embeds: [embed], ephemeral: true });
 		return;
@@ -171,7 +176,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			return;
 		}
 
-		const embed = await moreInfoEmbed();
+		const embed = moreInfoEmbed();
 
 		await i.update({ 
 			embeds: isEmbed ? [custom, embed] : [embed], 
