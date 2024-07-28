@@ -296,6 +296,15 @@ export function CreateRoundCornerPath(
 	ctx.closePath();
 }
 
+export function CreateClipPath(ctx: SKRSContext2D, x1: number, y1: number, x2: number, y2: number) {
+	ctx.beginPath();
+	ctx.moveTo(x1, y1);
+	ctx.lineTo(x2, y1);
+	ctx.lineTo(x2, y2);
+	ctx.lineTo(x1, y2);
+	ctx.closePath();
+}
+
 export function commandMd(client: Client, name: string) {
 	const command = client.application?.commands.cache.find(
 		(c) => c.name === name
