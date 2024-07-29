@@ -11,7 +11,8 @@
 			"wart": "./src/assets/decals/nether_wart.png",
 			"potato": "./src/assets/decals/potato.png",
 			"cane": "./src/assets/decals/sugar_cane.png",
-			"wheat": "./src/assets/decals/wheat.png"
+			"wheat": "./src/assets/decals/wheat.png",
+			"pumpkin": "./src/assets/decals/pumpkin.png"
 		}
 	},
 	"elements": {
