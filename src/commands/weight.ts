@@ -106,12 +106,12 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	// Apply override if set
 	const style = settings?.features?.weightStyleOverride
-		? settings.features?.weightStyle ?? undefined
+		? settings.weightStyle?.id ?? undefined
 		: undefined;
 
 	const custom = await getCustomFormatter({ 
 		settings,
-		account, 
+		account,
 		profile: profileWeight,
 		profileId: profile.profileId,
 		weightRank: weightRank,
