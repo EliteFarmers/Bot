@@ -12428,6 +12428,10 @@
             "type": "string",
             "nullable": true
           },
+          "disqualified": {
+            "type": "boolean",
+            "nullable": true
+          },
           "data": {
             "nullable": true
           }
@@ -15322,7 +15326,7 @@
             "format": "int32",
             "nullable": true
           },
-          "weightStylePosition": {
+          "position": {
             "$ref": "#/components/schemas/WeightStylePositionDto"
           },
           "maxWidth": {

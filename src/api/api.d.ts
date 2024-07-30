@@ -8208,6 +8208,7 @@ export interface components {
             status?: components["schemas"]["EventMemberStatus"];
             score?: string | null;
             lastUpdated?: string | null;
+            disqualified?: boolean | null;
             data?: unknown;
         };
         EventMemberDto: {
@@ -9158,7 +9159,7 @@ export interface components {
             fill?: string | null;
             /** Format: int32 */
             fontSize?: number | null;
-            weightStylePosition?: components["schemas"]["WeightStylePositionDto"];
+            position?: components["schemas"]["WeightStylePositionDto"];
             /** Format: double */
             maxWidth?: number | null;
             /** Format: double */

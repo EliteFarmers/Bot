@@ -34,9 +34,9 @@ export function getCustomFormatter(options: CustomFormatterOptions, style: numbe
 	let styleData = DefaultStyle as WeightStyle;
 	if (styleId) {
 		const cached = stylesCache[styleId];
-		console.log({ cached });
-		formatterName = cached.styleFormatter ?? formatterName;
-		styleData = (cached.data as WeightStyle) ?? styleData;
+
+		formatterName = cached?.styleFormatter ?? formatterName;
+		styleData = (cached?.data as WeightStyle) ?? styleData;
 	}
 
 	const formatter = formatters[formatterName] ?? createFromData;
