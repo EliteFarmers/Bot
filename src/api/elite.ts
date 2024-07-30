@@ -2,6 +2,9 @@ import createClient from 'openapi-fetch';
 import { components, paths } from './api.d';
 import { User } from 'discord.js';
 
+import dotenv from 'dotenv';
+dotenv.config();
+
 const { GET, PUT, POST, DELETE, PATCH } = createClient<paths>({
 	baseUrl: process.env.ELITE_API_URL,
 	headers: {
@@ -353,6 +356,8 @@ export const FetchSkillGraphs = (playerUuid: string, profileUuid: string, days?:
 			}
 		}
 	})
+
+export const FetchWeightStyles = () => GET('/product/styles', {});
 
 export const RequestGuildUpdate = (guildId: string) =>
 	POST('/bot/guild/{guildId}', {

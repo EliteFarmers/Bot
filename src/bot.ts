@@ -2,6 +2,7 @@ import { Client, GatewayIntentBits, Collection, ActivityType, Events } from 'dis
 import { Command, CommandGroup, CronTask, SubCommand, registerCommandGroups, registerFiles } from './classes/Command.js';
 import { SignalRecieverOptions } from './classes/Signal.js';
 import { ConnectToRMQ } from './api/rabbit.js';
+import { LoadWeightStyles } from './weight/custom.js';
 import { GlobalFonts } from '@napi-rs/canvas';
 import { CronJob } from 'cron';
 
@@ -66,6 +67,9 @@ export const signals = new Collection<string, SignalRecieverOptions>();
 client.once(Events.ClientReady, async () => {
 	setTimeout(updateActivity, 1000 * 30); // 30 seconds to wait for shards to be ready
 	setInterval(updateActivity, 1000 * 60 * 60 * 2); // Update count every 2 hours
+
+	LoadWeightStyles();
+	setInterval(LoadWeightStyles, 1000 * 60 * 30); // Update weight styles every 30 minutes
 
 	console.log('Ready!');
 
