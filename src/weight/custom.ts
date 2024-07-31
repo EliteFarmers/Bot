@@ -6,7 +6,6 @@ import { createFromData } from "./maker.js";
 import { validStyle, WeightStyle } from "../schemas/style.js";
 import { ErrorEmbed } from "../classes/embeds.js";
 
-// Styles will be fetched from the API in the future
 import * as DefaultStyle from './default.json';
 
 export interface CustomFormatterOptions {
