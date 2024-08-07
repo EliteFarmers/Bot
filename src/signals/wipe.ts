@@ -93,7 +93,7 @@ async function execute(signal: Signal) {
 	PrefixFooter(embed, 'This could also mean the profile was deleted or the player was kicked from a coop.');
 
 	channel?.send({ 
-		content: ping ? `<@&${ping}>` : undefined,
+		content: ping || undefined,
 		allowedMentions: { roles: ping ? [ ping ] : [] },
 		embeds: [embed], 
 	}).catch(() => undefined);
