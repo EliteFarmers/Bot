@@ -2977,13 +2977,13 @@ export interface paths {
             requestBody?: {
                 content: {
                     "application/json": {
-                        [key: string]: string[] | undefined;
+                        [key: string]: string[];
                     };
                     "text/json": {
-                        [key: string]: string[] | undefined;
+                        [key: string]: string[];
                     };
                     "application/*+json": {
-                        [key: string]: string[] | undefined;
+                        [key: string]: string[];
                     };
                 };
             };
@@ -3099,13 +3099,13 @@ export interface paths {
                     };
                     content: {
                         "text/plain": {
-                            [key: string]: components["schemas"]["JacobContestDto"][] | undefined;
+                            [key: string]: components["schemas"]["JacobContestDto"][];
                         };
                         "application/json": {
-                            [key: string]: components["schemas"]["JacobContestDto"][] | undefined;
+                            [key: string]: components["schemas"]["JacobContestDto"][];
                         };
                         "text/json": {
-                            [key: string]: components["schemas"]["JacobContestDto"][] | undefined;
+                            [key: string]: components["schemas"]["JacobContestDto"][];
                         };
                     };
                 };
@@ -5828,9 +5828,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["WeightStyleDto"];
-                        "application/json": components["schemas"]["WeightStyleDto"];
-                        "text/json": components["schemas"]["WeightStyleDto"];
+                        "text/plain": components["schemas"]["WeightStyleWithDataDto"];
+                        "application/json": components["schemas"]["WeightStyleWithDataDto"];
+                        "text/json": components["schemas"]["WeightStyleWithDataDto"];
                     };
                 };
                 /** @description Not Found */
@@ -7610,13 +7610,13 @@ export interface paths {
                     };
                     content: {
                         "text/plain": {
-                            [key: string]: number | undefined;
+                            [key: string]: number;
                         };
                         "application/json": {
-                            [key: string]: number | undefined;
+                            [key: string]: number;
                         };
                         "text/json": {
-                            [key: string]: number | undefined;
+                            [key: string]: number;
                         };
                     };
                 };
@@ -7770,6 +7770,10 @@ export interface components {
             uniqueRabbits?: components["schemas"]["ChocolateFactoryRabbitsDto"];
             totalRabbits?: components["schemas"]["ChocolateFactoryRabbitsDto"];
             unlockedZorro?: boolean;
+            /** Format: int32 */
+            refinedTrufflesConsumed?: number;
+            /** Format: int32 */
+            cocoaFortuneUpgrades?: number;
         };
         ChocolateFactoryRabbitsDto: {
             /** Format: int32 */
@@ -7821,16 +7825,16 @@ export interface components {
             /** Format: int32 */
             completeRefreshInterval?: number;
             leaderboards?: {
-                [key: string]: components["schemas"]["Leaderboard"] | undefined;
+                [key: string]: components["schemas"]["Leaderboard"];
             };
             collectionLeaderboards?: {
-                [key: string]: components["schemas"]["Leaderboard"] | undefined;
+                [key: string]: components["schemas"]["Leaderboard"];
             };
             skillLeaderboards?: {
-                [key: string]: components["schemas"]["Leaderboard"] | undefined;
+                [key: string]: components["schemas"]["Leaderboard"];
             };
             pestLeaderboards?: {
-                [key: string]: components["schemas"]["Leaderboard"] | undefined;
+                [key: string]: components["schemas"]["Leaderboard"];
             };
         };
         ConfiguredProductFeaturesDto: {
@@ -7852,7 +7856,7 @@ export interface components {
             start?: string;
             end?: string;
             brackets?: {
-                [key: string]: components["schemas"]["ContestBracketsDto"] | undefined;
+                [key: string]: components["schemas"]["ContestBracketsDto"];
             };
         };
         ContestBracketsDto: {
@@ -8031,7 +8035,7 @@ export interface components {
             /** Format: int64 */
             timestamp?: number;
             crops: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
         };
         CropRecords: {
@@ -8272,16 +8276,16 @@ export interface components {
             /** Format: double */
             totalWeight?: number;
             crops?: {
-                [key: string]: (number | null) | undefined;
+                [key: string]: number | null;
             } | null;
             cropWeight?: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
             bonusWeight?: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
             uncountedCrops?: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
             pests?: components["schemas"]["PestsDto"];
             inventory?: components["schemas"]["FarmingInventoryDto"];
@@ -8292,16 +8296,16 @@ export interface components {
             /** Format: double */
             totalWeight?: number;
             crops?: {
-                [key: string]: (number | null) | undefined;
+                [key: string]: number | null;
             } | null;
             cropWeight?: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
             bonusWeight?: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
             uncountedCrops?: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
             pests?: components["schemas"]["PestsDto"];
         };
@@ -8330,7 +8334,7 @@ export interface components {
             composter?: components["schemas"]["ComposterDto"];
             /** @description Visitor data */
             visitors?: {
-                [key: string]: components["schemas"]["VisitorDto"] | undefined;
+                [key: string]: components["schemas"]["VisitorDto"];
             };
             /** @description Last save time in unix seconds */
             lastSave?: string;
@@ -8483,13 +8487,13 @@ export interface components {
             name?: string | null;
             lore?: string[] | null;
             enchantments?: {
-                [key: string]: (number | null) | undefined;
+                [key: string]: number | null;
             } | null;
             attributes?: {
-                [key: string]: string | undefined;
+                [key: string]: string;
             } | null;
             gems?: {
-                [key: string]: string | undefined;
+                [key: string]: string;
             } | null;
         };
         JacobContestDto: {
@@ -8587,6 +8591,7 @@ export interface components {
         LeaderboardEntryDto: {
             ign?: string | null;
             profile?: string | null;
+            uuid?: string | null;
             /** Format: double */
             amount?: number;
         };
@@ -8601,16 +8606,16 @@ export interface components {
         };
         LeaderboardPositionsDto: {
             misc?: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
             skills?: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
             collections?: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
             pests?: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
         };
         LinkedAccountsDto: {
@@ -8680,12 +8685,12 @@ export interface components {
         };
         PestWeightsDto: {
             brackets?: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
             values?: {
                 [key: string]: {
-                    [key: string]: number | undefined;
-                } | undefined;
+                    [key: string]: number;
+                };
             };
         };
         PestsDto: {
@@ -8779,6 +8784,7 @@ export interface components {
             status?: number | null;
             detail?: string | null;
             instance?: string | null;
+        } & {
             [key: string]: unknown;
         };
         /**
@@ -8846,13 +8852,13 @@ export interface components {
             /** Format: double */
             bankBalance?: number;
             collections?: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
             collectionTiers?: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
             craftedMinions?: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
             pets?: components["schemas"]["PetDto"][];
             unparsed?: components["schemas"]["UnparsedApiDataDto"];
@@ -8919,7 +8925,7 @@ export interface components {
             /** Format: int64 */
             timestamp?: number;
             skills: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
         };
         SkillsDto: {
@@ -9013,13 +9019,13 @@ export interface components {
             /** Format: int32 */
             copper?: number;
             consumed?: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
             levelCaps?: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
             perks?: {
-                [key: string]: (number | null) | undefined;
+                [key: string]: number | null;
             } | null;
             tempStatBuffs?: components["schemas"]["TempStatBuffResponse"][] | null;
             accessoryBagSettings?: unknown;
@@ -9137,22 +9143,12 @@ export interface components {
             fill?: string | null;
             imageUrl?: string | null;
             crops?: {
-                [key: string]: string | undefined;
+                [key: string]: string;
             } | null;
         };
         WeightStyleDirectionDto: {
             start?: components["schemas"]["WeightStylePositionDto"];
             end?: components["schemas"]["WeightStylePositionDto"];
-        };
-        WeightStyleDto: {
-            /** Format: int32 */
-            id?: number;
-            styleFormatter?: string | null;
-            name?: string | null;
-            collection?: string | null;
-            description?: string | null;
-            images?: components["schemas"]["WeightStyleImageDto"][];
-            products?: components["schemas"]["ParentProductDto"][];
         };
         WeightStyleElementDto: {
             font?: string | null;
@@ -9239,7 +9235,7 @@ export interface components {
         };
         WeightsDto: {
             crops?: {
-                [key: string]: number | undefined;
+                [key: string]: number;
             };
             pests?: components["schemas"]["PestWeightsDto"];
         };
@@ -9250,14 +9246,14 @@ export interface components {
             count?: number;
             complete?: boolean;
             contests?: {
-                [key: string]: string[] | undefined;
+                [key: string]: string[];
             };
         };
         YearlyCropRecordsDto: {
             /** Format: int32 */
             year?: number;
             crops?: {
-                [key: string]: components["schemas"]["ContestParticipationWithTimestampDto"][] | undefined;
+                [key: string]: components["schemas"]["ContestParticipationWithTimestampDto"][];
             };
         };
     };
