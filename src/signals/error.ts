@@ -37,8 +37,7 @@ async function execute(signal: Signal) {
 
 	// Make message into a text file if it's too long
 	if (message.length > 1000) {
-		const attachment = new AttachmentBuilder(Buffer.from(message));
-		attachment.setName('error.txt');
+		const attachment = new AttachmentBuilder(Buffer.from(message), { name: 'error.txt' });
 
 		channel?.send({ 
 			content: ping ? `<@&${ping}>` : undefined,

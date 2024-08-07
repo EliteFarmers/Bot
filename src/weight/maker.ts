@@ -144,7 +144,7 @@ export async function createFromData({
 	}
 
 	const attachment = new AttachmentBuilder(canvas.toBuffer('image/webp'), {
-		name: 'weight.webp',
+		name: `${account.name}-${account.id}-${Date.now()}.webp`,
 	});
 
 	return attachment;
