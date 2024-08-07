@@ -34,6 +34,8 @@ async function execute(signal: Signal) {
 
 	const ping = discord ? `<@${discord}>` : '';
 
+	console.log(`Wipe detected: ${ign} (${uuid}) on ${profileId}`);
+
 	const { data: member } = await FetchProfile(uuid, profileId).catch(() => ({ data: undefined }));
 
 	const fields = [];
