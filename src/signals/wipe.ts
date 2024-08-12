@@ -1,8 +1,8 @@
-import { FetchProfile } from 'api/elite.js';
+import { FetchProfile } from '../api/elite.js';
 import { Signal, SignalRecieverOptions } from '../classes/Signal.js';
 import { EliteEmbed, PrefixFooter } from '../classes/embeds.js';
 import { Crop, getCropDisplayName, getCropFromItemId, getCropFromName } from 'farming-weight';
-import { GetCropEmoji } from 'classes/Util.js';
+import { GetCropEmoji } from '../classes/Util.js';
 
 const settings: SignalRecieverOptions = {
 	name: 'wipe',
@@ -27,6 +27,8 @@ async function execute(signal: Signal) {
 		guild 
 	} = signal;
 
+	console.log(`Wipe detected: ${ign} (${uuid}) on ${profileId}`);
+
 	if (!guild || !channelId) return;
 
 	const channel = guild.channels.cache.get(channelId) ?? await guild.channels.fetch(channelId);
@@ -34,11 +36,7 @@ async function execute(signal: Signal) {
 
 	const ping = discord ? `<@${discord}>` : '';
 
-	console.log(`Wipe detected: ${ign} (${uuid}) on ${profileId}`);
-
 	const { data: member } = await FetchProfile(uuid, profileId).catch(() => ({ data: undefined }));
-
-	const fields = [];
 
 	if (!member?.farmingWeight.totalWeight || member.farmingWeight.totalWeight <= 50) {
 		// Send short and simple message if the weight is low
@@ -46,6 +44,8 @@ async function execute(signal: Signal) {
 		channel?.send({ content: message, }).catch(() => undefined);
 		return;
 	}
+
+	const fields = [];
 
 	if (member?.collections) {
 		const crops = Object.entries(member.collections ?? {})

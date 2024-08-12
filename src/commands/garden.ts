@@ -4,7 +4,7 @@ import { FetchAccount, FetchProfile, UserSettings } from '../api/elite.js';
 import { EliteEmbed, EmptyField, EmptyString, ErrorEmbed, NotYoursReply, PrefixFooter, WarningEmbed } from '../classes/embeds.js';
 import { GetCropEmoji } from '../classes/Util.js';
 import playerAutocomplete from '../autocomplete/player.js';
-import { compareRarity, Crop, getCropDisplayName, getCropFromName, getCropMilestones, getCropUpgrades, getGardenLevel, groupGardenVisitors, Rarity } from 'farming-weight';
+import { compareRarity, Crop, GARDEN_VISITORS, GardenVisitor, getCropDisplayName, getCropFromName, getCropMilestones, getCropUpgrades, getGardenLevel, groupGardenVisitors, Rarity } from 'farming-weight';
 
 const command: Command = {
 	name: 'garden',
@@ -115,6 +115,14 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		return;
 	}
 
+
+	// Check if overflow should be included
+	const gardenOverflow = getGardenLevel(garden?.experience ?? 0, true).level > 15;
+	const milestoneOverflow = Object.values(getCropMilestones((garden?.crops ?? {}) as Record<string, number>, true)).some(v => v.level > 46);
+
+	const includeOverflow = gardenOverflow || milestoneOverflow;
+	let overflow = includeOverflow;
+
 	const rejectedVisitors = Object.values(garden?.visitors ?? {})
 		.reduce((acc, v) => acc + ((v?.visits ?? 0) - (v?.accepted ?? 0)), 0);
 	
@@ -141,6 +149,19 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		if (button.customId === 'uncommon') {
 			await button.update(getVisitorsPayload(true));
 		}
+
+		if (button.customId === 'overflow') {
+			overflow = !overflow;
+			await button.update(getGardenPayload());
+		}
+
+		if (button.customId === 'missing') {
+			await button.update(getMissingVisitors());
+		}
+
+		if (button.customId === 'missing-uncommon') {
+			await button.update(getMissingVisitors(true));
+		}
 	});
 
 	collector.on('end', () => {
@@ -158,7 +179,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const embed = EliteEmbed(settings)
 			.setTitle(`Garden Stats for ${playerName?.replace(/_/g, '\\_')} (${profile?.profileName})`)
 
-		const gardenLevel = getGardenLevel(garden?.experience ?? 0);
+		const gardenLevel = getGardenLevel(garden?.experience ?? 0, overflow);
 
 		let levelText = '';
 		if (gardenLevel.goal) {
@@ -166,10 +187,10 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		}
 		levelText += `\n-# ${(garden?.experience ?? 0).toLocaleString()} Total XP`;
 
-		levelText += `\n\n**Visitors**`;
-		levelText += `\nUnique • **${garden?.uniqueVisitors ?? 0}**/84`;
-		levelText += `\nAccepted • **${garden?.completedVisitors ?? 0}**`;
-		levelText += `\nRejected • **${rejectedVisitors ?? 0}**`;
+		levelText += `\n**Visitors**`;
+		levelText += `\nUnique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**/84`;
+		levelText += `\nAccepted • **${(garden?.completedVisitors ?? 0).toLocaleString()}**`;
+		levelText += `\nRejected • **${(rejectedVisitors ?? 0).toLocaleString()}**`;
 
 		embed.addFields({
 			name: `Garden Level **${gardenLevel.level}**`,
@@ -203,7 +224,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		});
 
 		const cropUpgrades = getCropUpgrades((garden?.cropUpgrades ?? {}) as Record<string, number>);
-		const milestones = getCropMilestones((garden?.crops ?? {}) as Record<string, number>);
+		const milestones = getCropMilestones((garden?.crops ?? {}) as Record<string, number>, overflow);
 		const cropText = Object.entries(milestones)
 			.sort(([, a], [, b]) => {
 				if (a.level === b.level) return b.total - a.total;
@@ -215,7 +236,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				const emoji = GetCropEmoji(name);
 				const upgrade = cropUpgrades[crop] ?? 0;
 
-				return `${emoji} **${value.level}** ${EmptyString} ${EmptyString} **${upgrade}**/9`
+				return `${emoji} **${value.level.toLocaleString()}** ${EmptyString} ${EmptyString} **${upgrade}**/9`
 					+ `\n-# ${value.total.toLocaleString()} ${name}`;
 			});
 
@@ -227,9 +248,12 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		embed.addFields(EmptyField());
 
+		const milestonesValues = Object.values(milestones);
+		const milestoneAvg = Object.values(milestones).reduce((acc, v) => acc + v.level, 0) / milestonesValues.length;
+
 		if (cropText.length > 5) {
 			embed.addFields({
-				name: EmptyString,
+				name: `Average • ${(+(milestoneAvg.toFixed(1))).toLocaleString()}`,
 				value: cropText.slice(5).join('\n'),
 				inline: true
 			});
@@ -239,12 +263,28 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			new ButtonBuilder()
 				.setLabel('Visitor Stats')
 				.setCustomId('visitors')
-				.setStyle(ButtonStyle.Success),
+				.setStyle(ButtonStyle.Success)
+		);
+
+		if (includeOverflow) {
+			linkRow.addComponents(
+				new ButtonBuilder()
+					.setLabel('Overflow')
+					.setCustomId('overflow')
+					.setStyle(ButtonStyle.Secondary),
+			);
+		}
+		
+		linkRow.addComponents(
 			new ButtonBuilder()
 				.setLabel(`@${account?.name}/${profile?.profileName}`)
 				.setURL(`https://elitebot.dev/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')}`)
 				.setStyle(ButtonStyle.Link)
 		);
+
+		if (overflow) {
+			PrefixFooter(embed, 'Showing overflow milestones and garden level!');
+		}
 
 		return { embeds: [embed], components: [linkRow] };
 	}
@@ -255,7 +295,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		let fieldCount = 0;
 		const visitorsList = Object.entries(visitorsByRarity)
 			.sort(([ a ], [ b ]) => compareRarity(b as Rarity, a as Rarity))
-			.map(([ rarity, visitors ], i) => {
+			.map(([ rarity, visitors ]) => {
 				if (uncommon && rarity !== Rarity.Uncommon) return undefined;
 
 				const accepted = visitors.reduce((acc, v) => acc + v.accepted, 0);
@@ -265,15 +305,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				const splitBy = visitors.length > 5 ? Math.ceil(visitors.length / 3) : 5;
 				const result = [];
 				
-				if (rarity === Rarity.Legendary && i > 0) {
-					while (fieldCount < 3) {
-						fieldCount++;
-						result.push(EmptyField());
-					}
-				}
-
-				if (!uncommon && rarity === Rarity.Uncommon && fieldCount < 3) {
-					while (fieldCount < 3) {
+				if (rarity !== Rarity.Special && rarity !== Rarity.Mythic) {
+					while (fieldCount % 3 !== 0) {
 						fieldCount++;
 						result.push(EmptyField());
 					}
@@ -284,9 +317,9 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 					fieldCount++;
 					result.push({
-						name: i === 0 ? `**${rarity}** • **${accepted}**/${visits}` : EmptyString,
+						name: i === 0 ? `**${rarity}** • **${accepted.toLocaleString()}**/${visits.toLocaleString()}` : EmptyString,
 						value: skipText 
-							? '-# Click "Uncommon Visitors" to see these!'
+							? '-# Click "Uncommon" to see these!'
 							: chunk.map(v => `-# ${v.short ?? v.name} • **${v.accepted}**/${v.visits}`).join('\n'),
 						inline: true
 					});
@@ -300,7 +333,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const embed = EliteEmbed(settings)
 			.setTitle(`Visitors for ${playerName?.replace(/_/g, '\\_')} (${profile?.profileName})`)
 			.setDescription(
-				`Unique • **${garden?.uniqueVisitors ?? 0}**/84 ${EmptyString} • ${EmptyString} Accepted • **${garden?.completedVisitors ?? 0}** ${EmptyString} • ${EmptyString} Rejected • **${rejectedVisitors ?? 0}**`
+				`Unique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**/84 ${EmptyString} • ${EmptyString} Accepted • **${(garden?.completedVisitors ?? 0).toLocaleString()}** ${EmptyString} • ${EmptyString} Rejected • **${(rejectedVisitors ?? 0).toLocaleString()}**`
 				+ '\nAcceptance Rate • **' + ((garden?.completedVisitors ?? 0) / ((garden?.completedVisitors ?? 0) + rejectedVisitors) * 100).toFixed(2) + '%**'
 			)
 
@@ -312,11 +345,109 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			new ButtonBuilder()
 				.setLabel('Garden Stats')
 				.setCustomId('garden')
-				.setStyle(ButtonStyle.Success),
+				.setStyle(ButtonStyle.Success)
+		);
+
+		if (garden?.uniqueVisitors !== Object.keys(GARDEN_VISITORS).length) {
+			linkRow.addComponents(
+				new ButtonBuilder()
+					.setLabel('Missing')
+					.setCustomId('missing')
+					.setStyle(ButtonStyle.Success)
+			);
+		}
+
+		linkRow.addComponents(
 			new ButtonBuilder()
-				.setLabel(uncommon ? 'Back' : 'Uncommon Visitors')
+				.setLabel(uncommon ? 'Back' : 'Uncommon')
 				.setCustomId(uncommon ? 'visitors' : 'uncommon')
 				.setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder()
+				.setLabel(`@${account?.name}/${profile?.profileName}`)
+				.setURL(`https://elitebot.dev/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')}`)
+				.setStyle(ButtonStyle.Link),
+		);
+
+		return { embeds: [embed], components: [linkRow] };
+	}
+
+	function getMissingVisitors(uncommon = false) {
+		const visitedVisitors = (garden?.visitors ?? {}) as Record<string, { visits: number; accepted: number; } | undefined>;
+
+		const missingVisitors = Object.entries(GARDEN_VISITORS)
+			.reduce<Partial<Record<Rarity, GardenVisitor[]>>>((acc, [ visitor, data ]) => {
+				const current = visitedVisitors[visitor];
+				if ((current && current.accepted > 0) || !data) {
+					return acc; // Not missing
+				}
+				acc[data.rarity] ??= [];
+				acc[data.rarity]?.push(data);
+				return acc;
+			}, {});
+
+		let fieldCount = 0;
+		const skipUncommon = !uncommon && (missingVisitors[Rarity.Uncommon]?.length ?? 0) > 15;
+
+		const visitorsList = Object.entries(missingVisitors)
+			.sort(([ a ], [ b ]) => compareRarity(b as Rarity, a as Rarity))
+			.map(([ rarity, visitors ]) => {
+				if (uncommon && rarity !== Rarity.Uncommon) return undefined;
+
+				const skipText = rarity === Rarity.Uncommon && skipUncommon;
+				const splitBy = visitors.length > 5 ? Math.ceil(visitors.length / 3) : 5;
+				const result = [];
+				
+				if (rarity !== Rarity.Special && rarity !== Rarity.Mythic) {
+					while (fieldCount % 3 !== 0) {
+						fieldCount++;
+						result.push(EmptyField());
+					}
+				}
+
+				for (let i = 0; i < visitors.length; i += splitBy) {
+					const chunk = visitors.slice(i, i + splitBy);
+
+					fieldCount++;
+					result.push({
+						name: i === 0 ? `**${rarity}** • **${visitors.length} Missing**` : EmptyString,
+						value: skipText 
+							? '-# Click "Missing Uncommon" to see these!'
+							: chunk.map(v => `-# ${v.short ?? v.name} [⧉](${v.wiki})`).join('\n'),
+						inline: true
+					});
+
+					if (skipText) break;
+				}
+
+				return result;
+			}).filter(a => a).flat() as { name: string; value: string; inline: boolean }[];
+
+		const embed = EliteEmbed(settings)
+			.setTitle(`Missing Visitors for ${playerName?.replace(/_/g, '\\_')} (${profile?.profileName})`)
+			.setDescription(
+				`Unique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**/84 ${EmptyString} • ${EmptyString} Accepted • **${(garden?.completedVisitors ?? 0).toLocaleString()}** ${EmptyString} • ${EmptyString} Rejected • **${(rejectedVisitors ?? 0).toLocaleString()}**`
+				+ '\nAcceptance Rate • **' + ((garden?.completedVisitors ?? 0) / ((garden?.completedVisitors ?? 0) + rejectedVisitors) * 100).toFixed(2) + '%**'
+			)
+
+		embed.addFields(visitorsList);
+
+		const linkRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+			new ButtonBuilder()
+				.setLabel('Visitor Stats')
+				.setCustomId('visitors')
+				.setStyle(ButtonStyle.Success)
+		);
+
+		if (skipUncommon || uncommon) {
+			linkRow.addComponents(
+				new ButtonBuilder()
+					.setLabel(uncommon ? 'Back' : 'Missing Uncommon')
+					.setCustomId(uncommon ? 'missing' : 'missing-uncommon')
+					.setStyle(ButtonStyle.Secondary)
+			);
+		}
+
+		linkRow.addComponents(
 			new ButtonBuilder()
 				.setLabel(`@${account?.name}/${profile?.profileName}`)
 				.setURL(`https://elitebot.dev/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')}`)
