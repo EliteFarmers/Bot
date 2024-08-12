@@ -27,20 +27,19 @@ async function execute(signal: Signal) {
 		guild 
 	} = signal;
 
-	console.log(`Wipe detected: ${ign} (${uuid}) on ${profileId}`);
-
 	if (!guild || !channelId) return;
 
 	const channel = guild.channels.cache.get(channelId) ?? await guild.channels.fetch(channelId);
 	if (!channel?.isTextBased()) return;
 
 	const ping = discord ? `<@${discord}>` : '';
+	const username = (ign || 'Unknown').replaceAll('_', '\\_');
 
 	const { data: member } = await FetchProfile(uuid, profileId).catch(() => ({ data: undefined }));
 
 	if (!member?.farmingWeight.totalWeight || member.farmingWeight.totalWeight <= 50) {
 		// Send short and simple message if the weight is low
-		const message = `**${ign}** (${member?.profileName ?? 'Unknown'})${ping ? ` (${ping})` : ''} has been wiped! [API](https://elitebot.dev/profile/${uuid}/${profileId})`;
+		const message = `**${username}** (${member?.profileName ?? 'Unknown'})${ping ? ` (${ping})` : ''} has been wiped! [API](https://api.elitebot.dev/profile/${uuid}/${profileId})`;
 		channel?.send({ content: message, }).catch(() => undefined);
 		return;
 	}
@@ -83,10 +82,10 @@ async function execute(signal: Signal) {
 	});
 
 	const embed = EliteEmbed()
-		.setDescription(`## **${ign}** (${member?.profileName ?? 'Unknown'})${ping ? ` (${ping})` : ''} has been wiped!\n`
+		.setDescription(`## **${username}** (${member?.profileName ?? 'Unknown'})${ping ? ` (${ping})` : ''} has been wiped!\n`
 			+ `-# UUID: \`${uuid}\`\n`
 			+ `-# Profile ID: \`${profileId}\`\n`
-			+ `-# [Link to API Data](https://elitebot.dev/profile/${uuid}/${profileId})`
+			+ `-# [Link to API Data](https://api.elitebot.dev/profile/${uuid}/${profileId})`
 		)
 		.setTimestamp()
 
