@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { Command, CommandAccess, CommandType } from '../classes/Command.js';
 import { FetchAccount, FetchCollectionGraphs, UserSettings } from '../api/elite.js';
-import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
+import { EliteEmbed, EmptyField, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 import { GetCropEmoji } from '../classes/Util.js';
 import playerAutocomplete from '../autocomplete/player.js';
 import { Crop, createFarmingWeightCalculator, getCropFromName } from 'farming-weight';
@@ -144,11 +144,13 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		.setTitle(`Crop Gain for ${discordPlayerName} (${profile.profileName})`)
 		.setDescription(`-# View charts and older data for ${discordPlayerName} [here!](https://elitebot.dev/@${account.id}/${profile.profileId}/charts)`)
 
+	const fields = [];
+
 	for (const day of days) {
 		const crops = Object.entries(day.crops).filter(([, amount]) => amount > 0).sort((a, b) => b[1] - a[1]);
 
 		if (crops.length <= 0) {
-			embed.addFields({
+			fields.push({
 				name: `<t:${day.start}:d>`,
 				value: 'None!',
 				inline: true
@@ -165,7 +167,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		const weight = calc.getWeightInfo().cropWeight;
 
-		embed.addFields({
+		fields.push({
 			name: `<t:${day.start}:d>`,
 			value: `**Weight:** ${weight.toFixed(2)}\n` + crops.slice(0, 3)
 				.map(([crop, amount]) => `${GetCropEmoji(crop)} ${amount.toLocaleString()}`)
@@ -173,6 +175,12 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			inline: true
 		});
 	}
+
+	while (fields.length % 3 !== 0) {
+		fields.push(EmptyField());
+	}
+
+	embed.addFields(fields);
 
 	interaction.editReply({ embeds: [embed], components: [row] });
 }
