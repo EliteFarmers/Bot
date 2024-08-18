@@ -106,7 +106,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const dataPoints = collections.sort((a, b) => +(a.timestamp ?? 0) - +(b.timestamp ?? 0));
 
-	type dayProgress = { start: number, crops: Record<string, number> };
+	type dayProgress = { start: number, crops: Record<string, number>, weight: number };
 
 	const days = [] as dayProgress[];
 
@@ -126,7 +126,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		days.push({
 			start: getUnixTime(startOfDay(fromUnixTime(start))),
-			crops: cropGains
+			crops: cropGains,
+			weight: +(lastPoint.cropWeight ?? 0) - +(point.cropWeight ?? 0)
 		});
 	}
 
@@ -165,7 +166,12 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			}, {}),
 		})
 
-		const weight = calc.getWeightInfo().cropWeight;
+		const calculated = calc.getWeightInfo().cropWeight;
+		
+		// Temporary fix for pests not being in old data
+		const weight = calculated * 0.5 > day.weight || day.weight < 0
+			? calculated 
+			: day.weight;
 
 		fields.push({
 			name: `<t:${day.start}:d>`,

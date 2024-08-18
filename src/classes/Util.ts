@@ -164,7 +164,7 @@ export function CropFromSimple(name: string) {
 }
 
 export function GetCropEmoji(crop: string) {
-	if (crop === 'Seeds') return '🌱';
+	if (crop.toLowerCase() === 'seeds') return '🌱';
 
 	const emoji = CropEmojis[crop as keyof typeof CropEmojis];
 
