@@ -3,7 +3,7 @@ import { Command, CommandAccess, CommandType } from '../classes/Command.js';
 import { FetchAccount, FetchLeaderboardRankings, FetchProfile, UserSettings } from '../api/elite.js';
 import { EliteEmbed, EmptyField, EmptyString, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 import { GetCropEmoji, LEVELING_XP } from '../classes/Util.js';
-import playerAutocomplete from '../autocomplete/player.js';
+import { autocomplete, playerOption } from '../autocomplete/player.js';
 import { getCustomFormatter } from '../weight/custom.js';
 import { getCropFromName, getLevel } from 'farming-weight';
 
@@ -16,15 +16,12 @@ const command: Command = {
 	slash: new SlashCommandBuilder()
 		.setName('weight')
 		.setDescription('Get a players farming weight!')
-		.addStringOption(option => option.setName('player')
-			.setDescription('The player in question.')
-			.setAutocomplete(true)
-			.setRequired(false))
+		.addStringOption(playerOption())
 		.addStringOption(option => option.setName('profile')
 			.setDescription('Optionally specify a profile!')
 			.setRequired(false)),
 	execute: execute,
-	autocomplete: playerAutocomplete
+	autocomplete
 }
 
 export default command;

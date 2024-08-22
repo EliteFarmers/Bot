@@ -3,7 +3,7 @@ import { Command, CommandAccess, CommandType } from '../classes/Command.js';
 import { FetchAccount, FetchCollectionGraphs, UserSettings } from '../api/elite.js';
 import { EliteEmbed, EmptyField, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 import { GetCropEmoji } from '../classes/Util.js';
-import playerAutocomplete from '../autocomplete/player.js';
+import { autocomplete, playerOption } from '../autocomplete/player.js';
 import { Crop, createFarmingWeightCalculator, getCropFromName } from 'farming-weight';
 import { fromUnixTime, getUnixTime, startOfDay } from 'date-fns';
 
@@ -14,15 +14,12 @@ const command: Command = {
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
 	slash: new SlashCommandBuilder()
-		.addStringOption(option => option.setName('player')
-			.setDescription('The player in question.')
-			.setAutocomplete(true)
-			.setRequired(false))
+		.addStringOption(playerOption())
 		.addStringOption(option => option.setName('profile')
 			.setDescription('Optionally specify a profile!')
 			.setRequired(false)),
 	execute: execute,
-	autocomplete: playerAutocomplete
+	autocomplete
 }
 
 export default command;

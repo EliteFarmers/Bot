@@ -2,7 +2,7 @@ import { Command, CommandAccess, CommandType } from "../classes/Command.js";
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from "../classes/embeds.js";
 import { FetchAccount, FetchUpdateAccount, LinkAccount } from "../api/elite.js";
-import playerAutocomplete from "../autocomplete/player.js";
+import { autocomplete, playerOption } from "../autocomplete/player.js";
 
 const command: Command = {
 	name: 'verify',
@@ -13,12 +13,9 @@ const command: Command = {
 	slash: new SlashCommandBuilder()
 		.setName('verify')
 		.setDescription('Link your Minecraft account!')
-		.addStringOption(option => option.setName('player')
-			.setDescription('Your minecraft account name.')
-			.setAutocomplete(true)
-			.setRequired(true)),
+		.addStringOption(playerOption('Your Minecraft account name.', true)),
 	execute: execute,
-	autocomplete: playerAutocomplete
+	autocomplete
 }
 
 export default command;

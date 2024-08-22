@@ -9,6 +9,8 @@ export interface CommandBase {
 	fetchSettings?: boolean
 }
 
+export type AutocompleteHandler = (interaction: AutocompleteInteraction) => Promise<void>;
+
 export interface Command extends CommandBase {
 	slash?: SlashCommandBuilder | ContextMenuCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'> | SlashCommandSubcommandsOnlyBuilder | SlashCommandOptionsOnlyBuilder,
 	
@@ -20,13 +22,13 @@ export interface Command extends CommandBase {
 	type: CommandType,
 	
 	execute: Function
-	autocomplete?: (interaction: AutocompleteInteraction) => Promise<void>
+	autocomplete?: AutocompleteHandler | Record<string, AutocompleteHandler>
 }
 
 export interface SubCommand extends CommandBase {
 	slash?: SlashCommandSubcommandBuilder | ((group: SlashCommandSubcommandBuilder) => SlashCommandSubcommandBuilder),
 	execute: Function,
-	autocomplete?: (interaction: AutocompleteInteraction) => Promise<void>
+	autocomplete?: AutocompleteHandler | Record<string, AutocompleteHandler>
 }
 
 export interface CommandGroupSettings extends CommandBase {
@@ -91,8 +93,18 @@ export class CommandGroup implements CommandGroupSettings {
 		}
 		
 		const category = interaction.options.getSubcommand() ?? '';
+		const auto = this.subcommands[category]?.autocomplete;
+		if (!auto) return;
+
+		if (typeof auto === 'function') {
+			auto(interaction);
+			return;
+		}
 		
-		this.subcommands[category]?.autocomplete?.(interaction);
+		const focused = interaction.options.getFocused(true);
+		if (!focused) return;
+
+		auto[focused.name]?.(interaction);
 	}
 
 	public addSubcommand(subCommand: SubCommand) {
@@ -171,4 +183,23 @@ export async function registerCommandGroups(folder: string, callback: (folder: s
 		const imported = await import(`../${folder}/${file}/command.js`);
 		callback(`${folder}/${file}`, imported.default);
 	}
+}
+
+export async function getAutocomplete(cmd: Command | CommandGroup, interaction: AutocompleteInteraction) {
+	if (cmd instanceof CommandGroup) {
+		cmd.autocomplete(interaction);
+		return undefined;
+	}
+
+	const auto = cmd.autocomplete;
+	if (!auto) return undefined;
+
+	if (typeof auto === 'function') {
+		return auto
+	}
+
+	const focused = interaction.options.getFocused(true);
+	if (!focused) undefined;
+
+	return auto[focused.name];
 }

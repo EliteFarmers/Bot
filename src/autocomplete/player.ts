@@ -1,7 +1,15 @@
 import { FetchLeaderboardSlice, SearchUsers } from '../api/elite.js';
-import { AutocompleteInteraction } from 'discord.js';
+import { AutocompleteInteraction, SlashCommandStringOption } from 'discord.js';
 
-export default async function playerAutocomplete(interaction: AutocompleteInteraction) {
+export function playerOption(description = 'The player to get results for!', required = false) {
+	return (builder: SlashCommandStringOption) => 
+		builder.setName('player')
+			.setDescription(description)
+			.setAutocomplete(true)
+			.setRequired(required);
+}
+
+export async function autocomplete(interaction: AutocompleteInteraction) {
 	if (interaction.responded) return;
 
 	const option = interaction.options.getFocused(true);

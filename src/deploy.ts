@@ -85,6 +85,8 @@ const rest = new REST().setToken(process.env.BOT_TOKEN);
 				console.log('Probably updated that slash command globally');
 			}
 		}, 3000);
+	} else {
+		console.log('Invalid arguments, please use "global" or "single <command name>"');
 	}
 })();
 

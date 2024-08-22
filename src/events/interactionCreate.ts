@@ -1,6 +1,6 @@
 import { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, CommandInteraction, ContextMenuCommandInteraction, Events, GuildMember, Interaction, StringSelectMenuInteraction } from 'discord.js';
 import { commands } from '../bot.js';
-import { Command, CommandGroup, CommandType } from '../classes/Command.js';
+import { Command, CommandGroup, CommandType, getAutocomplete } from '../classes/Command.js';
 import { HasRole, isValidAccess } from '../classes/Util.js';
 import { FetchGuild, FetchUserSettings } from '../api/elite.js';
 
@@ -77,7 +77,8 @@ async function OnAutocompleteInteraction(interaction: AutocompleteInteraction) {
 	if (!command || !('autocomplete' in command)) return;
 
 	try {
-		await command.autocomplete?.(interaction);
+		const auto = await getAutocomplete(command, interaction);
+		await auto?.(interaction);
 	} catch (error) {
 		console.log(error);
 	}

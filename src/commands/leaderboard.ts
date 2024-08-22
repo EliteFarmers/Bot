@@ -1,8 +1,10 @@
 import { components } from "../api/api.js";
-import { FetchAccount, FetchCollectionLeaderboardSlice, FetchLeaderboardRank, FetchLeaderboardSlice, FetchSkillLeaderboardSlice, UserSettings } from "../api/elite.js";
+import { FetchAccount, FetchLeaderboardRank, FetchLeaderboardSlice, UserSettings } from "../api/elite.js";
 import { Command, CommandAccess, CommandType } from "../classes/Command.js";
 import { EliteEmbed, ErrorEmbed } from "../classes/embeds.js";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, SlashCommandBuilder, SlashCommandSubcommandGroupBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, SlashCommandBuilder } from 'discord.js';
+import { playerOption, autocomplete as playerAuto } from "../autocomplete/player.js";
+import { leaderboardOption, autocomplete as lbAuto } from "../autocomplete/leaderboard.js";
 
 const command: Command = {
 	name: 'leaderboard',
@@ -10,7 +12,20 @@ const command: Command = {
 	usage: '(username)',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
-	slash: createLbSlashCommands(),
+	autocomplete: {
+		player: playerAuto, 
+		name: lbAuto
+	},
+	slash: new SlashCommandBuilder()
+		.setName('leaderboard')
+		.setDescription('Get a leaderboard!')
+		.addStringOption(leaderboardOption())
+		.addStringOption(playerOption())
+		.addIntegerOption(option => option
+			.setName('rank')
+			.setDescription('Jump to a specific rank!')
+			.setMinValue(1)
+			.setRequired(false)),
 	execute: execute
 }
 
@@ -18,9 +33,7 @@ export default command;
     
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	let playerName = interaction.options.getString('player', false) ?? undefined;
-
-	const category = interaction.options.getSubcommandGroup() ?? '';
-	const leaderboardId = interaction.options.getSubcommand() ?? '';
+	const leaderboardId = interaction.options.getString('name', false) ?? '';
 
 	await interaction.deferReply();
 
@@ -54,7 +67,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	let maxIndex = 1000;
 	let entries: components['schemas']['LeaderboardEntryDto'][] = [];
 
-	const lb = await FetchLeaderboard(category, leaderboardId, index, 12)
+	const lb = await FetchLeaderboard(leaderboardId, index, 12)
 		.then(res => { return res.data; }).catch(() => undefined);
 
 	if (!lb) {
@@ -69,7 +82,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	maxIndex = (lb.maxEntries ?? 1000) - 12;
 	entries = lb.entries ?? [];
 
-	const embed = await getEmbed(settings, index, maxIndex, leaderboardId, category, title, entries);
+	const embed = await getEmbed(settings, index, maxIndex, leaderboardId, title, entries);
 	if (!embed) {
 		const errorEmbed = ErrorEmbed('Failed to Fetch Leaderboard!')
 			.setDescription('Please try again later. If this issue persists, contact `kaeso.dev` on Discord.')
@@ -103,7 +116,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				}
 			}
 
-			const newEmbed = await getEmbed(settings, index, maxIndex, leaderboardId, category, title);
+			const newEmbed = await getEmbed(settings, index, maxIndex, leaderboardId, title);
 
 			if (!newEmbed) {
 				const errorEmbed = ErrorEmbed('Failed to Fetch Leaderboard!')
@@ -128,9 +141,9 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	});
 }
 
-async function getEmbed(settings: UserSettings | undefined = undefined, index: number, maxIndex: number, leaderboardId: string, category: string, title: string, entries?: components['schemas']['LeaderboardEntryDto'][]) {
+async function getEmbed(settings: UserSettings | undefined = undefined, index: number, maxIndex: number, leaderboardId: string, title: string, entries?: components['schemas']['LeaderboardEntryDto'][]) {
 	if (!entries) {
-		entries = await FetchLeaderboard(category, leaderboardId, index, 12)
+		entries = await FetchLeaderboard(leaderboardId, index, 12)
 			.then(res => { return res.data?.entries; }).catch(() => undefined);
 	}
 
@@ -138,14 +151,52 @@ async function getEmbed(settings: UserSettings | undefined = undefined, index: n
 
 	const embed = EliteEmbed(settings)
 		.setTitle(title)
-		.setDescription(`Showing **${index + 1}** - **${index + entries.length}** of **${(maxIndex + 12).toLocaleString()}** entries`)
-		.addFields(entries.map((entry, i) => ({
-			name: `#${index + i + 1} - ${entry.ign?.replaceAll('_', '\\_') ?? 'Unknown'}⠀`,
-			value: `[⧉](https://elitebot.dev/@${entry.ign}/${encodeURIComponent(entry.profile ?? '')}) ${(entry.amount ?? 0).toLocaleString()}`,
-			inline: true
-		})));
+		.setDescription(`Showing **${index + 1}** - **${index + entries.length}** of **${(maxIndex + 12).toLocaleString()}** entries! [⧉](https://elitebot.dev/leaderboard/${leaderboardId}/${index + 1})`);
+		
+	const profileLb = entries[0]?.members?.length	
+	if (profileLb) {
+		embed.addFields(getProfileLbFields(entries, index));
+	} else {
+		embed.addFields(getPlayerLbFields(entries, index));
+	}
 
 	return embed;
+}
+
+function getPlayerLbFields(entries: components['schemas']['LeaderboardEntryDto'][], index: number) {
+	return entries.map((entry, i) => ({
+		name: `#${index + i + 1} ${entry.ign?.replaceAll('_', '\\_') ?? 'Unknown'}⠀`,
+		value: `[⧉](https://elitebot.dev/@${entry.ign}/${encodeURIComponent(entry.profile ?? '')}) ${(entry.amount ?? 0).toLocaleString()}`,
+		inline: true
+	}))
+}
+
+function getProfileLbFields(entries: components['schemas']['LeaderboardEntryDto'][], index: number) {
+	return entries.map((entry, i) => {
+		const firstMember = entry.members?.[0];
+		const otherMembers = entry.members?.slice(1, 3);
+		let members = '\n-# ';
+
+		if (!otherMembers?.length) {
+			members = '';
+		} else {
+			members += otherMembers.map(m => m.ign.replaceAll('_', '\\_')).join(', ');
+		}
+
+		if (members.length > 24) {
+			members = members.slice(0, 24) + '...';
+		}
+	
+		if (entry.members?.length && entry.members.length > 3) {
+			members += ' **+' + (entry.members.length - 3) + '**';
+		}
+
+		return {
+			name: `#${index + i + 1} ${firstMember?.ign?.replaceAll('_', '\\_') ?? 'Unknown'}⠀`,
+			value: `[⧉](https://elitebot.dev/@${firstMember?.ign}/${encodeURIComponent(entry.uuid ?? '')}/garden) ${(entry.amount ?? 0).toLocaleString()}${members}`,
+			inline: true
+		}
+	})
 }
 
 function getButtonRow(index: number, maxIndex = 1000) {
@@ -178,63 +229,6 @@ function getButtonRow(index: number, maxIndex = 1000) {
 		);
 }
 
-function FetchLeaderboard(category: string, leaderboardId: string, offset: number, limit: number) {
-	if (category === 'skill') return FetchSkillLeaderboardSlice(leaderboardId, offset, limit);
-	if (category === 'crop') return FetchCollectionLeaderboardSlice(leaderboardId, offset, limit);
-
+function FetchLeaderboard(leaderboardId: string, offset: number, limit: number) {
 	return FetchLeaderboardSlice(leaderboardId, offset, limit);
-}
-
-function createLbSlashCommands() {
-	const builder = new SlashCommandBuilder()
-		.setName('leaderboard')
-		.setDescription('Get a leaderboard!')
-		.addSubcommand(subcommand => subcommand
-			.setName('farmingweight')
-			.setDescription('Get the Farming Weight leaderboard!')
-			.addStringOption(option => option
-				.setName('player')
-				.setDescription('Jump to a specific player!')
-				.setRequired(false))
-			.addIntegerOption(option => option
-				.setName('rank')
-				.setDescription('Jump to a specific rank!')
-				.setMinValue(1)
-				.setRequired(false)));
-
-	const cropGroup = new SlashCommandSubcommandGroupBuilder()
-		.setName('crop')
-		.setDescription('Get a crop leaderboard!')
-	
-	const crops = {
-		cactus: 'Cactus',
-		carrot: 'Carrot',
-		cocoa: 'Cocoa',
-		melon: 'Melon',
-		mushroom: 'Mushroom',
-		potato: 'Potato',
-		pumpkin: 'Pumpkin',
-		sugarcane: 'Sugar Cane',
-		netherwart: 'Nether Wart',
-		wheat: 'Wheat'
-	};
-
-	for (const [ name, crop ] of Object.entries(crops)) {
-		cropGroup.addSubcommand(subcommand => subcommand
-			.setName(name)
-			.setDescription(`Get the ${crop} leaderboard!`)
-			.addStringOption(option => option
-				.setName('player')
-				.setDescription('Jump to a specific player!')
-				.setRequired(false))
-			.addIntegerOption(option => option
-				.setName('rank')
-				.setDescription('Jump to a specific rank!')
-				.setMinValue(1)
-				.setRequired(false)));
-	}
-
-	builder.addSubcommandGroup(cropGroup);
-
-	return builder;
 }

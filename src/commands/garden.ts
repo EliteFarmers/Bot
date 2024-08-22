@@ -3,7 +3,7 @@ import { Command, CommandAccess, CommandType } from '../classes/Command.js';
 import { FetchAccount, FetchProfile, UserSettings } from '../api/elite.js';
 import { EliteEmbed, EmptyField, EmptyString, ErrorEmbed, NotYoursReply, PrefixFooter, WarningEmbed } from '../classes/embeds.js';
 import { GetCropEmoji } from '../classes/Util.js';
-import playerAutocomplete from '../autocomplete/player.js';
+import { autocomplete, playerOption } from '../autocomplete/player.js';
 import { compareRarity, Crop, GARDEN_VISITORS, GardenVisitor, getCropDisplayName, getCropFromName, getCropMilestones, getCropUpgrades, getGardenLevel, groupGardenVisitors, Rarity } from 'farming-weight';
 
 const command: Command = {
@@ -13,15 +13,12 @@ const command: Command = {
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
 	slash: new SlashCommandBuilder()
-		.addStringOption(option => option.setName('player')
-			.setDescription('The player in question.')
-			.setAutocomplete(true)
-			.setRequired(false))
+		.addStringOption(playerOption())
 		.addStringOption(option => option.setName('profile')
 			.setDescription('Optionally specify a profile!')
 			.setRequired(false)),
 	execute: execute,
-	autocomplete: playerAutocomplete
+	autocomplete
 }
 
 export default command;
