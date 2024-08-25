@@ -8,7 +8,7 @@ import { CronTask } from '../classes/Command.js';
 import { components } from '../api/api.js';
 
 const settings = {
-	cron: '0 10 * * * *',
+	cron: '0 15 * * * *',
 	execute: execute
 } satisfies CronTask;
 
@@ -41,7 +41,7 @@ async function execute(client: Client) {
 	if (!contests?.complete) {
 		// Check if it's a new skyblock year
 		const sbDate = SkyBlockTime.now;
-		if (sbDate.month !== 1 || sbDate.day !== 2) {
+		if (sbDate.month !== 1 || sbDate.day > 2) {
 			console.log('Contests not available yet! Shard: ' + client.shard?.ids[0]);
 			return;
 		}
