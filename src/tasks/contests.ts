@@ -52,7 +52,7 @@ async function execute(client: Client) {
 		// New year, send please wait message
 		const embed = EliteEmbed()
 			.setTitle(current.toString())
-			.setDescription(`Upcoming contest haven't been uploaded yet!`)
+			.setDescription(`Upcoming contests haven't been uploaded yet!`)
 			.addFields([{
 				name: 'Enjoy the Spring Season!',
 				value: `**+25** <:fortune:1180353749076693092> from [Atmospheric Filter](https://wiki.hypixel.net/Atmospheric_Filter)`
