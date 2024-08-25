@@ -1,10 +1,11 @@
-import { DisableGuildContestPings, FetchCurrentMonthlyBrackets, GetCurrentContests, GetGuildsToPing } from '../api/elite';
-import { CropFromSimple, GetCropEmoji, GetMedalEmoji } from '../classes/Util';
-import { EliteEmbed, PrefixFooter } from '../classes/embeds';
-import { Client, MessageCreateOptions, PermissionFlagsBits } from 'discord.js';
-import { Crop, getCropFromName, getFortuneRequiredForCollection } from 'farming-weight';
-import { GetSkyblockDate } from '../classes/SkyblockDate';
-import { CronTask } from '../classes/Command';
+import { DisableGuildContestPings, FetchCurrentMonthlyBrackets, GetCurrentContests, GetGuildsToPing } from '../api/elite.js';
+import { CropFromSimple, GetCropEmoji, GetMedalEmoji } from '../classes/Util.js';
+import { EliteEmbed, PrefixFooter } from '../classes/embeds.js';
+import { Client, EmbedBuilder, MessageCreateOptions, PermissionFlagsBits } from 'discord.js';
+import { Crop, getCropFromName, getFortuneRequiredForCollection, SkyBlockTime } from 'farming-weight';
+import { GetSkyblockDate } from '../classes/SkyblockDate.js';
+import { CronTask } from '../classes/Command.js';
+import { components } from '../api/api.js';
 
 const settings = {
 	cron: '0 10 * * * *',
@@ -28,10 +29,41 @@ const cropKeys: Record<string, string> = {
 
 async function execute(client: Client) {
 	console.log('Running contest ping task. Shard: ' + client.shard?.ids[0]);
-	
+
+	const { data: guilds } = await GetGuildsToPing().catch(() => ({ data: undefined, response: undefined }));
+	if (!guilds || guilds.length === 0) {
+		console.log('No guilds to ping! Shard: ' + client.shard?.ids[0]);
+		return;
+	}
+
 	const { data: contests } = await GetCurrentContests().catch(() => ({ data: undefined }));
+
 	if (!contests?.complete) {
-		console.log('Upcoming contests not available yet! Shard: ' + client.shard?.ids[0]);
+		// Check if it's a new skyblock year
+		const sbDate = SkyBlockTime.now;
+		if (sbDate.month !== 1 || sbDate.day !== 2) {
+			console.log('Contests not available yet! Shard: ' + client.shard?.ids[0]);
+			return;
+		}
+
+		const current = SkyBlockTime.from(sbDate.year, 1, 2);
+		const nextContest = SkyBlockTime.from(sbDate.year, 1, 2 + 3);
+
+		// New year, send please wait message
+		const embed = EliteEmbed()
+			.setTitle(current.toString())
+			.setDescription(`Upcoming contest haven't been uploaded yet!`)
+			.addFields([{
+				name: 'Enjoy the Spring Season!',
+				value: `**+25** <:fortune:1180353749076693092> from [Atmospheric Filter](https://wiki.hypixel.net/Atmospheric_Filter)`
+					+ `\nGood luck finding Zorro in [Hoppity's Hunt](https://wiki.hypixel.net/Hoppity%27s_Hunt)!`
+			}, {
+				name: 'Next Contest',
+				value: `Starts <t:${nextContest.unixSeconds}:R> [View All](<https://elitebot.dev/contests/upcoming#${nextContest.unixSeconds}>)`
+			}]);
+
+		sendMessages(client, embed, guilds);
+
 		return;
 	}
 	
@@ -44,12 +76,6 @@ async function execute(client: Client) {
 	}
 
 	const nextContest = Object.entries(contests.contests ?? {}).find(([ k ]) => +k > +timestamp);
-
-	const { data: guilds } = await GetGuildsToPing().catch(() => ({ data: undefined, response: undefined }));
-	if (!guilds || guilds.length === 0) {
-		console.log('No guilds to ping! Shard: ' + client.shard?.ids[0]);
-		return;
-	}
 
 	const { data: brackets } = await FetchCurrentMonthlyBrackets(3).catch(() => ({ data: undefined }));
 
@@ -80,6 +106,10 @@ async function execute(client: Client) {
 
 	PrefixFooter(embed, 'Estimated bracket requirements shown for 19.8 BPS');
 
+	await sendMessages(client, embed, guilds, crops);
+}
+
+async function sendMessages(client: Client, embed: EmbedBuilder, guilds: components['schemas']['ContestPingsFeatureDto'][], crops?: string[]) {
 	for (const pings of guilds) {
 		if (!pings.guildId || !pings?.enabled || !pings.channelId) {
 			console.log('Invalid pings config', pings);
@@ -111,10 +141,13 @@ async function execute(client: Client) {
 				continue;
 			}
 
-			const roles = crops
-				.map(crop => pings.cropPingRoles?.[cropKeys[crop] as keyof typeof pings.cropPingRoles] ?? undefined)
-				.filter(role => role);
-
+			let roles: string[] = [];
+			if (crops) {
+				roles = crops
+					.map(crop => pings.cropPingRoles?.[cropKeys[crop] as keyof typeof pings.cropPingRoles] ?? undefined)
+					.filter(role => role) as string[];
+			}
+	
 			// Make sure alwaysPingRole at least seems valid
 			const alwaysPing = !!pings.alwaysPingRole && pings.alwaysPingRole.length > 10;
 
