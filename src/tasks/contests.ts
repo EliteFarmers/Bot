@@ -8,7 +8,7 @@ import { CronTask } from '../classes/Command.js';
 import { components } from '../api/api.js';
 
 const settings = {
-	cron: '0 15 * * * *',
+	cron: '0 10 * * * *',
 	execute: execute
 } satisfies CronTask;
 
