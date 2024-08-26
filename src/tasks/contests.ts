@@ -116,18 +116,18 @@ async function sendMessages(client: Client, embed: EmbedBuilder, guilds: compone
 			continue;
 		}
 
-		const guild = client.guilds.cache.get(pings.guildId);
+		const guild = client.guilds.cache.get(pings.guildId)
+			?? await client.guilds.fetch(pings.guildId).catch(() => undefined);
 		if (!guild) {
 			console.log(`Guild ${pings.guildId} not found on Shard ${client.shard?.ids[0]}`);
 			continue;
 		}
 
 		try {
-			const channel = client.channels.cache.get(pings.channelId)
-				?? await client.channels.fetch(pings.channelId).catch(() => undefined);
-			if (!channel) continue; // Channel on another shard (or invalid)
+			const channel = guild.channels.cache.get(pings.channelId)
+				?? await guild.channels.fetch(pings.channelId).catch(() => undefined);
 
-			if (!channel || !channel.isTextBased() || channel.isDMBased()) {
+			if (!channel || !channel.isTextBased() || channel.isDMBased() || channel.guildId !== guild.id) {
 				console.log(`Invalid channel (${pings.channelId}) for guild ${pings.guildId}`);
 				DisableGuildContestPings(pings.guildId, 'Channel not found');
 				continue;
@@ -145,7 +145,7 @@ async function sendMessages(client: Client, embed: EmbedBuilder, guilds: compone
 			if (crops) {
 				roles = crops
 					.map(crop => pings.cropPingRoles?.[cropKeys[crop] as keyof typeof pings.cropPingRoles] ?? undefined)
-					.filter(role => role) as string[];
+					.filter(role => role && isFinite(+role)) as string[];
 			}
 	
 			// Make sure alwaysPingRole at least seems valid
