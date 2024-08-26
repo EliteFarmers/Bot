@@ -116,8 +116,8 @@ async function sendMessages(client: Client, embed: EmbedBuilder, guilds: compone
 			continue;
 		}
 
-		const guild = client.guilds.cache.get(pings.guildId)
-			?? await client.guilds.fetch(pings.guildId).catch(() => undefined);
+		const guild = client.guilds.cache.get(pings.guildId);
+		
 		if (!guild) {
 			console.log(`Guild ${pings.guildId} not found on Shard ${client.shard?.ids[0]}`);
 			continue;
