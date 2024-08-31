@@ -31,9 +31,6 @@ async function execute(interaction: ButtonInteraction, settings: UserSettings) {
 	}, {
 		name: 'Where can I see older data?',
 		value: 'If it exists, older data may be viewed on the Elite Farmers [website](https://elitebot.dev). View someone\'s profile and click on the "Charts" tab.',
-	}, {
-		name: 'These weight values are wrong!',
-		value: 'Pest kills are not stored historically right now, so collection gain from pests is not [counteracted](https://elitebot.dev/info#Pests). This means that the weight values may be higher than expected.',
 	})
 
 	return interaction.reply({ embeds: [embed.data], ephemeral: true });

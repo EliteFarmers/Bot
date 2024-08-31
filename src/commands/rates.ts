@@ -104,14 +104,20 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			value: text || 'Error!',
 			inline: true,
 		});
+
+	let details = settings 
+		? `You can view your rates with your farming gear on the [website here](<https://elitebot.dev/@${interaction.user.id}/rates>)!`
+		: `You can view your rates with your farming gear on the "**Rates**" tab of your [online stats](<https://elitebot.dev/>)!`;
 	
-	if (fortune) {
-		embed.addFields([{
-			name: 'Custom Fortune Warning',
-			value: 'The amount of fortune available varies depending on the crop.\nFor the best results, only look at the crop your entered fortune is for.',
-			inline: false,
-		}])
+	if (fortune !== undefined) {
+		details += '\n\n**Custom Fortune Warning**\nThe amount of fortune available varies depending on the crop. For the best results, only look at the crop your entered fortune is for.';
 	}
+
+	embed.addFields({
+		name: 'What\'s My Fortune?',
+		value: details,
+		inline: true,
+	});
 
 	const row = CropSelectRow('crop-select-rates', 'Select a crop to view its rates!');
 
@@ -135,7 +141,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		const cropDetails = `\nUsing **${reforge === 'bountiful' ? 'Bountiful' : 'Blessed'}**, `
 			+ `**${pet === 'mooshroom' ? 'Mooshroom Cow' : 'Elephant'}**, `
-			+ `and **${crop === Crop.Cactus ? '3' : '4'}/4ths Fermento Armor**!`;
+			+ `and **4/4ths Fermento Armor**!`;
 
 		const threeFourths = calculateAverageSpecialCrops(blocks, crop as Crop, 3);
 		const fromSpecial = cropInfo.coinSources[threeFourths.type] ?? 0;
@@ -167,23 +173,13 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				inline: true,
 			}]);
 
-		if (crop !== Crop.Cactus) {
-			cropEmbed.addFields([
-				EmptyField(), 
-				{
-					name: '3/4ths Fermento Armor',
-					value: `:coin: ${(threeFourthsTotal)?.toLocaleString() ?? '0'} ⠀ ${(specialDifference).toLocaleString()} less coins (~${threeFourths.amount} ${threeFourths.type})`,
-				}
-			])
-		} else {
-			cropEmbed.addFields([
-				EmptyField(), 
-				{
-					name: 'Note',
-					value: 'Optimal cactus farming requires a Racing Helmet\ninstead of 4/4ths Fermento Armor.',
-				}
-			]);
-		}
+		cropEmbed.addFields([
+			EmptyField(), 
+			{
+				name: '3/4ths Fermento Armor',
+				value: `:coin: ${(threeFourthsTotal)?.toLocaleString() ?? '0'} ⠀ ${(specialDifference).toLocaleString()} less coins (~${threeFourths.amount} ${threeFourths.type})`,
+			}
+		])
 
 		inter.update({ embeds: [cropEmbed] });
 	})
