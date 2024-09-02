@@ -56,10 +56,11 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const pet = interaction.options.getString('pet', false) ?? 'mooshroom';
 	const bps = interaction.options.getNumber('bps', false) ?? 20;
 	const timeName = TIME_OPTIONS[blocks as keyof typeof TIME_OPTIONS];
+	const blocksBroken = Math.round(blocks * (bps / 20));
 
 	const expectedDrops = calculateDetailedAverageDrops({
 		farmingFortune: fortune,
-		blocksBroken: Math.round(blocks * (bps / 20)),
+		blocksBroken: blocksBroken,
 		bountiful: reforge === 'bountiful',
 		mooshroom: pet === 'mooshroom',
 	}) as Partial<ReturnType<typeof calculateDetailedAverageDrops>>;
@@ -143,7 +144,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			+ `**${pet === 'mooshroom' ? 'Mooshroom Cow' : 'Elephant'}**, `
 			+ `and **4/4ths Fermento Armor**!`;
 
-		const threeFourths = calculateAverageSpecialCrops(blocks, crop as Crop, 3);
+		const threeFourths = calculateAverageSpecialCrops(blocksBroken, crop as Crop, 3);
 		const fromSpecial = cropInfo.coinSources[threeFourths.type] ?? 0;
 		const specialDifference = fromSpecial - threeFourths.npc;
 		const threeFourthsTotal = cropInfo.npcCoins - specialDifference;
