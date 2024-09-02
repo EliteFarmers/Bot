@@ -4,7 +4,6 @@ import { FetchAccount, FetchCollectionGraphs, UserSettings } from '../api/elite.
 import { EliteEmbed, EmptyField, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 import { GetCropEmoji } from '../classes/Util.js';
 import { autocomplete, playerOption } from '../autocomplete/player.js';
-import { Crop, createFarmingWeightCalculator, getCropFromName } from 'farming-weight';
 import { fromUnixTime, getUnixTime, startOfDay } from 'date-fns';
 
 const command: Command = {
@@ -156,23 +155,9 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			continue;
 		}
 
-		const calc = createFarmingWeightCalculator({
-			collection: crops.reduce<Record<string, number>>((acc, [crop, amount]) => { 
-				acc[getCropFromName(crop) ?? Crop.Seeds] = amount;
-				return acc;
-			}, {}),
-		})
-
-		const calculated = calc.getWeightInfo().cropWeight;
-		
-		// Temporary fix for pests not being in old data
-		const weight = calculated * 0.5 > day.weight || day.weight < 0
-			? calculated 
-			: day.weight;
-
 		fields.push({
 			name: `<t:${day.start}:d>`,
-			value: `**Weight:** ${weight.toFixed(2)}\n` + crops.slice(0, 3)
+			value: `**Weight:** ${day.weight.toFixed(2)}\n` + crops.slice(0, 3)
 				.map(([crop, amount]) => `${GetCropEmoji(crop)} ${amount.toLocaleString()}`)
 				.join('\n'),
 			inline: true
