@@ -178,7 +178,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			EmptyField(), 
 			{
 				name: '3/4ths Fermento Armor',
-				value: `:coin: ${(threeFourthsTotal)?.toLocaleString() ?? '0'} ⠀ ${(specialDifference).toLocaleString()} less coins (~${threeFourths.amount} ${threeFourths.type})`,
+				value: `:coin: ${(threeFourthsTotal)?.toLocaleString() ?? '0'} ⠀ ${(specialDifference).toLocaleString()} less coins (~${threeFourths.amount.toLocaleString()} ${threeFourths.type})`,
 			}
 		])
 
