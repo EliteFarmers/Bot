@@ -359,6 +359,14 @@ export const FetchSkillGraphs = (playerUuid: string, profileUuid: string, days?:
 
 export const FetchWeightStyles = () => GET('/product/styles', {});
 
+export const FetchProduct = (skuId: string) => GET('/product/{productId}', {
+	params: {
+		path: {
+			productId: skuId as unknown as number
+		}
+	}
+});
+
 export const FetchLeaderboardList = () => GET('/leaderboards', {});
 
 export const RequestGuildUpdate = (guildId: string) =>

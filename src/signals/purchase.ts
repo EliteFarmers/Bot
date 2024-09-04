@@ -1,3 +1,4 @@
+import { FetchProduct } from '../api/elite.js';
 import { Signal, SignalRecieverOptions } from '../classes/Signal.js';
 import { EliteEmbed } from '../classes/embeds.js';
 
@@ -27,9 +28,11 @@ async function execute(signal: Signal) {
 
 	const url = `https://discord.com/application-directory/${guild.client.application.id}/store/${signal.data.skuId}`;
 
+	const { data: product } = await FetchProduct(signal.data.skuId).catch(() => ({ data: undefined }));
+
 	const embed = EliteEmbed()
 		.setTitle('New Purchase!')
-		.setDescription(`New purchase from <@${data.userId}> for product \`${data.skuName}\`!`)
+		.setDescription(`New purchase from <@${data.userId}> for product \`${product?.name}\`!`)
 		.setTimestamp()
 
 	channel?.send({ 

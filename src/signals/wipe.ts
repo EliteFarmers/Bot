@@ -36,8 +36,9 @@ async function execute(signal: Signal) {
 	const username = (ign || 'Unknown').replaceAll('_', '\\_');
 
 	const { data: member } = await FetchProfile(uuid, profileId).catch(() => ({ data: undefined }));
+	if (!member?.wasRemoved) return;
 
-	if (!member?.farmingWeight.totalWeight || member.farmingWeight.totalWeight <= 50) {
+	if (!member.farmingWeight.totalWeight || member.farmingWeight.totalWeight <= 50) {
 		// Send short and simple message if the weight is low
 		const message = `**${username}** (${member?.profileName ?? 'Unknown'})${ping ? ` (${ping})` : ''} has been wiped! [API](https://api.elitebot.dev/profile/${uuid}/${profileId})`;
 		channel?.send({ content: message, }).catch(() => undefined);
@@ -46,7 +47,7 @@ async function execute(signal: Signal) {
 
 	const fields = [];
 
-	if (member?.collections) {
+	if (member.collections) {
 		const crops = Object.entries(member.collections ?? {})
 			.filter(([key]) => getCropFromItemId(key) !== undefined)
 			.map(([key, value]) => {
@@ -60,7 +61,7 @@ async function execute(signal: Signal) {
 		fields.push({ name: 'Collections', value: crops, inline: true });
 	}
 
-	if (member?.garden?.crops) {
+	if (member.garden?.crops) {
 		const crops = Object.entries(member.garden.crops ?? {})
 			.filter(([key, value]) => getCropFromName(key) !== undefined && value && isFinite(+value))
 			.map(([key, value]) => {
