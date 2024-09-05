@@ -357,6 +357,14 @@ export const FetchSkillGraphs = (playerUuid: string, profileUuid: string, days?:
 		}
 	})
 
+export const FetchContest = (timestamp: number) => GET('/contests/{timestamp}', {
+	params: {
+		path: {
+			timestamp
+		}
+	}
+});
+
 export const FetchWeightStyles = () => GET('/product/styles', {});
 
 export const FetchProduct = (skuId: string) => GET('/product/{productId}', {
