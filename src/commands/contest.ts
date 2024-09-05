@@ -4,7 +4,7 @@ import { yearOption, yearAutocomplete, monthOption, dayOption } from "../autocom
 import { Crop, getCropDisplayName, getCropFromName, SkyBlockTime } from "farming-weight";
 import { FetchContest, UserSettings } from "../api/elite.js";
 import { EliteEmbed } from "../classes/embeds.js";
-import { GetCropEmoji, GetMedalEmoji } from "classes/Util.js";
+import { GetCropEmoji, GetMedalEmoji } from "../classes/Util.js";
 
 
 const command: Command = {
