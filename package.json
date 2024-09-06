@@ -7,7 +7,7 @@
     "bufferutil": "^4.0.8",
     "cron": "^3.1.7",
     "date-fns": "^3.6.0",
-    "discord.js": "^14.16.0",
+    "discord.js": "^14.16.1",
     "farming-weight": "^0.4.15",
     "openapi-fetch": "^0.7.10",
     "utf-8-validate": "^6.0.4",
@@ -20,7 +20,7 @@
     "build": "tsc",
     "dev": "npx nodemon --exec \"npx tsx\" src/bot.ts",
     "slash": "tsx src/deploy.ts",
-    "singleslash": "tsx src/index.ts deploy single",
+    "singleslash": "tsx src/deploy.ts single",
     "prod": "node dist/index.js",
     "generate-api-types": "npx openapi-typescript \"./src/api/swagger.json\" -o \"./src/api/api.d.ts\""
   },
