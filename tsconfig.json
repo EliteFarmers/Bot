@@ -1,12 +1,12 @@
 {
     "compilerOptions": {
-        "target": "ESNext",
-        "module": "CommonJS",
+        "target": "ES2022",
+        "module": "NodeNext",
         "rootDir": "./src",
         "outDir": "./dist",
         "strict": true,
         "strictNullChecks": true,
-        "moduleResolution": "Node",
+        "moduleResolution": "NodeNext",
         "importHelpers": true,
         "experimentalDecorators": true,
         "esModuleInterop": true,

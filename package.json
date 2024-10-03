@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "dependencies": {
     "@napi-rs/canvas": "^0.1.56",
     "@types/amqplib": "^0.10.5",

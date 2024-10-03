@@ -1,5 +1,5 @@
 import createClient from 'openapi-fetch';
-import { components, paths } from './api.d';
+import { components, paths } from './api.d.js';
 import { User } from 'discord.js';
 
 import dotenv from 'dotenv';

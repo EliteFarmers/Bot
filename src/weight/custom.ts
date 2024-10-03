@@ -6,7 +6,7 @@ import { createFromData } from "./maker.js";
 import { validStyle, WeightStyle } from "../schemas/style.js";
 import { ErrorEmbed } from "../classes/embeds.js";
 
-import * as DefaultStyle from './default.json';
+import * as DefaultStyle from './default.json' assert { type: 'json' };
 
 export interface CustomFormatterOptions {
 	settings?: UserSettings;
@@ -30,7 +30,7 @@ export function getCustomFormatter(options: CustomFormatterOptions, style: numbe
 	let formatterName = 'data';
 	const styleId = style ?? options.account.settings?.weightStyle?.id;
 	
-	let styleData = DefaultStyle as WeightStyle;
+	let styleData = DefaultStyle as unknown as WeightStyle;
 	if (styleId) {
 		const cached = stylesCache[styleId];
 
