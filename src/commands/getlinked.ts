@@ -1,5 +1,5 @@
 import { Command, CommandAccess, CommandType } from "../classes/Command.js";
-import { ApplicationCommandType, ContextMenuCommandBuilder, UserContextMenuCommandInteraction } from "discord.js";
+import { ContextMenuCommandBuilder, UserContextMenuCommandInteraction } from "discord.js";
 import { FetchAccount } from "../api/elite.js";
 
 const settings: Command = {
@@ -7,9 +7,7 @@ const settings: Command = {
 	description: 'Get a user\'s linked account if they have one.',
 	type: CommandType.ContextMenu,
 	access: CommandAccess.Everywhere,
-	slash: new ContextMenuCommandBuilder()
-		.setDMPermission(false)
-		.setType(ApplicationCommandType.User),
+	slash: new ContextMenuCommandBuilder().setType(2),
 	execute: execute
 }
 

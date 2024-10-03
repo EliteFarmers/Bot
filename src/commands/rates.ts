@@ -154,7 +154,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			.setDescription(`Expected rates for **${fortune?.toLocaleString() ?? `${cropInfo.fortune.toLocaleString()} (MAX)`}** Farming Fortune in **${timeName}**!${cropDetails}\n${bpsText}`)
 			.addFields([{
 				name: 'Total NPC Profit',
-				value: ':coin: ' + cropInfo.npcCoins?.toLocaleString() ?? '0',
+				value: ':coin: ' + cropInfo.npcCoins.toLocaleString() || '0',
 				inline: true,
 			}, {
 				name: 'Collection Gain',
