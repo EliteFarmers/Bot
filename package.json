@@ -3,7 +3,7 @@
   "dependencies": {
     "@napi-rs/canvas": "^0.1.56",
     "@types/amqplib": "^0.10.5",
-    "@types/node": "^17.0.45",
+    "@types/node": "^20.0.0",
     "amqplib": "^0.10.4",
     "bufferutil": "^4.0.8",
     "cron": "^3.1.7",
