@@ -4,3 +4,6 @@ images/*.xcf
 .env.*
 !.env.example
 dist
+
+# Sentry Config File
+.sentryclirc

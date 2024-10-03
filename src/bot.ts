@@ -1,3 +1,5 @@
+import './sentry.js';
+import * as Sentry from '@sentry/node';
 import { Client, GatewayIntentBits, Collection, ActivityType, Events } from 'discord.js';
 import { Command, CommandGroup, CronTask, SubCommand, registerCommandGroups, registerFiles } from './classes/Command.js';
 import { SignalRecieverOptions } from './classes/Signal.js';
@@ -93,6 +95,7 @@ client.login(process.env.BOT_TOKEN);
 process.on('unhandledRejection', (reason, p) => {
 	console.error(reason, 'Unhandled Rejection at Promise', p);
 }).on('uncaughtException', err => {
+	Sentry.captureException(err);
 	console.error(err, 'Uncaught Exception thrown');
 	process.exit(1);
 });

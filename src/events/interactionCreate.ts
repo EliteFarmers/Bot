@@ -3,6 +3,7 @@ import { commands } from '../bot.js';
 import { Command, CommandGroup, CommandType, getAutocomplete } from '../classes/Command.js';
 import { HasRole, isValidAccess } from '../classes/Util.js';
 import { FetchGuild, FetchUserSettings } from '../api/elite.js';
+import * as Sentry from '@sentry/node';
 
 const settings = {
 	event: Events.InteractionCreate,
@@ -40,6 +41,8 @@ async function OnCommandInteraction(interaction: ChatInputCommandInteraction | C
 			command.execute(interaction);
 		}
 	} catch (error) {
+		Sentry.captureException(error);
+
 		await interaction.reply({ 
 			content: 'There was an error while executing this command!', 
 			ephemeral: true 
@@ -66,6 +69,8 @@ async function OnButtonInteraction(interaction: ButtonInteraction | StringSelect
 			command.execute(interaction);
 		}
 	} catch (error) {
+		Sentry.captureException(error);
+		
 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => undefined);
 	}
 }

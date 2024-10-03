@@ -16,11 +16,19 @@
         "forceConsistentCasingInFileNames": true,
         "removeComments": true,
         "isolatedModules": true,
+
         "typeRoots": [
             "node_modules/@types"
         ],
-        "sourceMap": false,
-        "baseUrl": "./src"
+
+        "sourceMap": true,
+        "baseUrl": "./src",
+        "inlineSources": true,
+
+        // Set `sourceRoot` to  "/" to strip the build path prefix
+        // from generated source code references.
+        // This improves issue grouping in Sentry.
+        "sourceRoot": "/"
     },
     "include": [
         "./**/*.ts", "./**/**/*.ts"
