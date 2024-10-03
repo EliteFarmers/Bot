@@ -30,8 +30,8 @@ dependencies:
     specifier: ^14.16.3
     version: 14.16.3(bufferutil@4.0.8)(utf-8-validate@6.0.4)
   farming-weight:
-    specifier: ^0.4.15
-    version: 0.4.15
+    specifier: ^0.6.3
+    version: 0.6.3
   openapi-fetch:
     specifier: ^0.7.10
     version: 0.7.10
@@ -1080,8 +1080,8 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /farming-weight@0.4.15:
-    resolution: {integrity: sha512-GQNMCzaTc8n88Euh9QpV8JrTDKAJgkmokqc5brUxIlfqg+Nwaa/ZMcz2cfDAiCrmaFlvogD1rwol0c8pRiV3ZQ==}
+  /farming-weight@0.6.3:
+    resolution: {integrity: sha512-PgyfyV5OceXustDmBKlxBKgTpfno305OTh51U1/4dL9dQH9SoribLuSwCF3nYSiXN8SCL2pmuTyAapnm1FREhw==}
     dev: false
 
   /fast-deep-equal@3.1.3:
