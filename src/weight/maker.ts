@@ -1,6 +1,6 @@
-import { CreateRoundCornerPath } from '../classes/Util.js';
+import { CreateRoundCornerPath } from '#classes/Util.js';
 import { CustomFormatterOptions } from './custom.js';
-import { ErrorEmbed } from '../classes/embeds.js';
+import { ErrorEmbed } from '#classes/embeds.js';
 import {
 	Canvas,
 	createCanvas,
@@ -9,10 +9,10 @@ import {
 	SKRSContext2D,
 } from '@napi-rs/canvas';
 import { AttachmentBuilder } from 'discord.js';
-import { BackgroundGradient, BackgroundStyle, ElementPosition, Position, WeightStyleDecal } from '../schemas/style.js';
-import { components } from '../api/api.js';
+import { BackgroundGradient, BackgroundStyle, ElementPosition, Position, WeightStyleDecal } from '#schemas/style.js';
+import { components } from '#api/api.js';
 import { getCropFromName } from 'farming-weight';
-import { UserSettings } from '../api/elite.js';
+import { UserSettings } from '#api/elite.js';
 
 export async function createFromData({
 	account,

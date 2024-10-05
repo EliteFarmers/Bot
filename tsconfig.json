@@ -4,9 +4,12 @@
         "module": "NodeNext",
         "rootDir": "./src",
         "outDir": "./dist",
+        "moduleResolution": "NodeNext",
+
+        "customConditions": [ "elite-bot-dev" ],
+
         "strict": true,
         "strictNullChecks": true,
-        "moduleResolution": "NodeNext",
         "importHelpers": true,
         "experimentalDecorators": true,
         "esModuleInterop": true,
@@ -39,5 +42,6 @@
     "ts-node": {
         "esm": true,
         "experimentalSpecifierResolution": "node",
-    }
+        "require": ["tsconfig-paths/register"]
+    },
 }

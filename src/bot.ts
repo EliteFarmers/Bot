@@ -1,10 +1,10 @@
 import './sentry.js';
 import * as Sentry from '@sentry/node';
 import { Client, GatewayIntentBits, Collection, ActivityType, Events } from 'discord.js';
-import { Command, CommandGroup, CronTask, SubCommand, registerCommandGroups, registerFiles } from './classes/Command.js';
-import { SignalRecieverOptions } from './classes/Signal.js';
-import { ConnectToRMQ } from './api/rabbit.js';
-import { LoadWeightStyles } from './weight/custom.js';
+import { Command, CommandGroup, CronTask, SubCommand, registerCommandGroups, registerFiles } from '#classes/Command.js';
+import { SignalRecieverOptions } from '#classes/Signal.js';
+import { ConnectToRMQ } from '#api/rabbit.js';
+import { LoadWeightStyles } from '#src/weight/custom.js';
 import { GlobalFonts } from '@napi-rs/canvas';
 import { CronJob } from 'cron';
 

@@ -1,4 +1,4 @@
-import { Command, CommandGroup, CommandType, SubCommand, registerCommandGroups, registerFiles } from './classes/Command.js';
+import { Command, CommandGroup, CommandType, SubCommand, registerCommandGroups, registerFiles } from '#classes/Command.js';
 import { PermissionsBitField, REST, RESTGetAPIApplicationCommandsResult, RESTPostAPIApplicationCommandsJSONBody, Routes, SlashCommandBuilder } from 'discord.js';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -19,13 +19,13 @@ const proccessArgs = process.argv.slice(1);
 async function loadCommands() {
 	const filter = (fileName: string) => fileName.endsWith('.ts') || fileName.endsWith('.js');
 
-	await registerFiles<Command>('commands', filter, (cmd) => {
+	await registerFiles<Command>('handlers/commands', filter, (cmd) => {
 		commands.set(cmd.name, cmd);
 	});
 
 	const subFilter = (fileName: string) => filter(fileName) && !fileName.includes('command');
 
-	await registerCommandGroups('commands', async (folder, group) => {
+	await registerCommandGroups('handlers/commands', async (folder, group) => {
 		const command = new CommandGroup(group);
 
 		await registerFiles<SubCommand>(folder, subFilter, (cmd) => {

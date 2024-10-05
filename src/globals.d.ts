@@ -8,6 +8,8 @@ namespace NodeJS {
 		ELITE_API_URL: string;
 		ENTITLEMENT_CHANNEL: string;
 
+		SENTRY_DSN?: string;
+
 		REDIS_URL: string;
 		REDIS_PASSWORD: string;
 

@@ -1,10 +1,10 @@
-import { components } from "../api/api.js";
+import { components } from "#api/api.js";
 import { AttachmentBuilder, EmbedBuilder } from "discord.js";
 import { createWeightEmbed } from "./embed.js";
-import { FetchWeightStyles, UserSettings } from "../api/elite.js";
+import { FetchWeightStyles, UserSettings } from "#api/elite.js";
 import { createFromData } from "./maker.js";
-import { validStyle, WeightStyle } from "../schemas/style.js";
-import { ErrorEmbed } from "../classes/embeds.js";
+import { validStyle, WeightStyle } from "#schemas/style.js";
+import { ErrorEmbed } from "#classes/embeds.js";
 
 import { DEFAULT_STYLE } from './defaultstyle.js';
 
