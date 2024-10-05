@@ -33,7 +33,7 @@
     "@types/node-fetch": "^2.6.11",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "dotenv": "^16.4.5",
-    "eslint": "^8.57.1",
+    "eslint": "^9.0.0",
     "tslib": "^2.7.0",
     "tsx": "^3.14.0",
     "typescript": "^5.6.2"
