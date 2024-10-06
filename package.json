@@ -1,55 +1,5 @@
 {
   "type": "module",
-  "scripts": {
-    "start": "tsx src/index.ts",
-    "lint": "eslint src --ext .ts",
-    "build:dev": "tsc",
-    "build": "tsc && pnpm sentry:sourcemaps",
-    "dev": "npx nodemon --exec \"npx tsx -C elite-bot-dev\" src/bot.ts",
-    "slash": "tsx src/deploy.ts",
-    "singleslash": "tsx src/deploy.ts single",
-    "prod": "node dist/index.js",
-    "generate-api-types": "npx openapi-typescript \"./src/api/swagger.json\" -o \"./src/api/api.d.ts\"",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org kaeso --project bot ./dist && sentry-cli sourcemaps upload --org kaeso --project bot ./dist"
-  },
-  "imports": {
-    "#src/*": {
-      "default": "./dist/*",
-      "elite-bot-dev": "./src/*"
-    },
-    "#api/*": {
-      "default": "./dist/api/*",
-      "elite-bot-dev": "./src/api/*"
-    },
-    "#schemas/*": {
-      "default": "./dist/schemas/*",
-      "elite-bot-dev": "./src/schemas/*"
-    },
-    "#handlers/*": {
-      "default": "./dist/handlers/*",
-      "elite-bot-dev": "./src/handlers/*"
-    },
-    "#autocomplete/*": {
-      "default": "./dist/handlers/autocomplete/*",
-      "elite-bot-dev": "./src/handlers/autocomplete/*"
-    },
-    "#commands/*": {
-      "default": "./dist/handlers/commands/*",
-      "elite-bot-dev": "./src/handlers/commands/*"
-    },
-    "#events/*": {
-      "default": "./dist/handlers/events/*",
-      "elite-bot-dev": "./src/handlers/events/*"
-    },
-    "#buttons/*": {
-      "default": "./dist/handlers/buttons/*",
-      "elite-bot-dev": "./src/handlers/buttons/*"
-    },
-    "#classes/*": {
-      "default": "./dist/classes/*",
-      "elite-bot-dev": "./src/classes/*"
-    }
-  },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.56",
     "@sentry/cli": "^2.36.6",
@@ -67,6 +17,17 @@
     "utf-8-validate": "^6.0.4",
     "zlib-sync": "^0.1.9",
     "zod": "^3.23.8"
+  },
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "lint": "eslint src --ext .ts",
+    "build": "tsc && pnpm sentry:sourcemaps",
+    "dev": "npx nodemon --exec \"npx tsx\" src/bot.ts",
+    "slash": "tsx src/deploy.ts",
+    "singleslash": "tsx src/deploy.ts single",
+    "prod": "node dist/index.js",
+    "generate-api-types": "npx openapi-typescript \"./src/api/swagger.json\" -o \"./src/api/api.d.ts\"",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org kaeso --project bot ./dist && sentry-cli sourcemaps upload --org kaeso --project bot ./dist"
   },
   "devDependencies": {
     "@types/node-fetch": "^2.6.11",

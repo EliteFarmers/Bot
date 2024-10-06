@@ -1,6 +1,6 @@
-import { GetCropColor } from "#classes/Util.js";
+import { GetCropColor } from "../classes/Util.js";
 import { CustomFormatterOptions } from "./custom.js";
-import { EliteEmbed } from "#classes/embeds.js";
+import { EliteEmbed } from "../classes/embeds.js";
 
 export async function createWeightEmbed({ account, profile, profileId, weightRank = -1, badgeUrl = '' }: CustomFormatterOptions) {
 	const ign = account.name ?? 'Unknown';

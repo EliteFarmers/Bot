@@ -1,4 +1,4 @@
-import { UserSettings } from "#api/elite.js";
+import { UserSettings } from "../api/elite.js";
 import { ColorResolvable, EmbedBuilder, RepliableInteraction } from "discord.js";
 
 export function EliteEmbed(settings?: UserSettings, footer = true) {

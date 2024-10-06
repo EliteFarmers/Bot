@@ -10,7 +10,7 @@ import {
 	Client,
 } from 'discord.js';
 import { client } from '../bot.js';
-import { CommandAccess } from '#classes/Command.js';
+import { CommandAccess } from './Command.js';
 import { SKRSContext2D } from '@napi-rs/canvas';
 
 export function isValidAccess(

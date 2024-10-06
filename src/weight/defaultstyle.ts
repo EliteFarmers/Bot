@@ -1,4 +1,4 @@
-import { WeightStyle } from '#schemas/style.js';
+import { WeightStyle } from '../schemas/style.js';
 
 export const DEFAULT_STYLE: WeightStyle = {
 	decal: {
