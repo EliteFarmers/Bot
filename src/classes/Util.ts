@@ -1,22 +1,19 @@
+import { SKRSContext2D } from '@napi-rs/canvas';
 import {
+	ActionRowBuilder,
+	ChannelType,
+	Client,
 	Guild,
 	GuildBasedChannel,
 	GuildMember,
-	Snowflake,
 	PermissionFlagsBits,
-	ChannelType,
-	ActionRowBuilder,
+	Snowflake,
 	StringSelectMenuBuilder,
-	Client,
 } from 'discord.js';
 import { client } from '../bot.js';
-import { CommandAccess } from './Command.js';
-import { SKRSContext2D } from '@napi-rs/canvas';
+import { CommandAccess } from './commands/index.js';
 
-export function isValidAccess(
-	access: CommandAccess,
-	type: ChannelType
-): boolean {
+export function isValidAccess(access: CommandAccess, type: ChannelType): boolean {
 	if (access === CommandAccess.Everywhere) return true;
 	// If access is direct, return true if type is also a DM, else false
 	if (access === CommandAccess.DirectMessage) return type === ChannelType.DM;
@@ -33,7 +30,7 @@ export function isValidAccess(
  */
 export async function FindChannel(
 	guild: Snowflake | Guild,
-	channelId: Snowflake
+	channelId: Snowflake,
 ): Promise<GuildBasedChannel | undefined> {
 	let guildObj = guild;
 
@@ -58,9 +55,7 @@ export async function FindChannel(
  * @param  {Snowflake} guildId
  * @returns {Promise<Guild | undefined>}
  */
-export async function FindGuild(
-	guildId: Snowflake
-): Promise<Guild | undefined> {
+export async function FindGuild(guildId: Snowflake): Promise<Guild | undefined> {
 	if (client.guilds.cache.has(guildId)) {
 		return client.guilds.cache.get(guildId);
 	}
@@ -76,19 +71,14 @@ export async function FindGuild(
  * @param  {} adminOverride=true
  * @returns boolean
  */
-export function HasRole(
-	member?: GuildMember,
-	roleId?: Snowflake,
-	adminOverride = true
-) {
+export function HasRole(member?: GuildMember, roleId?: Snowflake, adminOverride = true) {
 	if (!member || !roleId) return false;
 
 	const perms = member.permissions;
 	const roles = member.roles?.cache?.map((role) => role.id);
 
 	// If user has the admin perm and overide is true then return true
-	if (adminOverride && perms && perms.has(PermissionFlagsBits.Administrator))
-		return true;
+	if (adminOverride && perms && perms.has(PermissionFlagsBits.Administrator)) return true;
 
 	// Otherwise return whether or not the user has the role
 	return roles.includes(roleId) ?? false;
@@ -157,10 +147,7 @@ const simpleCropNames = {
 };
 
 export function CropFromSimple(name: string) {
-	return (
-		simpleCropNames[name.toLowerCase() as keyof typeof simpleCropNames] ??
-		undefined
-	);
+	return simpleCropNames[name.toLowerCase() as keyof typeof simpleCropNames] ?? undefined;
 }
 
 export function GetCropEmoji(crop: string) {
@@ -170,8 +157,7 @@ export function GetCropEmoji(crop: string) {
 
 	if (emoji) return `<:${emoji.name}:${emoji.id}>`;
 
-	const simpleCrop =
-		simpleCropNames[crop.toLowerCase() as keyof typeof simpleCropNames];
+	const simpleCrop = simpleCropNames[crop.toLowerCase() as keyof typeof simpleCropNames];
 	if (simpleCrop) {
 		const emoji = CropEmojis[simpleCrop as keyof typeof CropEmojis];
 		if (!emoji) return '';
@@ -183,16 +169,16 @@ export function GetCropEmoji(crop: string) {
 
 export function GetMedalEmoji(medal?: string) {
 	switch (medal) {
-	case 'bronze':
-		return '<:bronze:1175629425623187507> '; 
-	case 'silver':
-		return '<:silver:1175629454043779243> '; 
-	case 'gold':
-		return '<:gold:1175629485333299342> '; 
-	case 'platinum':
-		return '<:platinum:1175629500738961500> '; 
-	case 'diamond':
-		return '<:diamond:1175629512663384104> ';
+		case 'bronze':
+			return '<:bronze:1175629425623187507> ';
+		case 'silver':
+			return '<:silver:1175629454043779243> ';
+		case 'gold':
+			return '<:gold:1175629485333299342> ';
+		case 'platinum':
+			return '<:platinum:1175629500738961500> ';
+		case 'diamond':
+			return '<:diamond:1175629512663384104> ';
 	}
 	return '';
 }
@@ -201,10 +187,7 @@ export function UserHyperLink(userId?: Snowflake) {
 	return `<@${userId}> [⟳](discord://-/users/${userId})`;
 }
 
-export function CropSelectRow(
-	customId = 'crop-select',
-	placeholder = 'Select a crop!'
-) {
+export function CropSelectRow(customId = 'crop-select', placeholder = 'Select a crop!') {
 	const options = Object.entries(CropEmojis).map(([name, emoji], i) => ({
 		label: name,
 		value: i.toString(),
@@ -215,7 +198,7 @@ export function CropSelectRow(
 		new StringSelectMenuBuilder()
 			.addOptions(...options)
 			.setCustomId(customId)
-			.setPlaceholder(placeholder)
+			.setPlaceholder(placeholder),
 	);
 
 	return row;
@@ -278,19 +261,14 @@ export function CreateRoundCornerPath(
 	y: number,
 	width: number,
 	height: number,
-	cornerRadius: number
+	cornerRadius: number,
 ) {
 	ctx.beginPath();
 	ctx.moveTo(x + cornerRadius, y);
 	ctx.lineTo(x + width - cornerRadius, y);
 	ctx.quadraticCurveTo(x + width, y, x + width, y + cornerRadius);
 	ctx.lineTo(x + width, y + height - cornerRadius);
-	ctx.quadraticCurveTo(
-		x + width,
-		y + height,
-		x + width - cornerRadius,
-		y + height
-	);
+	ctx.quadraticCurveTo(x + width, y + height, x + width - cornerRadius, y + height);
 	ctx.lineTo(x + cornerRadius, y + height);
 	ctx.quadraticCurveTo(x, y + height, x, y + height - cornerRadius);
 	ctx.lineTo(x, y + cornerRadius);
@@ -308,19 +286,15 @@ export function CreateClipPath(ctx: SKRSContext2D, x1: number, y1: number, x2: n
 }
 
 export function commandMd(client: Client, name: string) {
-	const command = client.application?.commands.cache.find(
-		(c) => c.name === name
-	);
+	const command = client.application?.commands.cache.find((c) => c.name === name);
 	if (!command) return '`/' + name + '`';
 	return `</${name}:${command.id}>`;
 }
 
 export const LEVELING_XP = [
-	50, 125, 200, 300, 500, 750, 1000, 1500, 2000, 3500, 5000, 7500, 10000,
-	15000, 20000, 30000, 50000, 75000, 100000, 200000, 300000, 400000, 500000,
-	600000, 700000, 800000, 900000, 1000000, 1100000, 1200000, 1300000, 1400000,
-	1500000, 1600000, 1700000, 1800000, 1900000, 2000000, 2100000, 2200000,
-	2300000, 2400000, 2500000, 2600000, 2750000, 2900000, 3100000, 3400000,
-	3700000, 4000000, 4300000, 4600000, 4900000, 5200000, 5500000, 5800000,
-	6100000, 6400000, 6700000, 7000000,
+	50, 125, 200, 300, 500, 750, 1000, 1500, 2000, 3500, 5000, 7500, 10000, 15000, 20000, 30000, 50000, 75000, 100000,
+	200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000, 1100000, 1200000, 1300000, 1400000, 1500000,
+	1600000, 1700000, 1800000, 1900000, 2000000, 2100000, 2200000, 2300000, 2400000, 2500000, 2600000, 2750000, 2900000,
+	3100000, 3400000, 3700000, 4000000, 4300000, 4600000, 4900000, 5200000, 5500000, 5800000, 6100000, 6400000, 6700000,
+	7000000,
 ];

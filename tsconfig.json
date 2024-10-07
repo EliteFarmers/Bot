@@ -1,43 +1,37 @@
 {
-    "compilerOptions": {
-        "target": "ES2022",
-        "module": "NodeNext",
-        "rootDir": "./src",
-        "outDir": "./dist",
-        "strict": true,
-        "strictNullChecks": true,
-        "moduleResolution": "NodeNext",
-        "importHelpers": true,
-        "experimentalDecorators": true,
-        "esModuleInterop": true,
-        "skipLibCheck": true,
-        "allowSyntheticDefaultImports": true,
-        "resolveJsonModule": true,
-        "forceConsistentCasingInFileNames": true,
-        "removeComments": true,
-        "isolatedModules": true,
+	"compilerOptions": {
+		"target": "ES2022",
+		"module": "NodeNext",
+		"rootDir": "./src",
+		"outDir": "./dist",
+		"strict": true,
+		"strictNullChecks": true,
+		"moduleResolution": "NodeNext",
+		"importHelpers": true,
+		"experimentalDecorators": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"allowSyntheticDefaultImports": true,
+		"resolveJsonModule": true,
+		"forceConsistentCasingInFileNames": true,
+		"removeComments": true,
+		"isolatedModules": true,
 
-        "typeRoots": [
-            "node_modules/@types"
-        ],
+		"typeRoots": ["node_modules/@types"],
 
-        "sourceMap": true,
-        "baseUrl": "./src",
-        "inlineSources": true,
+		"sourceMap": true,
+		"baseUrl": "./src",
+		"inlineSources": true,
 
-        // Set `sourceRoot` to  "/" to strip the build path prefix
-        // from generated source code references.
-        // This improves issue grouping in Sentry.
-        "sourceRoot": "/"
-    },
-    "include": [
-        "./**/*.ts", "./**/**/*.ts"
-    ],
-    "exclude": [
-        "node_modules",
-    ],
-    "ts-node": {
-        "esm": true,
-        "experimentalSpecifierResolution": "node",
-    }
+		// Set `sourceRoot` to  "/" to strip the build path prefix
+		// from generated source code references.
+		// This improves issue grouping in Sentry.
+		"sourceRoot": "/"
+	},
+	"include": ["./**/*.ts", "./**/**/*.ts"],
+	"exclude": ["node_modules"],
+	"ts-node": {
+		"esm": true,
+		"experimentalSpecifierResolution": "node"
+	}
 }

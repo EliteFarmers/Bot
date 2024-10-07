@@ -7,7 +7,7 @@ const proccessArgs = process.argv.slice(1);
 const manager = new ShardingManager('./dist/bot.js', {
 	token: process.env.BOT_TOKEN,
 	totalShards: 'auto',
-	shardArgs: proccessArgs
+	shardArgs: proccessArgs,
 });
 
 manager.on('shardCreate', (shard) => {
@@ -16,9 +16,11 @@ manager.on('shardCreate', (shard) => {
 
 manager.spawn();
 
-process.on('unhandledRejection', (reason, p) => {
-	console.error(reason, 'Unhandled Rejection at Promise', p);
-}).on('uncaughtException', err => {
-	console.error(err, 'Uncaught Exception thrown');
-	process.exit(1);
-});
+process
+	.on('unhandledRejection', (reason, p) => {
+		console.error(reason, 'Unhandled Rejection at Promise', p);
+	})
+	.on('uncaughtException', (err) => {
+		console.error(err, 'Uncaught Exception thrown');
+		process.exit(1);
+	});

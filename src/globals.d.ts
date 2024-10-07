@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// biome-ignore lint/style/noNamespace: Needed to add typings to process.env
 namespace NodeJS {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	interface ProcessEnv {

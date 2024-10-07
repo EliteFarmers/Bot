@@ -1,32 +1,33 @@
 import './sentry.js';
-import * as Sentry from '@sentry/node';
-import { Client, GatewayIntentBits, Collection, ActivityType, Events } from 'discord.js';
-import { Command, CommandGroup, CronTask, SubCommand, registerCommandGroups, registerFiles } from './classes/Command.js';
-import { SignalRecieverOptions } from './classes/Signal.js';
-import { ConnectToRMQ } from './api/rabbit.js';
-import { LoadWeightStyles } from './weight/custom.js';
 import { GlobalFonts } from '@napi-rs/canvas';
+import * as Sentry from '@sentry/node';
 import { CronJob } from 'cron';
+import { ActivityType, Client, ClientEvents, Collection, Events, GatewayIntentBits } from 'discord.js';
+import { ConnectToRMQ } from './api/rabbit.js';
+import { SignalRecieverOptions } from './classes/Signal.js';
+import { Command, CommandGroup, CronTask, EliteCommand } from './classes/commands/index.js';
+import { registerCommandGroups, registerFiles } from './classes/register.js';
+import { LoadWeightStyles } from './weight/custom.js';
 
 import path from 'path';
 import dotenv from 'dotenv';
 dotenv.config();
 
 export const client = new Client({
-	intents: [GatewayIntentBits.Guilds]
+	intents: [GatewayIntentBits.Guilds],
 });
 
-export const commands = new Collection<string, Command | CommandGroup>();
+export const commands = new Collection<string, Command | CommandGroup | EliteCommand>();
 export const signals = new Collection<string, SignalRecieverOptions>();
 
-/* 
-* There is surely a better way to load these, but this is fine for now
-* as it only runs once on startup and allows you to only create a new file.
-*/
-(async function() {
+/*
+ * There is surely a better way to load these, but this is fine for now
+ * as it only runs once on startup and allows you to only create a new file.
+ */
+(async function () {
 	const filter = (fileName: string) => fileName.endsWith('.ts') || fileName.endsWith('.js');
 
-	registerFiles<Command>('commands', filter, (cmd) => {
+	registerFiles<Command | EliteCommand>('commands', filter, (cmd) => {
 		commands.set(cmd.name, cmd);
 	});
 
@@ -35,7 +36,7 @@ export const signals = new Collection<string, SignalRecieverOptions>();
 	registerCommandGroups('commands', (folder, group) => {
 		const command = new CommandGroup(group);
 
-		registerFiles<SubCommand>(folder, subFilter, (cmd) => {
+		registerFiles<Command>(folder, subFilter, (cmd) => {
 			command.addSubcommand(cmd);
 		});
 
@@ -46,8 +47,10 @@ export const signals = new Collection<string, SignalRecieverOptions>();
 		commands.set(btn.name, btn);
 	});
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	registerFiles<any>('events', filter, (event) => {
+	registerFiles<{
+		event: keyof ClientEvents;
+		execute: Parameters<typeof client.on<keyof ClientEvents>>[1];
+	}>('events', filter, (event) => {
 		client.on(event.event, event.execute);
 	});
 
@@ -59,12 +62,12 @@ export const signals = new Collection<string, SignalRecieverOptions>();
 		CronJob.from({
 			cronTime: task.cron,
 			onTick: () => task.execute(client),
-			start: true
-		})
+			start: true,
+		});
 	});
 
 	GlobalFonts.loadFontsFromDir(path.resolve('./src/assets/fonts/'));
-}());
+})();
 
 client.once(Events.ClientReady, async () => {
 	setTimeout(updateActivity, 1000 * 30); // 30 seconds to wait for shards to be ready
@@ -80,22 +83,24 @@ client.once(Events.ClientReady, async () => {
 
 async function updateActivity() {
 	if (!client.user) return;
-	
+
 	let guilds = client.guilds.cache.size;
 	if (client.shard) {
 		const counts = await client.shard.fetchClientValues('guilds.cache.size');
 		guilds = counts.reduce<number>((acc, curr) => Number(acc) + Number(curr), 0);
 	}
-	
+
 	client.user.setActivity(`${guilds} guilds (𝚫${client.shard?.ids[0] ?? '0'})`, { type: ActivityType.Watching });
 }
 
 client.login(process.env.BOT_TOKEN);
 
-process.on('unhandledRejection', (reason, p) => {
-	console.error(reason, 'Unhandled Rejection at Promise', p);
-}).on('uncaughtException', err => {
-	Sentry.captureException(err);
-	console.error(err, 'Uncaught Exception thrown');
-	process.exit(1);
-});
+process
+	.on('unhandledRejection', (reason, p) => {
+		console.error(reason, 'Unhandled Rejection at Promise', p);
+	})
+	.on('uncaughtException', (err) => {
+		Sentry.captureException(err);
+		console.error(err, 'Uncaught Exception thrown');
+		process.exit(1);
+	});

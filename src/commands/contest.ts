@@ -1,25 +1,39 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { Command, CommandAccess, CommandType } from "../classes/Command.js";
-import { yearOption, yearAutocomplete, monthOption, dayOption } from "../autocomplete/dates.js";
-import { Crop, getCropDisplayName, getCropFromName, SkyBlockTime } from "farming-weight";
-import { FetchContest, UserSettings } from "../api/elite.js";
-import { EliteEmbed } from "../classes/embeds.js";
-import { GetCropEmoji, GetMedalEmoji } from "../classes/Util.js";
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { Crop, SkyBlockTime, getCropDisplayName, getCropFromName } from 'farming-weight';
+import { FetchContest, UserSettings } from '../api/elite.js';
+import { dayOption, monthOption, yearAutocomplete, yearOption } from '../autocomplete/dates.js';
+import { GetCropEmoji, GetMedalEmoji } from '../classes/Util.js';
+import { Command, CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
+import { EliteEmbed } from '../classes/embeds.js';
 
-
-const command: Command = {
+const command = new EliteCommand({
 	name: 'contest',
 	description: 'Get participants of a specific Jacob Contest!',
-	usage: '(day) (month) (year)',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
-	slash: new SlashCommandBuilder()
-		.addIntegerOption(yearOption())
-		.addIntegerOption(monthOption())
-		.addIntegerOption(dayOption()),
+	options: [
+		{
+			name: 'year',
+			description: 'The Skyblock year of the contest',
+			autocomplete: yearAutocomplete,
+			builder: (b) => b.addIntegerOption(yearOption()),
+			required: false,
+		},
+		{
+			name: 'month',
+			description: 'The Skyblock month of the contest',
+			builder: (b) => b.addIntegerOption(monthOption()),
+			required: false,
+		},
+		{
+			name: 'day',
+			description: 'The Skyblock day of the contest',
+			builder: (b) => b.addIntegerOption(dayOption()),
+			required: false,
+		},
+	],
 	execute: execute,
-	autocomplete: yearAutocomplete
-}
+});
 
 export default command;
 
@@ -38,33 +52,40 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	if (year === currentTime.year) {
 		if (month === currentTime.month && day > currentTime.day) {
 			await interaction.deleteReply();
-			await interaction.followUp({ ephemeral: true, content: 'That date is in the future!' });
+			await interaction.followUp({
+				ephemeral: true,
+				content: 'That date is in the future!',
+			});
 			return;
 		} else if (month > currentTime.month) {
 			await interaction.deleteReply();
-			await interaction.followUp({ ephemeral: true, content: 'That date is in the future!' });
+			await interaction.followUp({
+				ephemeral: true,
+				content: 'That date is in the future!',
+			});
 			return;
 		}
 	}
 
 	if (!contests) {
 		await interaction.deleteReply();
-		await interaction.followUp({ ephemeral: true, content: 'No contest found for that date!' });
+		await interaction.followUp({
+			ephemeral: true,
+			content: 'No contest found for that date!',
+		});
 		return;
 	}
 
 	const isOngoing = date.dayUnixSeconds === currentTime.dayUnixSeconds;
 
-	const description = 
-		`<t:${date.dayUnixSeconds}:R> • [View Online](https://elitebot.dev/contest/${date.dayUnixSeconds})`
-		+ (isOngoing ? '\n-# This contest is currently active! Data is incomplete.' : '');
+	const description =
+		`<t:${date.dayUnixSeconds}:R> • [View Online](https://elitebot.dev/contest/${date.dayUnixSeconds})` +
+		(isOngoing ? '\n-# This contest is currently active! Data is incomplete.' : '');
 
-	const embed = EliteEmbed(settings)
-		.setTitle(date.toString())
-		.setDescription(description);
+	const embed = EliteEmbed(settings).setTitle(date.toString()).setDescription(description);
 
 	const fields = contests.map(({ crop, participants = -1, participations = [] }) => {
-		const c = getCropFromName(crop) ?? Crop.Wheat
+		const c = getCropFromName(crop) ?? Crop.Wheat;
 		const displayName = getCropDisplayName(c);
 		const part = participants !== -1 ? participants.toLocaleString() : 'N/A';
 
@@ -72,15 +93,17 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			.sort((a, b) => (b.collected ?? 0) - (a.collected ?? 0))
 			.slice(0, 5)
 			.map(({ playerName, playerUuid, profileUuid, collected, position, medal }) => {
-				return `**${!position || position === -1 ? '???' : position + 1}.** ${playerName?.replace(/_/g, '\\_') ?? 'Unknown'}`
-					+ `\n-# [⧉](https://elitebot.dev/@${playerUuid}/${profileUuid}) ${collected?.toLocaleString()} ${medal ? GetMedalEmoji(medal) : ''}`;
+				return (
+					`**${!position || position === -1 ? '???' : position + 1}.** ${playerName?.replace(/_/g, '\\_') ?? 'Unknown'}` +
+					`\n-# [⧉](https://elitebot.dev/@${playerUuid}/${profileUuid}) ${collected?.toLocaleString()} ${medal ? GetMedalEmoji(medal) : ''}`
+				);
 			})
 			.join('\n');
 
 		return {
 			name: `${GetCropEmoji(displayName)} ${displayName}${!isOngoing ? ` (${participations.length.toLocaleString()}/${part})` : ''}`,
 			value: topParticipants,
-			inline: true
+			inline: true,
 		};
 	});
 

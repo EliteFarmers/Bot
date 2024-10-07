@@ -1,41 +1,40 @@
 {
-  "type": "module",
-  "dependencies": {
-    "@napi-rs/canvas": "^0.1.56",
-    "@sentry/cli": "^2.36.6",
-    "@sentry/node": "^8.33.1",
-    "@sentry/profiling-node": "^8.33.1",
-    "@types/amqplib": "^0.10.5",
-    "@types/node": "^20.0.0",
-    "amqplib": "^0.10.4",
-    "bufferutil": "^4.0.8",
-    "cron": "^3.1.7",
-    "date-fns": "^4.0.0",
-    "discord.js": "^14.16.3",
-    "farming-weight": "^0.6.3",
-    "openapi-fetch": "^0.12.0",
-    "utf-8-validate": "^6.0.4",
-    "zlib-sync": "^0.1.9",
-    "zod": "^3.23.8"
-  },
-  "scripts": {
-    "start": "tsx src/index.ts",
-    "lint": "eslint src --ext .ts",
-    "build": "tsc && pnpm sentry:sourcemaps",
-    "dev": "npx nodemon --exec \"npx tsx\" src/bot.ts",
-    "slash": "tsx src/deploy.ts",
-    "singleslash": "tsx src/deploy.ts single",
-    "prod": "node dist/index.js",
-    "generate-api-types": "npx openapi-typescript \"./src/api/swagger.json\" -o \"./src/api/api.d.ts\"",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org kaeso --project bot ./dist && sentry-cli sourcemaps upload --org kaeso --project bot ./dist"
-  },
-  "devDependencies": {
-    "@types/node-fetch": "^2.6.11",
-    "@typescript-eslint/eslint-plugin": "^8.0.0",
-    "dotenv": "^16.4.5",
-    "eslint": "^9.0.0",
-    "tslib": "^2.7.0",
-    "tsx": "^4.0.0",
-    "typescript": "^5.6.2"
-  }
+	"type": "module",
+	"dependencies": {
+		"@napi-rs/canvas": "^0.1.56",
+		"@sentry/cli": "^2.36.6",
+		"@sentry/node": "^8.33.1",
+		"@sentry/profiling-node": "^8.33.1",
+		"@types/amqplib": "^0.10.5",
+		"@types/node": "^20.0.0",
+		"amqplib": "^0.10.4",
+		"bufferutil": "^4.0.8",
+		"cron": "^3.1.7",
+		"date-fns": "^4.0.0",
+		"discord.js": "^14.16.3",
+		"farming-weight": "^0.6.3",
+		"openapi-fetch": "^0.12.0",
+		"utf-8-validate": "^6.0.4",
+		"zlib-sync": "^0.1.9",
+		"zod": "^3.23.8"
+	},
+	"scripts": {
+		"start": "tsx src/index.ts",
+		"lint": "pnpm biome check --write",
+		"build": "tsc && pnpm sentry:sourcemaps",
+		"dev": "npx nodemon --exec \"npx tsx\" src/bot.ts",
+		"slash": "tsx src/deploy.ts",
+		"singleslash": "tsx src/deploy.ts single",
+		"prod": "node dist/index.js",
+		"generate-api-types": "npx openapi-typescript \"./src/api/swagger.json\" -o \"./src/api/api.d.ts\"",
+		"sentry:sourcemaps": "sentry-cli sourcemaps inject --org kaeso --project bot ./dist && sentry-cli sourcemaps upload --org kaeso --project bot ./dist"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.3",
+		"@types/node-fetch": "^2.6.11",
+		"dotenv": "^16.4.5",
+		"tslib": "^2.7.0",
+		"tsx": "^4.0.0",
+		"typescript": "^5.6.2"
+	}
 }

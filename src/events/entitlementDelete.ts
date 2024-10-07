@@ -1,10 +1,10 @@
-import { RefreshUserEntitlements } from "../api/elite.js";
-import { Entitlement, Events } from "discord.js";
+import { Entitlement, Events } from 'discord.js';
+import { RefreshUserEntitlements } from '../api/elite.js';
 
 const settings = {
 	event: Events.EntitlementDelete,
-	execute: execute
-}
+	execute: execute,
+};
 
 export default settings;
 

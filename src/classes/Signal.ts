@@ -19,7 +19,7 @@ export class Signal<T = unknown> {
 		try {
 			json = JSON.parse(data);
 			json.data = json.data ? JSON.parse(json.data) : undefined;
-		} catch (error) {
+		} catch (_) {
 			console.error('Failed to parse RabbitMQ message.');
 			return;
 		}
@@ -42,7 +42,7 @@ export class Signal<T = unknown> {
 		const guild = this.guild;
 		if (!guild) return undefined;
 
-		return guild.members.cache.get(this.authorId) ?? await guild.members.fetch(this.authorId);
+		return guild.members.cache.get(this.authorId) ?? (await guild.members.fetch(this.authorId));
 	}
 
 	async dmUser(message: MessageCreateOptions) {
@@ -53,17 +53,17 @@ export class Signal<T = unknown> {
 	}
 
 	async success(title: string, content: string) {
-		const embed = ErrorEmbed(title)
-			.setDescription(content)
-			.setFooter({ text: 'This action was triggered online via elitebot.dev.' });
-			
+		const embed = ErrorEmbed(title).setDescription(content).setFooter({
+			text: 'This action was triggered online via elitebot.dev.',
+		});
+
 		return this.dmUser({ embeds: [embed] });
 	}
 
 	async fail(title: string, content: string) {
-		const embed = ErrorEmbed(title)
-			.setDescription(content)
-			.setFooter({ text: 'This action was triggered online via elitebot.dev.' });
+		const embed = ErrorEmbed(title).setDescription(content).setFooter({
+			text: 'This action was triggered online via elitebot.dev.',
+		});
 
 		return this.dmUser({ embeds: [embed] });
 	}
@@ -77,7 +77,7 @@ export class Signal<T = unknown> {
 }
 
 export interface SignalRecieverOptions {
-	name: string,
-	permissions?: bigint,
-	execute: (signal: Signal, client?: Client) => void
+	name: string;
+	permissions?: bigint;
+	execute: (signal: Signal, client?: Client) => void;
 }

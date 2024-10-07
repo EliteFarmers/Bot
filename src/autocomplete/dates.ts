@@ -1,18 +1,15 @@
-import { SkyBlockTime } from 'farming-weight';
 import { AutocompleteInteraction, SlashCommandIntegerOption } from 'discord.js';
+import { SkyBlockTime } from 'farming-weight';
 
 export function yearOption(description = 'The skyblock year to get results for!', required = false) {
-	return (builder: SlashCommandIntegerOption) => 
-		builder.setName('year')
-			.setDescription(description)
-			.setAutocomplete(true)
-			.setMinValue(100)
-			.setRequired(required);
+	return (builder: SlashCommandIntegerOption) =>
+		builder.setName('year').setDescription(description).setAutocomplete(true).setMinValue(100).setRequired(required);
 }
 
 export function monthOption(description = 'The skyblock month to get results for!', required = false) {
-	return (builder: SlashCommandIntegerOption) => 
-		builder.setName('month')
+	return (builder: SlashCommandIntegerOption) =>
+		builder
+			.setName('month')
 			.setDescription(description)
 			.setMinValue(1)
 			.setMaxValue(12)
@@ -21,12 +18,8 @@ export function monthOption(description = 'The skyblock month to get results for
 }
 
 export function dayOption(description = 'The skyblock day to get results for!', required = false) {
-	return (builder: SlashCommandIntegerOption) => 
-		builder.setName('day')
-			.setDescription(description)
-			.setMinValue(1)
-			.setMaxValue(31)
-			.setRequired(required);
+	return (builder: SlashCommandIntegerOption) =>
+		builder.setName('day').setDescription(description).setMinValue(1).setMaxValue(31).setRequired(required);
 }
 
 export async function yearAutocomplete(interaction: AutocompleteInteraction) {
@@ -54,6 +47,6 @@ export async function yearAutocomplete(interaction: AutocompleteInteraction) {
 		name: (yearNum + i).toString(),
 		value: (yearNum + i).toString(),
 	}));
-	
+
 	interaction.respond(values);
 }

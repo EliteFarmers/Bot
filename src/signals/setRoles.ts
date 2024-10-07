@@ -1,32 +1,32 @@
+import { PermissionFlagsBits } from 'discord.js';
 import { Signal, SignalRecieverOptions } from '../classes/Signal.js';
 import { EliteEmbed } from '../classes/embeds.js';
-import { PermissionFlagsBits } from 'discord.js';
 
 const settings: SignalRecieverOptions = {
 	name: 'setRoles',
 	permissions: PermissionFlagsBits.ManageRoles,
-	execute: execute
-}
+	execute: execute,
+};
 
 export default settings;
 
 type Data = {
-	users: string[],
-	roleId: string,
-	reason: string,
-}
+	users: string[];
+	roleId: string;
+	reason: string;
+};
 
 async function execute(signal: Signal) {
 	if (!signal.isExpected<Data>()) return;
 
-	const { 
+	const {
 		data: { users, roleId, reason },
-		guild 
+		guild,
 	} = signal;
 
 	if (!guild || !users || !roleId) return;
 
-	const role = guild.roles.cache.get(roleId) ?? await guild.roles.fetch(roleId);
+	const role = guild.roles.cache.get(roleId) ?? (await guild.roles.fetch(roleId));
 	if (!role) return signal.fail('Invalid Role!', `The role with the id \`${roleId}\` does not exist!`);
 
 	// Check if the bot has perms to assign the role
@@ -35,14 +35,17 @@ async function execute(signal: Signal) {
 
 	const botHighestRole = botMember.roles.highest;
 	if (botHighestRole.comparePositionTo(role) <= 0) {
-		return signal.fail('Invalid Role Position!', 'The bot\'s highest role is lower than the role you are trying to assign!');
+		return signal.fail(
+			'Invalid Role Position!',
+			"The bot's highest role is lower than the role you are trying to assign!",
+		);
 	}
 
 	// Assign the role to all users
 	const failedUsers: string[] = [];
 
 	for (const userId of users) {
-		const member = guild.members.cache.get(userId) ?? await guild.members.fetch(userId);
+		const member = guild.members.cache.get(userId) ?? (await guild.members.fetch(userId));
 		if (!member) {
 			failedUsers.push(userId);
 			continue;
@@ -50,7 +53,7 @@ async function execute(signal: Signal) {
 
 		try {
 			await member.roles.add(role, reason);
-		} catch (error) {
+		} catch (_) {
 			failedUsers.push(userId);
 		}
 	}
@@ -61,10 +64,12 @@ async function execute(signal: Signal) {
 		.setDescription(`Successfully set the role \`${role.name}\` to ${users.length - failedUsers.length} users!`);
 
 	if (failedUsers.length > 0) {
-		embed.addFields([{ 
-			name: 'Failed Users', 
-			value: failedUsers.map(id => `<@${id}>`).join('\n') 
-		}]);
+		embed.addFields([
+			{
+				name: 'Failed Users',
+				value: failedUsers.map((id) => `<@${id}>`).join('\n'),
+			},
+		]);
 	}
 
 	signal.dmUser({ embeds: [embed] });

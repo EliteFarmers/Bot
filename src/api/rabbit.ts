@@ -1,8 +1,9 @@
 import { connect } from 'amqplib';
-import { Signal } from '../classes/Signal.js';
 import { client, signals } from '../bot.js';
+import { Signal } from '../classes/Signal.js';
 
-const errorMsg = 'Failed to connect to RabbitMQ, message queue from EliteAPI will not work.\nPlease check your RABBITMQ_URL env variable.\nThis is not an issue if you are not using EliteAPI\'s message queue.';
+const errorMsg =
+	"Failed to connect to RabbitMQ, message queue from EliteAPI will not work.\nPlease check your RABBITMQ_URL env variable.\nThis is not an issue if you are not using EliteAPI's message queue.";
 
 export async function ConnectToRMQ() {
 	const url = process.env.RABBITMQ_HOSTNAME;
@@ -14,8 +15,8 @@ export async function ConnectToRMQ() {
 		return;
 	}
 
-	let connection; 
-	
+	let connection;
+
 	try {
 		connection = await connect({
 			hostname: process.env.RABBITMQ_HOSTNAME,
@@ -23,7 +24,7 @@ export async function ConnectToRMQ() {
 			password: process.env.RABBITMQ_PASSWORD,
 			username: process.env.RABBITMQ_USERNAME,
 		});
-	} catch (error) {
+	} catch (_) {
 		console.error(errorMsg);
 		return;
 	}
@@ -40,24 +41,28 @@ export async function ConnectToRMQ() {
 	const queue = await channel.assertQueue('', { durable: false });
 	channel.bindQueue(queue.queue, exchange, '');
 
-	channel.consume(queue.queue, async (msg) => {
-		if (!msg) return;
-		const signal = new Signal(msg.content.toString());
+	channel.consume(
+		queue.queue,
+		async (msg) => {
+			if (!msg) return;
+			const signal = new Signal(msg.content.toString());
 
-		if (!signal.name || !signal.authorId || !signal.guildId) return;
-		if (!client.guilds.cache.has(signal.guildId)) return; // Wrong shard
+			if (!signal.name || !signal.authorId || !signal.guildId) return;
+			if (!client.guilds.cache.has(signal.guildId)) return; // Wrong shard
 
-		const info = signals.get(signal.name);
-		if (!info) return;
+			const info = signals.get(signal.name);
+			if (!info) return;
 
-		if (!await hasPermissions(signal.authorId, signal.guildId, info.permissions)) return;
+			if (!(await hasPermissions(signal.authorId, signal.guildId, info.permissions))) return;
 
-		try {
-			info?.execute(signal, client);
-		} catch (error) {
-			console.error(error);
-		}
-	}, { noAck: true });
+			try {
+				info?.execute(signal, client);
+			} catch (error) {
+				console.error(error);
+			}
+		},
+		{ noAck: true },
+	);
 }
 
 async function hasPermissions(userId: string, guildId: string, permissions?: bigint) {

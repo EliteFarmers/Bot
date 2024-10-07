@@ -1,14 +1,24 @@
-import { AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, CommandInteraction, ContextMenuCommandInteraction, Events, GuildMember, Interaction, StringSelectMenuInteraction } from 'discord.js';
-import { commands } from '../bot.js';
-import { Command, CommandGroup, CommandType, getAutocomplete } from '../classes/Command.js';
-import { HasRole, isValidAccess } from '../classes/Util.js';
-import { FetchGuild, FetchUserSettings } from '../api/elite.js';
 import * as Sentry from '@sentry/node';
+import {
+	AutocompleteInteraction,
+	ButtonInteraction,
+	ChatInputCommandInteraction,
+	CommandInteraction,
+	ContextMenuCommandInteraction,
+	Events,
+	GuildMember,
+	Interaction,
+	StringSelectMenuInteraction,
+} from 'discord.js';
+import { FetchGuild, FetchUserSettings } from '../api/elite.js';
+import { commands } from '../bot.js';
+import { HasRole, isValidAccess } from '../classes/Util.js';
+import { Command, CommandGroup, CommandType, getAutocomplete } from '../classes/commands/index.js';
 
 const settings = {
 	event: Events.InteractionCreate,
-	execute: execute
-}
+	execute: execute,
+};
 
 export default settings;
 
@@ -23,10 +33,10 @@ async function execute(interaction: Interaction) {
 }
 
 async function OnCommandInteraction(interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction) {
-	const command = (interaction.isChatInputCommand()) 
+	const command = interaction.isChatInputCommand()
 		? GetCommand(interaction.commandName, CommandType.Slash)
-		: GetCommand(interaction.commandName, CommandType.ContextMenu);
-		
+		: GetCommand(interaction.commandName, CommandType.UserContextMenu);
+
 	if (!command) return;
 
 	const hasPerms = await HasPermsAndAccess(command, interaction);
@@ -43,10 +53,12 @@ async function OnCommandInteraction(interaction: ChatInputCommandInteraction | C
 	} catch (error) {
 		Sentry.captureException(error);
 
-		await interaction.reply({ 
-			content: 'There was an error while executing this command!', 
-			ephemeral: true 
-		}).catch(() => undefined);
+		await interaction
+			.reply({
+				content: 'There was an error while executing this command!',
+				ephemeral: true,
+			})
+			.catch(() => undefined);
 	}
 }
 
@@ -70,8 +82,13 @@ async function OnButtonInteraction(interaction: ButtonInteraction | StringSelect
 		}
 	} catch (error) {
 		Sentry.captureException(error);
-		
-		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true }).catch(() => undefined);
+
+		await interaction
+			.reply({
+				content: 'There was an error while executing this command!',
+				ephemeral: true,
+			})
+			.catch(() => undefined);
 	}
 }
 
@@ -101,7 +118,10 @@ function GetCommand(name: string, type: CommandType): Command | CommandGroup | u
 	return command;
 }
 
-async function HasPermsAndAccess(command: Command | CommandGroup, interaction: CommandInteraction | ButtonInteraction | StringSelectMenuInteraction) {
+async function HasPermsAndAccess(
+	command: Command | CommandGroup,
+	interaction: CommandInteraction | ButtonInteraction | StringSelectMenuInteraction,
+) {
 	if (interaction.channel && !isValidAccess(command.access, interaction.channel.type)) return false;
 
 	if (!interaction.guildId || !command.permissions || !(interaction.member instanceof GuildMember)) return true;
@@ -113,10 +133,10 @@ async function HasPermsAndAccess(command: Command | CommandGroup, interaction: C
 			const hasRole = HasRole(interaction.member, server.adminRole as unknown as string);
 
 			if (!hasRole) {
-				await interaction.reply({ 
-					content: 'You don\'t have the required permissions for this command.', 
-					allowedMentions: { repliedUser: true }, 
-					ephemeral: true 
+				await interaction.reply({
+					content: "You don't have the required permissions for this command.",
+					allowedMentions: { repliedUser: true },
+					ephemeral: true,
 				});
 			}
 
@@ -128,10 +148,10 @@ async function HasPermsAndAccess(command: Command | CommandGroup, interaction: C
 	const perms = interaction.memberPermissions;
 	// Return if lacking one
 	if (!perms || !perms.has(command.permissions)) {
-		await interaction.reply({ 
-			content: 'You don\'t have the required permissions for this command.', 
-			allowedMentions: { repliedUser: true }, 
-			ephemeral: true 
+		await interaction.reply({
+			content: "You don't have the required permissions for this command.",
+			allowedMentions: { repliedUser: true },
+			ephemeral: true,
 		});
 		return false;
 	}

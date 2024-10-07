@@ -44,10 +44,12 @@ export const BackgroundGradient = z.object({
 		start: Position,
 		end: Position,
 	}),
-	bounds: z.object({
-		start: Position,
-		end: Position,
-	}).optional(),
+	bounds: z
+		.object({
+			start: Position,
+			end: Position,
+		})
+		.optional(),
 	stops: z.array(BackgroundGradientStop),
 	opacity: z.number().optional(),
 });

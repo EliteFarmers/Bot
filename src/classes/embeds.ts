@@ -1,19 +1,19 @@
-import { UserSettings } from "../api/elite.js";
-import { ColorResolvable, EmbedBuilder, RepliableInteraction } from "discord.js";
+import { ColorResolvable, EmbedBuilder, RepliableInteraction } from 'discord.js';
+import { UserSettings } from '../api/elite.js';
 
 export function EliteEmbed(settings?: UserSettings, footer = true) {
-	const embed = new EmbedBuilder()
+	const embed = new EmbedBuilder();
 
 	if (settings?.features?.embedColor) {
-		embed.setColor('#' + settings.features.embedColor as ColorResolvable);
+		embed.setColor(('#' + settings.features.embedColor) as ColorResolvable);
 	} else {
-		embed.setColor('#03fc7b')
+		embed.setColor('#03fc7b');
 	}
 
 	if (footer) {
-		embed.setFooter({ 
-			text: 'Powered by Elite Farmers API • kaeso.dev', 
-			iconURL: 'https://elitebot.dev/favicon.webp'
+		embed.setFooter({
+			text: 'Powered by Elite Farmers API • kaeso.dev',
+			iconURL: 'https://elitebot.dev/favicon.webp',
 		});
 	}
 
@@ -21,14 +21,11 @@ export function EliteEmbed(settings?: UserSettings, footer = true) {
 }
 
 export function ErrorEmbed(title: string, description?: string) {
-	const embed = EliteEmbed()
-		.setTitle(`Error: ${title}`)
-		.setColor('#ff0000')
-		.addFields({ 
-			name: 'Contact',
-			value: '[Support Server](https://elitebot.dev/support)'
-		});
-	
+	const embed = EliteEmbed().setTitle(`Error: ${title}`).setColor('#ff0000').addFields({
+		name: 'Contact',
+		value: '[Support Server](https://elitebot.dev/support)',
+	});
+
 	if (description) {
 		embed.setDescription(description);
 	}
@@ -37,14 +34,11 @@ export function ErrorEmbed(title: string, description?: string) {
 }
 
 export function WarningEmbed(title: string) {
-	return EliteEmbed()
-		.setTitle(title)
-		.setColor('#ffff00');
+	return EliteEmbed().setTitle(title).setColor('#ffff00');
 }
 
 export function NotYoursEmbed() {
-	return ErrorEmbed('Not Your Command!')
-		.setDescription('Run the command yourself to interact with it!');
+	return ErrorEmbed('Not Your Command!').setDescription('Run the command yourself to interact with it!');
 }
 
 export function NotYoursReply(interaction: RepliableInteraction) {
@@ -62,8 +56,8 @@ export function EmptyField(inline = true) {
 export function PrefixFooter(embed: EmbedBuilder, prefix: string) {
 	const current = embed.data.footer;
 	embed.setFooter({
-		iconURL: current?.icon_url ?? undefined,	
-		text: `${prefix}\n${current?.text ?? ''}`.trim(), 
+		iconURL: current?.icon_url ?? undefined,
+		text: `${prefix}\n${current?.text ?? ''}`.trim(),
 	});
 	return embed;
 }

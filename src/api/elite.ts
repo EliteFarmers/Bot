@@ -1,6 +1,6 @@
+import { User } from 'discord.js';
 import createClient from 'openapi-fetch';
 import { components, paths } from './api.d.js';
-import { User } from 'discord.js';
 
 import dotenv from 'dotenv';
 dotenv.config();
@@ -79,10 +79,7 @@ export const FetchContests = (playerUuid: string) =>
 		},
 	});
 
-export const FetchWeightLeaderboardRank = (
-	playerUuid: string,
-	profileUuid: string
-) =>
+export const FetchWeightLeaderboardRank = (playerUuid: string, profileUuid: string) =>
 	GET('/leaderboard/rank/{leaderboardId}/{playerUuid}/{profileUuid}', {
 		params: {
 			path: {
@@ -98,17 +95,12 @@ export const FetchLeaderboardRankings = (playerUuid: string, profileUuid: string
 		params: {
 			path: {
 				playerUuid,
-				profileUuid
-			}
-		}
+				profileUuid,
+			},
+		},
 	});
 
-
-export const FetchLeaderboardRank = (
-	leaderboardId: string,
-	playerUuid: string,
-	profileUuid: string
-) =>
+export const FetchLeaderboardRank = (leaderboardId: string, playerUuid: string, profileUuid: string) =>
 	GET('/leaderboard/rank/{leaderboardId}/{playerUuid}/{profileUuid}', {
 		params: {
 			path: {
@@ -119,11 +111,7 @@ export const FetchLeaderboardRank = (
 		},
 	});
 
-export const FetchLeaderboardSlice = (
-	leaderboardId: string,
-	offset = 0,
-	limit = 20
-) =>
+export const FetchLeaderboardSlice = (leaderboardId: string, offset = 0, limit = 20) =>
 	GET('/leaderboard/{id}', {
 		params: {
 			path: {
@@ -136,11 +124,7 @@ export const FetchLeaderboardSlice = (
 		},
 	});
 
-export const FetchSkillLeaderboardSlice = (
-	leaderboardId: string,
-	offset = 0,
-	limit = 20
-) =>
+export const FetchSkillLeaderboardSlice = (leaderboardId: string, offset = 0, limit = 20) =>
 	GET('/leaderboard/skill/{skillName}', {
 		params: {
 			path: {
@@ -153,11 +137,7 @@ export const FetchSkillLeaderboardSlice = (
 		},
 	});
 
-export const FetchCollectionLeaderboardSlice = (
-	leaderboardId: string,
-	offset = 0,
-	limit = 20
-) =>
+export const FetchCollectionLeaderboardSlice = (leaderboardId: string, offset = 0, limit = 20) =>
 	GET('/leaderboard/collection/{collection}', {
 		params: {
 			path: {
@@ -194,10 +174,7 @@ export const FetchGuildJacob = (id: string) =>
 		},
 	});
 
-export const UpdateGuildJacob = (
-	id: string,
-	data: components['schemas']['GuildJacobLeaderboardFeature']
-) =>
+export const UpdateGuildJacob = (id: string, data: components['schemas']['GuildJacobLeaderboardFeature']) =>
 	PUT('/bot/{guildId}/jacob', {
 		params: {
 			path: {
@@ -210,11 +187,12 @@ export const UpdateGuildJacob = (
 		},
 	});
 
-export const GetGuildsToPing = () => GET('/bot/contestpings', {
-	headers: {
-		Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-	},
-});
+export const GetGuildsToPing = () =>
+	GET('/bot/contestpings', {
+		headers: {
+			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
+		},
+	});
 
 export const DisableGuildContestPings = (id: string, reason: string) =>
 	DELETE('/bot/contestpings/{guildId}', {
@@ -286,21 +264,21 @@ export const FetchContestMonthlyBrackets = (year: number, month: number, months?
 		params: {
 			path: {
 				sbYear: year,
-				sbMonth: month
+				sbMonth: month,
 			},
 			query: {
-				months
-			}
-		}
+				months,
+			},
+		},
 	});
 
 export const FetchCurrentMonthlyBrackets = (months?: number) =>
 	GET('/graph/medals/now', {
 		params: {
 			query: {
-				months
-			}
-		}
+				months,
+			},
+		},
 	});
 
 export const FetchContestYearlyMonthlyBrackets = (year: number, months?: number, years?: number) =>
@@ -311,9 +289,9 @@ export const FetchContestYearlyMonthlyBrackets = (year: number, months?: number,
 			},
 			query: {
 				months,
-				years
-			}
-		}
+				years,
+			},
+		},
 	});
 
 export const GrantUserBadge = (playerUuid: string, badgeId: number) =>
@@ -321,8 +299,8 @@ export const GrantUserBadge = (playerUuid: string, badgeId: number) =>
 		params: {
 			path: {
 				playerUuid,
-				badgeId
-			}
+				badgeId,
+			},
 		},
 		headers: {
 			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
@@ -334,13 +312,13 @@ export const FetchCollectionGraphs = (playerUuid: string, profileUuid: string, d
 		params: {
 			path: {
 				playerUuid,
-				profileUuid
+				profileUuid,
 			},
 			query: {
 				days,
-				perDay
-			}
-		}
+				perDay,
+			},
+		},
 	});
 
 export const FetchSkillGraphs = (playerUuid: string, profileUuid: string, days?: number, perDay?: number) =>
@@ -348,32 +326,34 @@ export const FetchSkillGraphs = (playerUuid: string, profileUuid: string, days?:
 		params: {
 			path: {
 				playerUuid,
-				profileUuid
+				profileUuid,
 			},
 			query: {
 				days,
-				perDay
-			}
-		}
-	})
+				perDay,
+			},
+		},
+	});
 
-export const FetchContest = (timestamp: number) => GET('/contests/{timestamp}', {
-	params: {
-		path: {
-			timestamp
-		}
-	}
-});
+export const FetchContest = (timestamp: number) =>
+	GET('/contests/{timestamp}', {
+		params: {
+			path: {
+				timestamp,
+			},
+		},
+	});
 
 export const FetchWeightStyles = () => GET('/product/styles', {});
 
-export const FetchProduct = (skuId: string) => GET('/product/{productId}', {
-	params: {
-		path: {
-			productId: skuId as unknown as number
-		}
-	}
-});
+export const FetchProduct = (skuId: string) =>
+	GET('/product/{productId}', {
+		params: {
+			path: {
+				productId: skuId as unknown as number,
+			},
+		},
+	});
 
 export const FetchLeaderboardList = () => GET('/leaderboards', {});
 
@@ -429,13 +409,14 @@ export const UpdateGuildMemberRoles = (guildId: string, userId: string, roles: s
 		},
 	});
 
-export const RefreshUserEntitlements = (discordId: string) => POST('/bot/account/{discordId}/purchases', {
-	params: {
-		path: {
-			discordId: discordId as unknown as number,
+export const RefreshUserEntitlements = (discordId: string) =>
+	POST('/bot/account/{discordId}/purchases', {
+		params: {
+			path: {
+				discordId: discordId as unknown as number,
+			},
 		},
-	},
-	headers: {
-		Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-	},
-});
+		headers: {
+			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
+		},
+	});

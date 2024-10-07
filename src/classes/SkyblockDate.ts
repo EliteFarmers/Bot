@@ -55,11 +55,19 @@ export function GetDayWithSuffix(day: number) {
 }
 
 export function GetSkyblockMonthName(month: number) {
-	const months = [ 
-		'Early Spring', 'Spring', 'Late Spring', 
-		'Early Summer', 'Summer', 'Late Summer', 
-		'Early Autumn', 'Autumn', 'Late Autumn', 
-		'Early Winter', 'Winter', 'Late Winter',
+	const months = [
+		'Early Spring',
+		'Spring',
+		'Late Spring',
+		'Early Summer',
+		'Summer',
+		'Late Summer',
+		'Early Autumn',
+		'Autumn',
+		'Late Autumn',
+		'Early Winter',
+		'Winter',
+		'Late Winter',
 	];
 
 	return months[month] ?? 'Unknown';

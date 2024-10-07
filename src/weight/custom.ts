@@ -1,10 +1,10 @@
-import { components } from "../api/api.js";
-import { AttachmentBuilder, EmbedBuilder } from "discord.js";
-import { createWeightEmbed } from "./embed.js";
-import { FetchWeightStyles, UserSettings } from "../api/elite.js";
-import { createFromData } from "./maker.js";
-import { validStyle, WeightStyle } from "../schemas/style.js";
-import { ErrorEmbed } from "../classes/embeds.js";
+import { AttachmentBuilder, EmbedBuilder } from 'discord.js';
+import { components } from '../api/api.js';
+import { FetchWeightStyles, UserSettings } from '../api/elite.js';
+import { ErrorEmbed } from '../classes/embeds.js';
+import { WeightStyle, validStyle } from '../schemas/style.js';
+import { createWeightEmbed } from './embed.js';
+import { createFromData } from './maker.js';
 
 import { DEFAULT_STYLE } from './defaultstyle.js';
 
@@ -17,19 +17,24 @@ export interface CustomFormatterOptions {
 	weightRank?: number;
 	data?: WeightStyle;
 }
-type CustomFormatter = (opt: CustomFormatterOptions) => Promise<AttachmentBuilder | EmbedBuilder | null> | AttachmentBuilder | EmbedBuilder | null;
+type CustomFormatter = (
+	opt: CustomFormatterOptions,
+) => Promise<AttachmentBuilder | EmbedBuilder | null> | AttachmentBuilder | EmbedBuilder | null;
 
 const formatters: Record<string, CustomFormatter> = {
-	'embed': createWeightEmbed,
-	'data': createFromData
-}
+	embed: createWeightEmbed,
+	data: createFromData,
+};
 
 let stylesCache: Record<number, components['schemas']['WeightStyleWithDataDto']> = {};
 
-export function getCustomFormatter(options: CustomFormatterOptions, style: number | undefined = undefined): Promise<AttachmentBuilder | EmbedBuilder | null> | AttachmentBuilder | EmbedBuilder | null {
+export function getCustomFormatter(
+	options: CustomFormatterOptions,
+	style: number | undefined = undefined,
+): Promise<AttachmentBuilder | EmbedBuilder | null> | AttachmentBuilder | EmbedBuilder | null {
 	let formatterName = 'data';
 	const styleId = style ?? options.account.settings?.weightStyle?.id;
-	
+
 	let styleData = DEFAULT_STYLE;
 	if (styleId) {
 		const cached = stylesCache[styleId];
@@ -44,7 +49,10 @@ export function getCustomFormatter(options: CustomFormatterOptions, style: numbe
 	if (validStyle(selected)) {
 		options.data = selected;
 	} else {
-		return ErrorEmbed('Invalid style data!', 'The style data provided from the server is invalid, this should be reported!\n' + `Style ID: \`${styleId}\``);
+		return ErrorEmbed(
+			'Invalid style data!',
+			'The style data provided from the server is invalid, this should be reported!\n' + `Style ID: \`${styleId}\``,
+		);
 	}
 
 	return formatter(options);

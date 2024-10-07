@@ -1,12 +1,9 @@
-import { FetchLeaderboardSlice, SearchUsers } from '../api/elite.js';
 import { AutocompleteInteraction, SlashCommandStringOption } from 'discord.js';
+import { FetchLeaderboardSlice, SearchUsers } from '../api/elite.js';
 
 export function playerOption(description = 'The player to get results for!', required = false) {
-	return (builder: SlashCommandStringOption) => 
-		builder.setName('player')
-			.setDescription(description)
-			.setAutocomplete(true)
-			.setRequired(required);
+	return (builder: SlashCommandStringOption) =>
+		builder.setName('player').setDescription(description).setAutocomplete(true).setRequired(required);
 }
 
 export async function autocomplete(interaction: AutocompleteInteraction) {
@@ -19,24 +16,30 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
 	const player = option.value.replace(/[^a-zA-Z0-9_]/g, '') || undefined;
 
 	if (!player) {
-		const { data: leaderboard } = await FetchLeaderboardSlice('farmingweight', 0, 10).catch(() => ({ data: undefined }));
+		const { data: leaderboard } = await FetchLeaderboardSlice('farmingweight', 0, 10).catch(() => ({
+			data: undefined,
+		}));
 
 		const values = leaderboard?.entries?.slice(0, 10).map((entry) => ({
 			name: entry.ign ?? 'N/A',
 			value: entry.ign ?? 'N/A',
 		}));
 
-		interaction.respond(values ?? [
-			{
-				name: 'No results found',
-				value: 'No results found',
-			}
-		]);
+		interaction.respond(
+			values ?? [
+				{
+					name: 'No results found',
+					value: 'No results found',
+				},
+			],
+		);
 
 		return;
 	}
 
-	const { data: search = [] } = await SearchUsers(player).catch(() => ({ data: undefined }));
+	const { data: search = [] } = await SearchUsers(player).catch(() => ({
+		data: undefined,
+	}));
 
 	const values = search.map((name) => ({
 		name: name,

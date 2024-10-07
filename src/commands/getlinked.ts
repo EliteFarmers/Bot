@@ -1,15 +1,15 @@
-import { Command, CommandAccess, CommandType } from "../classes/Command.js";
-import { ContextMenuCommandBuilder, UserContextMenuCommandInteraction } from "discord.js";
-import { FetchAccount } from "../api/elite.js";
+import { ContextMenuCommandBuilder, UserContextMenuCommandInteraction } from 'discord.js';
+import { FetchAccount } from '../api/elite.js';
+import { Command, CommandAccess, CommandType } from '../classes/commands/index.js';
 
 const settings: Command = {
 	name: 'Get Linked Account',
-	description: 'Get a user\'s linked account if they have one.',
-	type: CommandType.ContextMenu,
+	description: "Get a user's linked account if they have one.",
+	type: CommandType.UserContextMenu,
 	access: CommandAccess.Everywhere,
 	slash: new ContextMenuCommandBuilder().setType(2),
-	execute: execute
-}
+	execute: execute,
+};
 
 export default settings;
 
@@ -18,16 +18,18 @@ async function execute(interaction: UserContextMenuCommandInteraction) {
 
 	await interaction.deferReply({ ephemeral: true });
 
-	const { data: found } = await FetchAccount(user.id).catch(() => ({ data: undefined }));
+	const { data: found } = await FetchAccount(user.id).catch(() => ({
+		data: undefined,
+	}));
 
 	if (!found) {
 		interaction.editReply({
-			content: `Linked account for ${user} not found!`
+			content: `Linked account for ${user} not found!`,
 		});
 		return;
 	}
 
 	interaction.editReply({
-		content: `${user} https://elitebot.dev/@${found.name}`
-	})
+		content: `${user} https://elitebot.dev/@${found.name}`,
+	});
 }

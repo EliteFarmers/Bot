@@ -1,10 +1,10 @@
-import { RequestGuildUpdate } from "../api/elite.js";
-import { Events, GuildChannel } from "discord.js";
+import { Events, GuildChannel } from 'discord.js';
+import { RequestGuildUpdate } from '../api/elite.js';
 
 const settings = {
 	event: Events.ChannelDelete,
-	execute: execute
-}
+	execute: execute,
+};
 
 export default settings;
 
