@@ -1,74 +1,44 @@
+import { getAccount } from 'classes/validate.js';
 import { fromUnixTime, getUnixTime, startOfDay } from 'date-fns';
-import {
-	ActionRowBuilder,
-	ButtonBuilder,
-	ButtonStyle,
-	ChatInputCommandInteraction,
-	SlashCommandBuilder,
-} from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction } from 'discord.js';
 import { FetchAccount, FetchCollectionGraphs, UserSettings } from '../api/elite.js';
-import { autocomplete, playerOption } from '../autocomplete/player.js';
+import { elitePlayerOption } from '../autocomplete/player.js';
 import { GetCropEmoji } from '../classes/Util.js';
-import { Command, CommandAccess, CommandType } from '../classes/commands/index.js';
+import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 import { EliteEmbed, EmptyField, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 
-const command: Command = {
+const command = new EliteCommand({
 	name: 'gain',
 	description: 'Get the collection gain of a player over the past week!',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
-	slash: new SlashCommandBuilder()
-		.addStringOption(playerOption())
-		.addStringOption((option) =>
-			option.setName('profile').setDescription('Optionally specify a profile!').setRequired(false),
-		),
+	options: {
+		player: elitePlayerOption,
+		profile: {
+			name: 'profile',
+			description: 'Optionally specify a profile!',
+			type: SlashCommandOptionType.String,
+		},
+	},
 	execute: execute,
-	autocomplete,
-};
+});
 
 export default command;
 
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
-	let playerName = interaction.options.getString('player', false)?.trim();
-	const _profileName = interaction.options.getString('profile', false)?.trim();
+	const playerNameInput = interaction.options.getString('player', false)?.trim();
+	const profileNameInput = interaction.options.getString('profile', false)?.trim();
 
 	await interaction.deferReply();
 
-	const { data: account } = await FetchAccount(playerName ?? interaction.user.id).catch(() => ({ data: undefined }));
+	const result = await getAccount(playerNameInput ?? interaction.user.id, profileNameInput, command);
 
-	if (!account?.id || !account?.name) {
-		const embed = WarningEmbed('Invalid Username!').addFields({
-			name: 'Proper Usage:',
-			value: '`/gain` `player:`(player name)\nOr link your account with </verify:1135100641560248334> first!',
-		});
-
-		if (playerName) {
-			embed.setDescription(`Player \`${playerName}\` does not exist (or an error occured)`);
-		} else {
-			embed.setDescription('You need to link your account or enter a playername!');
-		}
-
-		await interaction.deleteReply().catch(() => undefined);
-		interaction.followUp({ embeds: [embed], ephemeral: true });
+	if (!result.success) {
+		await interaction.editReply({ embeds: [result.embed] });
 		return;
 	}
 
-	playerName = account.name;
-	const discordPlayerName = playerName.replace(/_/g, '\\_');
-
-	const profile = _profileName
-		? account.profiles?.find((p) => p?.profileName?.toLowerCase() === _profileName.toLowerCase())
-		: (account.profiles?.find((p) => p.selected) ?? account.profiles?.[0]);
-
-	if (!profile?.profileId || !profile.profileName) {
-		const embed = ErrorEmbed('Invalid Profile!').setDescription(`Profile "${_profileName}" does not exist.`).addFields({
-			name: 'Proper Usage:',
-			value: '`/gain` `player:`(player name) `profile:`(profile name)',
-		});
-		await interaction.deleteReply().catch(() => undefined);
-		interaction.followUp({ embeds: [embed], ephemeral: true });
-		return;
-	}
+	const { account, profile, name: playerName } = result;
 
 	const { data: collections } = await FetchCollectionGraphs(account.id, profile.profileId, 9, 1).catch(() => ({
 		data: undefined,
@@ -87,9 +57,9 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	}
 
 	if (collections.length === 0) {
-		const embed = WarningEmbed(`Crop Gain for ${discordPlayerName} (${profile.profileName})`)
+		const embed = WarningEmbed(`Crop Gain for ${account.name} (${profile.profileName})`)
 			.setDescription(
-				`No collection data found. ${discordPlayerName} may not have farmed recently or has collections API disabled.` +
+				`No collection data found. ${account.name} may not have farmed recently or has collections API disabled.` +
 					` [Check Online Profile](https://elitebot.dev/@${account.id})`,
 			)
 			.setThumbnail(`https://mc-heads.net/head/${account.id}/left`);
@@ -147,9 +117,9 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	}
 
 	const embed = EliteEmbed(settings)
-		.setTitle(`Crop Gain for ${discordPlayerName} (${profile.profileName})`)
+		.setTitle(`Crop Gain for ${account.name} (${profile.profileName})`)
 		.setDescription(
-			`-# View charts and older data for ${discordPlayerName} [here!](https://elitebot.dev/@${account.id}/${profile.profileId}/charts)`,
+			`-# View charts and older data for ${account.name} [here!](https://elitebot.dev/@${account.id}/${profile.profileId}/charts)`,
 		);
 
 	const fields = [];

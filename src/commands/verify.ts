@@ -1,21 +1,25 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 import { FetchAccount, FetchUpdateAccount, LinkAccount } from '../api/elite.js';
-import { autocomplete, playerOption } from '../autocomplete/player.js';
-import { Command, CommandAccess, CommandType } from '../classes/commands/index.js';
+import { autocomplete } from '../autocomplete/player.js';
+import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 
-const command: Command = {
+const command = new EliteCommand({
 	name: 'verify',
 	description: 'Link your Minecraft account.',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
-	slash: new SlashCommandBuilder()
-		.setName('verify')
-		.setDescription('Link your Minecraft account!')
-		.addStringOption(playerOption('Your Minecraft account name.', true)),
+	options: {
+		player: {
+			name: 'player',
+			description: 'Link your Minecraft account!',
+			type: SlashCommandOptionType.String,
+			required: true,
+			autocomplete,
+		},
+	},
 	execute: execute,
-	autocomplete,
-};
+});
 
 export default command;
 
@@ -32,7 +36,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 			.setDescription("Usernames can only contain letters, numbers, underscores, and hyphens (if it's a uuid).")
 			.addFields({
 				name: 'Proper Usage:',
-				value: '`/verify` `player:`(player name)',
+				value: command.getUsage(),
 			});
 		return interaction.editReply({ embeds: [embed] });
 	}

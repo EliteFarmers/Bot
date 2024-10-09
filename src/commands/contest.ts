@@ -1,9 +1,9 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 import { Crop, SkyBlockTime, getCropDisplayName, getCropFromName } from 'farming-weight';
 import { FetchContest, UserSettings } from '../api/elite.js';
-import { dayOption, monthOption, yearAutocomplete, yearOption } from '../autocomplete/dates.js';
+import { eliteDayOption, eliteMonthOption, eliteYearOption } from '../autocomplete/dates.js';
 import { GetCropEmoji, GetMedalEmoji } from '../classes/Util.js';
-import { Command, CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
+import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
 import { EliteEmbed } from '../classes/embeds.js';
 
 const command = new EliteCommand({
@@ -11,27 +11,11 @@ const command = new EliteCommand({
 	description: 'Get participants of a specific Jacob Contest!',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
-	options: [
-		{
-			name: 'year',
-			description: 'The Skyblock year of the contest',
-			autocomplete: yearAutocomplete,
-			builder: (b) => b.addIntegerOption(yearOption()),
-			required: false,
-		},
-		{
-			name: 'month',
-			description: 'The Skyblock month of the contest',
-			builder: (b) => b.addIntegerOption(monthOption()),
-			required: false,
-		},
-		{
-			name: 'day',
-			description: 'The Skyblock day of the contest',
-			builder: (b) => b.addIntegerOption(dayOption()),
-			required: false,
-		},
-	],
+	options: {
+		year: eliteYearOption,
+		month: eliteMonthOption,
+		day: eliteDayOption,
+	},
 	execute: execute,
 });
 

@@ -1,5 +1,5 @@
 import fs from 'fs';
-import type { CommandGroupSettings } from './commands/index.js';
+import type { CommandGroup } from './commands/index.js';
 
 export async function registerFiles<T>(
 	folder: string,
@@ -14,10 +14,7 @@ export async function registerFiles<T>(
 	}
 }
 
-export async function registerCommandGroups(
-	folder: string,
-	callback: (folder: string, group: CommandGroupSettings) => void,
-) {
+export async function registerCommandGroups(folder: string, callback: (folder: string, group: CommandGroup) => void) {
 	const files = fs
 		.readdirSync(`./src/${folder}`)
 		.filter((fileName) => fs.lstatSync(`./src/${folder}/${fileName}`).isDirectory());

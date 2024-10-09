@@ -1,16 +1,15 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 import { UserSettings } from '../api/elite.js';
-import { Command, CommandAccess, CommandType } from '../classes/commands/index.js';
+import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
 import { EliteEmbed } from '../classes/embeds.js';
 
-const command: Command = {
+const command = new EliteCommand({
 	name: 'info',
 	description: 'Information about the bot!',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
-	slash: new SlashCommandBuilder().setName('info').setDescription('Get bot information!'),
 	execute: execute,
-};
+});
 
 export default command;
 

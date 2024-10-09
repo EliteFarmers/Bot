@@ -5,7 +5,7 @@ import { CronJob } from 'cron';
 import { ActivityType, Client, ClientEvents, Collection, Events, GatewayIntentBits } from 'discord.js';
 import { ConnectToRMQ } from './api/rabbit.js';
 import { SignalRecieverOptions } from './classes/Signal.js';
-import { Command, CommandGroup, CronTask, EliteCommand } from './classes/commands/index.js';
+import { CommandGroup, CronTask, EliteCommand } from './classes/commands/index.js';
 import { registerCommandGroups, registerFiles } from './classes/register.js';
 import { LoadWeightStyles } from './weight/custom.js';
 
@@ -17,17 +17,23 @@ export const client = new Client({
 	intents: [GatewayIntentBits.Guilds],
 });
 
-export const commands = new Collection<string, Command | CommandGroup | EliteCommand>();
+export const commands = new Collection<string, CommandGroup | EliteCommand>();
 export const signals = new Collection<string, SignalRecieverOptions>();
+
+const deploying = process.argv.some((arg) => arg.includes('deploy'));
 
 /*
  * There is surely a better way to load these, but this is fine for now
  * as it only runs once on startup and allows you to only create a new file.
  */
 (async function () {
+	if (deploying) {
+		return;
+	}
+
 	const filter = (fileName: string) => fileName.endsWith('.ts') || fileName.endsWith('.js');
 
-	registerFiles<Command | EliteCommand>('commands', filter, (cmd) => {
+	registerFiles<EliteCommand>('commands', filter, (cmd) => {
 		commands.set(cmd.name, cmd);
 	});
 
@@ -36,14 +42,14 @@ export const signals = new Collection<string, SignalRecieverOptions>();
 	registerCommandGroups('commands', (folder, group) => {
 		const command = new CommandGroup(group);
 
-		registerFiles<Command>(folder, subFilter, (cmd) => {
+		registerFiles<EliteCommand>(folder, subFilter, (cmd) => {
 			command.addSubcommand(cmd);
 		});
 
 		commands.set(command.name, command);
 	});
 
-	registerFiles<Command>('buttons', filter, (btn) => {
+	registerFiles<EliteCommand>('buttons', filter, (btn) => {
 		commands.set(btn.name, btn);
 	});
 
@@ -93,7 +99,9 @@ async function updateActivity() {
 	client.user.setActivity(`${guilds} guilds (𝚫${client.shard?.ids[0] ?? '0'})`, { type: ActivityType.Watching });
 }
 
-client.login(process.env.BOT_TOKEN);
+if (!deploying) {
+	client.login(process.env.BOT_TOKEN);
+}
 
 process
 	.on('unhandledRejection', (reason, p) => {

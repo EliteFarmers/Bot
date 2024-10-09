@@ -1,13 +1,12 @@
 import {
-	PermissionsBitField,
 	REST,
 	RESTGetAPIApplicationCommandsResult,
 	RESTPostAPIApplicationCommandsJSONBody,
+	RESTPostAPIContextMenuApplicationCommandsJSONBody,
 	Routes,
-	SlashCommandBuilder,
 } from 'discord.js';
 import dotenv from 'dotenv';
-import { Command, CommandGroup, CommandType, SubCommand } from './classes/commands/index.js';
+import { CommandGroup, EliteCommand } from './classes/commands/index.js';
 import { registerCommandGroups, registerFiles } from './classes/register.js';
 dotenv.config();
 
@@ -21,22 +20,22 @@ dotenv.config();
  *  ===================================================================
  */
 
-const commands = new Map<string, Command | CommandGroup>();
+const commands = new Map<string, EliteCommand | CommandGroup>();
 const proccessArgs = process.argv.slice(1);
 
 async function loadCommands() {
 	const filter = (fileName: string) => fileName.endsWith('.ts') || fileName.endsWith('.js');
 
-	await registerFiles<Command>('commands', filter, (cmd) => {
+	registerFiles<EliteCommand>('commands', filter, (cmd) => {
 		commands.set(cmd.name, cmd);
 	});
 
 	const subFilter = (fileName: string) => filter(fileName) && !fileName.includes('command');
 
-	await registerCommandGroups('commands', async (folder, group) => {
+	registerCommandGroups('commands', async (folder, group) => {
 		const command = new CommandGroup(group);
 
-		await registerFiles<SubCommand>(folder, subFilter, (cmd) => {
+		registerFiles<EliteCommand>(folder, subFilter, (cmd) => {
 			command.addSubcommand(cmd);
 		});
 
@@ -56,6 +55,7 @@ const rest = new REST().setToken(process.env.BOT_TOKEN);
 		.filter((json) => json) as RESTPostAPIApplicationCommandsJSONBody[];
 
 	if (proccessArgs[1] === 'global') {
+		// fs.writeFileSync('commands.json', JSON.stringify(json, null, 2));
 		await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
 			body: json,
 		});
@@ -95,39 +95,17 @@ const rest = new REST().setToken(process.env.BOT_TOKEN);
 	}
 })();
 
-function getCommandJSON(command?: Command | CommandGroup): RESTPostAPIApplicationCommandsJSONBody | undefined {
+function getCommandJSON(
+	command?: EliteCommand | CommandGroup,
+): RESTPostAPIApplicationCommandsJSONBody | RESTPostAPIContextMenuApplicationCommandsJSONBody | undefined {
+	if (!command) return;
+
 	if (command instanceof CommandGroup) {
 		return command.getCommandJSON();
 	}
 
-	if (!command) return;
-	if (
-		command.type !== CommandType.Slash &&
-		command.type !== CommandType.Combo &&
-		command.type !== CommandType.UserContextMenu
-	) {
-		return;
+	if (command.isChatInputCommand() && !command.isSubCommand() && command.slash) {
+		const json = command.toJSON();
+		return json as RESTPostAPIApplicationCommandsJSONBody | RESTPostAPIContextMenuApplicationCommandsJSONBody;
 	}
-
-	if (!command.slash && command.type === CommandType.Slash) {
-		command.slash = new SlashCommandBuilder();
-	} else if (!command.slash) {
-		return;
-	}
-
-	const slash = command.slash;
-
-	if (!slash.name) {
-		slash.setName(command.name);
-	}
-
-	if ('setDescription' in slash && !slash.description) {
-		slash.setDescription(command.description);
-	}
-
-	if (command.permissions) {
-		slash.setDefaultMemberPermissions(PermissionsBitField.resolve(command.permissions));
-	}
-
-	return command.slash.toJSON();
 }

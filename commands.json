@@ -1,0 +1,388 @@
+[
+	{
+		"options": [
+			{
+				"type": 1,
+				"name": "fortune",
+				"description": "Get the farming fortune required for Jacob Contests!",
+				"options": [
+					{
+						"max_value": 20,
+						"min_value": 10,
+						"autocomplete": false,
+						"type": 10,
+						"name": "bps",
+						"description": "Your blocks broken per second! (10-20)",
+						"required": false
+					},
+					{
+						"name": "dicer",
+						"description": "Include tier 3 dicer crops in the calculation?",
+						"required": false,
+						"type": 5
+					},
+					{
+						"name": "mooshroom",
+						"description": "Include mooshroom mushrooms in the calculation?",
+						"required": false,
+						"type": 5
+					}
+				]
+			},
+			{
+				"type": 1,
+				"name": "player",
+				"description": "Get jacob's stats of a player!",
+				"options": [
+					{
+						"autocomplete": true,
+						"type": 3,
+						"name": "player",
+						"description": "The player to get results for!",
+						"required": false
+					},
+					{
+						"autocomplete": false,
+						"type": 3,
+						"name": "profile",
+						"description": "Optionally specify a profile!",
+						"required": false
+					}
+				]
+			}
+		],
+		"name": "jacob",
+		"description": "Get jacob's stats of a player!",
+		"type": 1
+	},
+	{
+		"options": [],
+		"name": "badges",
+		"description": "View available badges!",
+		"type": 1
+	},
+	{
+		"options": [
+			{
+				"min_value": 100,
+				"autocomplete": true,
+				"type": 4,
+				"name": "year",
+				"description": "The skyblock year to get results for!",
+				"required": false
+			},
+			{
+				"max_value": 12,
+				"min_value": 1,
+				"autocomplete": false,
+				"type": 4,
+				"choices": [
+					{
+						"name": "Early Spring",
+						"value": 1
+					},
+					{
+						"name": "Spring",
+						"value": 2
+					},
+					{
+						"name": "Late Spring",
+						"value": 3
+					},
+					{
+						"name": "Early Summer",
+						"value": 4
+					},
+					{
+						"name": "Summer",
+						"value": 5
+					},
+					{
+						"name": "Late Summer",
+						"value": 6
+					},
+					{
+						"name": "Early Autumn",
+						"value": 7
+					},
+					{
+						"name": "Autumn",
+						"value": 8
+					},
+					{
+						"name": "Late Autumn",
+						"value": 9
+					},
+					{
+						"name": "Early Winter",
+						"value": 10
+					},
+					{
+						"name": "Winter",
+						"value": 11
+					},
+					{
+						"name": "Late Winter",
+						"value": 12
+					}
+				],
+				"name": "month",
+				"description": "The skyblock month to get results for!",
+				"required": false
+			},
+			{
+				"max_value": 31,
+				"min_value": 1,
+				"autocomplete": false,
+				"type": 4,
+				"name": "day",
+				"description": "The skyblock day to get results for!",
+				"required": false
+			}
+		],
+		"name": "contest",
+		"description": "Get participants of a specific Jacob Contest!",
+		"type": 1
+	},
+	{
+		"options": [
+			{
+				"autocomplete": true,
+				"type": 3,
+				"name": "player",
+				"description": "The player to get results for!",
+				"required": false
+			},
+			{
+				"autocomplete": false,
+				"type": 3,
+				"name": "profile",
+				"description": "Optionally specify a profile!",
+				"required": false
+			}
+		],
+		"name": "fortune",
+		"description": "Get a players farming fortune progress!",
+		"type": 1
+	},
+	{
+		"options": [
+			{
+				"autocomplete": true,
+				"type": 3,
+				"name": "player",
+				"description": "The player to get results for!",
+				"required": false
+			},
+			{
+				"autocomplete": false,
+				"type": 3,
+				"name": "profile",
+				"description": "Optionally specify a profile!",
+				"required": false
+			}
+		],
+		"name": "gain",
+		"description": "Get the collection gain of a player over the past week!",
+		"type": 1
+	},
+	{
+		"options": [
+			{
+				"autocomplete": true,
+				"type": 3,
+				"name": "player",
+				"description": "The player to get results for!",
+				"required": false
+			},
+			{
+				"autocomplete": false,
+				"type": 3,
+				"name": "profile",
+				"description": "Optionally specify a profile!",
+				"required": false
+			}
+		],
+		"name": "garden",
+		"description": "Get garden stats for a player's profile!",
+		"type": 1
+	},
+	{
+		"options": [
+			{
+				"autocomplete": true,
+				"type": 3,
+				"name": "command",
+				"description": "Specify a command for more info.",
+				"required": false
+			}
+		],
+		"name": "help",
+		"description": "All commands",
+		"type": 1
+	},
+	{
+		"options": [],
+		"name": "info",
+		"description": "Information about the bot!",
+		"type": 1
+	},
+	{
+		"options": [
+			{
+				"autocomplete": true,
+				"type": 3,
+				"name": "leaderboard",
+				"description": "The leaderboard to get results from.",
+				"required": true
+			},
+			{
+				"autocomplete": true,
+				"type": 3,
+				"name": "player",
+				"description": "The player to get results for!",
+				"required": false
+			},
+			{
+				"min_value": 1,
+				"autocomplete": false,
+				"type": 4,
+				"name": "rank",
+				"description": "Jump to a specific rank!",
+				"required": false
+			}
+		],
+		"name": "leaderboard",
+		"description": "Get a leaderboard",
+		"type": 1
+	},
+	{
+		"options": [
+			{
+				"max_value": 5000,
+				"min_value": 0,
+				"autocomplete": false,
+				"type": 4,
+				"name": "fortune",
+				"description": "The amount of fortune to calculate rates for!",
+				"required": false
+			},
+			{
+				"autocomplete": false,
+				"type": 4,
+				"choices": [
+					{
+						"name": "Jacob Contest",
+						"value": 24000
+					},
+					{
+						"name": "1 Hour",
+						"value": 72000
+					},
+					{
+						"name": "4 Hours",
+						"value": 288000
+					},
+					{
+						"name": "12 Hours",
+						"value": 864000
+					},
+					{
+						"name": "24 Hours",
+						"value": 1728000
+					}
+				],
+				"name": "time",
+				"description": "The amount of time to calculate rates for!",
+				"required": false
+			},
+			{
+				"autocomplete": false,
+				"type": 3,
+				"choices": [
+					{
+						"name": "Bountiful",
+						"value": "bountiful"
+					},
+					{
+						"name": "Blessed",
+						"value": "blessed"
+					}
+				],
+				"name": "reforge",
+				"description": "The reforge to calculate rates for!",
+				"required": false
+			},
+			{
+				"autocomplete": false,
+				"type": 3,
+				"choices": [
+					{
+						"name": "Mooshroom Cow",
+						"value": "mooshroom"
+					},
+					{
+						"name": "Elephant",
+						"value": "elephant"
+					}
+				],
+				"name": "pet",
+				"description": "The pet to calculate rates for!",
+				"required": false
+			},
+			{
+				"max_value": 20,
+				"min_value": 10,
+				"autocomplete": false,
+				"type": 10,
+				"name": "bps",
+				"description": "Your blocks broken per second! (10-20)",
+				"required": false
+			}
+		],
+		"name": "rates",
+		"description": "Get NPC profit rates for a given amount of fortune!",
+		"type": 1
+	},
+	{
+		"options": [],
+		"name": "shop",
+		"description": "View the shop!",
+		"type": 1
+	},
+	{
+		"options": [
+			{
+				"autocomplete": true,
+				"type": 3,
+				"name": "player",
+				"description": "Link your Minecraft account!",
+				"required": true
+			}
+		],
+		"name": "verify",
+		"description": "Link your Minecraft account.",
+		"type": 1
+	},
+	{
+		"options": [
+			{
+				"autocomplete": true,
+				"type": 3,
+				"name": "player",
+				"description": "The player to get results for!",
+				"required": false
+			},
+			{
+				"autocomplete": false,
+				"type": 3,
+				"name": "profile",
+				"description": "Optionally specify a profile!",
+				"required": false
+			}
+		],
+		"name": "weight",
+		"description": "Calculate a players farming weight",
+		"type": 1
+	}
+]

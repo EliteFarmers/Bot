@@ -1,5 +1,14 @@
 import { AutocompleteInteraction, SlashCommandStringOption } from 'discord.js';
 import { FetchLeaderboardSlice, SearchUsers } from '../api/elite.js';
+import { EliteSlashCommandOption, SlashCommandOptionType } from '../classes/commands/options.js';
+
+export const elitePlayerOption: EliteSlashCommandOption = {
+	name: 'player',
+	description: 'The player to get results for!',
+	alternative: 'Or link your account with </verify:1135100641560248334> first!',
+	type: SlashCommandOptionType.String,
+	autocomplete,
+};
 
 export function playerOption(description = 'The player to get results for!', required = false) {
 	return (builder: SlashCommandStringOption) =>

@@ -1,4 +1,3 @@
-import { EliteCommand } from 'classes/commands/command.js';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -6,38 +5,45 @@ import {
 	ChatInputCommandInteraction,
 	ComponentType,
 	EmbedBuilder,
-	SlashCommandSubcommandBuilder,
 } from 'discord.js';
 import { getCropFromName, getFortuneRequiredForCollection } from 'farming-weight';
 import type { components } from '../../api/api.js';
 import { FetchCurrentMonthlyBrackets, UserSettings } from '../../api/elite.js';
 import { GetCropEmoji } from '../../classes/Util.js';
-import { EliteEmbed, ErrorEmbed, NotYoursEmbed, PrefixFooter } from '../../classes/embeds.js';
+import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../../classes/commands/index.js';
+import { EliteEmbed, EmptyString, ErrorEmbed, NotYoursEmbed, PrefixFooter } from '../../classes/embeds.js';
 
 const command = new EliteCommand({
 	name: 'fortune',
 	description: 'Get the farming fortune required for Jacob Contests!',
-	slash: new SlashCommandSubcommandBuilder()
-		.setName('fortune')
-		.setDescription('Get the farming fortune required for Jacob Contests!')
-		.addNumberOption((option) =>
-			option
-				.setName('bps')
-				.setDescription('Your blocks broken per second! (10-20)')
-				.setMinValue(10)
-				.setMaxValue(20)
-				.setRequired(false),
-		)
-		.addBooleanOption((option) =>
-			option.setName('dicer').setDescription('Include tier 3 dicer crops in the calculation?').setRequired(false),
-		)
-		.addBooleanOption((option) =>
-			option.setName('mooshroom').setDescription('Include mooshroom mushrooms in the calculation?').setRequired(false),
-		),
+	type: CommandType.Slash,
+	access: CommandAccess.Everywhere,
+	subCommand: true,
+	options: {
+		bps: {
+			name: 'bps',
+			description: 'Your blocks broken per second! (10-20)',
+			type: SlashCommandOptionType.Number,
+			builder: (b) => b.setMinValue(10).setMaxValue(20),
+		},
+		dicer: {
+			name: 'dicer',
+			description: 'Include tier 3 dicer crops in the calculation?',
+			type: SlashCommandOptionType.Boolean,
+			required: false,
+		},
+		mooshroom: {
+			name: 'mooshroom',
+			description: 'Include mooshroom mushrooms in the calculation?',
+			type: SlashCommandOptionType.Boolean,
+		},
+	},
 	execute: execute,
 });
 
 export default command;
+
+const fortuneEmoji = '<:fortune:1180353749076693092>';
 
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	const useDicers = interaction.options.getBoolean('dicer', false) ?? true;
@@ -71,7 +77,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const embed = EliteEmbed(settings)
 		.setTitle('Jacob Contest Fortune Requirements')
 		.setDescription(
-			`Requirements are averaged using contests from <t:${+(brackets?.start ?? 0)}:R> until now.\nUsing an efficiency of **${bps} BPS** (${(ratio * 100).toFixed(1)}%)`,
+			`Requirements are averaged using contests from **<t:${+(brackets?.start ?? 0)}:R>** until now.\nUsing an efficiency of **${bps} BPS** (${(ratio * 100).toFixed(1)}%)`,
 		);
 
 	PrefixFooter(
@@ -79,20 +85,24 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		`Dicer RNG drops ${useDicers ? 'included' : 'not included'} • Mooshroom Cow mushrooms ${useMooshroom ? 'included' : 'not included'}`,
 	);
 
-	const lessButton = new ButtonBuilder().setCustomId('less').setLabel('Include Less').setStyle(ButtonStyle.Secondary);
+	const lessButton = new ButtonBuilder().setCustomId('less').setLabel('Decrease Range').setStyle(ButtonStyle.Secondary);
 
-	const moreButton = new ButtonBuilder().setCustomId('more').setLabel('Include More').setStyle(ButtonStyle.Secondary);
+	const moreButton = new ButtonBuilder().setCustomId('more').setLabel('Increase Range').setStyle(ButtonStyle.Secondary);
+
+	const helpButton = new ButtonBuilder().setCustomId('help').setLabel('Help').setStyle(ButtonStyle.Secondary);
 
 	const silverRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
 		new ButtonBuilder().setCustomId('lower').setLabel('Silver / Bronze').setStyle(ButtonStyle.Primary),
 		lessButton,
 		moreButton,
+		helpButton,
 	);
 
 	const diamondRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
 		new ButtonBuilder().setCustomId('higher').setLabel('Diamond / Platinum / Gold').setStyle(ButtonStyle.Primary),
 		lessButton,
 		moreButton,
+		helpButton,
 	);
 
 	const reply = await interaction
@@ -110,6 +120,54 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	if (!collector) return;
 
 	collector.on('collect', async (button) => {
+		if (button.customId === 'help') {
+			const helpEmbed = EliteEmbed(settings)
+				.setTitle('Help Menu')
+				.setDescription(
+					'This command shows you the estimated farming fortune required to get each medal in Jacob contests!' +
+						' Data is obtained from participations saved in [elitebot.dev/contests](https://elitebot.dev/contests)' +
+						' which will not be 100% accurate, but should give you a good idea of what to aim for.\n' +
+						EmptyString,
+				)
+				.setFields(
+					{
+						name: 'What do the buttons do?',
+						value: [
+							'**Decrease Range** and **Increase Range** will change the time range used to calculate the averages, which may be more or less accurate.',
+							'**Silver / Bronze** and **Diamond / Platinum / Gold** will show you the requirements for each bracket.',
+							'**Help** will show you this message again.\n' + EmptyString,
+						].join('\n'),
+					},
+					{
+						name: 'What do the command options do?',
+						value: [
+							'`bps` is the blocks broken per second you want to use for the calculations.' +
+								' __A common mistake is to use 20 BPS when you are not actually breaking that many blocks.__',
+							'`dicer` will include or exclude tier 3 dicer crops from the calculations.',
+							'`mooshroom` will include or exclude mooshroom eater mushrooms from the calculations.\n' + EmptyString,
+						].join('\n'),
+					},
+					{
+						name: 'How do I read the results?',
+						value: [
+							"Here's an example result: ",
+							`**Diamond Bracket**`,
+							`${GetCropEmoji('Wheat')} \`  472,132\` ${fortuneEmoji} \` 1,868\``,
+							'1. **Diamond Bracket** - The bracket the results under it are for.',
+							`2. ${GetCropEmoji('Wheat')} - The crop you're reading the results for (Wheat in this case).`,
+							'3. `472,132` - The calculated average collection required to get the medal.',
+							'4. `1,868` - The estimated fortune required to get that collection.',
+							'',
+							'If the fortune required is zero, you can get the medal by farming for the whole contest without any fortune.' +
+								' Keep in mind that these brackets are averages and the actual requirements may vary.',
+						].join('\n'),
+					},
+				);
+
+			await button.reply({ embeds: [helpEmbed], ephemeral: true }).catch(() => undefined);
+			return;
+		}
+
 		if (button.user.id !== interaction.user.id) {
 			await button.reply({ embeds: [NotYoursEmbed()], ephemeral: true }).catch(() => undefined);
 			return;
@@ -164,7 +222,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		brackets = data.data;
 		embed.setDescription(
-			`Required collection is averaged using contests from <t:${+(brackets?.start ?? 0)}:R> until now.\nUsing an efficiency of **${bps} BPS** (${(ratio * 100).toFixed(1)}%)`,
+			`Required collection is averaged using contests from **<t:${+(brackets?.start ?? 0)}:R>** until now.\nUsing an efficiency of **${bps} BPS** (${(ratio * 100).toFixed(1)}%)`,
 		);
 
 		await button
@@ -181,8 +239,6 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		}
 	});
 }
-
-const fortuneEmoji = '<:fortune:1180353749076693092>';
 
 function higherEmbed(
 	embed: EmbedBuilder,

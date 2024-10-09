@@ -3,16 +3,16 @@ import { components } from '../api/api.js';
 import { FetchAccount, FetchContests, FetchGuildJacob, UpdateGuildJacob } from '../api/elite.js';
 import { GetReadableDate } from '../classes/SkyblockDate.js';
 import { GetCropColor, GetCropEmoji, GetCropURL, GetEmbeddedTimestamp, UserHyperLink } from '../classes/Util.js';
-import { Command, CommandAccess, CommandType } from '../classes/commands/index.js';
+import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 
-const command: Command = {
+const command = new EliteCommand({
 	name: 'LBSUBMIT',
 	description: 'Submit your scores!',
 	access: CommandAccess.Guild,
 	type: CommandType.Button,
 	execute: execute,
-};
+});
 
 export default command;
 

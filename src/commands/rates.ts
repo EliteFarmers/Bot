@@ -2,7 +2,7 @@ import { ChatInputCommandInteraction, ComponentType, SlashCommandBuilder } from 
 import { Crop, calculateAverageSpecialCrops, calculateDetailedAverageDrops, getCropDisplayName } from 'farming-weight';
 import { UserSettings } from '../api/elite.js';
 import { CropSelectRow, GetCropEmoji } from '../classes/Util.js';
-import { Command, CommandAccess, CommandType } from '../classes/commands/index.js';
+import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 import { EliteEmbed, EmptyField, NotYoursReply } from '../classes/embeds.js';
 
 const TIME_OPTIONS = {
@@ -13,58 +13,46 @@ const TIME_OPTIONS = {
 	1_728_000: '24 Hours',
 };
 
-const command: Command = {
+const command = new EliteCommand({
 	name: 'rates',
 	description: 'Get NPC profit rates for a given amount of fortune!',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
-	slash: new SlashCommandBuilder()
-		.setName('rates')
-		.setDescription('Get NPC profit rates for a given amount of fortune!')
-		.addIntegerOption((option) =>
-			option
-				.setName('fortune')
-				.setDescription('The amount of fortune to calculate rates for!')
-				.setMinValue(0)
-				.setMaxValue(5000)
-				.setRequired(false),
-		)
-		.addIntegerOption((option) =>
-			option
-				.setName('time')
-				.setDescription('The amount of time to calculate rates for!')
-				.addChoices(
-					...Object.entries(TIME_OPTIONS).map(([value, name]) => ({
-						name,
-						value: +value,
-					})),
-				)
-				.setRequired(false),
-		)
-		.addStringOption((option) =>
-			option
-				.setName('reforge')
-				.setDescription('The reforge to calculate rates for!')
-				.addChoices({ name: 'Bountiful', value: 'bountiful' }, { name: 'Blessed', value: 'blessed' })
-				.setRequired(false),
-		)
-		.addStringOption((option) =>
-			option
-				.setName('pet')
-				.setDescription('The pet to calculate rates for!')
-				.addChoices({ name: 'Mooshroom Cow', value: 'mooshroom' }, { name: 'Elephant', value: 'elephant' })
-				.setRequired(false),
-		)
-		.addNumberOption((option) =>
-			option
-				.setName('bps')
-				.setDescription('Your blocks broken per second! (10-20)')
-				.setMinValue(10)
-				.setMaxValue(20)
-				.setRequired(false),
-		),
+	options: {
+		fortune: {
+			name: 'fortune',
+			description: 'The amount of fortune to calculate rates for!',
+			type: SlashCommandOptionType.Integer,
+			builder: (b) => b.setMinValue(0).setMaxValue(5000),
+		},
+		time: {
+			name: 'time',
+			description: 'The amount of time to calculate rates for!',
+			type: SlashCommandOptionType.Integer,
+			builder: (b) => b.addChoices(...Object.entries(TIME_OPTIONS).map(([value, name]) => ({ name, value: +value }))),
+		},
+		reforge: {
+			name: 'reforge',
+			description: 'The reforge to calculate rates for!',
+			type: SlashCommandOptionType.String,
+			builder: (b) => b.addChoices({ name: 'Bountiful', value: 'bountiful' }, { name: 'Blessed', value: 'blessed' }),
+		},
+		pet: {
+			name: 'pet',
+			description: 'The pet to calculate rates for!',
+			type: SlashCommandOptionType.String,
+			builder: (b) =>
+				b.addChoices({ name: 'Mooshroom Cow', value: 'mooshroom' }, { name: 'Elephant', value: 'elephant' }),
+		},
+		bps: {
+			name: 'bps',
+			description: 'Your blocks broken per second! (10-20)',
+			type: SlashCommandOptionType.Number,
+			builder: (b) => b.setMinValue(10).setMaxValue(20),
+		},
+	},
 	execute: execute,
-};
+});
 
 export default command;
 

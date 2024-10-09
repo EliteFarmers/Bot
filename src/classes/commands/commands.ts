@@ -1,16 +1,14 @@
 import {
 	AutocompleteInteraction,
-	BaseInteraction,
 	Client,
 	ContextMenuCommandBuilder,
-	Interaction,
-	PermissionsBitField,
-	RESTPostAPIApplicationCommandsJSONBody,
 	SlashCommandBuilder,
 	SlashCommandOptionsOnlyBuilder,
 	SlashCommandSubcommandBuilder,
 	SlashCommandSubcommandsOnlyBuilder,
 } from 'discord.js';
+import { EliteCommand } from './command.js';
+import { EliteCommandOption, EliteSlashCommandOption } from './index.js';
 
 export interface CommandBase {
 	name: string;
@@ -21,34 +19,41 @@ export interface CommandBase {
 	permissions?: bigint;
 	adminRoleOverride?: boolean;
 	access: CommandAccess;
-	type: CommandType;
 }
 
-export type AutocompleteHandler = (interaction: AutocompleteInteraction) => Promise<void>;
-
-export interface EliteCommandOption<T extends SlashCommandBuilder = SlashCommandBuilder> {
-	name: string;
-	description: string;
-	required?: boolean;
-	autocomplete?: AutocompleteHandler;
-	builder: (builder: T) => T | SlashCommandOptionsOnlyBuilder;
+interface SlashCommandBase extends CommandBase {
+	type: CommandType.Slash | CommandType.GuildSlash | CommandType.Combo;
+	options?: Record<string, EliteSlashCommandOption>;
 }
 
-export interface SlashCommand extends CommandBase {
-	slash?: SlashCommandBuilder | ContextMenuCommandBuilder | SlashCommandOptionsOnlyBuilder;
-
-	autocomplete?: AutocompleteHandler | Record<string, AutocompleteHandler>;
-
-	options?: EliteCommandOption[];
+export interface SlashCommand extends SlashCommandBase {
+	subCommand?: false;
+	slash?: SlashCommandBuilder;
+	options?: Record<string, EliteSlashCommandOption>;
 }
 
-export type Command = SlashCommand;
+export interface SubCommand extends SlashCommandBase {
+	subCommand: true;
+	slash?: SlashCommandSubcommandBuilder;
+}
 
-export interface CommandGroupSettings extends CommandBase {
+export interface ButtonCommand extends CommandBase {
+	type: CommandType.Button;
+	options?: Record<string, EliteSlashCommandOption>;
+}
+
+export interface ContextMenuCommand extends CommandBase {
+	type: CommandType.UserContextMenu | CommandType.MessageContextMenu;
+	slash?: ContextMenuCommandBuilder;
+}
+
+export interface GroupCommand extends CommandBase {
+	type: CommandType.Group;
 	slash?: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder;
-
-	addSubcommand?: (subCommand: SlashCommand) => void;
+	addSubcommand?: (subCommand: EliteCommand) => void;
 }
+
+export type Command = SlashCommand | ContextMenuCommand | GroupCommand | ButtonCommand | SubCommand;
 
 export enum CommandType {
 	Slash,

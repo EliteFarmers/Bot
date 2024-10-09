@@ -1,15 +1,14 @@
-import { ContextMenuCommandBuilder, UserContextMenuCommandInteraction } from 'discord.js';
+import { UserContextMenuCommandInteraction } from 'discord.js';
 import { FetchAccount } from '../api/elite.js';
-import { Command, CommandAccess, CommandType } from '../classes/commands/index.js';
+import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
 
-const settings: Command = {
+const settings = new EliteCommand({
 	name: 'Get Linked Account',
 	description: "Get a user's linked account if they have one.",
 	type: CommandType.UserContextMenu,
 	access: CommandAccess.Everywhere,
-	slash: new ContextMenuCommandBuilder().setType(2),
 	execute: execute,
-};
+});
 
 export default settings;
 

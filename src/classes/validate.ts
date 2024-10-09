@@ -1,16 +1,39 @@
+import { components } from 'api/api.js';
+import { EmbedBuilder } from 'discord.js';
 import { FetchAccount } from '../api/elite.js';
-import { Command } from './commands/index.js';
+import { EliteCommand } from './commands/index.js';
 import { ErrorEmbed, WarningEmbed } from './embeds.js';
 
-export async function getAccount(playerId: string, profileId: string, command: Command) {
-	const { data: account } = await FetchAccount(playerId).catch(() => ({
-		data: undefined,
-	}));
+type AccountWithNameAndId = Required<Pick<components['schemas']['MinecraftAccountDto'], 'id' | 'name'>> &
+	components['schemas']['MinecraftAccountDto'];
+
+export type GetAccountReturn =
+	| {
+			success: false;
+			embed: EmbedBuilder;
+	  }
+	| {
+			success: true;
+			account: AccountWithNameAndId;
+			profile: components['schemas']['ProfileDetailsDto'];
+			name: string;
+	  };
+
+export async function getAccount(
+	playerId: string | undefined,
+	profileId: string | undefined,
+	command: EliteCommand,
+): Promise<GetAccountReturn> {
+	const { data: account } = playerId
+		? await FetchAccount(playerId).catch(() => ({
+				data: undefined,
+			}))
+		: { data: undefined };
 
 	if (!account?.id || !account?.name) {
 		const embed = WarningEmbed('Invalid Username!').addFields({
 			name: 'Proper Usage:',
-			value: '`/weight` `player:`(player name)\nOr link your account with </verify:1135100641560248334> first!',
+			value: command.getUsage() ?? 'No usage information available.',
 		});
 
 		if (playerId) {
@@ -29,10 +52,12 @@ export async function getAccount(playerId: string, profileId: string, command: C
 		: (account.profiles?.find((p) => p.selected) ?? account.profiles?.[0]);
 
 	if (!profile?.profileId || !profile.profileName) {
-		const embed = ErrorEmbed('Invalid Profile!').setDescription(`Profile "${profileId}" does not exist.`).addFields({
-			name: 'Proper Usage:',
-			value: '`/weight` `player:`(player name) `profile:`(profile name)',
-		});
+		const embed = ErrorEmbed('Invalid Profile!')
+			.setDescription(`Profile "${profileId}" does not exist.`)
+			.addFields({
+				name: 'Proper Usage:',
+				value: command.getUsage() ?? 'No usage information available.',
+			});
 
 		if (!profileId) {
 			embed.setDescription('This player has no profiles!');
@@ -41,5 +66,5 @@ export async function getAccount(playerId: string, profileId: string, command: C
 		return { success: false, embed };
 	}
 
-	return { success: true, account, profile, name: playerId };
+	return { success: true, account: account as AccountWithNameAndId, profile, name: account.name };
 }

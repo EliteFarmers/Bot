@@ -1,38 +1,29 @@
-import {
-	ActionRowBuilder,
-	ButtonBuilder,
-	ButtonStyle,
-	ChatInputCommandInteraction,
-	ComponentType,
-	SlashCommandBuilder,
-} from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType } from 'discord.js';
 import { components } from '../api/api.js';
 import { FetchAccount, FetchLeaderboardRank, FetchLeaderboardSlice, UserSettings } from '../api/elite.js';
-import { autocomplete as lbAuto, leaderboardOption } from '../autocomplete/leaderboard.js';
-import { autocomplete as playerAuto, playerOption } from '../autocomplete/player.js';
-import { Command, CommandAccess, CommandType } from '../classes/commands/index.js';
+import { eliteLeaderboardOption } from '../autocomplete/leaderboard.js';
+import { elitePlayerOption } from '../autocomplete/player.js';
+import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed } from '../classes/embeds.js';
+import { getAccount } from '../classes/validate.js';
 
-const command: Command = {
+const command = new EliteCommand({
 	name: 'leaderboard',
 	description: 'Get a leaderboard',
-	usage: '(username)',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
-	autocomplete: {
-		player: playerAuto,
-		name: lbAuto,
+	options: {
+		leaderboard: eliteLeaderboardOption,
+		player: elitePlayerOption,
+		rank: {
+			name: 'rank',
+			description: 'Jump to a specific rank!',
+			type: SlashCommandOptionType.Integer,
+			builder: (b) => b.setMinValue(1),
+		},
 	},
-	slash: new SlashCommandBuilder()
-		.setName('leaderboard')
-		.setDescription('Get a leaderboard!')
-		.addStringOption(leaderboardOption())
-		.addStringOption(playerOption())
-		.addIntegerOption((option) =>
-			option.setName('rank').setDescription('Jump to a specific rank!').setMinValue(1).setRequired(false),
-		),
 	execute: execute,
-};
+});
 
 export default command;
 
@@ -45,22 +36,14 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	let givenIndex = 0;
 
 	if (playerName !== undefined) {
-		const player = await FetchAccount(playerName)
-			.then((res) => {
-				return res.data;
-			})
-			.catch(() => undefined);
-		const selectedProfile = player?.profiles?.find((p) => p?.selected) ?? player?.profiles?.[0];
+		const result = await getAccount(playerName, undefined, command);
 
-		if (!selectedProfile?.profileId) {
-			const embed = ErrorEmbed('Invalid User!').setDescription(`User "${playerName}" does not exist.`).addFields({
-				name: 'Proper Usage:',
-				value: '`/leaderboard` `player:`(player name)',
-			});
-			await interaction.deleteReply().catch(() => undefined);
-			interaction.followUp({ embeds: [embed], ephemeral: true });
+		if (!result.success) {
+			await interaction.editReply({ embeds: [result.embed] });
 			return;
 		}
+
+		const { account: player, profile: selectedProfile } = result;
 
 		const rank = await FetchLeaderboardRank(leaderboardId, player?.id ?? '', selectedProfile?.profileId)
 			.then((res) => {

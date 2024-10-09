@@ -1,16 +1,16 @@
 import { ButtonInteraction } from 'discord.js';
 import { UserSettings } from '../api/elite.js';
-import { Command, CommandAccess, CommandType } from '../classes/commands/index.js';
+import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
 import { EliteEmbed } from '../classes/embeds.js';
 
-const command: Command = {
+const command = new EliteCommand({
 	name: 'GAININFO',
 	description: 'Get information about the gain command!',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Button,
 	fetchSettings: true,
 	execute: execute,
-};
+});
 
 export default command;
 

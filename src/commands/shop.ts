@@ -1,15 +1,15 @@
 import { ChatInputCommandInteraction } from 'discord.js';
 import { UserSettings } from '../api/elite.js';
-import { Command, CommandAccess, CommandType } from '../classes/commands/index.js';
+import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
 import { EliteEmbed } from '../classes/embeds.js';
 
-const command: Command = {
+const command = new EliteCommand({
 	name: 'shop',
 	description: 'View the shop!',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
 	execute: execute,
-};
+});
 
 export default command;
 

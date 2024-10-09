@@ -1,17 +1,17 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, PermissionFlagsBits } from 'discord.js';
 import { FetchGuildJacob } from '../api/elite.js';
-import { Command, CommandAccess, CommandType } from '../classes/commands/index.js';
+import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed } from '../classes/embeds.js';
 import { getLeaderboardEmbed } from './submitscores.js';
 
-const command: Command = {
+const command = new EliteCommand({
 	name: 'LBSETUP',
 	description: 'Setup a jacob leaderboard!',
 	permissions: PermissionFlagsBits.Administrator | PermissionFlagsBits.ManageGuild,
 	access: CommandAccess.Guild,
 	type: CommandType.Button,
 	execute: execute,
-};
+});
 
 export default command;
 

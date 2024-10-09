@@ -13,7 +13,7 @@ import {
 import { FetchGuild, FetchUserSettings } from '../api/elite.js';
 import { commands } from '../bot.js';
 import { HasRole, isValidAccess } from '../classes/Util.js';
-import { Command, CommandGroup, CommandType, getAutocomplete } from '../classes/commands/index.js';
+import { Command, CommandGroup, CommandType, EliteCommand, getAutocomplete } from '../classes/commands/index.js';
 
 const settings = {
 	event: Events.InteractionCreate,
@@ -33,9 +33,11 @@ async function execute(interaction: Interaction) {
 }
 
 async function OnCommandInteraction(interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction) {
-	const command = interaction.isChatInputCommand()
-		? GetCommand(interaction.commandName, CommandType.Slash)
-		: GetCommand(interaction.commandName, CommandType.UserContextMenu);
+	const command = GetCommand(interaction.commandName);
+	if (command instanceof EliteCommand) {
+		if (command.isChatInputCommand() && !interaction.isChatInputCommand()) return;
+		if (command.isContextMenuCommand() && !interaction.isContextMenuCommand()) return;
+	}
 
 	if (!command) return;
 
@@ -66,8 +68,8 @@ async function OnButtonInteraction(interaction: ButtonInteraction | StringSelect
 	const args = interaction.customId.split('|');
 	const commandName = args[0];
 
-	const command = GetCommand(commandName, CommandType.Button);
-	if (!command) return;
+	const command = GetCommand(commandName);
+	if (!command || command instanceof CommandGroup || !command.isButtonCommand()) return;
 
 	const hasPerms = await HasPermsAndAccess(command, interaction);
 	if (!hasPerms) return;
@@ -94,32 +96,24 @@ async function OnButtonInteraction(interaction: ButtonInteraction | StringSelect
 
 async function OnAutocompleteInteraction(interaction: AutocompleteInteraction) {
 	if (interaction.responded) return;
-	const command = GetCommand(interaction.commandName, CommandType.Autocomplete);
 
-	if (!command || !('autocomplete' in command)) return;
+	const command = GetCommand(interaction.commandName);
+	if (!command || command instanceof CommandGroup) return;
 
 	try {
-		const auto = await getAutocomplete(command, interaction);
+		const auto = command.getAutocomplete(interaction);
 		await auto?.(interaction);
 	} catch (error) {
 		console.log(error);
 	}
 }
 
-function GetCommand(name: string, type: CommandType): Command | CommandGroup | undefined {
-	const command: Command | CommandGroup | undefined = commands.get(name);
-
-	if (!command) return undefined;
-	// If type and command type are autocomplete it's valid
-	if (type === CommandType.Autocomplete && 'autocomplete' in command) return command;
-	// If the types don't match or the type isn't combo than it's invalid
-	if (command.type !== type && type !== CommandType.Combo) return undefined;
-
-	return command;
+function GetCommand(name: string): EliteCommand | CommandGroup | undefined {
+	return commands.get(name);
 }
 
 async function HasPermsAndAccess(
-	command: Command | CommandGroup,
+	command: EliteCommand | CommandGroup,
 	interaction: CommandInteraction | ButtonInteraction | StringSelectMenuInteraction,
 ) {
 	if (interaction.channel && !isValidAccess(command.access, interaction.channel.type)) return false;

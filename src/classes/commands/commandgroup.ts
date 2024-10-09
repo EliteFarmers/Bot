@@ -7,29 +7,31 @@ import {
 	SlashCommandSubcommandBuilder,
 	SlashCommandSubcommandsOnlyBuilder,
 } from 'discord.js';
-import { CommandAccess, CommandGroupSettings, CommandType, SubCommand } from './index.js';
+import { CommandAccess, CommandType, EliteCommand, GroupCommand } from './index.js';
 
-export class CommandGroup implements CommandGroupSettings {
+export class CommandGroup implements GroupCommand {
 	public declare name: string;
 	public declare description: string;
 	public declare access: CommandAccess;
-	public declare type: CommandType;
 	public declare permissions?: bigint;
+	public declare type: CommandType.Group;
 	public declare fetchSettings?: boolean | undefined;
+	public declare adminRoleOverride?: boolean | undefined;
 
 	public declare slash: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder;
 
 	private declare selfExecute: Function;
-	private declare subcommands: Record<string, SubCommand>;
+	public declare subcommands: Record<string, EliteCommand>;
 
-	constructor(settings: CommandGroupSettings) {
+	constructor(settings: GroupCommand) {
 		this.name = settings.name;
 		this.description = settings.description;
 		this.fetchSettings = settings.fetchSettings ?? false;
 
 		this.access = settings.access ?? CommandAccess.Everywhere;
-		this.type = settings.type ?? CommandType.Slash;
+		this.type = CommandType.Group;
 		this.permissions = settings.permissions;
+		this.adminRoleOverride = settings.adminRoleOverride;
 
 		this.slash = settings.slash ?? new SlashCommandBuilder().setName(this.name);
 		// .setDescription(this.description);
@@ -58,58 +60,37 @@ export class CommandGroup implements CommandGroupSettings {
 		}
 
 		const category = interaction.options.getSubcommand() ?? '';
-		const auto = this.subcommands[category]?.autocomplete;
-		if (!auto) return;
 
-		if (typeof auto === 'function') {
-			auto(interaction);
+		const auto = this.subcommands[category]?.getAutocomplete(interaction);
+		auto?.(interaction);
+		return;
+	}
+
+	public addSubcommand(subCommand: EliteCommand) {
+		if (!subCommand.isSubCommand() || !(subCommand.slash instanceof SlashCommandSubcommandBuilder)) {
 			return;
 		}
 
-		const focused = interaction.options.getFocused(true);
-		if (!focused) return;
-
-		auto[focused.name]?.(interaction);
-	}
-
-	public addSubcommand(subCommand: SubCommand) {
-		subCommand.slash ??= new SlashCommandSubcommandBuilder()
-			.setName(subCommand.name)
-			.setDescription(subCommand.description);
-
-		const slash = subCommand.slash;
-
-		if (typeof slash === 'object') {
-			if (!slash.name) slash.setName(subCommand.name);
-			if (!slash.description) slash.setDescription(subCommand.description);
+		if (!this.subcommands[subCommand.name]) {
+			this.subcommands[subCommand.name] = subCommand;
+			this.slash.addSubcommand(() => subCommand.slash as SlashCommandSubcommandBuilder);
+			subCommand.setParent(this);
 		}
-
-		this.slash.addSubcommand(slash);
-		this.subcommands[subCommand.name] = subCommand;
 	}
 
 	public getCommandJSON(): RESTPostAPIApplicationCommandsJSONBody | undefined {
-		if (
-			this.type !== CommandType.Slash &&
-			this.type !== CommandType.Combo &&
-			this.type !== CommandType.UserContextMenu
-		) {
-			return;
-		}
-
 		this.slash ??= new SlashCommandBuilder();
-		const slash = this.slash;
 
-		if (!slash.name) {
-			slash.setName(this.name);
+		if (!this.slash.name) {
+			this.slash.setName(this.name);
 		}
 
-		if ('setDescription' in slash && !slash.description) {
-			slash.setDescription(this.description);
+		if ('setDescription' in this.slash && !this.slash.description) {
+			this.slash.setDescription(this.description);
 		}
 
 		if (this.permissions) {
-			slash.setDefaultMemberPermissions(PermissionsBitField.resolve(this.permissions));
+			this.slash.setDefaultMemberPermissions(PermissionsBitField.resolve(this.permissions));
 		}
 
 		return this.slash.toJSON();

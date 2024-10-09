@@ -1,4 +1,5 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { getAccount } from 'classes/validate.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 import {
 	Crop,
 	PlayerOptions,
@@ -10,73 +11,43 @@ import {
 	getLevel,
 } from 'farming-weight';
 import { FetchAccount, FetchProfile, UserSettings } from '../api/elite.js';
-import { autocomplete, playerOption } from '../autocomplete/player.js';
+import { elitePlayerOption } from '../autocomplete/player.js';
 import { LEVELING_XP } from '../classes/Util.js';
-import { Command, CommandAccess, CommandType } from '../classes/commands/index.js';
+import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 
-const command: Command = {
+const command = new EliteCommand({
 	name: 'fortune',
 	description: 'Get a players farming fortune progress!',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
-	slash: new SlashCommandBuilder()
-		.addStringOption(playerOption())
-		.addStringOption((option) =>
-			option.setName('profile').setDescription('Optionally specify a profile!').setRequired(false),
-		),
+	options: {
+		player: elitePlayerOption,
+		profile: {
+			name: 'profile',
+			description: 'Optionally specify a profile!',
+			type: SlashCommandOptionType.String,
+		},
+	},
 	execute: execute,
-	autocomplete: autocomplete,
-};
+});
 
 export default command;
 
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
-	let playerName = interaction.options.getString('player', false)?.trim();
-	const _profileName = interaction.options.getString('profile', false)?.trim();
+	const playerNameInput = interaction.options.getString('player', false)?.trim();
+	const profileNameInput = interaction.options.getString('profile', false)?.trim();
 
 	await interaction.deferReply();
 
-	const { data: account } = await FetchAccount(playerName ?? interaction.user.id).catch(() => ({ data: undefined }));
+	const result = await getAccount(playerNameInput ?? interaction.user.id, profileNameInput, command);
 
-	if (!account?.id || !account?.name) {
-		const embed = WarningEmbed('Invalid Username!').addFields({
-			name: 'Proper Usage:',
-			value: '`/weight` `player:`(player name)\nOr link your account with </verify:1135100641560248334> first!',
-		});
-
-		if (playerName) {
-			embed.setDescription(`Player \`${playerName}\` does not exist (or an error occured)`);
-		} else {
-			embed.setDescription('You need to link your account or enter a playername!');
-		}
-
-		await interaction.deleteReply().catch(() => undefined);
-		interaction.followUp({ embeds: [embed], ephemeral: true });
+	if (!result.success) {
+		await interaction.editReply({ embeds: [result.embed] });
 		return;
 	}
 
-	playerName = account.name;
-
-	const profile = _profileName
-		? account.profiles?.find((p) => p?.profileName?.toLowerCase() === _profileName.toLowerCase())
-		: (account.profiles?.find((p) => p.selected) ?? account.profiles?.[0]);
-
-	if (!profile?.profileId || !profile.profileName) {
-		const embed = ErrorEmbed('Invalid Profile!').setDescription(`Profile "${_profileName}" does not exist.`).addFields({
-			name: 'Proper Usage:',
-			value: '`/weight` `player:`(player name) `profile:`(profile name)',
-		});
-
-		if (!_profileName) {
-			embed.setDescription('This player has no profiles!');
-		}
-
-		await interaction.deleteReply().catch(() => undefined);
-		interaction.followUp({ embeds: [embed], ephemeral: true });
-		return;
-	}
-
+	const { account, profile, name: playerName } = result;
 	const { data: member } = await FetchProfile(account.id, profile.profileId).catch(() => ({ data: undefined }));
 
 	if (!member) {
@@ -131,14 +102,23 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			{
 				name: 'Breakdown',
 				value: Object.entries(player.breakdown)
-					.map(([name, value]) => `**${name}**: ${value}`)
+					.map(([name, value]) => `**${name}**: ${value.toLocaleString()}`)
 					.join('\n'),
+				inline: true,
 			},
 			{
 				name: 'Wart Breakdown',
 				value: Object.entries(player.getCropFortune(Crop.NetherWart, player.getBestTool(Crop.NetherWart)).breakdown)
-					.map(([name, value]) => `**${name}**: ${value}`)
+					.map(([name, value]) => `**${name}**: ${value.toLocaleString()}`)
 					.join('\n'),
+				inline: true,
+			},
+			{
+				name: 'Gear Breakdown',
+				value: Object.entries(player.armorSet.getFortuneBreakdown())
+					.map(([name, value]) => `**${name}**: ${value.toLocaleString()}`)
+					.join('\n'),
+				inline: true,
 			},
 		);
 

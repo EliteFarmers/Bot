@@ -1,3 +1,4 @@
+import { elitePlayerOption } from 'autocomplete/player.js';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -6,32 +7,36 @@ import {
 	ChatInputCommandInteraction,
 	CommandInteraction,
 	ComponentType,
-	SlashCommandSubcommandBuilder,
 	StringSelectMenuBuilder,
 } from 'discord.js';
-import { FetchAccount, FetchProfile, UserSettings } from '../../api/elite.js';
-import { autocomplete, playerOption } from '../../autocomplete/player.js';
+import { FetchProfile, UserSettings } from '../../api/elite.js';
 import { GetReadableDate } from '../../classes/SkyblockDate.js';
 import { GetCropEmoji, GetMedalEmoji } from '../../classes/Util.js';
-import { SubCommand } from '../../classes/commands/index.js';
+import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../../classes/embeds.js';
+import { getAccount } from '../../classes/validate.js';
 
-const command: SubCommand = {
+const command = new EliteCommand({
 	name: 'player',
 	description: "Get jacob's stats of a player!",
-	slash: new SlashCommandSubcommandBuilder()
-		.addStringOption(playerOption())
-		.addStringOption((option) =>
-			option.setName('profile').setDescription('Optionally specify a profile!').setRequired(false),
-		),
+	access: CommandAccess.Everywhere,
+	type: CommandType.Slash,
+	subCommand: true,
+	options: {
+		player: elitePlayerOption,
+		profile: {
+			name: 'profile',
+			description: 'Optionally specify a profile!',
+			required: false,
+			type: SlashCommandOptionType.String,
+		},
+	},
 	execute: execute,
-	autocomplete,
-};
+});
 
 export default command;
 
 async function execute(interaction: ButtonInteraction | ChatInputCommandInteraction, settings?: UserSettings) {
-	console.log(settings);
 	if (interaction instanceof CommandInteraction) {
 		const args: JacobCMDArgs = {
 			playerName: interaction.options.getString('player', false) ?? undefined,
@@ -48,44 +53,20 @@ async function execute(interaction: ButtonInteraction | ChatInputCommandInteract
 }
 
 async function commandExecute(interaction: ChatInputCommandInteraction | ButtonInteraction, cmdArgs: JacobCMDArgs) {
-	let { playerName, profileName } = cmdArgs;
+	const { playerName: playerNameInput, profileName: profileNameInput } = cmdArgs;
 	const settings = cmdArgs.settings;
 
 	await interaction.deferReply();
 
-	const { data: account } = await FetchAccount(playerName ?? interaction.user.id).catch(() => ({ data: undefined }));
+	const result = await getAccount(playerNameInput ?? interaction.user.id, profileNameInput, command);
 
-	if (!account?.id || !account?.name) {
-		const embed = WarningEmbed('Specify a Username!')
-			.addFields({
-				name: 'Proper Usage:',
-				value: '`/jacob` `player:`(player name)',
-			})
-			.setDescription(
-				'Checking for yourself?\nYou must use `/verify` `player:`(account name) before using this shortcut!',
-			);
-		await interaction.deleteReply().catch(() => undefined);
-		interaction.followUp({ embeds: [embed], ephemeral: true });
+	if (!result.success) {
+		await interaction.editReply({ embeds: [result.embed] });
 		return;
 	}
 
-	playerName = account.name;
-
-	const profile = profileName
-		? account.profiles?.find((p) => p?.profileName?.toLowerCase() === profileName?.toLowerCase())
-		: (account.profiles?.find((p) => p.selected) ?? account.profiles?.[0]);
-
-	if (!profile?.profileId || !profile.profileName) {
-		const embed = ErrorEmbed('Invalid Profile!').setDescription(`Profile "${profileName}" does not exist.`).addFields({
-			name: 'Proper Usage:',
-			value: '`/jacob` `player:`(player name) `profile:`(profile name)',
-		});
-		await interaction.deleteReply().catch(() => undefined);
-		interaction.followUp({ embeds: [embed], ephemeral: true });
-		return;
-	}
-
-	profileName = profile.profileName;
+	const { account, profile, name: playerName } = result;
+	const profileName = profile.profileName;
 
 	const member = await FetchProfile(account.id, profile.profileId)
 		.then((res) => {

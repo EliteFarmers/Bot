@@ -1,35 +1,38 @@
-import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
+import { AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js';
 import { UserSettings } from '../api/elite.js';
 import { commands } from '../bot.js';
-import { Command, CommandAccess, CommandType } from '../classes/commands/index.js';
+import {
+	CommandAccess,
+	CommandGroup,
+	CommandType,
+	EliteCommand,
+	SlashCommandOptionType,
+} from '../classes/commands/index.js';
 import { EliteEmbed } from '../classes/embeds.js';
 
-const command: Command = {
+const command = new EliteCommand({
 	name: 'help',
 	description: 'All commands',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
-	slash: new SlashCommandBuilder()
-		.setName('help')
-		.setDescription('Get the help menu!')
-		.addStringOption((option) =>
-			option
-				.setName('command')
-				.setDescription('Specify a command for more info.')
-				.setRequired(false)
-				.addChoices(...generateCommandNameChoices()),
-		),
+	options: {
+		command: {
+			name: 'command',
+			description: 'Specify a command for more info.',
+			type: SlashCommandOptionType.String,
+			autocomplete,
+			required: false,
+		},
+	},
 	execute: execute,
-};
+});
 
 export default command;
 
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	const hCommand = interaction.options.getString('command', false) ?? undefined;
 
-	const newPrefix = '/';
 	let helpMenu;
-
 	if (!hCommand) {
 		helpMenu = getHelpEmbed();
 		return interaction.reply({
@@ -38,10 +41,11 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			ephemeral: true,
 		});
 	} else {
-		const name = hCommand.toLowerCase();
-		const command = commands.get(name);
+		const [name, sub = ''] = hCommand.toLowerCase().replace('/', '').trim().split('_');
+		const cmd = commands.get(name);
+		const command = cmd instanceof CommandGroup ? cmd.subcommands[sub] : cmd;
 
-		if (!command) {
+		if (!command || command instanceof CommandGroup || !command.isChatInputCommand()) {
 			const embed = getHelpEmbed();
 			return interaction.reply({
 				content: "That's not a valid command! Here's the menu instead.",
@@ -51,17 +55,11 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			});
 		}
 
-		const embed = new EmbedBuilder().setColor('#03fc7b').setTitle(`Usage for ${command.name}`);
-
-		const data = [];
-		data.push(`**Name:** ${command.name}`);
-
-		if (command.description) data.push(`**Description:** ${command.description}`);
-		if ('usage' in command && command.usage) data.push(`**Usage:** ${newPrefix}${command.name} ${command.usage}`);
+		const embed = EliteEmbed(settings).setTitle(`Usage for /${command.displayName}`);
 
 		embed.addFields({
 			name: 'Command Information',
-			value: `${data.join('\n')}`,
+			value: command.getUsage(true) ?? 'No usage information available.',
 			inline: false,
 		});
 
@@ -75,22 +73,24 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	function getHelpEmbed() {
 		const helpMenu = EliteEmbed(settings);
 
-		helpMenu.setTitle("Here's a list of all the commands:");
+		helpMenu.setTitle('All Commands');
+		const fields = [] as { name: string; value: string; inline: boolean }[];
 
-		commands.forEach((command) => {
-			if (command.type === CommandType.Button) return;
-			let value = command.description;
+		const cmds = Array.from(commands.values())
+			.filter((cmd) => cmd instanceof CommandGroup || cmd.isChatInputCommand() || cmd.isSubCommand())
+			.map((cmd) => (cmd instanceof CommandGroup ? Object.values(cmd.subcommands) : cmd))
+			.flat()
+			.sort((a, b) => a.displayName.localeCompare(b.displayName));
 
-			if ('usage' in command && command.usage) {
-				value += `\nUsage: ${newPrefix}${command.name} ${command.usage}`;
-			}
-
-			helpMenu.addFields({
-				name: `${newPrefix}${command.name}`,
-				value,
-				inline: false,
+		cmds.forEach((command) => {
+			fields.push({
+				name: '/' + command.displayName,
+				value: command.description,
+				inline: true,
 			});
 		});
+
+		helpMenu.addFields(fields.slice(0, 25));
 
 		helpMenu.setFooter({
 			text: `\nYou can send "/help [command name]" to get info on a specific command!`,
@@ -99,12 +99,53 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	}
 }
 
-function generateCommandNameChoices(): { name: string; value: string }[] {
-	const choices = [];
+export async function autocomplete(interaction: AutocompleteInteraction) {
+	if (interaction.responded) return;
 
-	for (const cmdName in commands) {
-		choices.push({ name: cmdName, value: cmdName });
+	const option = interaction.options.getFocused(true);
+	if (!option || option.name !== 'command') return;
+
+	const searchString = option.value.replace(/[^a-zA-Z0-9-]/g, '') || undefined;
+
+	if (!searchString) {
+		interaction.respond([
+			{ name: '/weight', value: 'weight' },
+			{ name: '/garden', value: 'garden' },
+			{ name: '/gain', value: 'gain' },
+		]);
+		return;
 	}
 
-	return choices;
+	const results = await getCommandOptions(searchString);
+
+	if (!results) {
+		interaction.respond([
+			{ name: '/weight', value: 'weight' },
+			{ name: '/garden', value: 'garden' },
+			{ name: '/gain', value: 'gain' },
+		]);
+		return;
+	}
+
+	interaction.respond(results);
+}
+
+async function getCommandOptions(commandName: string) {
+	commandName = commandName.toLowerCase().replace('/', '').trim();
+
+	const matchIndex = (str: string) => str.toLowerCase().indexOf(commandName);
+
+	const results = Array.from(commands.values())
+		.filter((cmd) => cmd instanceof CommandGroup || cmd.isChatInputCommand() || cmd.isSubCommand())
+		.map((cmd) => (cmd instanceof CommandGroup ? Object.values(cmd.subcommands) : cmd))
+		.flat()
+		.map((cmd) => cmd.displayName)
+		.filter((name) => name.includes(commandName) || name.toLowerCase().includes(commandName))
+		.sort((a, b) => matchIndex(a) - matchIndex(b))
+		.slice(0, 5);
+
+	return results?.map((name) => ({
+		name: '/' + name,
+		value: name.replaceAll(' ', '_'),
+	}));
 }

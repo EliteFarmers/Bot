@@ -1,10 +1,30 @@
 import { AutocompleteInteraction, SlashCommandIntegerOption } from 'discord.js';
 import { SkyBlockTime } from 'farming-weight';
+import { EliteSlashCommandOption, SlashCommandOptionType } from '../classes/commands/options.js';
+
+export const eliteYearOption: EliteSlashCommandOption = {
+	name: 'year',
+	description: 'The skyblock year to get results for!',
+	type: SlashCommandOptionType.Integer,
+	autocomplete: yearAutocomplete,
+	builder: (b) => b.setMinValue(100),
+};
 
 export function yearOption(description = 'The skyblock year to get results for!', required = false) {
 	return (builder: SlashCommandIntegerOption) =>
 		builder.setName('year').setDescription(description).setAutocomplete(true).setMinValue(100).setRequired(required);
 }
+
+export const eliteMonthOption: EliteSlashCommandOption = {
+	name: 'month',
+	description: 'The skyblock month to get results for!',
+	type: SlashCommandOptionType.Integer,
+	builder: (b) =>
+		b
+			.setMinValue(1)
+			.setMaxValue(12)
+			.setChoices(SkyBlockTime.MonthNames.map((name, i) => ({ name, value: i + 1 }))),
+};
 
 export function monthOption(description = 'The skyblock month to get results for!', required = false) {
 	return (builder: SlashCommandIntegerOption) =>
@@ -16,6 +36,13 @@ export function monthOption(description = 'The skyblock month to get results for
 			.setChoices(SkyBlockTime.MonthNames.map((name, i) => ({ name, value: i + 1 })))
 			.setRequired(required);
 }
+
+export const eliteDayOption: EliteSlashCommandOption = {
+	name: 'day',
+	description: 'The skyblock day to get results for!',
+	type: SlashCommandOptionType.Integer,
+	builder: (b) => b.setMinValue(1).setMaxValue(31),
+};
 
 export function dayOption(description = 'The skyblock day to get results for!', required = false) {
 	return (builder: SlashCommandIntegerOption) =>
