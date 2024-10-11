@@ -104,8 +104,13 @@ function getCommandJSON(
 		return command.getCommandJSON();
 	}
 
+	if (command.isContextMenuCommand()) {
+		const json = command.toJSON();
+		return json as RESTPostAPIContextMenuApplicationCommandsJSONBody;
+	}
+
 	if (command.isChatInputCommand() && !command.isSubCommand() && command.slash) {
 		const json = command.toJSON();
-		return json as RESTPostAPIApplicationCommandsJSONBody | RESTPostAPIContextMenuApplicationCommandsJSONBody;
+		return json as RESTPostAPIApplicationCommandsJSONBody;
 	}
 }
