@@ -9,7 +9,7 @@ const settings = {
 export default settings;
 
 async function execute(channel: GuildChannel) {
-	if (channel.isThread() || !channel.isTextBased()) return;
+	if (channel.isThread() || !channel.isTextBased() && channel.guildId) return;
 
-	await RequestGuildUpdate(channel.guild.id);
+	await RequestGuildUpdate(channel.guildId);
 }
