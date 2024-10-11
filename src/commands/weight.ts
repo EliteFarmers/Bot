@@ -1,4 +1,4 @@
-import { getAccount } from 'classes/validate.js';
+import { getAccount } from '../classes/validate.js';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
