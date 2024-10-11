@@ -1,20 +1,32 @@
-import { getAccount } from 'classes/validate.js';
-import { ChatInputCommandInteraction } from 'discord.js';
+import {
+	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+	ChatInputCommandInteraction,
+	StringSelectMenuBuilder,
+} from 'discord.js';
 import {
 	Crop,
+	FarmingPlayer,
+	FortuneSourceProgress,
+	GearSlot,
 	PlayerOptions,
+	UpgradeReason,
 	ZorroMode,
 	createFarmingPlayer,
+	getCropDisplayName,
 	getCropFromName,
 	getCropMilestoneLevels,
 	getGardenLevel,
 	getLevel,
 } from 'farming-weight';
-import { FetchAccount, FetchProfile, UserSettings } from '../api/elite.js';
+import { FetchProfile, UserSettings } from '../api/elite.js';
 import { elitePlayerOption } from '../autocomplete/player.js';
-import { LEVELING_XP } from '../classes/Util.js';
+import { CROP_ARRAY, CropSelectRow, GEAR_ARRAY, GetCropEmoji, LEVELING_XP, removeColorCodes } from '../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
-import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
+import { EliteEmbed, ErrorEmbed, NotYoursReply, PrefixFooter } from '../classes/embeds.js';
+import { progressBar } from '../classes/progressbar.js';
+import { getAccount } from '../classes/validate.js';
 
 const command = new EliteCommand({
 	name: 'fortune',
@@ -90,37 +102,247 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const player = createFarmingPlayer(options);
 
+	if (player.pets.length) {
+		player.selectPet(player.pets.sort((a, b) => b.fortune - a.fortune)[0]);
+	}
+
+	const url = `https://elitebot.dev/@${account.id}/${profile.profileId}/rates#fortune`;
+
+	const cropProgress = (crop: Crop) => {
+		const tool = player.getBestTool(crop);
+		if (tool) player.selectTool(tool);
+
+		const progress = player.getCropProgress(crop);
+		const total = progress.reduce((acc, curr) => acc + curr.fortune, 0);
+		const max = progress.reduce((acc, curr) => acc + curr.maxFortune, 0);
+
+		return (
+			`**${total.toLocaleString()}** / ${max.toLocaleString()} • ${GetCropEmoji(crop)}\n` +
+			`-# ${progressBar(Math.min(total / max, 1))}`
+		);
+	};
+
+	const sourceProgress = (source: FortuneSourceProgress) => {
+		const total = source.fortune;
+		const max = source.maxFortune;
+		const missing = source.api === false ? '⚠' : '**' + total.toLocaleString() + '**';
+
+		const name = source.wiki ? `[${source.name}](${source.wiki})` : source.name;
+
+		return (
+			`${missing} / ${max.toLocaleString()} • ${name} \n` +
+			(source.api === false
+				? `-# Configure this [on elitebot.dev!](${url})`
+				: `${progressBar(Math.min(total / max, 1))}`)
+		);
+	};
+
 	const embed = EliteEmbed(settings)
 		.setTitle(`Farming Fortune for ${playerName} (${profile.profileName})`)
-		.setDescription(
-			player.fortune +
-				'General Farming Fortune' +
-				player.getCropFortune(Crop.NetherWart, player.getBestTool(Crop.NetherWart)).fortune +
-				'Nether Wart Fortune',
-		)
+		.setDescription(`-# View more [on elitebot.dev!](${url})`)
 		.addFields(
 			{
-				name: 'Breakdown',
-				value: Object.entries(player.breakdown)
-					.map(([name, value]) => `**${name}**: ${value.toLocaleString()}`)
-					.join('\n'),
+				name: 'General Fortune',
+				value: player.getProgress().map(sourceProgress).join('\n'),
 				inline: true,
 			},
 			{
-				name: 'Wart Breakdown',
-				value: Object.entries(player.getCropFortune(Crop.NetherWart, player.getBestTool(Crop.NetherWart)).breakdown)
-					.map(([name, value]) => `**${name}**: ${value.toLocaleString()}`)
-					.join('\n'),
+				name: 'Gear Fortune',
+				value: player.armorSet.getProgress().map(sourceProgress).join('\n'),
 				inline: true,
 			},
 			{
-				name: 'Gear Breakdown',
-				value: Object.entries(player.armorSet.getFortuneBreakdown())
-					.map(([name, value]) => `**${name}**: ${value.toLocaleString()}`)
-					.join('\n'),
+				name: 'Crop Specific Fortune',
+				value:
+					`${cropProgress(Crop.Cactus)}\n` +
+					`${cropProgress(Crop.Carrot)}\n` +
+					`${cropProgress(Crop.CocoaBeans)}\n` +
+					`${cropProgress(Crop.Melon)}\n` +
+					`${cropProgress(Crop.Mushroom)}\n` +
+					`${cropProgress(Crop.NetherWart)}\n` +
+					`${cropProgress(Crop.Potato)}\n` +
+					`${cropProgress(Crop.Pumpkin)}\n` +
+					`${cropProgress(Crop.SugarCane)}\n` +
+					`${cropProgress(Crop.Wheat)}\n`,
 				inline: true,
 			},
 		);
 
-	interaction.editReply({ embeds: [embed] });
+	PrefixFooter(embed, `Sources with \"⚠\" don't exist in the Hypixel API and can only be set on elitebot.dev.`);
+
+	const row = CropSelectRow('crop-select-fortune', 'Select a crop to view its fortune!');
+	const gearRow = getGearRow(player);
+	const backButton = new ActionRowBuilder<ButtonBuilder>().addComponents(
+		new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId('home').setLabel('Main Page'),
+	);
+
+	const reply = await interaction.editReply({ embeds: [embed], components: [row, gearRow] });
+
+	const collector = reply.createMessageComponentCollector({
+		time: 120_000,
+	});
+
+	collector.on('collect', async (inter) => {
+		if (inter.user.id !== interaction.user.id) {
+			return NotYoursReply(inter);
+		}
+
+		collector.resetTimer();
+
+		if (inter.customId === 'crop-select-fortune') {
+			if (!inter.isStringSelectMenu()) return;
+
+			const selected = CROP_ARRAY[+inter.values[0]] as Crop;
+			const cropEmbed = getCropFortuneProgress(selected);
+
+			await inter.update({ embeds: [cropEmbed], components: [row, gearRow, backButton] });
+			return;
+		}
+
+		if (inter.customId === 'gear-select-fortune') {
+			if (!inter.isStringSelectMenu()) return;
+
+			const selected = GEAR_ARRAY[+inter.values[0]] as GearSlot;
+			const gearEmbed = getGearFortuneProgress(selected);
+
+			await inter.update({ embeds: [gearEmbed] });
+			return;
+		}
+
+		if (inter.customId === 'home') {
+			await inter.update({ embeds: [embed], components: [row, gearRow, backButton] });
+			return;
+		}
+	});
+
+	collector.on('end', async () => {
+		reply.edit({ components: [] }).catch(() => undefined);
+	});
+
+	function getCropFortuneProgress(crop: Crop) {
+		const tool = player.getBestTool(crop);
+		if (tool) player.selectTool(tool);
+
+		const cropFortune = player.getCropFortune(crop);
+		const progress = player.getCropProgress(crop);
+
+		const thisSource = progress.find((source) => source.name === 'Farming Tool');
+
+		const embed = EliteEmbed(settings)
+			.setTitle(`Farming Fortune for ${playerName} (${profile.profileName})`)
+			.setDescription(
+				`${getCropDisplayName(crop)} Fortune • **${cropFortune.fortune.toLocaleString()}** / ${progress.reduce((acc, curr) => acc + curr.maxFortune, 0).toLocaleString()}` +
+					`\n-# View more [on elitebot.dev!](${url})`,
+			)
+			.addFields({
+				name: 'Fortune Sources',
+				value: progress.map(sourceProgress).join('\n'),
+				inline: true,
+			});
+
+		embed.addFields({
+			name: removeColorCodes(tool?.name ?? thisSource?.name ?? 'Farming Tool'),
+			value: thisSource?.progress?.map(sourceProgress)?.join('\n') ?? 'No Progress',
+			inline: true,
+		});
+
+		if (thisSource?.nextInfo) {
+			const next = thisSource.nextInfo;
+			const reason = thisSource.info?.upgrade;
+
+			let reasonText = '';
+			switch (reason?.reason) {
+				case UpgradeReason.DeadEnd:
+					reasonText = 'Switch To';
+					break;
+				case UpgradeReason.Situational:
+					reasonText = 'Also Consider';
+					break;
+				case UpgradeReason.NextTier:
+				default:
+					reasonText = 'Upgrade To';
+					break;
+			}
+
+			embed.addFields({
+				name: reasonText,
+				value: `[${next.name}](${next.wiki})` + (reason?.why ? `\n-# ${reason.why}` : ''),
+				inline: true,
+			});
+		}
+
+		return embed;
+	}
+
+	function getGearFortuneProgress(slot: GearSlot) {
+		const item = player.armorSet.getPiece(slot);
+		const progress = player.armorSet.getPieceProgress(slot);
+
+		const embed = EliteEmbed(settings)
+			.setTitle(`Farming Fortune for ${playerName} (${profile.profileName})`)
+			.setDescription(`Total Gear Fortune • **${player.armorSet.fortune.toLocaleString()}**`)
+			.addFields({
+				name: 'Gear Fortune',
+				value: player.armorSet.getProgress().map(sourceProgress).join('\n'),
+				inline: true,
+			});
+
+		if (progress?.length) {
+			embed.addFields({
+				name: removeColorCodes(item?.item.name ?? slot),
+				value: progress.map(sourceProgress).join('\n'),
+				inline: true,
+			});
+		} else {
+			embed.addFields({
+				name: 'No Progress',
+				value: "This piece of gear has no fortune sources (or you don't have an item)!",
+				inline: true,
+			});
+		}
+
+		const armorSources = player.armorSet.getProgress();
+		const thisSource = armorSources.find((source) => source.name === slot);
+
+		if (thisSource?.nextInfo) {
+			const next = thisSource.nextInfo;
+			const reason = thisSource.info?.upgrade;
+
+			let reasonText = '';
+			switch (reason?.reason) {
+				case UpgradeReason.DeadEnd:
+					reasonText = 'Switch To';
+					break;
+				case UpgradeReason.Situational:
+					reasonText = 'Also Consider';
+					break;
+				case UpgradeReason.NextTier:
+				default:
+					reasonText = 'Upgrade To';
+					break;
+			}
+
+			embed.addFields({
+				name: reasonText,
+				value: `[${next.name}](${next.wiki})` + (reason?.why ? `\n-# ${reason.why}` : ''),
+				inline: true,
+			});
+		}
+
+		return embed;
+	}
+}
+
+function getGearRow(player: FarmingPlayer) {
+	const options = GEAR_ARRAY.map((slot, i) => ({
+		label: removeColorCodes(player.armorSet.getPiece(slot)?.item.name ?? slot),
+		value: i.toString(),
+	}));
+
+	return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+		new StringSelectMenuBuilder()
+			.addOptions(...options)
+			.setCustomId('gear-select-fortune')
+			.setPlaceholder('Select a gear piece to view its fortune!'),
+	);
 }

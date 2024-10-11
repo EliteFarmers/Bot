@@ -10,6 +10,7 @@ import {
 	Snowflake,
 	StringSelectMenuBuilder,
 } from 'discord.js';
+import { Crop, GearSlot } from 'farming-weight';
 import { client } from '../bot.js';
 import { CommandAccess } from './commands/index.js';
 
@@ -146,6 +147,29 @@ const simpleCropNames = {
 	wheat: 'Wheat',
 };
 
+export const CROP_ARRAY = [
+	Crop.Cactus,
+	Crop.Carrot,
+	Crop.CocoaBeans,
+	Crop.Melon,
+	Crop.Mushroom,
+	Crop.NetherWart,
+	Crop.Potato,
+	Crop.Pumpkin,
+	Crop.SugarCane,
+	Crop.Wheat,
+];
+export const GEAR_ARRAY = [
+	GearSlot.Helmet,
+	GearSlot.Chestplate,
+	GearSlot.Leggings,
+	GearSlot.Boots,
+	GearSlot.Necklace,
+	GearSlot.Cloak,
+	GearSlot.Belt,
+	GearSlot.Gloves,
+];
+
 export function CropFromSimple(name: string) {
 	return simpleCropNames[name.toLowerCase() as keyof typeof simpleCropNames] ?? undefined;
 }
@@ -153,7 +177,7 @@ export function CropFromSimple(name: string) {
 export function GetCropEmoji(crop: string) {
 	if (crop.toLowerCase() === 'seeds') return '🌱';
 
-	const emoji = CropEmojis[crop as keyof typeof CropEmojis];
+	const emoji = CropEmojis[crop as keyof typeof CropEmojis] ?? EliteCropEmojis[crop as keyof typeof EliteCropEmojis];
 
 	if (emoji) return `<:${emoji.name}:${emoji.id}>`;
 
@@ -247,6 +271,19 @@ const CropEmojis = {
 	},
 };
 
+const EliteCropEmojis = {
+	[Crop.Cactus]: CropEmojis.Cactus,
+	[Crop.Carrot]: CropEmojis.Carrot,
+	[Crop.CocoaBeans]: CropEmojis['Cocoa Beans'],
+	[Crop.Melon]: CropEmojis.Melon,
+	[Crop.Mushroom]: CropEmojis.Mushroom,
+	[Crop.NetherWart]: CropEmojis['Nether Wart'],
+	[Crop.Potato]: CropEmojis.Potato,
+	[Crop.Pumpkin]: CropEmojis.Pumpkin,
+	[Crop.SugarCane]: CropEmojis['Sugar Cane'],
+	[Crop.Wheat]: CropEmojis.Wheat,
+};
+
 export async function GetPurchaseUpdateChannel(client: Client) {
 	const channel =
 		client.channels.cache.get(process.env.ENTITLEMENT_CHANNEL) ??
@@ -289,6 +326,10 @@ export function commandMd(client: Client, name: string) {
 	const command = client.application?.commands.cache.find((c) => c.name === name);
 	if (!command) return '`/' + name + '`';
 	return `</${name}:${command.id}>`;
+}
+
+export function removeColorCodes(str: string) {
+	return str.replace(/§[0-9a-fklmnor]/g, '');
 }
 
 export const LEVELING_XP = [
