@@ -9,7 +9,7 @@ import {
 	EmbedBuilder,
 } from 'discord.js';
 import { getCropFromName, getLevel } from 'farming-weight';
-import { FetchAccount, FetchLeaderboardRankings, FetchProfile, UserSettings } from '../api/elite.js';
+import { FetchLeaderboardRankings, FetchProfile, UserSettings } from '../api/elite.js';
 import { elitePlayerOption } from '../autocomplete/player.js';
 import { GetCropEmoji, LEVELING_XP } from '../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';

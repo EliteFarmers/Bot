@@ -1,4 +1,4 @@
-import { elitePlayerOption } from 'autocomplete/player.js';
+import { elitePlayerOption } from '../../autocomplete/player.js';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
