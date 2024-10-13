@@ -78,7 +78,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	await interaction.deferReply();
 
-	const result = await getAccount(playerNameInput ?? interaction.user.id, profileNameInput, command);
+	const result = await getAccount(playerNameInput, profileNameInput, command, interaction.user.id);
 
 	if (!result.success) {
 		await interaction.editReply({ embeds: [result.embed] });

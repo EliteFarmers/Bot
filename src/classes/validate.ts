@@ -23,16 +23,29 @@ export async function getAccount(
 	playerId: string | undefined,
 	profileId: string | undefined,
 	command: EliteCommand,
+	userId?: string,
 ): Promise<GetAccountReturn> {
-	const { data: account } = playerId
-		? await FetchAccount(playerId).catch(() => ({
+	const { data: account } = (playerId || userId)
+		? await FetchAccount((playerId ?? userId) as string).catch(() => ({
 				data: undefined,
 			}))
 		: { data: undefined };
 
 	if (!account?.id || !account?.name) {
+		// Check if account wasn't linked
+		if (userId) {
+			const embed = WarningEmbed('Account not linked!').addFields({
+				name: 'Proper Usage',
+				value: command.getUsage() ?? 'No usage information available.',
+			});
+
+			embed.setDescription(`In order to use this command without specifying a player name, you need to link your account with </verify:1135100641560248334> first!`);
+	
+			return { success: false, embed };
+		}
+
 		const embed = WarningEmbed('Invalid Username!').addFields({
-			name: 'Proper Usage:',
+			name: 'Proper Usage',
 			value: command.getUsage() ?? 'No usage information available.',
 		});
 
