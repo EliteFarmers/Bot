@@ -40,7 +40,7 @@ dependencies:
     version: 14.16.3(bufferutil@4.0.8)(utf-8-validate@6.0.4)
   farming-weight:
     specifier: ^0.6.3
-    version: 0.6.3
+    version: 0.6.4
   openapi-fetch:
     specifier: ^0.12.0
     version: 0.12.2
@@ -1410,8 +1410,8 @@ packages:
       '@esbuild/win32-x64': 0.18.20
     dev: true
 
-  /farming-weight@0.6.3:
-    resolution: {integrity: sha512-PgyfyV5OceXustDmBKlxBKgTpfno305OTh51U1/4dL9dQH9SoribLuSwCF3nYSiXN8SCL2pmuTyAapnm1FREhw==}
+  /farming-weight@0.6.4:
+    resolution: {integrity: sha512-T6PycM+MrF1oDEpJJjLXTuXk1ARB8EIguiLD8zgez4W+bcsrwSJXH5h/WifYDf/hQ+jF5qxU0wBcGz1jitSAbw==}
     dev: false
 
   /fast-deep-equal@3.1.3:
