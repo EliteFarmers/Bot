@@ -33,7 +33,7 @@ export async function getAccount(
 
 	if (!account?.id || !account?.name) {
 		// Check if account wasn't linked
-		if (userId) {
+		if (userId && !playerId) {
 			const embed = WarningEmbed('Account not linked!').addFields({
 				name: 'Proper Usage',
 				value: command.getUsage() ?? 'No usage information available.',
