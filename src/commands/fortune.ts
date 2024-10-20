@@ -231,7 +231,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const embed = EliteEmbed(settings)
 			.setTitle(`Farming Fortune for ${playerName} (${profile.profileName})`)
 			.setDescription(
-				`${getCropDisplayName(crop)} Fortune • **${cropFortune.fortune.toLocaleString()}** / ${progress.reduce((acc, curr) => acc + curr.maxFortune, 0).toLocaleString()}` +
+				`${GetCropEmoji(crop)} ${getCropDisplayName(crop)} Fortune • **${cropFortune.fortune.toLocaleString()}** / ${progress.reduce((acc, curr) => acc + curr.maxFortune, 0).toLocaleString()}` +
 					`\n-# View more [on elitebot.dev!](${url})`,
 			)
 			.addFields({
