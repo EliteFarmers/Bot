@@ -1,4 +1,3 @@
-import { elitePlayerOption } from '../../autocomplete/player.js';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -10,6 +9,7 @@ import {
 	StringSelectMenuBuilder,
 } from 'discord.js';
 import { FetchProfile, UserSettings } from '../../api/elite.js';
+import { elitePlayerOption } from '../../autocomplete/player.js';
 import { GetReadableDate } from '../../classes/SkyblockDate.js';
 import { GetCropEmoji, GetMedalEmoji } from '../../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../../classes/commands/index.js';

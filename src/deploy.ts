@@ -26,23 +26,22 @@ const proccessArgs = process.argv.slice(1);
 async function loadCommands() {
 	const filter = (fileName: string) => fileName.endsWith('.ts') || fileName.endsWith('.js');
 
-	registerFiles<EliteCommand>('commands', filter, (cmd) => {
+	await registerFiles<EliteCommand>('commands', filter, (cmd) => {
 		commands.set(cmd.name, cmd);
 	});
 
 	const subFilter = (fileName: string) => filter(fileName) && !fileName.includes('command');
 
-	registerCommandGroups('commands', async (folder, group) => {
+	await registerCommandGroups('commands', async (folder, group) => {
 		const command = new CommandGroup(group);
 
-		registerFiles<EliteCommand>(folder, subFilter, (cmd) => {
+		await registerFiles<EliteCommand>(folder, subFilter, (cmd) => {
 			command.addSubcommand(cmd);
+			console.log('Loaded subcommand: ' + cmd.name);
 		});
 
 		commands.set(command.name, command);
 	});
-
-	await new Promise<void>((resolve) => setTimeout(resolve, 3000));
 }
 
 const rest = new REST().setToken(process.env.BOT_TOKEN);
@@ -50,6 +49,7 @@ const rest = new REST().setToken(process.env.BOT_TOKEN);
 (async () => {
 	await loadCommands();
 	console.log('Loaded ' + commands.size + ' commands');
+
 	const json = Array.from(commands.values())
 		.map(getCommandJSON)
 		.filter((json) => json) as RESTPostAPIApplicationCommandsJSONBody[];

@@ -39,10 +39,10 @@ const deploying = process.argv.some((arg) => arg.includes('deploy'));
 
 	const subFilter = (fileName: string) => filter(fileName) && !fileName.includes('command');
 
-	registerCommandGroups('commands', (folder, group) => {
+	registerCommandGroups('commands', async (folder, group) => {
 		const command = new CommandGroup(group);
 
-		registerFiles<EliteCommand>(folder, subFilter, (cmd) => {
+		await registerFiles<EliteCommand>(folder, subFilter, (cmd) => {
 			command.addSubcommand(cmd);
 		});
 

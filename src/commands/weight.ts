@@ -1,4 +1,3 @@
-import { getAccount } from '../classes/validate.js';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -14,6 +13,7 @@ import { elitePlayerOption } from '../autocomplete/player.js';
 import { GetCropEmoji, LEVELING_XP } from '../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 import { EliteEmbed, EmptyField, EmptyString, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
+import { getAccount } from '../classes/validate.js';
 import { getCustomFormatter } from '../weight/custom.js';
 
 const command = new EliteCommand({

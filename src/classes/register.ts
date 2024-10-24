@@ -14,13 +14,16 @@ export async function registerFiles<T>(
 	}
 }
 
-export async function registerCommandGroups(folder: string, callback: (folder: string, group: CommandGroup) => void) {
+export async function registerCommandGroups(
+	folder: string,
+	callback: (folder: string, group: CommandGroup) => Promise<void>,
+) {
 	const files = fs
 		.readdirSync(`./src/${folder}`)
 		.filter((fileName) => fs.lstatSync(`./src/${folder}/${fileName}`).isDirectory());
 
 	for (const file of files) {
 		const imported = await import(`../${folder}/${file}/command.js`);
-		callback(`${folder}/${file}`, imported.default);
+		await callback(`${folder}/${file}`, imported.default);
 	}
 }
