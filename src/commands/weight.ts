@@ -82,7 +82,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const weightRank = rankings?.misc?.farmingweight ?? -1;
 
 	const badge = account.badges?.filter((b) => b?.visible).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))[0];
-	const badgeId = badge?.imageId ? `https://cdn.elitebot.dev/u/${badge.imageId}.png` : '';
+	const badgeId = badge?.image.url ?? '';
 
 	// Apply override if set
 	const style = settings?.features?.weightStyleOverride ? (settings.weightStyle?.id ?? undefined) : undefined;
