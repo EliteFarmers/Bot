@@ -18,6 +18,7 @@ Clicking "More Info" reveals a specific breakdown of where your weight comes fro
 
 ---
 ### /rates
+Check out the estimated collection and coin rates based on your inputs.
 
 **Usage:** `/rates` `(fortune): <farming fortune>` `(time): <session length>` `(reforge): <tool reforge>` `(pet): <farming pet>` `(bps): <breaks per second>`
 
@@ -36,7 +37,7 @@ Specifying a player name or position will jump to their location on the leaderbo
 
 ---
 ### /jacob player
-Check out your Jacob's contest stats!
+Check out your Jacob's contest stats.
 
 **Usage:** `/jacob player` `(player): <ign>` `(profile): <name>`
 
@@ -44,7 +45,7 @@ Check out your Jacob's contest stats!
 
 ---
 ### /jacob fortune
-Check how much fortune you will need for each bracket in a contest!
+Check how much fortune you will need for each bracket in a contest.
 
 **Usage:** `/jacob fortune` `(bps): <breaks per second>` `(dicer): <include rng drop>` `(mooshroom): <include mooshroom cow drops>`
 
@@ -52,7 +53,7 @@ Check how much fortune you will need for each bracket in a contest!
 
 ---
 ### /fortune
-View your estimated fortune to see what you can do to improve!
+View your estimated fortune to see what you can do to improve.
 
 **Usage:** `/fortune` `(player): <ign>` `(profile): <name>`
 
@@ -62,7 +63,7 @@ View your estimated fortune to see what you can do to improve!
 
 ---
 ### /gain
-Check your collection and weight gain over the past week! View your profile on [elitebot.dev](https://elitebot.dev/) for a more detailed version
+Check your collection and weight gain over the past week. View your profile on [elitebot.dev](https://elitebot.dev/) for a more detailed version.
 
 **Usage:** `/gain` `(player): <ign>` `(profile): <name>`
 
@@ -70,7 +71,7 @@ Check your collection and weight gain over the past week! View your profile on [
 
 ---
 ### /garden
-Proudly display how maxed your garden is!
+Proudly display how maxed your garden is.
 
 **Usage:** `/garden` `(player): <ign>` `(profile): <name>`
 
@@ -78,7 +79,7 @@ Proudly display how maxed your garden is!
 
 ---
 ### /contest
-View the top players for a specific contest!
+View the top players for a specific contest.
 
 **Usage:** `/contest` `[year]: <skyblock year>` `[month] <skyblock month>` `[day] <skyblock day>`
 
