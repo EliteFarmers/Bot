@@ -3,24 +3,33 @@
 Use the `/help` command to see the list in Discord!
 
 A command argument wrapped in `(` `)` means that it's optional, while `[` `]` is required, Discord will reflect this.
+<br>
+<br>
 
 ---
 ### /weight
 The heart and soul of the bot.
 
-**Usage:** `/weight` `(playerName): <ign>` `(profile): <name>`
+**Usage:** `/weight` `(player): <ign>` `(profile): <name>`
 
-![weight](https://github.com/user-attachments/assets/3173080b-e020-4b20-a110-d49d39c7edc1)
+<img src="https://github.com/user-attachments/assets/3173080b-e020-4b20-a110-d49d39c7edc1" alt="weight" style="width:500px;"/>
 
 Clicking "More Info" reveals a specific breakdown of where your weight comes from.
+
+---
+### /rates
+
+**Usage:** `/rates` `(fortune): <farming fortune>` `(time): <session length>` `(reforge): <tool reforge>` `(pet): <farming pet>` `(bps): <breaks per second>`
+
+<img src="https://github.com/user-attachments/assets/81859c43-ffce-45aa-8c1b-85e4735fc336" alt="rates" style="width:500px;"/>
 
 ---
 ### /leaderboard
 The fantastic flex, and largest letdown.
 
-**Usage:** `/leaderboard` `(leaderboard): <type>` `(playerName): <ign>` `(rank): <position>`
+**Usage:** `/leaderboard` `(leaderboard): <type>` `(player): <ign>` `(rank): <position>`
 
-![leaderboard](https://github.com/user-attachments/assets/59115215-99c6-4683-9123-e78012dcde07)
+<img src="https://github.com/user-attachments/assets/59115215-99c6-4683-9123-e78012dcde07" alt="leaderboard" style="width:500px;"/>
 
 Specifying a player name or position will jump to their location on the leaderboard. Please note that scores may take up to 1 minute to update values.
 
@@ -28,27 +37,81 @@ Specifying a player name or position will jump to their location on the leaderbo
 ### /jacob player
 Check out your Jacob's contest stats!
 
-**Usage:** `/jacob player` `(playerName): <ign>` `(profile): <name>`
+**Usage:** `/jacob player` `(player): <ign>` `(profile): <name>`
 
-![jacob player](https://github.com/user-attachments/assets/d20abab4-8c71-4f0c-a315-fe32142a742a)
+<img src="https://github.com/user-attachments/assets/d20abab4-8c71-4f0c-a315-fe32142a742a" alt="drawing" style="width:500px;"/>
 
+---
 ### /jacob fortune
 Check how much fortune you will need for each bracket in a contest!
 
-![jacob fortune](https://github.com/user-attachments/assets/70143f8f-07b3-4e22-a97a-9f5f62dc7aac)
+**Usage:** `/jacob fortune` `(bps): <breaks per second>` `(dicer): <include rng drop>` `(mooshroom): <include mooshroom cow drops>`
+
+<img src="https://github.com/user-attachments/assets/70143f8f-07b3-4e22-a97a-9f5f62dc7aac" alt="drawing" style="width:500px;"/>
 
 ---
+### /fortune
+View your estimated fortune to see what you can do to improve!
+
+**Usage:** `/fortune` `(player): <ign>` `(profile): <name>`
+
+<img src="https://github.com/user-attachments/assets/35fa9189-641d-47cf-ac3e-ad2faed9de18" alt="main page" style="width:300px;"/>
+<img src="https://github.com/user-attachments/assets/6379e5a2-374e-4a1f-b22e-16faaacee590" alt="crop page" style="width:248px;"/>
+<img src="https://github.com/user-attachments/assets/5dbe81b9-225b-4e9e-b212-10a35ffbb68e" alt="equipment page" style="width:241px;"/>
+
+---
+### /gain
+Check your collection and weight gain over the past week! View your profile on [elitebot.dev](https://elitebot.dev/) for a more detailed version
+
+**Usage:** `/gain` `(player): <ign>` `(profile): <name>`
+
+<img src="https://github.com/user-attachments/assets/83053605-81ce-45bc-a51f-665f023ce417" alt="gain" style="width:350px;"/>
+
+---
+### /garden
+Proudly display how maxxed your garden is!
+
+**Usage:** `/garden` `(player): <ign>` `(profile): <name>`
+
+<img src="https://github.com/user-attachments/assets/3582fcbf-ef9e-46f1-b97a-66200604cf50" alt="garden" style="width:350px;"/>
+
+---
+### /contest
+View the top players for a specific contest!
+
+**Usage:** `/contest` `[year]: <skyblock year>` `[month] <skyblock month>` `[day] <skyblock day>`
+
+<img src="https://github.com/user-attachments/assets/34c61178-479b-4302-8399-6b468fc4eaaa" alt="contest" style="width:500px;"/>
+
+## Info Commands
+
 ### /info
 For all your questions!
 
 **Usage:** `/info`
 
-![info](https://github.com/user-attachments/assets/df3903d9-54c9-4d2d-9e50-c5775e885ecf)
+<img src="https://github.com/user-attachments/assets/df3903d9-54c9-4d2d-9e50-c5775e885ecf" alt="info" style="width:500px;"/>
+
+---
+### /badges
+Check out all the amazing badges you can earn!
+
+**Usage:** `/badges`
+
+<img src="https://github.com/user-attachments/assets/618024a0-1377-46d2-9523-6b1bb43647c8" alt="badges" style="width:500px;"/>
 
 ---
 ### /verify
 Link your Minecraft account so you no longer need to specify your player name! In order for this to work you must have your discord linked on Hypixel. Run the same command again to remove the link.
 
-**Usage:** `/verify` `[playerName]: <ign>`
+**Usage:** `/verify` `[player]: <ign>`
 
-![verify](https://github.com/user-attachments/assets/c0296ab1-85cc-4980-ab0a-91533cad8a2e)
+<img src="https://github.com/user-attachments/assets/c0296ab1-85cc-4980-ab0a-91533cad8a2e" alt="verify" style="width:500px;"/>
+
+---
+### /shop
+Check out the elite shop to support the development of Elite!
+
+**Usage:** `/shop`
+
+<img src="https://github.com/user-attachments/assets/452de61a-c450-43d1-a599-c02fdb2bf0c0" alt="shop" style="width:500px;"/>

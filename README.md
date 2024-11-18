@@ -1,6 +1,6 @@
 # Elite Discord Bot
 
-![Verified](https://github.com/user-attachments/assets/30d29241-2ff1-4170-b2e7-83231c2cbab6)
+<img src="https://github.com/user-attachments/assets/30d29241-2ff1-4170-b2e7-83231c2cbab6" alt="verified discord app" style="width:400px;"/>
 
 Elite is a **verified** discord bot made for Hypixel Skyblock farmers, providing a custom weight system to compare stats. 
 *Originally made for the [Elite Skyblock Farmers](https://discord.gg/farms) discord.*
@@ -14,7 +14,11 @@ Farming weight shows a more accurate number that represents total time spent far
 ### [Click Me To Invite The Bot!](https://elitebot.dev/invite)
 
 
----
+## Features
+- Minecraft Account linking
+- Jacob contest leaderboards for both Elite farmers and Regular farmers
+- Check out the [Commands List](COMMANDS.md) for more
+
 
 ## Contributing
 
