@@ -22,6 +22,7 @@ Clicking "More Info" reveals a specific breakdown of where your weight comes fro
 **Usage:** `/rates` `(fortune): <farming fortune>` `(time): <session length>` `(reforge): <tool reforge>` `(pet): <farming pet>` `(bps): <breaks per second>`
 
 <img src="https://github.com/user-attachments/assets/81859c43-ffce-45aa-8c1b-85e4735fc336" alt="rates" style="width:500px;"/>
+<img src="https://github.com/user-attachments/assets/0ebc311f-37b0-43b3-8abe-57be33912942" alt="rates breakdown" style="width:404px;"/>
 
 ---
 ### /leaderboard
