@@ -55,9 +55,9 @@ View your estimated fortune to see what you can do to improve!
 
 **Usage:** `/fortune` `(player): <ign>` `(profile): <name>`
 
-<img src="https://github.com/user-attachments/assets/35fa9189-641d-47cf-ac3e-ad2faed9de18" alt="main page" style="width:300px;"/>
-<img src="https://github.com/user-attachments/assets/6379e5a2-374e-4a1f-b22e-16faaacee590" alt="crop page" style="width:248px;"/>
-<img src="https://github.com/user-attachments/assets/5dbe81b9-225b-4e9e-b212-10a35ffbb68e" alt="equipment page" style="width:241px;"/>
+<img src="https://github.com/user-attachments/assets/35fa9189-641d-47cf-ac3e-ad2faed9de18" alt="main page" style="width:350px;"/>
+<img src="https://github.com/user-attachments/assets/6379e5a2-374e-4a1f-b22e-16faaacee590" alt="crop page" style="width:290px;"/>
+<img src="https://github.com/user-attachments/assets/5dbe81b9-225b-4e9e-b212-10a35ffbb68e" alt="equipment page" style="width:282px;"/>
 
 ---
 ### /gain
