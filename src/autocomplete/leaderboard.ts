@@ -14,7 +14,7 @@ export const eliteLeaderboardOption: EliteSlashCommandOption = {
 export function leaderboardOption(required = true) {
 	return (builder: SlashCommandStringOption) =>
 		builder
-			.setName('name')
+			.setName('leaderboard')
 			.setDescription('The leaderboard to get results from.')
 			.setAutocomplete(true)
 			.setRequired(required);
@@ -26,7 +26,7 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
 	if (interaction.responded) return;
 
 	const option = interaction.options.getFocused(true);
-	if (!option || option.name !== 'name') return;
+	if (!option || option.name !== 'leaderboard') return;
 
 	const lbKey = option.value.replace(/[^a-zA-Z0-9-]/g, '') || undefined;
 
