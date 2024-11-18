@@ -29,7 +29,7 @@ export default command;
 
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	let playerName = interaction.options.getString('player', false) ?? undefined;
-	const leaderboardId = interaction.options.getString('name', false) ?? '';
+	const leaderboardId = interaction.options.getString('leaderboard', false) ?? '';
 
 	await interaction.deferReply();
 
