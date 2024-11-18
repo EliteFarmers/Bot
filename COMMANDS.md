@@ -70,7 +70,7 @@ Check your collection and weight gain over the past week! View your profile on [
 
 ---
 ### /garden
-Proudly display how maxxed your garden is!
+Proudly display how maxed your garden is!
 
 **Usage:** `/garden` `(player): <ign>` `(profile): <name>`
 
