@@ -78,7 +78,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			.slice(0, 5)
 			.map(({ playerName, playerUuid, profileUuid, collected, position, medal }) => {
 				return (
-					`**${!position || position === -1 ? '???' : position + 1}.** ${playerName?.replace(/_/g, '\\_') ?? 'Unknown'}` +
+					`**${position === undefined || position === -1 ? '???' : position + 1}.** ${playerName?.replace(/_/g, '\\_') ?? 'Unknown'}` +
 					`\n-# [⧉](https://elitebot.dev/@${playerUuid}/${profileUuid}) ${collected?.toLocaleString()} ${medal ? GetMedalEmoji(medal) : ''}`
 				);
 			})
