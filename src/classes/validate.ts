@@ -35,25 +35,26 @@ export async function getAccount(
 	if (!account?.id || !account?.name) {
 		// Check if account wasn't linked
 		if (userId && !playerId) {
-			const embed = WarningEmbed('Account not linked!').addFields({
+			const embed = ErrorEmbed('Account not linked!').addFields({
 				name: 'Proper Usage',
 				value: command.getUsage() ?? 'No usage information available.',
 			});
 
 			embed.setDescription(
-				`In order to use this command without specifying a player name, you need to link your account with </verify:1135100641560248334> first!`,
+				(profileId ? `You entered "${profileId}" as the \`profile\` option. Did you mean to specify the \`player\` parameter instead?\n\n` : '')
+				+ `In order to use this command without specifying a player name, you need to link your account with </verify:1135100641560248334> first!`
 			);
 
 			return { success: false, embed };
 		}
 
-		const embed = WarningEmbed('Invalid Username!').addFields({
+		const embed = ErrorEmbed('Invalid Username!').addFields({
 			name: 'Proper Usage',
 			value: command.getUsage() ?? 'No usage information available.',
 		});
 
 		if (playerId) {
-			embed.setDescription(`Player \`${playerId}\` does not exist (or an error occured)`);
+			embed.setDescription(`Player \`${playerId}\` does not exist!\n-# Or an error occured, try again later.`);
 		} else {
 			embed.setDescription('You need to link your account or enter a playername!');
 		}
