@@ -5,6 +5,7 @@ images/*.xcf
 !.env.example
 dist
 src/weight/testing.json
+*.bat
 
 # Sentry Config File
 .sentryclirc

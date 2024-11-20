@@ -3,10 +3,9 @@ import { components } from '../api/api.js';
 import { FetchWeightStyles, UserSettings } from '../api/elite.js';
 import { ErrorEmbed } from '../classes/embeds.js';
 import { WeightStyle, validStyle } from '../schemas/style.js';
+import { DEFAULT_STYLE } from './defaultstyle.js';
 import { createWeightEmbed } from './embed.js';
 import { createFromData } from './maker.js';
-
-import { DEFAULT_STYLE } from './defaultstyle.js';
 
 export interface CustomFormatterOptions {
 	settings?: UserSettings;
@@ -26,6 +25,8 @@ const formatters: Record<string, CustomFormatter> = {
 	data: createFromData,
 };
 
+// import * as TestStyle from './testing.json';
+
 let stylesCache: Record<number, components['schemas']['WeightStyleWithDataDto']> = {};
 
 export function getCustomFormatter(
@@ -35,6 +36,7 @@ export function getCustomFormatter(
 	let formatterName = 'data';
 	const styleId = style ?? options.account.settings?.weightStyle?.id;
 
+	// let styleData = TestStyle as unknown as WeightStyle;
 	let styleData = DEFAULT_STYLE;
 	if (styleId) {
 		const cached = stylesCache[styleId];
