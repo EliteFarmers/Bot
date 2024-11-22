@@ -2,7 +2,7 @@ import { components } from 'api/api.js';
 import { EmbedBuilder } from 'discord.js';
 import { FetchAccount } from '../api/elite.js';
 import { EliteCommand } from './commands/index.js';
-import { ErrorEmbed, WarningEmbed } from './embeds.js';
+import { ErrorEmbed } from './embeds.js';
 
 type AccountWithNameAndId = Required<Pick<components['schemas']['MinecraftAccountDto'], 'id' | 'name'>> &
 	components['schemas']['MinecraftAccountDto'];
@@ -41,8 +41,10 @@ export async function getAccount(
 			});
 
 			embed.setDescription(
-				(profileId ? `You entered "${profileId}" as the \`profile\` option. Did you mean to specify the \`player\` parameter instead?\n\n` : '')
-				+ `In order to use this command without specifying a player name, you need to link your account with </verify:1135100641560248334> first!`
+				(profileId
+					? `You entered "${profileId}" as the \`profile\` option. Did you mean to specify the \`player\` parameter instead?\n\n`
+					: '') +
+					`In order to use this command without specifying a player name, you need to link your account with </verify:1135100641560248334> first!`,
 			);
 
 			return { success: false, embed };
