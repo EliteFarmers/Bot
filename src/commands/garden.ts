@@ -12,9 +12,9 @@ import {
 	getGardenLevel,
 	groupGardenVisitors,
 } from 'farming-weight';
-import { FetchAccount, FetchProfile, UserSettings } from '../api/elite.js';
+import { FetchProfile, UserSettings } from '../api/elite.js';
 import { elitePlayerOption } from '../autocomplete/player.js';
-import { GetCropEmoji } from '../classes/Util.js';
+import { escapeIgn, GetCropEmoji } from '../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 import {
 	EliteEmbed,
@@ -92,7 +92,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	if (!member) {
 		const embed = ErrorEmbed("Couldn't fetch data!")
-			.setDescription(`Something went wrong when getting garden data for "${playerName}".`)
+			.setDescription(`Something went wrong when getting garden data for "${escapeIgn(playerName)}".`)
 			.setFooter({ text: 'Contact kaeso.dev if this continues to happen' });
 		await interaction.deleteReply().catch(() => undefined);
 		interaction.followUp({ embeds: [embed], ephemeral: true });
@@ -100,7 +100,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	}
 
 	if (!garden) {
-		const embed = WarningEmbed(`Stats for ${playerName.replace(/_/g, '\\_')}`)
+		const embed = WarningEmbed(`Stats for ${escapeIgn(playerName)}`)
 			.addFields({
 				name: 'Garden data not found!',
 				value: 'If garden is unlocked, please wait a moment and try again.',
@@ -179,7 +179,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	function getGardenPayload() {
 		const embed = EliteEmbed(settings).setTitle(
-			`Garden Stats for ${playerName?.replace(/_/g, '\\_')} (${profile?.profileName})`,
+			`Garden Stats for ${escapeIgn(playerName)} (${profile?.profileName})`,
 		);
 
 		const gardenLevel = getGardenLevel(garden?.experience ?? 0, overflow);
@@ -334,7 +334,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			.flat() as { name: string; value: string; inline: boolean }[];
 
 		const embed = EliteEmbed(settings)
-			.setTitle(`Visitors for ${playerName?.replace(/_/g, '\\_')} (${profile?.profileName})`)
+			.setTitle(`Visitors for ${escapeIgn(playerName)} (${profile?.profileName})`)
 			.setDescription(
 				`Unique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**/84 ${EmptyString} • ${EmptyString} Accepted • **${(garden?.completedVisitors ?? 0).toLocaleString()}** ${EmptyString} • ${EmptyString} Rejected • **${(rejectedVisitors ?? 0).toLocaleString()}**` +
 					'\nAcceptance Rate • **' +
@@ -431,7 +431,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			.flat() as { name: string; value: string; inline: boolean }[];
 
 		const embed = EliteEmbed(settings)
-			.setTitle(`Missing Visitors for ${playerName?.replace(/_/g, '\\_')} (${profile?.profileName})`)
+			.setTitle(`Missing Visitors for ${escapeIgn(playerName)} (${profile?.profileName})`)
 			.setDescription(
 				`Unique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**/84 ${EmptyString} • ${EmptyString} Accepted • **${(garden?.completedVisitors ?? 0).toLocaleString()}** ${EmptyString} • ${EmptyString} Rejected • **${(rejectedVisitors ?? 0).toLocaleString()}**` +
 					'\nAcceptance Rate • **' +

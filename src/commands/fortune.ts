@@ -22,7 +22,7 @@ import {
 } from 'farming-weight';
 import { FetchProfile, UserSettings } from '../api/elite.js';
 import { elitePlayerOption } from '../autocomplete/player.js';
-import { CROP_ARRAY, CropSelectRow, GEAR_ARRAY, GetCropEmoji, LEVELING_XP, removeColorCodes } from '../classes/Util.js';
+import { CROP_ARRAY, CropSelectRow, escapeIgn, GEAR_ARRAY, GetCropEmoji, LEVELING_XP, removeColorCodes } from '../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed, NotYoursReply, PrefixFooter } from '../classes/embeds.js';
 import { progressBar } from '../classes/progressbar.js';
@@ -64,7 +64,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	if (!member) {
 		const embed = ErrorEmbed("Couldn't fetch data!")
-			.setDescription(`Something went wrong when getting data for "${playerName}".`)
+			.setDescription(`Something went wrong when getting data for "${escapeIgn(playerName)}".`)
 			.setFooter({ text: 'Contact kaeso.dev if this continues to happen' });
 		await interaction.deleteReply().catch(() => undefined);
 		interaction.followUp({ embeds: [embed], ephemeral: true });
@@ -138,7 +138,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	};
 
 	const embed = EliteEmbed(settings)
-		.setTitle(`Farming Fortune for ${playerName} (${profile.profileName})`)
+		.setTitle(`Farming Fortune for ${escapeIgn(playerName)} (${profile.profileName})`)
 		.setDescription(`-# View more [on elitebot.dev!](${url})`)
 		.addFields(
 			{
@@ -229,7 +229,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const thisSource = progress.find((source) => source.name === 'Farming Tool');
 
 		const embed = EliteEmbed(settings)
-			.setTitle(`Farming Fortune for ${playerName} (${profile.profileName})`)
+			.setTitle(`Farming Fortune for ${escapeIgn(playerName)} (${profile.profileName})`)
 			.setDescription(
 				`${GetCropEmoji(crop)} ${getCropDisplayName(crop)} Fortune • **${cropFortune.fortune.toLocaleString()}** / ${progress.reduce((acc, curr) => acc + curr.maxFortune, 0).toLocaleString()}` +
 					`\n-# View more [on elitebot.dev!](${url})`,
@@ -279,7 +279,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const progress = player.armorSet.getPieceProgress(slot);
 
 		const embed = EliteEmbed(settings)
-			.setTitle(`Farming Fortune for ${playerName} (${profile.profileName})`)
+			.setTitle(`Farming Fortune for ${escapeIgn(playerName)} (${profile.profileName})`)
 			.setDescription(`Total Gear Fortune • **${player.armorSet.fortune.toLocaleString()}**`)
 			.addFields({
 				name: 'Gear Fortune',

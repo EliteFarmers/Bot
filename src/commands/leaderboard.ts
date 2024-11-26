@@ -1,11 +1,12 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType } from 'discord.js';
 import { components } from '../api/api.js';
-import { FetchAccount, FetchLeaderboardRank, FetchLeaderboardSlice, UserSettings } from '../api/elite.js';
+import { FetchLeaderboardRank, FetchLeaderboardSlice, UserSettings } from '../api/elite.js';
 import { eliteLeaderboardOption } from '../autocomplete/leaderboard.js';
 import { elitePlayerOption } from '../autocomplete/player.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed } from '../classes/embeds.js';
 import { getAccount } from '../classes/validate.js';
+import { escapeIgn } from '../classes/Util.js';
 
 const command = new EliteCommand({
 	name: 'leaderboard',
@@ -198,7 +199,7 @@ async function getEmbed(
 
 function getPlayerLbFields(entries: components['schemas']['LeaderboardEntryDto'][], index: number) {
 	return entries.map((entry, i) => ({
-		name: `#${index + i + 1} ${entry.ign?.replaceAll('_', '\\_') ?? 'Unknown'}⠀`,
+		name: `#${index + i + 1} ${escapeIgn(entry.ign) ?? 'Unknown'}⠀`,
 		value: `[⧉](https://elitebot.dev/@${entry.ign}/${encodeURIComponent(entry.profile ?? '')}) ${(entry.amount ?? 0).toLocaleString()}`,
 		inline: true,
 	}));
@@ -225,7 +226,7 @@ function getProfileLbFields(entries: components['schemas']['LeaderboardEntryDto'
 		}
 
 		return {
-			name: `#${index + i + 1} ${firstMember?.ign?.replaceAll('_', '\\_') ?? 'Unknown'}⠀`,
+			name: `#${index + i + 1} ${escapeIgn(firstMember?.ign) ?? 'Unknown'}⠀`,
 			value: `[⧉](https://elitebot.dev/@${firstMember?.ign}/${encodeURIComponent(entry.uuid ?? '')}/garden) ${(entry.amount ?? 0).toLocaleString()}${members}`,
 			inline: true,
 		};

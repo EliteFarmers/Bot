@@ -2,7 +2,7 @@ import { ButtonInteraction, ChannelType, EmbedBuilder, PermissionFlagsBits } fro
 import { components } from '../api/api.js';
 import { FetchAccount, FetchContests, FetchGuildJacob, UpdateGuildJacob } from '../api/elite.js';
 import { GetReadableDate } from '../classes/SkyblockDate.js';
-import { GetCropColor, GetCropEmoji, GetCropURL, GetEmbeddedTimestamp, UserHyperLink } from '../classes/Util.js';
+import { escapeIgn, GetCropColor, GetCropEmoji, GetCropURL, GetEmbeddedTimestamp, UserHyperLink } from '../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 
@@ -256,13 +256,13 @@ async function execute(interaction: ButtonInteraction) {
 						: `**New 3rd Place Score!**`;
 
 			if (old.uuid !== account.id) {
-				message += `\n<@${interaction.user.id}> **(${account.name})** has beaten <@${old.discordId}> (${old.ign}) by **${(collected - old.record.collected).toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`;
+				message += `\n<@${interaction.user.id}> **(${escapeIgn(account.name)})** has beaten <@${old.discordId}> (${old.ign}) by **${(collected - old.record.collected).toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`;
 			} else {
 				const improvement = collected - old.record.collected;
 				sendPing =
 					sendPing || (oldIndex === 0 && (improvement >= 500 || (leaderboard.pingForSmallImprovements ?? false)));
 
-				message += `\n<@${interaction.user.id}> **(${account.name})** improved their score by **${improvement.toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`;
+				message += `\n<@${interaction.user.id}> **(${escapeIgn(account.name)})** improved their score by **${improvement.toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`;
 			}
 
 			embed.setDescription((embed.data.description ?? '') + `\n${message}`);
@@ -272,7 +272,7 @@ async function execute(interaction: ButtonInteraction) {
 				scores.length === 0 ? '' : scores.length === 1 ? '**New 2nd Place Score!**\n' : '**New 3rd Place Score!**\n';
 			embed.setDescription(
 				(embed.data.description ?? '') +
-					`\n${prefix}<@${interaction.user.id}> **(${account.name})** has set a new score of **${collected.toLocaleString()}** collection! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`,
+					`\n${prefix}<@${interaction.user.id}> **(${escapeIgn(account.name)})** has set a new score of **${collected.toLocaleString()}** collection! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`,
 			);
 		}
 

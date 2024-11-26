@@ -2,7 +2,7 @@ import { fromUnixTime, getUnixTime, startOfDay } from 'date-fns';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction } from 'discord.js';
 import { FetchCollectionGraphs, UserSettings } from '../api/elite.js';
 import { elitePlayerOption } from '../autocomplete/player.js';
-import { GetCropEmoji } from '../classes/Util.js';
+import { escapeIgn, GetCropEmoji } from '../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 import { EliteEmbed, EmptyField, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 import { getAccount } from '../classes/validate.js';
@@ -49,7 +49,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	if (!collections) {
 		const embed = ErrorEmbed("Couldn't fetch data!")
-			.setDescription(`Something went wrong when getting data for "${playerName}".`)
+			.setDescription(`Something went wrong when getting data for "${escapeIgn(playerName)}".`)
 			.setFooter({ text: 'Contact kaeso.dev if this continues to happen' });
 		await interaction.deleteReply().catch(() => undefined);
 		interaction.followUp({ embeds: [embed], ephemeral: true });
@@ -57,9 +57,9 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	}
 
 	if (collections.length === 0) {
-		const embed = WarningEmbed(`Crop Gain for ${account.name} (${profile.profileName})`)
+		const embed = WarningEmbed(`Crop Gain for ${escapeIgn(account.name)} (${profile.profileName})`)
 			.setDescription(
-				`No collection data found. ${account.name} may not have farmed recently or has collections API disabled.` +
+				`No collection data found. ${escapeIgn(account.name)} may not have farmed recently or has collections API disabled.` +
 					` [Check Online Profile](https://elitebot.dev/@${account.id})`,
 			)
 			.setThumbnail(`https://mc-heads.net/head/${account.id}/left`);
@@ -117,9 +117,9 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	}
 
 	const embed = EliteEmbed(settings)
-		.setTitle(`Crop Gain for ${account.name} (${profile.profileName})`)
+		.setTitle(`Crop Gain for ${escapeIgn(account.name)} (${profile.profileName})`)
 		.setDescription(
-			`-# View charts and older data for ${account.name} [here!](https://elitebot.dev/@${account.id}/${profile.profileId}/charts)`,
+			`-# View charts and older data for ${escapeIgn(account.name)} [here!](https://elitebot.dev/@${account.id}/${profile.profileId}/charts)`,
 		);
 
 	const fields = [];

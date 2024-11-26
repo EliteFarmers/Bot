@@ -45,8 +45,8 @@ importers:
         specifier: ^0.7.0
         version: 0.7.0
       openapi-fetch:
-        specifier: ^0.12.0
-        version: 0.12.2
+        specifier: ^0.13.0
+        version: 0.13.0
       utf-8-validate:
         specifier: ^6.0.4
         version: 6.0.4
@@ -857,11 +857,11 @@ packages:
     resolution: {integrity: sha512-IRUxE4BVsHWXkV/SFOut4qTlagw2aM8T5/vnTsmrHJvVoKueJHRc/JaFND7QDDc61kLYUJ6qlZM3sqTSyx2dTw==}
     hasBin: true
 
-  openapi-fetch@0.12.2:
-    resolution: {integrity: sha512-ctMQ4LkkSWfIDUMuf1SYuPMsQ7ePcWAkYaMPW1lCDdk4WlV3Vulq1zoyGrwnFVvrBs5t7OOqNF+EKa8SAaovEA==}
+  openapi-fetch@0.13.0:
+    resolution: {integrity: sha512-6Nlf/BDbtyHwHdNrLPUiyt4CZMzL3ZyAt55yWH8W7+Z+8aYWnvca4uZHQHXViy8KcnCMqAhLM/bifh2Yjjkf6w==}
 
-  openapi-typescript-helpers@0.0.13:
-    resolution: {integrity: sha512-z44WK2e7ygW3aUtAtiurfEACohf/Qt9g6BsejmIYgEoY4REHeRzgFJmO3ium0libsuzPc145I+8lE9aiiZrQvQ==}
+  openapi-typescript-helpers@0.0.15:
+    resolution: {integrity: sha512-opyTPaunsklCBpTK8JGef6mfPhLSnyy5a0IN9vKtx3+4aExf+KxEqYwIy3hqkedXIB97u357uLMJsOnm3GVjsw==}
 
   path-parse@1.0.7:
     resolution: {integrity: sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==}
@@ -1821,11 +1821,11 @@ snapshots:
 
   node-gyp-build@4.8.2: {}
 
-  openapi-fetch@0.12.2:
+  openapi-fetch@0.13.0:
     dependencies:
-      openapi-typescript-helpers: 0.0.13
+      openapi-typescript-helpers: 0.0.15
 
-  openapi-typescript-helpers@0.0.13: {}
+  openapi-typescript-helpers@0.0.15: {}
 
   path-parse@1.0.7: {}
 

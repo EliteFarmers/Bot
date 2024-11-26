@@ -339,3 +339,7 @@ export const LEVELING_XP = [
 	3100000, 3400000, 3700000, 4000000, 4300000, 4600000, 4900000, 5200000, 5500000, 5800000, 6100000, 6400000, 6700000,
 	7000000,
 ];
+
+export function escapeIgn(name?: string | null) {
+	return name?.replace(/_/g, '\\_');
+}

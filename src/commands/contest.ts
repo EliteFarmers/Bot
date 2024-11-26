@@ -2,7 +2,7 @@ import { ChatInputCommandInteraction } from 'discord.js';
 import { Crop, SkyBlockTime, getCropDisplayName, getCropFromName } from 'farming-weight';
 import { FetchContest, UserSettings } from '../api/elite.js';
 import { eliteDayOption, eliteMonthOption, eliteYearOption } from '../autocomplete/dates.js';
-import { GetCropEmoji, GetMedalEmoji } from '../classes/Util.js';
+import { escapeIgn, GetCropEmoji, GetMedalEmoji } from '../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
 import { EliteEmbed } from '../classes/embeds.js';
 
@@ -78,7 +78,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			.slice(0, 5)
 			.map(({ playerName, playerUuid, profileUuid, collected, position, medal }) => {
 				return (
-					`**${position === undefined || position === -1 ? '???' : position + 1}.** ${playerName?.replace(/_/g, '\\_') ?? 'Unknown'}` +
+					`**${position === undefined || position === -1 ? '???' : position + 1}.** ${escapeIgn(playerName) ?? 'Unknown'}` +
 					`\n-# [⧉](https://elitebot.dev/@${playerUuid}/${profileUuid}) ${collected?.toLocaleString()} ${medal ? GetMedalEmoji(medal) : ''}`
 				);
 			})

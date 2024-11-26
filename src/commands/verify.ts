@@ -3,6 +3,7 @@ import { FetchAccount, FetchUpdateAccount, LinkAccount } from '../api/elite.js';
 import { autocomplete } from '../autocomplete/player.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
+import { escapeIgn } from '../classes/Util.js';
 
 const command = new EliteCommand({
 	name: 'verify',
@@ -78,7 +79,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 		const embed = EliteEmbed()
 			.setTitle('Account Linked!')
 			.setDescription(
-				`Your account has been linked to ${playerName}! You can now use the \`/weight\` command without entering your username!`,
+				`Your account has been linked to ${escapeIgn(playerName)}! You can now use the \`/weight\` command without entering your username!`,
 			)
 			.addFields({
 				name: 'Want to unlink your account?',

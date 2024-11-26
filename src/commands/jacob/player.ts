@@ -11,7 +11,7 @@ import {
 import { FetchProfile, UserSettings } from '../../api/elite.js';
 import { elitePlayerOption } from '../../autocomplete/player.js';
 import { GetReadableDate } from '../../classes/SkyblockDate.js';
-import { GetCropEmoji, GetMedalEmoji } from '../../classes/Util.js';
+import { escapeIgn, GetCropEmoji, GetMedalEmoji } from '../../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../../classes/embeds.js';
 import { getAccount } from '../../classes/validate.js';
@@ -98,14 +98,14 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 
 	const partic =
 		jacob.participations && jacob.participations > 0 && jacob.contests && jacob.contests.length > 0
-			? `Out of **${jacob.participations?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests, **${account.name?.replace(/_/g, '\\_')}** has been 1st **${jacob.contests
+			? `Out of **${jacob.participations?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests, **${escapeIgn(account.name)}** has been 1st **${jacob.contests
 					?.filter((c) => c.position === 0)
 					.length.toString()
 					.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** times!`
-			: `**${account.name?.replace(/_/g, '\\_')}** has participated in **${jacob.participations?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests!`;
+			: `**${escapeIgn(account.name)}** has participated in **${jacob.participations?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests!`;
 
 	const embed = EliteEmbed(settings)
-		.setTitle(`Jacob's Stats for ${playerName.replace(/_/g, '\\_')}${profileName ? ` on ${profileName}` : ``}`)
+		.setTitle(`Jacob's Stats for ${escapeIgn(playerName)}${profileName ? ` on ${profileName}` : ``}`)
 		.setDescription(
 			`${GetMedalEmoji('diamond')}**${earned?.diamond}** ${GetMedalEmoji('platinum')}**${earned?.platinum}** ${GetMedalEmoji('gold')} ${medals?.gold} / **${earned?.gold}** ${GetMedalEmoji('silver')} ${medals?.silver} / **${earned?.silver}** ${GetMedalEmoji('bronze')} ${medals?.bronze} / **${earned?.bronze}**\n${partic}\n⠀`,
 		)
@@ -209,7 +209,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 
 		const newEmbed = EliteEmbed(settings)
 			.setTitle(
-				`Recent ${selectedCrop ? selectedCrop : "Jacob's"} Contests for ${playerName?.replace(/_/g, '\\_')}${profileName ? ` on ${profileName}` : ``}`,
+				`Recent ${selectedCrop ? selectedCrop : "Jacob's"} Contests for ${escapeIgn(playerName)}${profileName ? ` on ${profileName}` : ``}`,
 			)
 			.setDescription(
 				entries.length !== 1
@@ -220,7 +220,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 		const contestAmount = entries.length;
 
 		if (contestAmount === 0) {
-			newEmbed.setDescription(`**${account?.name?.replace(/_/g, '\\_')}** hasn't participated in any contests!`);
+			newEmbed.setDescription(`**${escapeIgn(account?.name)}** hasn't participated in any contests!`);
 			return newEmbed;
 		}
 
