@@ -18,7 +18,7 @@ export interface CommandBase {
 
 	permissions?: bigint;
 	adminRoleOverride?: boolean;
-	access: CommandAccess;
+	access: CommandAccess | CommandAccess[];
 }
 
 interface SlashCommandBase extends CommandBase {
@@ -69,7 +69,8 @@ export enum CommandType {
 export enum CommandAccess {
 	Everywhere,
 	Guild,
-	DirectMessage,
+	BotDM,
+	PrivateMessages,
 }
 
 export interface CronTask {

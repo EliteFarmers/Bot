@@ -22,7 +22,15 @@ import {
 } from 'farming-weight';
 import { FetchProfile, UserSettings } from '../api/elite.js';
 import { elitePlayerOption } from '../autocomplete/player.js';
-import { CROP_ARRAY, CropSelectRow, escapeIgn, GEAR_ARRAY, GetCropEmoji, LEVELING_XP, removeColorCodes } from '../classes/Util.js';
+import {
+	CROP_ARRAY,
+	CropSelectRow,
+	GEAR_ARRAY,
+	GetCropEmoji,
+	LEVELING_XP,
+	escapeIgn,
+	removeColorCodes,
+} from '../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed, NotYoursReply, PrefixFooter } from '../classes/embeds.js';
 import { progressBar } from '../classes/progressbar.js';

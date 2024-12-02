@@ -2,7 +2,14 @@ import { ButtonInteraction, ChannelType, EmbedBuilder, PermissionFlagsBits } fro
 import { components } from '../api/api.js';
 import { FetchAccount, FetchContests, FetchGuildJacob, UpdateGuildJacob } from '../api/elite.js';
 import { GetReadableDate } from '../classes/SkyblockDate.js';
-import { escapeIgn, GetCropColor, GetCropEmoji, GetCropURL, GetEmbeddedTimestamp, UserHyperLink } from '../classes/Util.js';
+import {
+	GetCropColor,
+	GetCropEmoji,
+	GetCropURL,
+	GetEmbeddedTimestamp,
+	UserHyperLink,
+	escapeIgn,
+} from '../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 

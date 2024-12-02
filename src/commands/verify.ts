@@ -1,9 +1,9 @@
 import { ChatInputCommandInteraction } from 'discord.js';
 import { FetchAccount, FetchUpdateAccount, LinkAccount } from '../api/elite.js';
 import { autocomplete } from '../autocomplete/player.js';
+import { escapeIgn } from '../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
-import { escapeIgn } from '../classes/Util.js';
 
 const command = new EliteCommand({
 	name: 'verify',

@@ -13,7 +13,7 @@ import {
 import { FetchGuild, FetchUserSettings } from '../api/elite.js';
 import { commands } from '../bot.js';
 import { HasRole, isValidAccess } from '../classes/Util.js';
-import { Command, CommandGroup, CommandType, EliteCommand, getAutocomplete } from '../classes/commands/index.js';
+import { CommandGroup, EliteCommand } from '../classes/commands/index.js';
 
 const settings = {
 	event: Events.InteractionCreate,

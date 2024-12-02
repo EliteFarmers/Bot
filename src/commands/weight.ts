@@ -10,7 +10,7 @@ import {
 import { getCropFromName, getLevel } from 'farming-weight';
 import { FetchLeaderboardRankings, FetchProfile, UserSettings } from '../api/elite.js';
 import { elitePlayerOption } from '../autocomplete/player.js';
-import { escapeIgn, GetCropEmoji, LEVELING_XP } from '../classes/Util.js';
+import { GetCropEmoji, LEVELING_XP, escapeIgn } from '../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 import { EliteEmbed, EmptyField, EmptyString, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 import { getAccount } from '../classes/validate.js';

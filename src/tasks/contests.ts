@@ -32,6 +32,8 @@ const cropKeys: Record<string, string> = {
 	Wheat: 'wheat',
 };
 
+const fortuneEmoji = '<:fortune:1313282552060055635>';
+
 async function execute(client: Client) {
 	console.log('Running contest ping task. Shard: ' + client.shard?.ids[0]);
 
@@ -67,7 +69,7 @@ async function execute(client: Client) {
 				{
 					name: 'Enjoy the Spring Season!',
 					value:
-						`**+25** <:fortune:1180353749076693092> from [Atmospheric Filter](https://wiki.hypixel.net/Atmospheric_Filter)` +
+						`**+25** ${fortuneEmoji} from [Atmospheric Filter](https://wiki.hypixel.net/Atmospheric_Filter)` +
 						`\nGood luck finding Zorro in [Hoppity's Hunt](https://wiki.hypixel.net/Hoppity%27s_Hunt)!`,
 				},
 				{
@@ -204,7 +206,6 @@ function getFields(
 
 	const goldEmoji = GetMedalEmoji('gold');
 	const diamondEmoji = GetMedalEmoji('diamond');
-	const fortuneEmoji = '<:fortune:1180353749076693092>';
 
 	return entries.map(([crop, { gold, diamond }]) => {
 		const goldFortune = Math.max(

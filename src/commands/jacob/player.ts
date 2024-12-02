@@ -11,7 +11,7 @@ import {
 import { FetchProfile, UserSettings } from '../../api/elite.js';
 import { elitePlayerOption } from '../../autocomplete/player.js';
 import { GetReadableDate } from '../../classes/SkyblockDate.js';
-import { escapeIgn, GetCropEmoji, GetMedalEmoji } from '../../classes/Util.js';
+import { GetCropEmoji, GetMedalEmoji, escapeIgn } from '../../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../../classes/embeds.js';
 import { getAccount } from '../../classes/validate.js';

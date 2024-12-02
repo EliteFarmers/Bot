@@ -14,7 +14,7 @@ import {
 } from 'farming-weight';
 import { FetchProfile, UserSettings } from '../api/elite.js';
 import { elitePlayerOption } from '../autocomplete/player.js';
-import { escapeIgn, GetCropEmoji } from '../classes/Util.js';
+import { GetCropEmoji, escapeIgn } from '../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 import {
 	EliteEmbed,
@@ -178,9 +178,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	});
 
 	function getGardenPayload() {
-		const embed = EliteEmbed(settings).setTitle(
-			`Garden Stats for ${escapeIgn(playerName)} (${profile?.profileName})`,
-		);
+		const embed = EliteEmbed(settings).setTitle(`Garden Stats for ${escapeIgn(playerName)} (${profile?.profileName})`);
 
 		const gardenLevel = getGardenLevel(garden?.experience ?? 0, overflow);
 

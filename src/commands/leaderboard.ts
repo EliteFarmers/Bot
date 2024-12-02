@@ -3,10 +3,10 @@ import { components } from '../api/api.js';
 import { FetchLeaderboardRank, FetchLeaderboardSlice, UserSettings } from '../api/elite.js';
 import { eliteLeaderboardOption } from '../autocomplete/leaderboard.js';
 import { elitePlayerOption } from '../autocomplete/player.js';
+import { escapeIgn } from '../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed } from '../classes/embeds.js';
 import { getAccount } from '../classes/validate.js';
-import { escapeIgn } from '../classes/Util.js';
 
 const command = new EliteCommand({
 	name: 'leaderboard',

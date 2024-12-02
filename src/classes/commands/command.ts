@@ -2,9 +2,11 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import {
 	ApplicationCommandType,
+	ApplicationIntegrationType,
 	AutocompleteInteraction,
 	ContextMenuCommandBuilder,
 	ContextMenuCommandType,
+	InteractionContextType,
 	PermissionsBitField,
 	SharedNameAndDescription,
 	SlashCommandBuilder,
@@ -20,7 +22,6 @@ import {
 	CommandGroup,
 	CommandType,
 	ContextMenuCommand,
-	EliteCommandOption,
 	EliteSlashCommandOption,
 	SlashCommand,
 	SlashCommandOptionType,
@@ -36,7 +37,7 @@ export class EliteCommand implements CommandBase {
 		| SlashCommandSubcommandBuilder;
 	declare permissions?: bigint | undefined;
 	declare adminRoleOverride?: boolean | undefined;
-	declare access: CommandAccess;
+	declare access: CommandAccess[];
 	declare type: CommandType;
 	declare execute: Function;
 	declare name: string;
@@ -55,7 +56,7 @@ export class EliteCommand implements CommandBase {
 		this.description = settings.description;
 		this.fetchSettings = settings.fetchSettings ?? false;
 
-		this.access = settings.access;
+		this.access = settings.access instanceof Array ? settings.access : [settings.access];
 		this.type = settings.type;
 		this.permissions = settings.permissions;
 		this.adminRoleOverride = settings.adminRoleOverride;
@@ -132,6 +133,10 @@ export class EliteCommand implements CommandBase {
 
 		this.slash ??= new SlashCommandBuilder();
 		this.slash.setName(this.name).setDescription(this.description);
+
+		if (!this.isSubCommand()) {
+			EliteCommand.setCommandAccess(this.slash, this.access);
+		}
 
 		if (this.permissions) {
 			this.slash.setDefaultMemberPermissions(PermissionsBitField.resolve(this.permissions));
@@ -248,8 +253,41 @@ export class EliteCommand implements CommandBase {
 
 		this.slash.setName(this.name).setType(type);
 
+		EliteCommand.setCommandAccess(this.slash, this.access);
+
 		if (this.permissions) {
 			this.slash.setDefaultMemberPermissions(PermissionsBitField.resolve(this.permissions));
+		}
+	}
+
+	static setCommandAccess(
+		slash: SlashCommandBuilder | ContextMenuCommandBuilder | SlashCommandSubcommandsOnlyBuilder,
+		access: CommandAccess[],
+	) {
+		for (const a of access) {
+			switch (a) {
+				case CommandAccess.Everywhere:
+					slash.setIntegrationTypes(ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall);
+					slash.setContexts(
+						InteractionContextType.Guild,
+						InteractionContextType.BotDM,
+						InteractionContextType.PrivateChannel,
+					);
+					break;
+				case CommandAccess.Guild:
+					slash.setIntegrationTypes(ApplicationIntegrationType.GuildInstall, ...(slash.integration_types ?? []));
+					slash.setContexts(InteractionContextType.Guild, ...(slash.contexts ?? []));
+					break;
+				case CommandAccess.BotDM:
+					slash.setContexts(InteractionContextType.BotDM, ...(slash.contexts ?? []));
+					break;
+				case CommandAccess.PrivateMessages:
+					slash.setContexts(InteractionContextType.PrivateChannel, ...(slash.contexts ?? []));
+					slash.setIntegrationTypes(ApplicationIntegrationType.GuildInstall, ...(slash.integration_types ?? []));
+					break;
+				default:
+					break;
+			}
 		}
 	}
 

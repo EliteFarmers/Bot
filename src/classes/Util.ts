@@ -14,12 +14,18 @@ import { Crop, GearSlot } from 'farming-weight';
 import { client } from '../bot.js';
 import { CommandAccess } from './commands/index.js';
 
-export function isValidAccess(access: CommandAccess, type: ChannelType): boolean {
-	if (access === CommandAccess.Everywhere) return true;
-	// If access is direct, return true if type is also a DM, else false
-	if (access === CommandAccess.DirectMessage) return type === ChannelType.DM;
-	// Access has to be GUILD at this point, so return true as long as the channel isn't a DM
-	return type !== ChannelType.DM;
+export function isValidAccess(access: CommandAccess | CommandAccess[], type: ChannelType): boolean {
+	const a = access instanceof Array ? access : [access];
+
+	if (a.includes(CommandAccess.Everywhere)) return true;
+
+	switch (type) {
+		case ChannelType.DM:
+		case ChannelType.GroupDM:
+			return a.includes(CommandAccess.BotDM) || a.includes(CommandAccess.PrivateMessages);
+		default:
+			return a.includes(CommandAccess.Guild);
+	}
 }
 
 /**
@@ -194,15 +200,15 @@ export function GetCropEmoji(crop: string) {
 export function GetMedalEmoji(medal?: string) {
 	switch (medal) {
 		case 'bronze':
-			return '<:bronze:1175629425623187507> ';
+			return '<:bronze:1313281303973597214> ';
 		case 'silver':
-			return '<:silver:1175629454043779243> ';
+			return '<:silver:1313281335703507004> ';
 		case 'gold':
-			return '<:gold:1175629485333299342> ';
+			return '<:gold:1313281357329334335> ';
 		case 'platinum':
-			return '<:platinum:1175629500738961500> ';
+			return '<:platinum:1313281394029625468> ';
 		case 'diamond':
-			return '<:diamond:1175629512663384104> ';
+			return '<:diamond:1313281416053788753> ';
 	}
 	return '';
 }
@@ -230,43 +236,43 @@ export function CropSelectRow(customId = 'crop-select', placeholder = 'Select a 
 
 const CropEmojis = {
 	Cactus: {
-		id: '1158914561454387370',
+		id: '1263608405939978404',
 		name: 'cactus',
 	},
 	Carrot: {
-		id: '1158914559843766372',
+		id: '1263608446335582280',
 		name: 'carrot',
 	},
 	'Cocoa Beans': {
-		id: '1158914476704284694',
+		id: '1263608459618947186',
 		name: 'cocoa',
 	},
 	Melon: {
-		id: '1158914475794112522',
+		id: '1263608474743341098',
 		name: 'melon',
 	},
 	Mushroom: {
-		id: '1158914474577768490',
-		name: 'mushrooms',
+		id: '1263608486609162301',
+		name: 'mushroom',
 	},
 	'Nether Wart': {
-		id: '1158914473252360282',
+		id: '1263608502564425788',
 		name: 'netherwart',
 	},
 	Potato: {
-		id: '1158914472329613433',
+		id: '1263608514639560725',
 		name: 'potato',
 	},
 	Pumpkin: {
-		id: '1158914471394279454',
+		id: '1263608527918989403',
 		name: 'pumpkin',
 	},
 	'Sugar Cane': {
-		id: '1158914469532016642',
+		id: '1263608539578892391',
 		name: 'sugarcane',
 	},
 	Wheat: {
-		id: '1158914469087432754',
+		id: '1263608553797849119',
 		name: 'wheat',
 	},
 };

@@ -43,7 +43,7 @@ const command = new EliteCommand({
 
 export default command;
 
-const fortuneEmoji = '<:fortune:1180353749076693092>';
+const fortuneEmoji = '<:fortune:1313282552060055635>';
 
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	const useDicers = interaction.options.getBoolean('dicer', false) ?? true;
