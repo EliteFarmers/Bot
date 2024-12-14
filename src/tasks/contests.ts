@@ -183,7 +183,7 @@ async function sendMessages(
 				content: (alwaysPing ? `<@&${pings.alwaysPingRole}> ` : '') + roles.map((role) => `<@&${role}>`).join(' '),
 				embeds: [embed],
 				allowedMentions: {
-					roles: alwaysPing ? [ pings.alwaysPingRole, ...roles ] : roles,
+					roles: alwaysPing ? [pings.alwaysPingRole, ...roles] : roles,
 				},
 			} as MessageCreateOptions;
 
