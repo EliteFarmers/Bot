@@ -12,7 +12,7 @@
 		"cron": "^3.1.7",
 		"date-fns": "^4.0.0",
 		"discord.js": "^14.16.3",
-		"farming-weight": "^0.7.1",
+		"farming-weight": "^0.7.3",
 		"openapi-fetch": "^0.13.0",
 		"utf-8-validate": "^6.0.4",
 		"zlib-sync": "^0.1.9",
