@@ -34,10 +34,22 @@ export async function createFromData({
 		result = rWeight.toString();
 	}
 
+	const backgroundStyle = data.elements.background;
+
+	// Create canvas
+	const bgWidth = data.elements.background?.size?.x ?? 1920;
+	const bgHeight = data.elements.background?.size?.y ?? 400;
+
+	const canvas = createCanvas(bgWidth, bgHeight);
+	const ctx = canvas.getContext('2d');
+
+	const headDirection =
+		data.elements.head && getPosition(canvas, data.elements.head).x < canvas.width / 2 ? 'right' : 'left';
+
 	// Load images and avatar
 	const images = [
 		data.elements?.background?.imageUrl ? loadImage(data.elements.background.imageUrl).catch(() => null) : null,
-		data.elements.head ? loadImage(`https://mc-heads.net/head/${uuid}/left`).catch(() => null) : null,
+		data.elements.head ? loadImage(`https://mc-heads.net/head/${uuid}/${headDirection}`).catch(() => null) : null,
 		badgeUrl !== '' ? loadImage(badgeUrl).catch(() => null) : null,
 		getDecalImage(profile, data.decal),
 	];
@@ -49,14 +61,13 @@ export async function createFromData({
 		// );
 	}
 
-	const backgroundStyle = data.elements.background;
+	if (backgroundImg && !data.elements?.background?.size?.x) {
+		canvas.width = backgroundImg.width ?? 1920;
+	}
 
-	// Create canvas
-	const bgWidth = data.elements.background?.size?.x ?? backgroundImg?.width ?? 1920;
-	const bgHeight = data.elements.background?.size?.y ?? backgroundImg?.height ?? 400;
-
-	const canvas = createCanvas(bgWidth, bgHeight);
-	const ctx = canvas.getContext('2d');
+	if (backgroundImg && !data.elements?.background?.size?.y) {
+		canvas.height = backgroundImg.height ?? 400;
+	}
 
 	// Clip the corners, draw background and decal, then restore the clip
 	ctx.save();
