@@ -237,12 +237,14 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			rank: value ?? -1,
 		}));
 
+		const cropWeight = +crops.reduce((acc, [, value]) => acc + (value ?? 0), 0).toFixed(2);
+
 		const formattedCrops = crops.map(([key, value]) => {
 			const crop = getCropFromName(key);
 			if (!crop) return '';
 
 			const collection = member?.collections?.[crop];
-			const percent = Math.round(((value ?? 0) / totalWeight) * 1000) / 10;
+			const percent = Math.round(((value ?? 0) / cropWeight) * 1000) / 10;
 
 			const { rank = -1, key: lb } = cropRanks.find((c) => c.crop === crop) ?? {};
 			const rankString =
@@ -253,8 +255,6 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				`${collection ? `\n-# ${rankString}${collection.toLocaleString()} ${key}` : ''}`
 			);
 		});
-
-		const cropWeight = +crops.reduce((acc, [, value]) => acc + (value ?? 0), 0).toFixed(2);
 
 		embed.addFields(
 			{
