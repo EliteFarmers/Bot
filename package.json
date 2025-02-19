@@ -9,7 +9,7 @@
 		"@types/node": "^20.0.0",
 		"amqplib": "^0.10.4",
 		"bufferutil": "^4.0.8",
-		"cron": "^3.1.7",
+		"cron": "^4.0.0",
 		"date-fns": "^4.0.0",
 		"discord.js": "^14.16.3",
 		"farming-weight": "^0.8.2",
