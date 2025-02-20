@@ -145,7 +145,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		);
 	};
 
-	const apiWarning = (!member.api.inventories)
+	const apiWarning = (member.api?.inventories === false)
 		? `:x: ${escapeIgn(playerName)} has **Inventory API** access disabled. Most data is missing. :x:\n`
 		: '';
 
