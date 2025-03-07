@@ -287,7 +287,7 @@ function makeField(
 		.map(([cropName, medals = {}]) => {
 			return {
 				cropName,
-				collection: medals[bracket.toLowerCase() as keyof typeof medals] ?? 0,
+				collection: (medals[bracket.toLowerCase() as keyof typeof medals] ?? 0) as number,
 			};
 		})
 		.sort((a, b) => a.cropName.localeCompare(b.cropName));
