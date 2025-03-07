@@ -145,9 +145,10 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		);
 	};
 
-	const apiWarning = (member.api?.inventories === false)
-		? `:x: ${escapeIgn(playerName)} has **Inventory API** access disabled. Most data is missing. :x:\n`
-		: '';
+	const apiWarning =
+		member.api?.inventories === false
+			? `:x: ${escapeIgn(playerName)} has **Inventory API** access disabled. Most data is missing. :x:\n`
+			: '';
 
 	const embed = EliteEmbed(settings)
 		.setTitle(`Farming Fortune for ${escapeIgn(playerName)} (${profile.profileName})`)

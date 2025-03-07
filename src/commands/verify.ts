@@ -58,11 +58,12 @@ async function execute(interaction: ChatInputCommandInteraction) {
 
 	try {
 		const { error, response } = await LinkAccount(interaction.user.id, playerName);
+		const errorMsg = error?.errors?.generalErrors?.join('\n') || error?.message || 'Please try again later.';
 
 		if (!response.ok) {
 			const embed = ErrorEmbed('Failed to Link Account!')
 				.setDescription(
-					(error || 'Please try again later.') +
+					errorMsg +
 						'\n⠀\nEnsure your Discord account is properly linked to your minecraft account on Hypixel. It should match your username exactly, case-sensitive.',
 				)
 				.addFields({
