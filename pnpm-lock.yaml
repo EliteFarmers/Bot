@@ -42,8 +42,8 @@ importers:
         specifier: ^14.16.3
         version: 14.16.3(bufferutil@4.0.8)(utf-8-validate@6.0.4)
       farming-weight:
-        specifier: ^0.8.2
-        version: 0.8.2
+        specifier: ^0.8.3
+        version: 0.8.3
       openapi-fetch:
         specifier: ^0.13.0
         version: 0.13.0
@@ -765,8 +765,8 @@ packages:
     engines: {node: '>=12'}
     hasBin: true
 
-  farming-weight@0.8.2:
-    resolution: {integrity: sha512-kAId/00QD9WCoaORv/Hdssb7KXeCJuX0/T/9KZ2Olv7Q++bY3KhWW/Dt3pixhBlGR/12tOTnHlI2QFkAkHT4ZA==}
+  farming-weight@0.8.3:
+    resolution: {integrity: sha512-YN4VoT01WFbjy3bBgGgMSZNSDv/nCGe+BeUHj1i+0A+vqWgYo6T4vBBAbOzzFg7YIIhl8G8MktZwTWzQgHknvg==}
 
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
@@ -1744,7 +1744,7 @@ snapshots:
       '@esbuild/win32-ia32': 0.18.20
       '@esbuild/win32-x64': 0.18.20
 
-  farming-weight@0.8.2: {}
+  farming-weight@0.8.3: {}
 
   fast-deep-equal@3.1.3: {}
 

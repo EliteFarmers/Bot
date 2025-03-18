@@ -1,5 +1,25 @@
 {
 	"type": "module",
+	"scripts": {
+		"start": "tsx src/index.ts",
+		"lint": "pnpm biome check --write",
+		"build": "tsc && pnpm sentry:sourcemaps",
+		"dev": "npx nodemon --exec \"npx tsx\" src/bot.ts",
+		"slash": "tsx src/deploy.ts",
+		"singleslash": "tsx src/deploy.ts single",
+		"prod": "node dist/index.js",
+		"generate-api-types": "npx openapi-typescript \"./src/api/swagger.json\" -o \"./src/api/api.d.ts\"",
+		"sentry:sourcemaps": "sentry-cli sourcemaps inject --org kaeso --project bot ./dist && sentry-cli sourcemaps upload --org kaeso --project bot ./dist"
+	},
+	"packageManager": "pnpm@9.15.0",
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@types/node-fetch": "^2.6.11",
+		"dotenv": "^16.4.5",
+		"tslib": "^2.7.0",
+		"tsx": "^3.14.0",
+		"typescript": "^5.6.2"
+	},
 	"dependencies": {
 		"@napi-rs/canvas": "^0.1.56",
 		"@sentry/cli": "^2.36.6",
@@ -12,30 +32,10 @@
 		"cron": "^3.1.7",
 		"date-fns": "^4.0.0",
 		"discord.js": "^14.16.3",
-		"farming-weight": "^0.8.2",
+		"farming-weight": "^0.8.3",
 		"openapi-fetch": "^0.13.0",
 		"utf-8-validate": "^6.0.4",
 		"zlib-sync": "^0.1.9",
 		"zod": "^3.23.8"
-	},
-	"scripts": {
-		"start": "tsx src/index.ts",
-		"lint": "pnpm biome check --write",
-		"build": "tsc && pnpm sentry:sourcemaps",
-		"dev": "npx nodemon --exec \"npx tsx\" src/bot.ts",
-		"slash": "tsx src/deploy.ts",
-		"singleslash": "tsx src/deploy.ts single",
-		"prod": "node dist/index.js",
-		"generate-api-types": "npx openapi-typescript \"./src/api/swagger.json\" -o \"./src/api/api.d.ts\"",
-		"sentry:sourcemaps": "sentry-cli sourcemaps inject --org kaeso --project bot ./dist && sentry-cli sourcemaps upload --org kaeso --project bot ./dist"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "1.9.4",
-		"@types/node-fetch": "^2.6.11",
-		"dotenv": "^16.4.5",
-		"tslib": "^2.7.0",
-		"tsx": "^3.14.0",
-		"typescript": "^5.6.2"
-	},
-	"packageManager": "pnpm@9.15.0+sha512.76e2379760a4328ec4415815bcd6628dee727af3779aaa4c914e3944156c4299921a89f976381ee107d41f12cfa4b66681ca9c718f0668fa0831ed4c6d8ba56c"
+	}
 }
