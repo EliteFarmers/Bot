@@ -76,10 +76,12 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		return;
 	}
 
-	const { data: rankings } = await FetchLeaderboardRankings(account.id, profile.profileId).catch(() => ({
-		data: undefined,
-	}));
-	const weightRank = rankings?.misc?.farmingweight ?? -1;
+	const { data: rankings } = await FetchLeaderboardRankings(account.id, profile.profileId)
+		.then(({ data }) => ({ data: data?.ranks }))
+		.catch(() => ({
+			data: undefined,
+		}));
+	const weightRank = rankings?.farmingweight?.rank ?? -1;
 
 	const badge = account.badges?.filter((b) => b?.visible).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))[0];
 	const badgeId = badge?.image.url ?? '';
@@ -210,7 +212,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				? `[#${weightRank}](https://elitebot.dev/leaderboard/farmingweight/${account?.id}-${profile?.profileId}) • `
 				: '';
 
-		const farmingRank = rankings?.skills?.farming ?? -1;
+		const farmingRank = rankings?.farming?.rank ?? -1;
 		const farmingLevel = getLevel(member?.skills?.farming ?? 0, LEVELING_XP, 50 + (member?.jacob.perks?.levelCap ?? 0));
 		const farmingRankText =
 			farmingRank > -1
@@ -231,11 +233,13 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			},
 		);
 
-		const cropRanks = Object.entries(rankings?.collections ?? {}).map(([key, value]) => ({
-			crop: getCropFromName(key),
-			key,
-			rank: value ?? -1,
-		}));
+		const cropRanks = Object.values(rankings ?? {})
+			.filter((v) => getCropFromName(v.slug) !== undefined)
+			.map((value) => ({
+				crop: getCropFromName(value.slug),
+				key: value.slug,
+				rank: value.rank ?? -1,
+			}));
 
 		const cropWeight = +crops.reduce((acc, [, value]) => acc + (value ?? 0), 0).toFixed(2);
 
