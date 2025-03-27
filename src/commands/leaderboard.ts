@@ -70,6 +70,10 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		})
 		.catch(() => undefined);
 
+	if (lb?.maxEntries === -1) {
+		lb.maxEntries = 10_000;
+	}
+
 	if (!lb) {
 		const embed = ErrorEmbed('Failed to Fetch Leaderboard!').setDescription(
 			'Please try again later. If this issue persists, contact `kaeso.dev` on Discord.',
@@ -78,12 +82,11 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		interaction.followUp({ embeds: [embed], ephemeral: true });
 		return;
 	}
-	const title = (lb.title ?? '') + ' Leaderboard';
 
 	maxIndex = (lb.maxEntries ?? 1000) - 12;
 	entries = lb.entries ?? [];
 
-	const embed = await getEmbed(settings, index, maxIndex, leaderboardId, title, entries);
+	const embed = await getEmbed(settings, index, maxIndex, leaderboardId, lb, entries);
 	if (!embed) {
 		const errorEmbed = ErrorEmbed('Failed to Fetch Leaderboard!')
 			.setDescription('Please try again later. If this issue persists, contact `kaeso.dev` on Discord.')
@@ -129,7 +132,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				}
 			}
 
-			const newEmbed = await getEmbed(settings, index, maxIndex, leaderboardId, title);
+			const newEmbed = await getEmbed(settings, index, maxIndex, leaderboardId, lb);
 
 			if (!newEmbed) {
 				const errorEmbed = ErrorEmbed('Failed to Fetch Leaderboard!')
@@ -168,7 +171,7 @@ async function getEmbed(
 	index: number,
 	maxIndex: number,
 	leaderboardId: string,
-	title: string,
+	lb: components['schemas']['LeaderboardDto'],
 	entries?: components['schemas']['LeaderboardEntryDto'][],
 ) {
 	if (!entries) {
@@ -181,10 +184,20 @@ async function getEmbed(
 
 	if (!entries) return undefined;
 
+	const montly = leaderboardId.endsWith('-monthly');
+	const weekly = leaderboardId.endsWith('-weekly');
+	let interval = '';
+
+	if (weekly || montly) {
+		interval = `\n-# Runs from **<t:${lb.startsAt}:D>** to **<t:${lb.endsAt}:D>**`;
+	}
+
+	const title = montly ? `${lb.title} (Monthly)` : weekly ? `${lb.title.slice(0, -7)} (Weekly)` : lb.title;
+
 	const embed = EliteEmbed(settings)
 		.setTitle(title)
 		.setDescription(
-			`Showing **${index + 1}** - **${index + entries.length}** of **${(maxIndex + 12).toLocaleString()}** entries! [⧉](https://elitebot.dev/leaderboard/${leaderboardId}/${index + 1})`,
+			`Showing **${index + 1}** - **${index + entries.length}** of **${(maxIndex + 12).toLocaleString()}** entries! [⧉](https://elitebot.dev/leaderboard/${leaderboardId}/${index + 1})${interval}`,
 		);
 
 	const profileLb = entries[0]?.members?.length;

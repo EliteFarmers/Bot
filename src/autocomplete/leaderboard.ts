@@ -20,7 +20,7 @@ export function leaderboardOption(required = true) {
 			.setRequired(required);
 }
 
-let leaderboards: components['schemas']['Leaderboard'][] | undefined;
+let leaderboards: (components['schemas']['LeaderboardInfoDto'] & { id: string })[] | undefined;
 
 export async function autocomplete(interaction: AutocompleteInteraction) {
 	if (interaction.responded) return;
@@ -77,20 +77,13 @@ async function fetchLeaderboards() {
 	}));
 	if (!leaderboardsData) return;
 
-	const lbs = Object.entries({
-		...leaderboardsData.leaderboards,
-		...leaderboardsData.collectionLeaderboards,
-		...leaderboardsData.pestLeaderboards,
-		...leaderboardsData.profileLeaderboards,
-	}).concat(
-		Object.entries(leaderboardsData.skillLeaderboards ?? {}).map(([key, value]) => [
-			key,
-			{ ...value, title: value.title + ' Xp' },
-		]),
-	);
-
-	leaderboards = lbs.map(([key, value]) => ({
-		...value,
+	leaderboards = Object.entries(leaderboardsData.leaderboards).map(([key, lb]) => ({
+		...lb,
+		title: key.endsWith('-monthly')
+			? `${lb.title} (Monthly)`
+			: key.endsWith('-weekly')
+				? `${lb.title} (Weekly)`
+				: lb.title,
 		id: key,
 	}));
 }

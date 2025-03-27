@@ -120,6 +120,7 @@ export const FetchLeaderboardSlice = (leaderboardId: string, offset = 0, limit =
 			query: {
 				offset,
 				limit,
+				new: true,
 			},
 		},
 	});

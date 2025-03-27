@@ -3,7 +3,7 @@
 	"openapi": "3.0.0",
 	"info": {
 		"title": "Elite API",
-		"description": "A backend API for https://elitebot.dev/ that provides Hypixel Skyblock data.\r\n<br>\r\nUse of this API requires following the [Elite API TOS](https://elitebot.dev/apiterms). This API is not affiliated with Hypixel or Mojang.\"",
+		"description": "A backend API for https://elitebot.dev/ that provides Hypixel Skyblock data.\n<br>\nUse of this API requires following the [Elite API TOS](https://elitebot.dev/apiterms). This API is not affiliated with Hypixel or Mojang.",
 		"termsOfService": "https://elitebot.dev/apiterms",
 		"contact": {
 			"name": "- GitHub",
@@ -5974,7 +5974,7 @@
 			"get": {
 				"tags": ["Leaderboard"],
 				"summary": "Get Leaderboard",
-				"operationId": "EliteAPIFeaturesLeaderboardsGetLeaderboardGetLeaderboardEndpoint",
+				"operationId": "EliteAPIFeaturesLeaderboardsEndpointsGetLeaderboardGetLeaderboardEndpoint",
 				"parameters": [
 					{
 						"name": "leaderboard",
@@ -6002,6 +6002,15 @@
 							"type": "integer",
 							"format": "int32",
 							"default": 20,
+							"nullable": true
+						}
+					},
+					{
+						"name": "new",
+						"in": "query",
+						"description": "Use new leaderboard backend (will be default in the future)",
+						"schema": {
+							"type": "boolean",
 							"nullable": true
 						}
 					}
@@ -6034,14 +6043,61 @@
 			"get": {
 				"tags": ["Leaderboard"],
 				"summary": "Get leaderboards",
-				"operationId": "EliteAPIFeaturesLeaderboardsGetLeaderboardsGetLeaderboardsEndpoint",
+				"operationId": "EliteAPIFeaturesLeaderboardsEndpointsGetLeaderboardsGetLeaderboardsEndpoint",
 				"responses": {
 					"200": {
 						"description": "Success",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ConfigLeaderboardSettings"
+									"$ref": "#/components/schemas/LeaderboardsResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/leaderboards/{playerUuid}/{profileUuid}": {
+			"get": {
+				"tags": ["Leaderboard"],
+				"summary": "Get a Player's Leaderboard Ranks",
+				"operationId": "EliteAPIFeaturesLeaderboardsEndpointsGetPlayerLeaderboardRanksGetPlayerLeaderboardRanksEndpoint",
+				"parameters": [
+					{
+						"name": "playerUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "profileUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LeaderboardRanksResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
 								}
 							}
 						}
@@ -6053,7 +6109,7 @@
 			"get": {
 				"tags": ["Leaderboard"],
 				"summary": "Get a Player's Leaderboard Rank",
-				"operationId": "EliteAPIFeaturesLeaderboardsGetPlayerRankGetPlayerRankEndpoint",
+				"operationId": "EliteAPIFeaturesLeaderboardsEndpointsGetPlayerRankGetPlayerRankEndpoint1",
 				"parameters": [
 					{
 						"name": "leaderboard",
@@ -6091,12 +6147,123 @@
 						}
 					},
 					{
+						"name": "upcoming",
+						"in": "query",
+						"description": "Amount of upcoming players to include (max 100). Only works with new leaderboard backend",
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"default": 0,
+							"nullable": true
+						}
+					},
+					{
 						"name": "atRank",
 						"in": "query",
 						"description": "Start at a specified rank for upcoming players",
 						"schema": {
 							"type": "integer",
 							"format": "int32",
+							"nullable": true
+						}
+					},
+					{
+						"name": "new",
+						"in": "query",
+						"description": "Use new leaderboard backend (will be default in the future)",
+						"schema": {
+							"type": "boolean",
+							"nullable": true
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LeaderboardPositionDto"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/leaderboard/{leaderboard}/{playerUuid}/{profileUuid}": {
+			"get": {
+				"tags": ["Leaderboard"],
+				"summary": "Get a Player's Leaderboard Rank",
+				"operationId": "EliteAPIFeaturesLeaderboardsEndpointsGetPlayerRankGetPlayerRankEndpoint2",
+				"parameters": [
+					{
+						"name": "leaderboard",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "playerUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "profileUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "includeUpcoming",
+						"in": "query",
+						"schema": {
+							"type": "boolean",
+							"default": false,
+							"nullable": true
+						}
+					},
+					{
+						"name": "upcoming",
+						"in": "query",
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"default": 0,
+							"nullable": true
+						}
+					},
+					{
+						"name": "atRank",
+						"in": "query",
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"nullable": true
+						}
+					},
+					{
+						"name": "new",
+						"in": "query",
+						"schema": {
+							"type": "boolean",
 							"nullable": true
 						}
 					}
@@ -6129,7 +6296,7 @@
 			"get": {
 				"tags": ["Leaderboard"],
 				"summary": "Get a Player's Leaderboard Ranks",
-				"operationId": "EliteAPIFeaturesLeaderboardsGetPlayerRanksGetPlayerRanksEndpoint",
+				"operationId": "EliteAPIFeaturesLeaderboardsEndpointsGetPlayerRanksGetPlayerRanksEndpoint",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -6169,14 +6336,15 @@
 							}
 						}
 					}
-				}
+				},
+				"deprecated": true
 			}
 		},
 		"/leaderboard/rank/{leaderboard}/{profileUuid}": {
 			"get": {
 				"tags": ["Leaderboard"],
 				"summary": "Get a Profiles's Leaderboard Rank",
-				"operationId": "EliteAPIFeaturesLeaderboardsGetProfileRankGetProfileRankEndpoint",
+				"operationId": "EliteAPIFeaturesLeaderboardsEndpointsGetProfileRankGetProfileRankEndpoint1",
 				"parameters": [
 					{
 						"name": "leaderboard",
@@ -6206,12 +6374,115 @@
 						}
 					},
 					{
+						"name": "upcoming",
+						"in": "query",
+						"description": "Amount of upcoming players to include (max 100). Only works with new leaderboard backend",
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"default": 0,
+							"nullable": true
+						}
+					},
+					{
 						"name": "atRank",
 						"in": "query",
 						"description": "Start at a specified rank for upcoming players",
 						"schema": {
 							"type": "integer",
 							"format": "int32",
+							"nullable": true
+						}
+					},
+					{
+						"name": "new",
+						"in": "query",
+						"description": "Use new leaderboard backend (will be default in the future)",
+						"schema": {
+							"type": "boolean",
+							"nullable": true
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LeaderboardPositionDto"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/leaderboard/{leaderboard}/{profileUuid}": {
+			"get": {
+				"tags": ["Leaderboard"],
+				"summary": "Get a Profiles's Leaderboard Rank",
+				"operationId": "EliteAPIFeaturesLeaderboardsEndpointsGetProfileRankGetProfileRankEndpoint2",
+				"parameters": [
+					{
+						"name": "leaderboard",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "profileUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "includeUpcoming",
+						"in": "query",
+						"schema": {
+							"type": "boolean",
+							"default": false,
+							"nullable": true
+						}
+					},
+					{
+						"name": "upcoming",
+						"in": "query",
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"default": 0,
+							"nullable": true
+						}
+					},
+					{
+						"name": "atRank",
+						"in": "query",
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"nullable": true
+						}
+					},
+					{
+						"name": "new",
+						"in": "query",
+						"schema": {
+							"type": "boolean",
 							"nullable": true
 						}
 					}
@@ -6329,7 +6600,7 @@
 			"get": {
 				"tags": ["Profile"],
 				"summary": "Get All Profile Details",
-				"operationId": "EliteAPIFeaturesProfileGetAllProfileDetailsGetAllProfileDetailsEndpoint",
+				"operationId": "EliteAPIFeaturesProfilesEndpointsGetAllProfileDetailsGetAllProfileDetailsEndpoint",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -6371,7 +6642,7 @@
 			"get": {
 				"tags": ["Profile"],
 				"summary": "Get Profile Member",
-				"operationId": "EliteAPIFeaturesProfileGetProfileGetProfileEndpoint",
+				"operationId": "EliteAPIFeaturesProfilesEndpointsGetProfileGetProfileEndpoint",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -6421,7 +6692,7 @@
 			"get": {
 				"tags": ["Profile"],
 				"summary": "Get Profile Details",
-				"operationId": "EliteAPIFeaturesProfileGetProfileDetailsGetProfileDetailsEndpoint",
+				"operationId": "EliteAPIFeaturesProfilesEndpointsGetProfileDetailsGetProfileDetailsEndpoint",
 				"parameters": [
 					{
 						"name": "profileUuid",
@@ -6463,7 +6734,7 @@
 			"get": {
 				"tags": ["Profile"],
 				"summary": "Get names of a player's profiles",
-				"operationId": "EliteAPIFeaturesProfileGetProfileNamesGetProfileNamesEndpoint",
+				"operationId": "EliteAPIFeaturesProfilesEndpointsGetProfileNamesGetProfileNamesEndpoint",
 				"parameters": [
 					{
 						"name": "player",
@@ -6505,7 +6776,7 @@
 			"get": {
 				"tags": ["Profile"],
 				"summary": "Get Profile Member",
-				"operationId": "EliteAPIFeaturesProfileGetSelectedProfileGetSelectedProfileEndpoint",
+				"operationId": "EliteAPIFeaturesProfilesEndpointsGetSelectedProfileGetSelectedProfileEndpoint",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -11401,13 +11672,28 @@
 			"LeaderboardDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["id", "title", "limit", "offset", "maxEntries", "profile", "entries"],
+				"required": [
+					"id",
+					"title",
+					"limit",
+					"offset",
+					"maxEntries",
+					"minimumScore",
+					"startsAt",
+					"endsAt",
+					"profile",
+					"entries"
+				],
 				"properties": {
 					"id": {
 						"type": "string"
 					},
 					"title": {
 						"type": "string"
+					},
+					"shortTitle": {
+						"type": "string",
+						"nullable": true
 					},
 					"limit": {
 						"type": "integer",
@@ -11420,6 +11706,19 @@
 					"maxEntries": {
 						"type": "integer",
 						"format": "int32"
+					},
+					"minimumScore": {
+						"type": "number",
+						"description": "The minimum score required to be on the leaderboard",
+						"format": "decimal"
+					},
+					"startsAt": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"endsAt": {
+						"type": "integer",
+						"format": "int64"
 					},
 					"profile": {
 						"type": "boolean"
@@ -11484,7 +11783,7 @@
 			"LeaderboardEntryDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["uuid", "amount"],
+				"required": ["uuid", "amount", "removed", "initialAmount"],
 				"properties": {
 					"ign": {
 						"type": "string",
@@ -11503,6 +11802,14 @@
 					"amount": {
 						"type": "number",
 						"description": "Score of the entry",
+						"format": "double"
+					},
+					"removed": {
+						"type": "boolean"
+					},
+					"initialAmount": {
+						"type": "number",
+						"description": "Initial score of the entry",
 						"format": "double"
 					},
 					"members": {
@@ -11536,78 +11843,126 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ConfigLeaderboardSettings": {
+			"LeaderboardsResponse": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": [
-					"completeRefreshInterval",
-					"leaderboards",
-					"collectionLeaderboards",
-					"skillLeaderboards",
-					"pestLeaderboards",
-					"profileLeaderboards"
-				],
+				"required": ["leaderboards"],
 				"properties": {
-					"completeRefreshInterval": {
-						"type": "integer",
-						"format": "int32"
-					},
 					"leaderboards": {
 						"type": "object",
 						"additionalProperties": {
-							"$ref": "#/components/schemas/Leaderboard"
-						}
-					},
-					"collectionLeaderboards": {
-						"type": "object",
-						"additionalProperties": {
-							"$ref": "#/components/schemas/Leaderboard"
-						}
-					},
-					"skillLeaderboards": {
-						"type": "object",
-						"additionalProperties": {
-							"$ref": "#/components/schemas/Leaderboard"
-						}
-					},
-					"pestLeaderboards": {
-						"type": "object",
-						"additionalProperties": {
-							"$ref": "#/components/schemas/Leaderboard"
-						}
-					},
-					"profileLeaderboards": {
-						"type": "object",
-						"additionalProperties": {
-							"$ref": "#/components/schemas/Leaderboard"
+							"$ref": "#/components/schemas/LeaderboardInfoDto"
 						}
 					}
 				}
 			},
-			"Leaderboard": {
+			"LeaderboardInfoDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["id", "title", "limit", "order", "scoreFormat", "profile"],
+				"required": ["title", "category", "profile", "minimumScore", "intervalType", "scoreDataType"],
 				"properties": {
-					"id": {
-						"type": "string"
+					"title": {
+						"type": "string",
+						"description": "Leaderboard title"
 					},
+					"short": {
+						"type": "string",
+						"description": "Leaderboard short title",
+						"nullable": true
+					},
+					"category": {
+						"type": "string",
+						"description": "Leaderboard category"
+					},
+					"profile": {
+						"type": "boolean",
+						"description": "If true, the leaderboard is profile based"
+					},
+					"minimumScore": {
+						"type": "number",
+						"description": "Minimum score required to be on the leaderboard",
+						"format": "decimal"
+					},
+					"intervalType": {
+						"description": "Interval type of the leaderboard",
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/LeaderboardType"
+							}
+						]
+					},
+					"scoreDataType": {
+						"description": "Score data type of the leaderboard",
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/LeaderboardScoreDataType"
+							}
+						]
+					}
+				}
+			},
+			"LeaderboardType": {
+				"type": "integer",
+				"description": "",
+				"x-enumNames": ["Current", "Weekly", "Monthly"],
+				"enum": [0, 1, 2]
+			},
+			"LeaderboardScoreDataType": {
+				"type": "integer",
+				"description": "",
+				"x-enumNames": ["Double", "Long", "Decimal"],
+				"enum": [0, 1, 2]
+			},
+			"LeaderboardRanksResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["ranks"],
+				"properties": {
+					"ranks": {
+						"type": "object",
+						"additionalProperties": {
+							"$ref": "#/components/schemas/PlayerLeaderboardEntryWithRankDto"
+						}
+					}
+				}
+			},
+			"PlayerLeaderboardEntryWithRankDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["title", "slug", "rank", "amount", "initialAmount", "type"],
+				"properties": {
 					"title": {
 						"type": "string"
 					},
-					"limit": {
-						"type": "integer",
-						"format": "int32"
+					"short": {
+						"type": "string",
+						"nullable": true
 					},
-					"order": {
+					"slug": {
 						"type": "string"
 					},
-					"scoreFormat": {
+					"profile": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"rank": {
 						"type": "integer",
 						"format": "int32"
 					},
-					"profile": {
-						"type": "boolean"
+					"intervalIdentifier": {
+						"type": "string",
+						"nullable": true
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					},
+					"initialAmount": {
+						"type": "number",
+						"format": "double"
+					},
+					"type": {
+						"$ref": "#/components/schemas/LeaderboardScoreDataType"
 					}
 				}
 			},
@@ -11725,6 +12080,7 @@
 					"skills",
 					"chocolateFactory",
 					"events",
+					"leaderboards",
 					"isSelected",
 					"wasRemoved",
 					"lastUpdated"
@@ -11808,6 +12164,12 @@
 						"type": "array",
 						"items": {
 							"$ref": "#/components/schemas/ProfileEventMemberDto"
+						}
+					},
+					"leaderboards": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/PlayerLeaderboardEntryWithRankDto"
 						}
 					},
 					"isSelected": {

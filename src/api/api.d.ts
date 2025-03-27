@@ -1822,7 +1822,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Leaderboard */
-		get: operations['EliteAPIFeaturesLeaderboardsGetLeaderboardGetLeaderboardEndpoint'];
+		get: operations['EliteAPIFeaturesLeaderboardsEndpointsGetLeaderboardGetLeaderboardEndpoint'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1839,7 +1839,24 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get leaderboards */
-		get: operations['EliteAPIFeaturesLeaderboardsGetLeaderboardsGetLeaderboardsEndpoint'];
+		get: operations['EliteAPIFeaturesLeaderboardsEndpointsGetLeaderboardsGetLeaderboardsEndpoint'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/leaderboards/{playerUuid}/{profileUuid}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get a Player's Leaderboard Ranks */
+		get: operations['EliteAPIFeaturesLeaderboardsEndpointsGetPlayerLeaderboardRanksGetPlayerLeaderboardRanksEndpoint'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1856,7 +1873,24 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get a Player's Leaderboard Rank */
-		get: operations['EliteAPIFeaturesLeaderboardsGetPlayerRankGetPlayerRankEndpoint'];
+		get: operations['EliteAPIFeaturesLeaderboardsEndpointsGetPlayerRankGetPlayerRankEndpoint1'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/leaderboard/{leaderboard}/{playerUuid}/{profileUuid}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get a Player's Leaderboard Rank */
+		get: operations['EliteAPIFeaturesLeaderboardsEndpointsGetPlayerRankGetPlayerRankEndpoint2'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1872,8 +1906,11 @@ export interface paths {
 			path?: never;
 			cookie?: never;
 		};
-		/** Get a Player's Leaderboard Ranks */
-		get: operations['EliteAPIFeaturesLeaderboardsGetPlayerRanksGetPlayerRanksEndpoint'];
+		/**
+		 * Get a Player's Leaderboard Ranks
+		 * @deprecated
+		 */
+		get: operations['EliteAPIFeaturesLeaderboardsEndpointsGetPlayerRanksGetPlayerRanksEndpoint'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1890,7 +1927,24 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get a Profiles's Leaderboard Rank */
-		get: operations['EliteAPIFeaturesLeaderboardsGetProfileRankGetProfileRankEndpoint'];
+		get: operations['EliteAPIFeaturesLeaderboardsEndpointsGetProfileRankGetProfileRankEndpoint1'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/leaderboard/{leaderboard}/{profileUuid}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get a Profiles's Leaderboard Rank */
+		get: operations['EliteAPIFeaturesLeaderboardsEndpointsGetProfileRankGetProfileRankEndpoint2'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1941,7 +1995,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get All Profile Details */
-		get: operations['EliteAPIFeaturesProfileGetAllProfileDetailsGetAllProfileDetailsEndpoint'];
+		get: operations['EliteAPIFeaturesProfilesEndpointsGetAllProfileDetailsGetAllProfileDetailsEndpoint'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1958,7 +2012,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Profile Member */
-		get: operations['EliteAPIFeaturesProfileGetProfileGetProfileEndpoint'];
+		get: operations['EliteAPIFeaturesProfilesEndpointsGetProfileGetProfileEndpoint'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1975,7 +2029,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Profile Details */
-		get: operations['EliteAPIFeaturesProfileGetProfileDetailsGetProfileDetailsEndpoint'];
+		get: operations['EliteAPIFeaturesProfilesEndpointsGetProfileDetailsGetProfileDetailsEndpoint'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1992,7 +2046,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get names of a player's profiles */
-		get: operations['EliteAPIFeaturesProfileGetProfileNamesGetProfileNamesEndpoint'];
+		get: operations['EliteAPIFeaturesProfilesEndpointsGetProfileNamesGetProfileNamesEndpoint'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2009,7 +2063,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Profile Member */
-		get: operations['EliteAPIFeaturesProfileGetSelectedProfileGetSelectedProfileEndpoint'];
+		get: operations['EliteAPIFeaturesProfilesEndpointsGetSelectedProfileGetSelectedProfileEndpoint'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -3619,12 +3673,22 @@ export interface components {
 		LeaderboardDto: {
 			id: string;
 			title: string;
+			shortTitle?: string | null;
 			/** Format: int32 */
 			limit: number;
 			/** Format: int32 */
 			offset: number;
 			/** Format: int32 */
 			maxEntries: number;
+			/**
+			 * Format: decimal
+			 * @description The minimum score required to be on the leaderboard
+			 */
+			minimumScore: number;
+			/** Format: int64 */
+			startsAt: number;
+			/** Format: int64 */
+			endsAt: number;
 			profile: boolean;
 			entries: components['schemas']['LeaderboardEntryDto'][];
 		};
@@ -3654,6 +3718,12 @@ export interface components {
 			 * @description Score of the entry
 			 */
 			amount: number;
+			removed: boolean;
+			/**
+			 * Format: double
+			 * @description Initial score of the entry
+			 */
+			initialAmount: number;
 			members?: components['schemas']['ProfileLeaderboardMemberDto'][] | null;
 		};
 		ProfileLeaderboardMemberDto: {
@@ -3666,34 +3736,52 @@ export interface components {
 			xp: number;
 		};
 		LeaderboardSliceRequest: Record<string, never>;
-		ConfigLeaderboardSettings: {
-			/** Format: int32 */
-			completeRefreshInterval: number;
+		LeaderboardsResponse: {
 			leaderboards: {
-				[key: string]: components['schemas']['Leaderboard'];
-			};
-			collectionLeaderboards: {
-				[key: string]: components['schemas']['Leaderboard'];
-			};
-			skillLeaderboards: {
-				[key: string]: components['schemas']['Leaderboard'];
-			};
-			pestLeaderboards: {
-				[key: string]: components['schemas']['Leaderboard'];
-			};
-			profileLeaderboards: {
-				[key: string]: components['schemas']['Leaderboard'];
+				[key: string]: components['schemas']['LeaderboardInfoDto'];
 			};
 		};
-		Leaderboard: {
-			id: string;
+		LeaderboardInfoDto: {
+			/** @description Leaderboard title */
 			title: string;
-			/** Format: int32 */
-			limit: number;
-			order: string;
-			/** Format: int32 */
-			scoreFormat: number;
+			/** @description Leaderboard short title */
+			short?: string | null;
+			/** @description Leaderboard category */
+			category: string;
+			/** @description If true, the leaderboard is profile based */
 			profile: boolean;
+			/**
+			 * Format: decimal
+			 * @description Minimum score required to be on the leaderboard
+			 */
+			minimumScore: number;
+			/** @description Interval type of the leaderboard */
+			intervalType: components['schemas']['LeaderboardType'];
+			/** @description Score data type of the leaderboard */
+			scoreDataType: components['schemas']['LeaderboardScoreDataType'];
+		};
+		/** @enum {integer} */
+		LeaderboardType: 0 | 1 | 2;
+		/** @enum {integer} */
+		LeaderboardScoreDataType: 0 | 1 | 2;
+		LeaderboardRanksResponse: {
+			ranks: {
+				[key: string]: components['schemas']['PlayerLeaderboardEntryWithRankDto'];
+			};
+		};
+		PlayerLeaderboardEntryWithRankDto: {
+			title: string;
+			short?: string | null;
+			slug: string;
+			profile?: boolean | null;
+			/** Format: int32 */
+			rank: number;
+			intervalIdentifier?: string | null;
+			/** Format: double */
+			amount: number;
+			/** Format: double */
+			initialAmount: number;
+			type: components['schemas']['LeaderboardScoreDataType'];
 		};
 		LeaderboardPositionDto: {
 			/** Format: int32 */
@@ -3755,6 +3843,7 @@ export interface components {
 			skills: components['schemas']['SkillsDto'];
 			chocolateFactory: components['schemas']['ChocolateFactoryDto'];
 			events: components['schemas']['ProfileEventMemberDto'][];
+			leaderboards: components['schemas']['PlayerLeaderboardEntryWithRankDto'][];
 			isSelected: boolean;
 			wasRemoved: boolean;
 			/** Format: int64 */
@@ -8753,11 +8842,13 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesLeaderboardsGetLeaderboardGetLeaderboardEndpoint: {
+	EliteAPIFeaturesLeaderboardsEndpointsGetLeaderboardGetLeaderboardEndpoint: {
 		parameters: {
 			query?: {
 				offset?: number | null;
 				limit?: number;
+				/** @description Use new leaderboard backend (will be default in the future) */
+				new?: boolean | null;
 			};
 			header?: never;
 			path: {
@@ -8788,7 +8879,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesLeaderboardsGetLeaderboardsGetLeaderboardsEndpoint: {
+	EliteAPIFeaturesLeaderboardsEndpointsGetLeaderboardsGetLeaderboardsEndpoint: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8803,18 +8894,54 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					'application/json': components['schemas']['ConfigLeaderboardSettings'];
+					'application/json': components['schemas']['LeaderboardsResponse'];
 				};
 			};
 		};
 	};
-	EliteAPIFeaturesLeaderboardsGetPlayerRankGetPlayerRankEndpoint: {
+	EliteAPIFeaturesLeaderboardsEndpointsGetPlayerLeaderboardRanksGetPlayerLeaderboardRanksEndpoint: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				playerUuid: string;
+				profileUuid: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['LeaderboardRanksResponse'];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+		};
+	};
+	EliteAPIFeaturesLeaderboardsEndpointsGetPlayerRankGetPlayerRankEndpoint1: {
 		parameters: {
 			query?: {
 				/** @description Include upcoming players */
 				includeUpcoming?: boolean | null;
+				/** @description Amount of upcoming players to include (max 100). Only works with new leaderboard backend */
+				upcoming?: number | null;
 				/** @description Start at a specified rank for upcoming players */
 				atRank?: number | null;
+				/** @description Use new leaderboard backend (will be default in the future) */
+				new?: boolean | null;
 			};
 			header?: never;
 			path: {
@@ -8847,7 +8974,45 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesLeaderboardsGetPlayerRanksGetPlayerRanksEndpoint: {
+	EliteAPIFeaturesLeaderboardsEndpointsGetPlayerRankGetPlayerRankEndpoint2: {
+		parameters: {
+			query?: {
+				includeUpcoming?: boolean | null;
+				upcoming?: number | null;
+				atRank?: number | null;
+				new?: boolean | null;
+			};
+			header?: never;
+			path: {
+				leaderboard: string;
+				playerUuid: string;
+				profileUuid: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['LeaderboardPositionDto'];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+		};
+	};
+	EliteAPIFeaturesLeaderboardsEndpointsGetPlayerRanksGetPlayerRanksEndpoint: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8879,17 +9044,58 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesLeaderboardsGetProfileRankGetProfileRankEndpoint: {
+	EliteAPIFeaturesLeaderboardsEndpointsGetProfileRankGetProfileRankEndpoint1: {
 		parameters: {
 			query?: {
 				/** @description Include upcoming players */
 				includeUpcoming?: boolean | null;
+				/** @description Amount of upcoming players to include (max 100). Only works with new leaderboard backend */
+				upcoming?: number | null;
 				/** @description Start at a specified rank for upcoming players */
 				atRank?: number | null;
+				/** @description Use new leaderboard backend (will be default in the future) */
+				new?: boolean | null;
 			};
 			header?: never;
 			path: {
 				/** @description Id of leaderboard */
+				leaderboard: string;
+				profileUuid: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['LeaderboardPositionDto'];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+		};
+	};
+	EliteAPIFeaturesLeaderboardsEndpointsGetProfileRankGetProfileRankEndpoint2: {
+		parameters: {
+			query?: {
+				includeUpcoming?: boolean | null;
+				upcoming?: number | null;
+				atRank?: number | null;
+				new?: boolean | null;
+			};
+			header?: never;
+			path: {
 				leaderboard: string;
 				profileUuid: string;
 			};
@@ -8993,7 +9199,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesProfileGetAllProfileDetailsGetAllProfileDetailsEndpoint: {
+	EliteAPIFeaturesProfilesEndpointsGetAllProfileDetailsGetAllProfileDetailsEndpoint: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9024,7 +9230,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesProfileGetProfileGetProfileEndpoint: {
+	EliteAPIFeaturesProfilesEndpointsGetProfileGetProfileEndpoint: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9063,7 +9269,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesProfileGetProfileDetailsGetProfileDetailsEndpoint: {
+	EliteAPIFeaturesProfilesEndpointsGetProfileDetailsGetProfileDetailsEndpoint: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9101,7 +9307,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesProfileGetProfileNamesGetProfileNamesEndpoint: {
+	EliteAPIFeaturesProfilesEndpointsGetProfileNamesGetProfileNamesEndpoint: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9132,7 +9338,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesProfileGetSelectedProfileGetSelectedProfileEndpoint: {
+	EliteAPIFeaturesProfilesEndpointsGetSelectedProfileGetSelectedProfileEndpoint: {
 		parameters: {
 			query?: never;
 			header?: never;
