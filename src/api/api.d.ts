@@ -2618,20 +2618,14 @@ export interface components {
 			youtube?: string | null;
 		};
 		PlayerRequest: Record<string, never>;
-		/** @description the dto used to send an error response to the client */
 		ErrorResponse: {
 			/**
 			 * Format: int32
-			 * @description the http status code sent to the client. default is 400.
 			 * @default 400
 			 */
 			statusCode: number;
-			/**
-			 * @description the message for the error response
-			 * @default One or more errors occurred!
-			 */
+			/** @default One or more errors occurred! */
 			message: string;
-			/** @description the collection of errors for the current context */
 			errors: {
 				[key: string]: string[];
 			};
@@ -3783,6 +3777,7 @@ export interface components {
 			initialAmount: number;
 			type: components['schemas']['LeaderboardScoreDataType'];
 		};
+		LeaderboardRanksRequest: Record<string, never>;
 		LeaderboardPositionDto: {
 			/** Format: int32 */
 			rank: number;
@@ -3843,7 +3838,6 @@ export interface components {
 			skills: components['schemas']['SkillsDto'];
 			chocolateFactory: components['schemas']['ChocolateFactoryDto'];
 			events: components['schemas']['ProfileEventMemberDto'][];
-			leaderboards: components['schemas']['PlayerLeaderboardEntryWithRankDto'][];
 			isSelected: boolean;
 			wasRemoved: boolean;
 			/** Format: int64 */
@@ -8901,7 +8895,10 @@ export interface operations {
 	};
 	EliteAPIFeaturesLeaderboardsEndpointsGetPlayerLeaderboardRanksGetPlayerLeaderboardRanksEndpoint: {
 		parameters: {
-			query?: never;
+			query?: {
+				/** @description Maximum rank number to return. Used if you don't want ranks higher than a certain number. */
+				max?: number | null;
+			};
 			header?: never;
 			path: {
 				playerUuid: string;
@@ -8918,15 +8915,6 @@ export interface operations {
 				};
 				content: {
 					'application/json': components['schemas']['LeaderboardRanksResponse'];
-				};
-			};
-			/** @description Bad Request */
-			400: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/problem+json': components['schemas']['ErrorResponse'];
 				};
 			};
 		};

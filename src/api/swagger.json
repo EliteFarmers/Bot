@@ -17,7 +17,7 @@
 	},
 	"servers": [
 		{
-			"url": "http://localhost:5164"
+			"url": "https://api.elitebot.dev"
 		}
 	],
 	"paths": {
@@ -6079,6 +6079,16 @@
 						"schema": {
 							"type": "string"
 						}
+					},
+					{
+						"name": "max",
+						"in": "query",
+						"description": "Maximum rank number to return. Used if you don't want ranks higher than a certain number.",
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"nullable": true
+						}
 					}
 				],
 				"responses": {
@@ -6088,16 +6098,6 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/LeaderboardRanksResponse"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"content": {
-							"application/problem+json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
 								}
 							}
 						}
@@ -8392,24 +8392,20 @@
 			},
 			"ErrorResponse": {
 				"type": "object",
-				"description": "the dto used to send an error response to the client",
 				"additionalProperties": false,
 				"required": ["statusCode", "message", "errors"],
 				"properties": {
 					"statusCode": {
 						"type": "integer",
-						"description": "the http status code sent to the client. default is 400.",
 						"format": "int32",
 						"default": 400
 					},
 					"message": {
 						"type": "string",
-						"description": "the message for the error response",
 						"default": "One or more errors occurred!"
 					},
 					"errors": {
 						"type": "object",
-						"description": "the collection of errors for the current context",
 						"additionalProperties": {
 							"type": "array",
 							"items": {
@@ -11966,6 +11962,10 @@
 					}
 				}
 			},
+			"LeaderboardRanksRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
 			"LeaderboardPositionDto": {
 				"type": "object",
 				"additionalProperties": false,
@@ -12080,7 +12080,6 @@
 					"skills",
 					"chocolateFactory",
 					"events",
-					"leaderboards",
 					"isSelected",
 					"wasRemoved",
 					"lastUpdated"
@@ -12164,12 +12163,6 @@
 						"type": "array",
 						"items": {
 							"$ref": "#/components/schemas/ProfileEventMemberDto"
-						}
-					},
-					"leaderboards": {
-						"type": "array",
-						"items": {
-							"$ref": "#/components/schemas/PlayerLeaderboardEntryWithRankDto"
 						}
 					},
 					"isSelected": {

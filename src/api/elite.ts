@@ -79,7 +79,7 @@ export const FetchContests = (playerUuid: string) =>
 		},
 	});
 
-export const FetchWeightLeaderboardRank = (playerUuid: string, profileUuid: string) =>
+export const FetchWeightLeaderboardRank = (playerUuid: string, profileUuid: string, max = 10_000) =>
 	GET('/leaderboard/{leaderboard}/{playerUuid}/{profileUuid}', {
 		params: {
 			path: {
@@ -89,16 +89,20 @@ export const FetchWeightLeaderboardRank = (playerUuid: string, profileUuid: stri
 			},
 			query: {
 				new: true,
+				max,
 			},
 		},
 	});
 
-export const FetchLeaderboardRankings = (playerUuid: string, profileUuid: string) =>
+export const FetchLeaderboardRankings = (playerUuid: string, profileUuid: string, max = 10_000) =>
 	GET('/leaderboards/{playerUuid}/{profileUuid}', {
 		params: {
 			path: {
 				playerUuid,
 				profileUuid,
+			},
+			query: {
+				max,
 			},
 		},
 	});
