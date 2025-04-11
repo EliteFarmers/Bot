@@ -331,14 +331,15 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			.filter((a) => a)
 			.flat() as { name: string; value: string; inline: boolean }[];
 
+		const acceptanceRate =
+			((garden?.completedVisitors ?? 0) / ((garden?.completedVisitors ?? 0) + rejectedVisitors)) * 100;
+		const acceptanceRateText = isNaN(acceptanceRate) ? '0.00' : `${acceptanceRate.toFixed(2)}`;
 		const embed = EliteEmbed(settings)
 			.setTitle(`Visitors for ${escapeIgn(playerName)} (${profile?.profileName})`)
 			.setDescription(
 				`Unique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**/84 ${EmptyString} • ${EmptyString} Accepted • **${(garden?.completedVisitors ?? 0).toLocaleString()}** ${EmptyString} • ${EmptyString} Rejected • **${(rejectedVisitors ?? 0).toLocaleString()}**` +
 					'\nAcceptance Rate • **' +
-					(((garden?.completedVisitors ?? 0) / ((garden?.completedVisitors ?? 0) + rejectedVisitors)) * 100).toFixed(
-						2,
-					) +
+					acceptanceRateText +
 					'%**',
 			);
 
@@ -428,14 +429,15 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			.filter((a) => a)
 			.flat() as { name: string; value: string; inline: boolean }[];
 
+		const acceptanceRate =
+			((garden?.completedVisitors ?? 0) / ((garden?.completedVisitors ?? 0) + rejectedVisitors)) * 100;
+		const acceptanceRateText = isNaN(acceptanceRate) ? '0.00' : `${acceptanceRate.toFixed(2)}`;
 		const embed = EliteEmbed(settings)
 			.setTitle(`Missing Visitors for ${escapeIgn(playerName)} (${profile?.profileName})`)
 			.setDescription(
 				`Unique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**/84 ${EmptyString} • ${EmptyString} Accepted • **${(garden?.completedVisitors ?? 0).toLocaleString()}** ${EmptyString} • ${EmptyString} Rejected • **${(rejectedVisitors ?? 0).toLocaleString()}**` +
 					'\nAcceptance Rate • **' +
-					(((garden?.completedVisitors ?? 0) / ((garden?.completedVisitors ?? 0) + rejectedVisitors)) * 100).toFixed(
-						2,
-					) +
+					acceptanceRateText +
 					'%**',
 			);
 
