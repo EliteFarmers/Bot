@@ -3,7 +3,7 @@ import { GlobalFonts } from '@napi-rs/canvas';
 import * as Sentry from '@sentry/node';
 import { CronJob } from 'cron';
 import { ActivityType, Client, ClientEvents, Collection, Events, GatewayIntentBits } from 'discord.js';
-import { ConnectToRMQ } from './api/rabbit.js';
+import { ConnectToRedis } from './api/redis.js';
 import { SignalRecieverOptions } from './classes/Signal.js';
 import { CommandGroup, CronTask, EliteCommand } from './classes/commands/index.js';
 import { registerCommandGroups, registerFiles } from './classes/register.js';
@@ -84,7 +84,7 @@ client.once(Events.ClientReady, async () => {
 
 	console.log('Ready!');
 
-	ConnectToRMQ();
+	ConnectToRedis();
 });
 
 async function updateActivity() {
