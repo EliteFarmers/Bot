@@ -43,7 +43,7 @@ Contributions are welcome! Please open an issue or pull request if you have any 
 	```
 	Enter your bot token in the `BOT_TOKEN` field. The `ELITE_API_URL` field can be left as is, but if you want to use [your instance of the API](https://github.com/EliteFarmers/API), change it to your API's URL. 
 	
-	**Note:** When using the production API, authenticated routes such as for `/verify` will not work. You would need to run your own instance of the API to work on anything requiring auth.
+	**Note:** When using the production API, authenticated routes such as for `/verify` will not work. You would need to run your own instance of the API to work on anything requiring auth. The redis connection also only matters if you are running your own instance of the API.
 
 3. Install dependencies with `pnpm install`. (Run `npm install -g pnpm` if you don't have `pnpm` installed)
 

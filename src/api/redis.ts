@@ -67,7 +67,6 @@ export async function ConnectToRedis() {
 
 		// Subscribe to the specific channel
 		await subscriber.subscribe(REDIS_CHANNEL_NAME, async (message, channel) => {
-			console.log(`Received message from Redis channel '${channel}'`);
 			if (channel !== REDIS_CHANNEL_NAME) return;
 
 			try {
