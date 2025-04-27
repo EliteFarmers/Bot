@@ -1,8 +1,8 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, PermissionFlagsBits } from 'discord.js';
+import { ButtonInteraction, MessageFlags, PermissionFlagsBits } from 'discord.js';
 import { FetchGuildJacob } from '../api/elite.js';
 import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed } from '../classes/embeds.js';
-import { getLeaderboardEmbed } from './submitscores.js';
+import { getLeaderboardComponents } from './submitscores.js';
 
 const command = new EliteCommand({
 	name: 'LBSETUP',
@@ -30,6 +30,8 @@ async function execute(interaction: ButtonInteraction) {
 		.then((data) => data.data)
 		.catch(() => undefined);
 
+	console.log(guild);
+
 	if (!guild) {
 		const embed = ErrorEmbed('Jacob Leaderboards not available!').setDescription(
 			'This server does not have Jacob Leaderboards enabled.\nIf you were expecting this to work, please contact "kaeso.dev" on Discord.\nThis feature is being remade currently, and will likely be a paid feature. Sorry for the inconvenience.',
@@ -49,16 +51,11 @@ async function execute(interaction: ButtonInteraction) {
 		return;
 	}
 
-	const embed = EliteEmbed().setTitle('Leaderboard Setup').setDescription('Congrat!');
+	const embed = EliteEmbed().setTitle('Leaderboard Setup').setDescription('Setup!');
 	interaction.editReply({ embeds: [embed] });
 
-	const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-		new ButtonBuilder().setCustomId(`LBSUBMIT|${lbId}`).setLabel('Submit Scores').setStyle(ButtonStyle.Secondary),
-		new ButtonBuilder()
-			.setLabel('View Online')
-			.setURL(`https://elitebot.dev/server/${interaction.guildId}`)
-			.setStyle(ButtonStyle.Link),
-	);
+	const components = getLeaderboardComponents(leaderboard, interaction.guildId);
 
-	interaction.message.edit({ embeds: [getLeaderboardEmbed(leaderboard)], components: [row] }).catch(() => undefined);
+	interaction.message.delete().catch(() => undefined);
+	interaction.channel?.send({ components, flags: MessageFlags.IsComponentsV2 }).catch((e) => console.error(e));
 }

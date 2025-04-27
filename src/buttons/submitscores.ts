@@ -1,4 +1,13 @@
-import { ButtonInteraction, ChannelType, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
+import {
+	ButtonBuilder,
+	ButtonInteraction,
+	ButtonStyle,
+	ChannelType,
+	ContainerBuilder,
+	EmbedBuilder,
+	PermissionFlagsBits,
+	TextDisplayBuilder,
+} from 'discord.js';
 import { components } from '../api/api.js';
 import { FetchAccount, FetchContests, FetchGuildJacob, UpdateGuildJacob } from '../api/elite.js';
 import { GetReadableDate } from '../classes/SkyblockDate.js';
@@ -65,7 +74,7 @@ async function execute(interaction: ButtonInteraction) {
 	if (isAdmin) {
 		await interaction.message
 			.edit({
-				embeds: [getLeaderboardEmbed(leaderboard)],
+				components: getLeaderboardComponents(leaderboard, interaction.guildId),
 			})
 			.catch(() => undefined);
 	}
@@ -353,57 +362,80 @@ async function execute(interaction: ButtonInteraction) {
 		interaction.editReply({ embeds: [embed] });
 	}
 
+	const components = getLeaderboardComponents(leaderboard, interaction.guildId);
+
 	interaction.message
 		.edit({
-			embeds: [getLeaderboardEmbed(leaderboard)],
+			components,
 			allowedMentions: { users: [] },
 		})
 		.catch(() => undefined);
 }
 
-export function getLeaderboardEmbed(lb: components['schemas']['GuildJacobLeaderboard']) {
+export function getLeaderboardComponents(lb: components['schemas']['GuildJacobLeaderboard'], guildId?: string) {
 	const { cactus, carrot, cocoaBeans, melon, mushroom, netherWart, potato, pumpkin, sugarCane, wheat } = lb.crops ?? {};
 
-	const embed = EliteEmbed()
-		.setTitle(lb.title ?? "Jacob's Contest Leaderboard")
-		.setDescription('These are the highscores set by your fellow server members!');
+	const headerContainer = new ContainerBuilder();
 
-	let footerText = 'Scores are valid starting ';
+	const headerText = new TextDisplayBuilder().setContent(
+		[
+			`## ${lb.title ?? "Jacob's Contest Leaderboard"}`,
+			'-# These are the highscores set by your fellow server members!',
+		].join('\n'),
+	);
+
+	headerContainer.addTextDisplayComponents(headerText);
+
+	const container = new ContainerBuilder();
+
+	container.addTextDisplayComponents(
+		new TextDisplayBuilder().setContent(getField('Cactus', cactus)),
+		new TextDisplayBuilder().setContent(getField('Carrot', carrot)),
+		new TextDisplayBuilder().setContent(getField('Cocoa Beans', cocoaBeans)),
+		new TextDisplayBuilder().setContent(getField('Melon', melon)),
+		new TextDisplayBuilder().setContent(getField('Mushroom', mushroom)),
+		new TextDisplayBuilder().setContent(getField('Nether Wart', netherWart)),
+		new TextDisplayBuilder().setContent(getField('Potato', potato)),
+		new TextDisplayBuilder().setContent(getField('Pumpkin', pumpkin)),
+		new TextDisplayBuilder().setContent(getField('Sugar Cane', sugarCane)),
+		new TextDisplayBuilder().setContent(getField('Wheat', wheat)),
+	);
+
+	let footerText = '-# Scores are valid starting ';
 	if (!lb.startCutoff || lb.startCutoff === -1) {
-		footerText += 'from the beginning of Skyblock';
+		footerText += 'from the beginning of Skyblock!';
 	}
 	if (lb.startCutoff && lb.startCutoff !== -1) {
-		footerText += GetReadableDate(lb.startCutoff);
+		footerText += `${GetReadableDate(lb.startCutoff)} (<t:${lb.startCutoff}:D>)`;
 	}
 
 	if (lb.endCutoff && lb.endCutoff !== -1) {
 		footerText += ` to ${GetReadableDate(lb.endCutoff)}`;
 	}
 
-	embed.setFooter({ text: footerText });
+	const footerContainer = new ContainerBuilder();
 
-	embed.addFields([
-		getField('Cactus', cactus),
-		getField('Carrot', carrot),
-		getField('Cocoa Beans', cocoaBeans),
-		getField('Melon', melon),
-		getField('Mushroom', mushroom),
-		getField('Nether Wart', netherWart),
-		getField('Potato', potato),
-		getField('Pumpkin', pumpkin),
-		getField('Sugar Cane', sugarCane),
-		getField('Wheat', wheat),
-	]);
+	const footerTextComponent = new TextDisplayBuilder().setContent(footerText);
 
-	return embed;
+	footerContainer.addTextDisplayComponents(footerTextComponent);
+
+	footerContainer.addActionRowComponents((row) =>
+		row.addComponents(
+			new ButtonBuilder().setCustomId(`LBSUBMIT|${lb.id}`).setLabel('Submit Scores').setStyle(ButtonStyle.Primary),
+			new ButtonBuilder()
+				.setLabel('View Online')
+				.setURL(`https://elitebot.dev/server/${guildId}`)
+				.setStyle(ButtonStyle.Link),
+		),
+	);
+
+	return [headerContainer, container, footerContainer];
 }
 
 function getField(crop: string, scores?: components['schemas']['GuildJacobLeaderboardEntry'][]) {
-	if (!scores || scores.length === 0)
-		return {
-			name: crop,
-			value: 'No Scores Set Yet!',
-		};
+	if (!scores || scores.length === 0) {
+		return '## ' + crop + '\nNo Scores Set Yet!';
+	}
 
 	const first = scores[0];
 	const otherScores = scores
@@ -418,8 +450,5 @@ function getField(crop: string, scores?: components['schemas']['GuildJacobLeader
 		${otherScores}
 	`;
 
-	return {
-		name: `${crop} - ${first.ign}`,
-		value,
-	};
+	return `### ${crop} - ${first.ign}\n${value.trim()}`;
 }

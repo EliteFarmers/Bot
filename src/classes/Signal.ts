@@ -2,8 +2,8 @@ import { Client, MessageCreateOptions } from 'discord.js';
 import { client } from '../bot.js';
 import { ErrorEmbed } from './embeds.js';
 
-// RabbitMQ Message "Signal"
-// This is the message that is recieved from the RabbitMQ server.
+// Redis Pub/Sub Message "Signal"
+// This is the message that is recieved from the Redis server.
 // It is used to signal the bot to do something from the EliteAPI.
 // "Signal" is used as "Message" would be confusing with the Discord.js Message class.
 export class Signal<T = unknown> {
@@ -20,7 +20,8 @@ export class Signal<T = unknown> {
 			json = JSON.parse(data);
 			json.data = json.data ? JSON.parse(json.data) : undefined;
 		} catch (_) {
-			console.error('Failed to parse RabbitMQ message.');
+			console.log(_);
+			console.error('Failed to parse Redis message.');
 			return;
 		}
 

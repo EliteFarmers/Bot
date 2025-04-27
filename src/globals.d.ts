@@ -9,11 +9,6 @@ namespace NodeJS {
 		REDIS_URL: string;
 		REDIS_PASSWORD: string;
 
-		RABBITMQ_PORT: string;
-		RABBITMQ_HOSTNAME: string;
-		RABBITMQ_USERNAME: string;
-		RABBITMQ_PASSWORD: string;
-
 		ELITE_DISCORD_ID: string;
 		ELITE_FARMER_ROLE: string;
 	}
