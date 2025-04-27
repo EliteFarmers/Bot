@@ -24,8 +24,8 @@ importers:
         specifier: ^0.10.7
         version: 0.10.7
       '@types/node':
-        specifier: ^20.17.28
-        version: 20.17.31
+        specifier: ^22.0.0
+        version: 22.15.2
       bufferutil:
         specifier: ^4.0.9
         version: 4.0.9
@@ -718,8 +718,8 @@ packages:
   '@types/node-fetch@2.6.12':
     resolution: {integrity: sha512-8nneRWKCg3rMtF69nLQJnOYUcbafYeFSjqkw3jCRLsqkWFlHaoQrr5mXmofFGOx3DKn7UfmBMyov8ySvLRVldA==}
 
-  '@types/node@20.17.31':
-    resolution: {integrity: sha512-quODOCNXQAbNf1Q7V+fI8WyErOCh0D5Yd31vHnKu4GkSztGQ7rlltAaqXhHhLl33tlVyUXs2386MkANSwgDn6A==}
+  '@types/node@22.15.2':
+    resolution: {integrity: sha512-uKXqKN9beGoMdBfcaTY1ecwz6ctxuJAcUlwE55938g0ZJ8lRxwAZqRz2AJ4pzpt5dHdTPMB863UZ0ESiFUcP7A==}
 
   '@types/pg-pool@2.0.6':
     resolution: {integrity: sha512-TaAUE5rq2VQYxab5Ts7WZhKNmuN78Q6PiFonTDdpbx8a1H0M1vhy3rhiMjl+e2iHmogyMw7jZF4FrE6eJUy5HQ==}
@@ -1165,8 +1165,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  undici-types@6.19.8:
-    resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
+  undici-types@6.21.0:
+    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
 
   undici@6.21.1:
     resolution: {integrity: sha512-q/1rj5D0/zayJB2FraXdaWxbhWiNKDvu8naDT2dl1yTlvJp4BLtOcp2a5BvgGNQpYYJzau7tf1WgKv3b+7mqpQ==}
@@ -1865,26 +1865,26 @@ snapshots:
 
   '@types/amqplib@0.10.7':
     dependencies:
-      '@types/node': 20.17.31
+      '@types/node': 22.15.2
 
   '@types/connect@3.4.36':
     dependencies:
-      '@types/node': 20.17.31
+      '@types/node': 22.15.2
 
   '@types/luxon@3.4.2': {}
 
   '@types/mysql@2.15.26':
     dependencies:
-      '@types/node': 20.17.31
+      '@types/node': 22.15.2
 
   '@types/node-fetch@2.6.12':
     dependencies:
-      '@types/node': 20.17.31
+      '@types/node': 22.15.2
       form-data: 4.0.2
 
-  '@types/node@20.17.31':
+  '@types/node@22.15.2':
     dependencies:
-      undici-types: 6.19.8
+      undici-types: 6.21.0
 
   '@types/pg-pool@2.0.6':
     dependencies:
@@ -1892,7 +1892,7 @@ snapshots:
 
   '@types/pg@8.6.1':
     dependencies:
-      '@types/node': 20.17.31
+      '@types/node': 22.15.2
       pg-protocol: 1.8.0
       pg-types: 2.2.0
 
@@ -1900,11 +1900,11 @@ snapshots:
 
   '@types/tedious@4.0.14':
     dependencies:
-      '@types/node': 20.17.31
+      '@types/node': 22.15.2
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 20.17.31
+      '@types/node': 22.15.2
 
   '@vladfrangu/async_event_emitter@2.4.6': {}
 
@@ -2325,7 +2325,7 @@ snapshots:
 
   typescript@5.8.3: {}
 
-  undici-types@6.19.8: {}
+  undici-types@6.21.0: {}
 
   undici@6.21.1: {}
 
