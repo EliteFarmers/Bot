@@ -320,6 +320,14 @@ async function execute(interaction: ButtonInteraction) {
 				).toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${
 					contest.timestamp ?? 0
 				})`;
+
+				// Check if this knocked someone out of the top 3
+				if (scores.length > 2) {
+					const knockedOut = scores[2];
+					if (knockedOut.discordId !== interaction.user.id) {
+						message += `\n<@${knockedOut.discordId}> (${knockedOut.ign}) has been knocked out of the top 3!`;
+					}
+				}
 			} else {
 				const improvement = collected - old.record.collected;
 				sendPing =
@@ -512,16 +520,16 @@ function getField(crop: string, scores?: components['schemas']['GuildJacobLeader
 	const otherScores = scores
 		.slice(1)
 		.map((s, i) => {
-			return `**${i + 2}.**⠀${UserHyperLink(
+			return `**${i + 2}.**⠀${s.record?.collected?.toLocaleString()}⠀${UserHyperLink(
 				s.discordId,
-			)}⠀${s.record?.collected?.toLocaleString()}⠀${GetEmbeddedTimestamp(
+			)}⠀${GetEmbeddedTimestamp(
 				s.record?.timestamp ?? 0,
 			)} [⧉](https://elitebot.dev/contest/${s.record?.timestamp ?? 0})`;
 		})
 		.join('\n');
 
 	const value =
-		`**1.**⠀${UserHyperLink(first.discordId)}⠀**${first.record?.collected?.toLocaleString()}**⠀${GetEmbeddedTimestamp(
+		`**1.**⠀**${first.record?.collected?.toLocaleString()}**⠀${UserHyperLink(first.discordId)}⠀${GetEmbeddedTimestamp(
 			first.record?.timestamp ?? 0,
 		)} [⧉](https://elitebot.dev/contest/${first.record?.timestamp ?? 0})\n` + otherScores.trim();
 
