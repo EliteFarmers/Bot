@@ -520,14 +520,14 @@ function getField(crop: string, scores?: components['schemas']['GuildJacobLeader
 	const otherScores = scores
 		.slice(1)
 		.map((s, i) => {
-			return `${i + 2}. ${scoreFormat(s.record?.collected)}⠀${UserHyperLink(s.discordId)}⠀${GetEmbeddedTimestamp(
+			return `${i + 2}. ${scoreFormat(s.record?.collected)}  ${UserHyperLink(s.discordId)}  ${GetEmbeddedTimestamp(
 				s.record?.timestamp ?? 0,
 			)} [⧉](https://elitebot.dev/contest/${s.record?.timestamp ?? 0})`;
 		})
 		.join('\n');
 
 	const value =
-		`1. ${scoreFormat(first.record?.collected)}⠀${UserHyperLink(first.discordId)}⠀${GetEmbeddedTimestamp(
+		`1. **${scoreFormat(first.record?.collected)}**  ${UserHyperLink(first.discordId)}  ${GetEmbeddedTimestamp(
 			first.record?.timestamp ?? 0,
 		)} [⧉](https://elitebot.dev/contest/${first.record?.timestamp ?? 0})\n` + otherScores.trim();
 
