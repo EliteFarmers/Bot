@@ -11,7 +11,7 @@
 		"generate-api-types": "npx openapi-typescript \"./src/api/swagger.json\" -o \"./src/api/api.d.ts\"",
 		"sentry:sourcemaps": "sentry-cli sourcemaps inject --org kaeso --project bot ./dist && sentry-cli sourcemaps upload --org kaeso --project bot ./dist"
 	},
-	"packageManager": "pnpm@9.15.0",
+	"packageManager": "pnpm@9.15.9",
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@types/node-fetch": "^2.6.12",
