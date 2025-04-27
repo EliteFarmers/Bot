@@ -434,7 +434,7 @@ export function getLeaderboardComponents(lb: components['schemas']['GuildJacobLe
 
 function getField(crop: string, scores?: components['schemas']['GuildJacobLeaderboardEntry'][]) {
 	if (!scores || scores.length === 0) {
-		return '## ' + crop + '\nNo Scores Set Yet!';
+		return `### ${GetCropEmoji(crop)} ${crop} \nNo Scores Set Yet!`;
 	}
 
 	const first = scores[0];
@@ -445,10 +445,9 @@ function getField(crop: string, scores?: components['schemas']['GuildJacobLeader
 		})
 		.join('\n');
 
-	const value = `
-		${GetCropEmoji(crop)} ${UserHyperLink(first.discordId)}⠀**${first.record?.collected?.toLocaleString()}**⠀${GetEmbeddedTimestamp(first.record?.timestamp ?? 0)} [⧉](https://elitebot.dev/contest/${first.record?.timestamp ?? 0})
-		${otherScores}
-	`;
+	const value =
+		`**1.**⠀${UserHyperLink(first.discordId)}⠀**${first.record?.collected?.toLocaleString()}**⠀${GetEmbeddedTimestamp(first.record?.timestamp ?? 0)} [⧉](https://elitebot.dev/contest/${first.record?.timestamp ?? 0})\n` +
+		otherScores.trim();
 
-	return `### ${crop} - ${first.ign}\n${value.trim()}`;
+	return `### ${GetCropEmoji(crop)} ${crop} - ${first.ign}\n${value.trim()}`;
 }
