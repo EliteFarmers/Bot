@@ -4,16 +4,17 @@ import {
 	ButtonStyle,
 	ChannelType,
 	ContainerBuilder,
-	EmbedBuilder,
+	MessageFlags,
 	PermissionFlagsBits,
+	SectionBuilder,
 	TextDisplayBuilder,
 } from 'discord.js';
 import { components } from '../api/api.js';
 import { FetchAccount, FetchContests, FetchGuildJacob, UpdateGuildJacob } from '../api/elite.js';
 import { GetReadableDate } from '../classes/SkyblockDate.js';
 import {
-	GetCropColor,
 	GetCropEmoji,
+	GetCropTuple,
 	GetCropURL,
 	GetEmbeddedTimestamp,
 	UserHyperLink,
@@ -60,10 +61,6 @@ async function execute(interaction: ButtonInteraction) {
 	const isAdmin = interaction.memberPermissions.has(PermissionFlagsBits.Administrator);
 
 	if (!leaderboard?.crops) {
-		if (isAdmin) {
-			await interaction.message.edit({ components: [] }).catch(() => undefined);
-		}
-
 		const embed = ErrorEmbed('Leaderboard not found!').setDescription(
 			'This leaderboard does not exist.\n⠀\nIf you were expecting this to work, please contact "kaeso.dev" on Discord.\nThis feature is being remade currently, and will likely be a paid feature. Sorry for the inconvenience.',
 		);
@@ -71,10 +68,22 @@ async function execute(interaction: ButtonInteraction) {
 		return;
 	}
 
+	if (!interaction.message.flags.has(MessageFlags.IsComponentsV2)) {
+		await interaction.message.delete().catch(() => undefined);
+		await interaction.channel
+			?.send({
+				components: getLeaderboardComponents(leaderboard, interaction.guildId),
+				allowedMentions: { parse: [] },
+				flags: [MessageFlags.IsComponentsV2, MessageFlags.SuppressNotifications],
+			})
+			.catch(() => undefined);
+	}
+
 	if (isAdmin) {
 		await interaction.message
 			.edit({
 				components: getLeaderboardComponents(leaderboard, interaction.guildId),
+				allowedMentions: { parse: [] },
 			})
 			.catch(() => undefined);
 	}
@@ -216,7 +225,13 @@ async function execute(interaction: ButtonInteraction) {
 		Mushroom: leaderboard.crops.mushroom,
 	};
 
-	const cropEmbeds = new Map<string, EmbedBuilder>();
+	const cropEmbeds = new Map<
+		string,
+		{
+			container: ContainerBuilder;
+			section: SectionBuilder;
+		}
+	>();
 
 	validContests.sort((a, b) => (b.collected ?? 0) - (a.collected ?? 0));
 	let sendPing = false;
@@ -252,15 +267,19 @@ async function execute(interaction: ButtonInteraction) {
 		const oldIndex = scores.findIndex((s) => (s.record?.collected ?? 0) < collected);
 		const old = oldIndex !== -1 ? scores[oldIndex] : undefined;
 
-		const embed =
-			cropEmbeds.get(crop) ??
-			EliteEmbed()
-				.setColor(GetCropColor(crop))
-				.setThumbnail(GetCropURL(crop) ?? 'https://elitebot.dev/favicon.webp')
-				.setTitle(`New Score for ${crop}!`);
+		let updateContainer = cropEmbeds.get(crop);
 
-		if (oldIndex === 0) {
-			embed.setTitle(`New High Score for ${crop}!`);
+		if (!updateContainer) {
+			updateContainer = {
+				container: new ContainerBuilder().setAccentColor(GetCropTuple(crop)),
+				section: new SectionBuilder()
+					.addTextDisplayComponents((b) =>
+						b.setContent(oldIndex === 0 ? `## New High Score for ${crop}!` : `## New Score for ${crop}!`),
+					)
+					.setThumbnailAccessory((b) => b.setURL(GetCropURL(crop) ?? 'https://elitebot.dev/favicon.webp')),
+			};
+
+			updateContainer.container.addSectionComponents(updateContainer.section);
 		}
 
 		if (old?.record?.collected) {
@@ -272,23 +291,38 @@ async function execute(interaction: ButtonInteraction) {
 						: `**New 3rd Place Score!**`;
 
 			if (old.uuid !== account.id) {
-				message += `\n<@${interaction.user.id}> **(${escapeIgn(account.name)})** has beaten <@${old.discordId}> (${old.ign}) by **${(collected - old.record.collected).toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`;
+				message += `\n<@${interaction.user.id}> **(${escapeIgn(
+					account.name,
+				)})** has beaten <@${old.discordId}> (${old.ign}) by **${(
+					collected - old.record.collected
+				).toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${
+					contest.timestamp ?? 0
+				})`;
 			} else {
 				const improvement = collected - old.record.collected;
 				sendPing =
 					sendPing || (oldIndex === 0 && (improvement >= 500 || (leaderboard.pingForSmallImprovements ?? false)));
 
-				message += `\n<@${interaction.user.id}> **(${escapeIgn(account.name)})** improved their score by **${improvement.toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`;
+				message += `\n<@${interaction.user.id}> **(${escapeIgn(
+					account.name,
+				)})** improved their score by **${improvement.toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${
+					contest.timestamp ?? 0
+				})`;
 			}
 
-			embed.setDescription((embed.data.description ?? '') + `\n${message}`);
+			updateContainer.section.addTextDisplayComponents((b) => b.setContent(`${message}`));
 		} else {
 			sendPing = true;
 			const prefix =
 				scores.length === 0 ? '' : scores.length === 1 ? '**New 2nd Place Score!**\n' : '**New 3rd Place Score!**\n';
-			embed.setDescription(
-				(embed.data.description ?? '') +
-					`\n${prefix}<@${interaction.user.id}> **(${escapeIgn(account.name)})** has set a new score of **${collected.toLocaleString()}** collection! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0})`,
+			updateContainer.section.addTextDisplayComponents((b) =>
+				b.setContent(
+					`\n${prefix}<@${interaction.user.id}> **(${escapeIgn(
+						account.name,
+					)})** has set a new score of **${collected.toLocaleString()}** collection! [⧉](https://elitebot.dev/contest/${
+						contest.timestamp ?? 0
+					})`,
+				),
 			);
 		}
 
@@ -315,7 +349,7 @@ async function execute(interaction: ButtonInteraction) {
 		// Remove any scores that are not in the top 3
 		while (scores.length > 3) scores.pop();
 
-		cropEmbeds.set(crop, embed);
+		cropEmbeds.set(crop, updateContainer);
 		currentScores[crop as keyof typeof currentScores] = scores;
 	}
 
@@ -330,22 +364,37 @@ async function execute(interaction: ButtonInteraction) {
 		return;
 	}
 
-	const embedsToSend = Array.from(cropEmbeds.values());
-	const newRecords = embedsToSend.length > 0;
+	const componentsToSend = Array.from(cropEmbeds.values()).map((c) => c.container);
+	const newRecords = componentsToSend.length > 0;
 
 	if (leaderboard.updateChannelId && newRecords) {
 		const channel = await interaction.guild.channels.fetch(leaderboard.updateChannelId);
 
+		const pingDisplay =
+			sendPing && leaderboard.updateRoleId
+				? new TextDisplayBuilder({ content: `<@&${leaderboard.updateRoleId}> ` })
+				: undefined;
+
 		if (channel?.type === ChannelType.GuildText || channel?.type === ChannelType.GuildAnnouncement) {
 			channel
 				.send({
-					content: sendPing && leaderboard.updateRoleId ? `<@&${leaderboard.updateRoleId}>` : undefined,
-					embeds: embedsToSend,
-					allowedMentions: { roles: [leaderboard.updateRoleId ?? ''] },
+					flags: MessageFlags.IsComponentsV2,
+					components: pingDisplay ? [pingDisplay, ...componentsToSend.slice(0, 5)] : componentsToSend.slice(0, 5),
 				})
 				.catch((e) => {
 					console.error(e);
 				});
+
+			if (componentsToSend.length > 5) {
+				channel
+					.send({
+						flags: MessageFlags.IsComponentsV2,
+						components: componentsToSend.slice(5),
+					})
+					.catch((e) => {
+						console.error(e);
+					});
+			}
 		}
 	}
 
@@ -367,7 +416,7 @@ async function execute(interaction: ButtonInteraction) {
 	interaction.message
 		.edit({
 			components,
-			allowedMentions: { users: [] },
+			allowedMentions: { parse: [] },
 		})
 		.catch(() => undefined);
 }
@@ -441,13 +490,18 @@ function getField(crop: string, scores?: components['schemas']['GuildJacobLeader
 	const otherScores = scores
 		.slice(1)
 		.map((s, i) => {
-			return `**${i + 2}.**⠀${UserHyperLink(s.discordId)}⠀${s.record?.collected?.toLocaleString()}⠀${GetEmbeddedTimestamp(s.record?.timestamp ?? 0)} [⧉](https://elitebot.dev/contest/${s.record?.timestamp ?? 0})`;
+			return `**${i + 2}.**⠀${UserHyperLink(
+				s.discordId,
+			)}⠀${s.record?.collected?.toLocaleString()}⠀${GetEmbeddedTimestamp(
+				s.record?.timestamp ?? 0,
+			)} [⧉](https://elitebot.dev/contest/${s.record?.timestamp ?? 0})`;
 		})
 		.join('\n');
 
 	const value =
-		`**1.**⠀${UserHyperLink(first.discordId)}⠀**${first.record?.collected?.toLocaleString()}**⠀${GetEmbeddedTimestamp(first.record?.timestamp ?? 0)} [⧉](https://elitebot.dev/contest/${first.record?.timestamp ?? 0})\n` +
-		otherScores.trim();
+		`**1.**⠀${UserHyperLink(first.discordId)}⠀**${first.record?.collected?.toLocaleString()}**⠀${GetEmbeddedTimestamp(
+			first.record?.timestamp ?? 0,
+		)} [⧉](https://elitebot.dev/contest/${first.record?.timestamp ?? 0})\n` + otherScores.trim();
 
 	return `### ${GetCropEmoji(crop)} ${crop} - ${first.ign}\n${value.trim()}`;
 }

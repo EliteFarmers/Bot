@@ -57,5 +57,11 @@ async function execute(interaction: ButtonInteraction) {
 	const components = getLeaderboardComponents(leaderboard, interaction.guildId);
 
 	interaction.message.delete().catch(() => undefined);
-	interaction.channel?.send({ components, flags: MessageFlags.IsComponentsV2 }).catch((e) => console.error(e));
+	interaction.channel
+		?.send({
+			components,
+			allowedMentions: { parse: [] },
+			flags: [MessageFlags.IsComponentsV2, MessageFlags.SuppressNotifications],
+		})
+		.catch((e) => console.error(e));
 }

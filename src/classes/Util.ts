@@ -140,6 +140,11 @@ export function GetCropColor(crop: string) {
 	return '#03fc7b';
 }
 
+export function GetCropTuple(crop: string): [number, number, number] {
+	const hex = GetCropColor(crop);
+	return [hex.slice(1, 3), hex.slice(3, 5), hex.slice(5, 7)].map((c) => parseInt(c, 16)) as [number, number, number];
+}
+
 const simpleCropNames = {
 	cactus: 'Cactus',
 	carrot: 'Carrot',
