@@ -1,4 +1,6 @@
 import {
+	APIContainerComponent,
+	APITextDisplayComponent,
 	ButtonBuilder,
 	ButtonInteraction,
 	ButtonStyle,
@@ -61,6 +63,26 @@ async function execute(interaction: ButtonInteraction) {
 	const isAdmin = interaction.memberPermissions.has(PermissionFlagsBits.Administrator);
 
 	if (!leaderboard?.crops) {
+		if (isAdmin) {
+			try {
+				// Scuffed way to remove the submit button
+				const components = interaction.message.components;
+				const buttonContainer = components.at(-1) as APIContainerComponent;
+				const textDisplay = buttonContainer.components[0] as APITextDisplayComponent;
+
+				const newButtonContainer = new ContainerBuilder().addTextDisplayComponents((b) =>
+					b.setContent(textDisplay.content ?? 'Error fetching text'),
+				);
+
+				await interaction.message.edit({
+					components: [...components.slice(0, -1), newButtonContainer],
+					allowedMentions: { parse: [] },
+				});
+			} catch (e) {
+				console.error(e);
+			}
+		}
+
 		const embed = ErrorEmbed('Leaderboard not found!').setDescription(
 			'This leaderboard does not exist.\n⠀\nIf you were expecting this to work, please contact "kaeso.dev" on Discord.\nThis feature is being remade currently, and will likely be a paid feature. Sorry for the inconvenience.',
 		);
