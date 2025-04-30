@@ -94,7 +94,9 @@ async function updateActivity() {
 	const installs =
 		(client.application?.approximateGuildCount ?? 0) + (client.application?.approximateUserInstallCount ?? 0);
 
-	client.user.setActivity(`${installs} installs (𝚫${client.shard?.ids[0] ?? '0'})`, { type: ActivityType.Watching });
+	client.user.setActivity(`${installs.toLocaleString()} installs (𝚫${client.shard?.ids[0] ?? '0'})`, {
+		type: ActivityType.Watching,
+	});
 }
 
 if (!deploying) {
