@@ -90,13 +90,11 @@ client.once(Events.ClientReady, async () => {
 async function updateActivity() {
 	if (!client.user) return;
 
-	let guilds = client.guilds.cache.size;
-	if (client.shard) {
-		const counts = await client.shard.fetchClientValues('guilds.cache.size');
-		guilds = counts.reduce<number>((acc, curr) => Number(acc) + Number(curr), 0);
-	}
+	await client.application?.fetch();
+	const installs =
+		(client.application?.approximateGuildCount ?? 0) + (client.application?.approximateUserInstallCount ?? 0);
 
-	client.user.setActivity(`${guilds} guilds (𝚫${client.shard?.ids[0] ?? '0'})`, { type: ActivityType.Watching });
+	client.user.setActivity(`${installs} installs (𝚫${client.shard?.ids[0] ?? '0'})`, { type: ActivityType.Watching });
 }
 
 if (!deploying) {

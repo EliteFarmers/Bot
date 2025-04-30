@@ -325,7 +325,7 @@ async function execute(interaction: ButtonInteraction) {
 				if (scores.length > 2) {
 					const knockedOut = scores[2];
 					if (knockedOut.discordId !== interaction.user.id) {
-						message += `\n<@${knockedOut.discordId}> (${knockedOut.ign}) has been knocked out of the top 3!`;
+						message += `\n-# <@${knockedOut.discordId}> (${knockedOut.ign}) has been knocked out of the top 3!`;
 					}
 				}
 			} else {
