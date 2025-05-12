@@ -1,3 +1,4 @@
+import { utc } from '@date-fns/utc';
 import { fromUnixTime, getUnixTime, startOfDay } from 'date-fns';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction } from 'discord.js';
 import { FetchCollectionGraphs, UserSettings } from '../api/elite.js';
@@ -88,9 +89,6 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	for (let i = 0; i < dataPoints.length; i++) {
 		const point = dataPoints[i];
-		const start = +(point.timestamp ?? 0);
-
-		// Find next point that's under 24 hours later
 		const lastPoint = dataPoints.at(i + 1) ?? point;
 
 		const cropGains = Object.entries(lastPoint.crops ?? {}).reduce<Record<string, number>>((gains, current) => {
@@ -100,7 +98,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		}, {});
 
 		days.push({
-			start: getUnixTime(startOfDay(fromUnixTime(start))),
+			start: getUnixTime(startOfDay(fromUnixTime(lastPoint.timestamp, { in: utc }), { in: utc })),
 			crops: cropGains,
 			weight: +(lastPoint.cropWeight ?? 0) - +(point.cropWeight ?? 0),
 		});

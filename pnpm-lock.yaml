@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@date-fns/utc':
+        specifier: ^2.1.0
+        version: 2.1.0
       '@napi-rs/canvas':
         specifier: ^0.1.68
         version: 0.1.69
@@ -130,6 +133,9 @@ packages:
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [win32]
+
+  '@date-fns/utc@2.1.0':
+    resolution: {integrity: sha512-176grgAgU2U303rD2/vcOmNg0kGPbhzckuH1TEP2al7n0AQipZIy9P15usd2TKQCG1g+E1jX/ZVQSzs4sUDwgA==}
 
   '@discordjs/builders@1.11.1':
     resolution: {integrity: sha512-2zDAVuoeAkdv0YQzYKO8vZfaDfB+1KZ60ymBKtD7QDpsh6lzAnQSUBLqeRkhlons6BT9+yRctOh9fPy94w6kDA==}
@@ -1256,6 +1262,8 @@ snapshots:
 
   '@biomejs/cli-win32-x64@1.9.4':
     optional: true
+
+  '@date-fns/utc@2.1.0': {}
 
   '@discordjs/builders@1.11.1':
     dependencies:

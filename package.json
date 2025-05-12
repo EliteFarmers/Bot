@@ -21,6 +21,7 @@
 		"typescript": "^5.8.2"
 	},
 	"dependencies": {
+		"@date-fns/utc": "^2.1.0",
 		"@napi-rs/canvas": "^0.1.68",
 		"@sentry/cli": "^2.43.0",
 		"@sentry/node": "^8.55.0",
