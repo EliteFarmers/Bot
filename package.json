@@ -34,7 +34,7 @@
 		"discord.js": "^14.18.0",
 		"farming-weight": "^0.8.3",
 		"openapi-fetch": "^0.13.5",
-		"redis": "^4.7.0",
+		"redis": "^5.0.0",
 		"utf-8-validate": "^6.0.5",
 		"zlib-sync": "^0.1.9",
 		"zod": "^3.24.2"
