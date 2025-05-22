@@ -22,6 +22,7 @@ const command = new EliteCommand({
 			type: SlashCommandOptionType.String,
 			autocomplete: autocomplete,
 		},
+		// maybe just put both possible yaws for farms that this would affect? this would probably just be confusing for most people
 		flipped: {
 			name: 'flipped',
 			description:
