@@ -4,7 +4,7 @@ import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from
 import { AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js';
 
 const command = new EliteCommand({
-	name: 'info',
+	name: 'search',
 	description: 'Get info about a farm design!',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
