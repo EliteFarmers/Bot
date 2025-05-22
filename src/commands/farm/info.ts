@@ -57,82 +57,81 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	let orienation = "North" as Direction;
 	let version = "1.8.9" as MinecraftVersion;
 
-	const components = [
-		new ContainerBuilder()
-            .addTextDisplayComponents(
-                new TextDisplayBuilder().setContent(`# ${design.name}`),
-            )
-            .addTextDisplayComponents(
-                new TextDisplayBuilder().setContent(`Yaw: ${design.angle.yaw}, Pitch: ${design.angle.pitch}\nSpeed: ${design.speed.speed}, Depth strider level: ${depthStriderLevel}`),
-            )
-            .addSeparatorComponents(
-                new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
-            )
-            .addTextDisplayComponents(
-                new TextDisplayBuilder().setContent(`bps: ${design.bps}\nLane time: \nKeys used: `),
-            )
-            .addSeparatorComponents(
-                new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
-            )
-            .addTextDisplayComponents(
-				// todo: dont have field/value if there isnt an example
-				new TextDisplayBuilder().setContent(`Tutorial video: ${design.tutorials?.video ?? 'n/a'}\nDiscussion thread: ${design.tutorials?.thread ?? 'n/a'}\nVisitable  example: ${design.tutorials?.garden ?? 'n/a'}`),
-            )
-            .addSeparatorComponents(
-				new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
-            )
-            .addTextDisplayComponents(
-				// todo: dont have field if there isnt any authors
-                new TextDisplayBuilder().setContent(`-# Authors: ${design.authors?.join(", ") ?? 'n/a'}`),
-            ),
-		new ContainerBuilder()
-			.addTextDisplayComponents(new TextDisplayBuilder().setContent('# Settings'))
-			.addActionRowComponents(
-				new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-					new StringSelectMenuBuilder()
-						.setCustomId('depth_strider')
-						.setPlaceholder('Select the depth strider level you use')
-						.addOptions(
-							new StringSelectMenuOptionBuilder().setLabel('Depth Strider 1').setValue('1'),
-							new StringSelectMenuOptionBuilder().setLabel('Depth Strider 2').setValue('2'),
-							new StringSelectMenuOptionBuilder().setLabel('Depth Strider 3').setValue('3'),
-						),
-				),
-			)
-			.addActionRowComponents(
-				new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-					new StringSelectMenuBuilder()
-						.setCustomId('direction')
-						.setPlaceholder('Select the direction your farm faces')
-						.addOptions(
-							new StringSelectMenuOptionBuilder().setLabel('North').setValue('North'),
-							new StringSelectMenuOptionBuilder().setLabel('South').setValue('South'),
-							new StringSelectMenuOptionBuilder().setLabel('East').setValue('East'),
-							new StringSelectMenuOptionBuilder().setLabel('West').setValue('West'),
-						),
-				),
-			)
-			.addActionRowComponents(
-				new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-					new StringSelectMenuBuilder()
-						.setCustomId('version')
-						.setPlaceholder('Select Minecaft version')
-						.addOptions(
-							new StringSelectMenuOptionBuilder().setLabel('1.8.9').setValue('1.8.9'),
-							new StringSelectMenuOptionBuilder().setLabel('1.21').setValue('1.21'),
-						),
-				),
-			)
-			.addActionRowComponents(
-				new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-					new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel('Remember my choices').setCustomId('save'),
-				),
+	let farmInfoComponent = new ContainerBuilder()
+		.addTextDisplayComponents(
+			new TextDisplayBuilder().setContent(`# ${design.name}`),
+		)
+		.addTextDisplayComponents(
+			new TextDisplayBuilder().setContent(`Yaw: ${design.angle.yaw}, Pitch: ${design.angle.pitch}\nSpeed: ${design.speed.speed}, Depth strider level: ${depthStriderLevel}`),
+		)
+		.addSeparatorComponents(
+			new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+		)
+		.addTextDisplayComponents(
+			new TextDisplayBuilder().setContent(`bps: ${design.bps}\nLane time: \nKeys used: `),
+		)
+		.addSeparatorComponents(
+			new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+		)
+		.addTextDisplayComponents(
+			// todo: dont have field/value if there isnt an example
+			new TextDisplayBuilder().setContent(`Tutorial video: ${design.tutorials?.video ?? 'n/a'}\nDiscussion thread: ${design.tutorials?.thread ?? 'n/a'}\nVisitable  example: ${design.tutorials?.garden ?? 'n/a'}`),
+		)
+		.addSeparatorComponents(
+			new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+		)
+		.addTextDisplayComponents(
+			// todo: dont have field if there isnt any authors
+			new TextDisplayBuilder().setContent(`-# Authors: ${design.authors?.join(", ") ?? 'n/a'}`),
+		);
+
+	const settingsComponent = new ContainerBuilder()
+		.addTextDisplayComponents(new TextDisplayBuilder().setContent('# Settings'))
+		.addActionRowComponents(
+			new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+				new StringSelectMenuBuilder()
+					.setCustomId('depth_strider')
+					.setPlaceholder('Select the depth strider level you use')
+					.addOptions(
+						new StringSelectMenuOptionBuilder().setLabel('Depth Strider 1').setValue('1'),
+						new StringSelectMenuOptionBuilder().setLabel('Depth Strider 2').setValue('2'),
+						new StringSelectMenuOptionBuilder().setLabel('Depth Strider 3').setValue('3'),
+					),
 			),
-	];
+		)
+		.addActionRowComponents(
+			new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+				new StringSelectMenuBuilder()
+					.setCustomId('direction')
+					.setPlaceholder('Select the direction your farm faces')
+					.addOptions(
+						new StringSelectMenuOptionBuilder().setLabel('North').setValue('North'),
+						new StringSelectMenuOptionBuilder().setLabel('South').setValue('South'),
+						new StringSelectMenuOptionBuilder().setLabel('East').setValue('East'),
+						new StringSelectMenuOptionBuilder().setLabel('West').setValue('West'),
+					),
+			),
+		)
+		.addActionRowComponents(
+			new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+				new StringSelectMenuBuilder()
+					.setCustomId('version')
+					.setPlaceholder('Select Minecaft version')
+					.addOptions(
+						new StringSelectMenuOptionBuilder().setLabel('1.8.9').setValue('1.8.9'),
+						new StringSelectMenuOptionBuilder().setLabel('1.21').setValue('1.21'),
+					),
+			),
+		)
+		.addActionRowComponents(
+			new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+				new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel('Remember my choices').setCustomId('save'),
+			),
+		);
 
 	await interaction
 		.reply({
-			components: components,
+			components: [farmInfoComponent, settingsComponent],
 			allowedMentions: { repliedUser: false },
 		})
 		.catch(() => undefined);
