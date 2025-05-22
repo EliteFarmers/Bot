@@ -14,7 +14,7 @@ import {
 	StringSelectMenuOptionBuilder,
 	TextDisplayBuilder,
 } from 'discord.js';
-import { DepthStriderLevels, Direction, MinecraftVersion, farmDesigns, farmsData } from 'farming-weight';
+import { DepthStriderLevels, Direction, MinecraftVersion, farmDesigns, farmInfo, farmsData } from 'farming-weight';
 import { $ZodAny } from 'zod/v4/core';
 
 const command = new EliteCommand({
@@ -57,15 +57,26 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const orienation = 'North' as Direction;
 	const version = '1.8.9' as MinecraftVersion;
 
+	const speed = await calcSpeed(
+		design.speed,
+		version,
+		depthStriderLevel,
+	);
+
+	const blocksPerSecond = await calcBlocksPerSecond(
+		speed,
+		design.angle.yaw,
+	);
+
 	const farmInfoComponent = new ContainerBuilder()
 		.addTextDisplayComponents(new TextDisplayBuilder().setContent(`# ${design.name}`))
 		.addTextDisplayComponents(
 			new TextDisplayBuilder().setContent(
-				`Yaw: ${design.angle.yaw}, Pitch: ${design.angle.pitch}\nSpeed: ${design.speed.speed}, Depth strider level: ${depthStriderLevel}`,
+				`Yaw: ${design.angle.yaw}, Pitch: ${design.angle.pitch}\nSpeed: ${speed}, Depth strider level: ${depthStriderLevel}`,
 			),
 		)
 		.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true))
-		.addTextDisplayComponents(new TextDisplayBuilder().setContent(`bps: ${design.bps}\nLane time: \nKeys used: `))
+		.addTextDisplayComponents(new TextDisplayBuilder().setContent(`bps: ${design.bps}\nLane time: ${480 / blocksPerSecond}\nKeys used: `))
 		.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true))
 		.addTextDisplayComponents(
 			// todo: dont have field/value if there isnt an example
@@ -132,11 +143,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 }
 
 async function calcSpeed(
-	currentSpeed: number,
-	usesSoulSand?: boolean,
-	designVersion?: MinecraftVersion,
+	designSpeed: farmInfo["speed"],
 	targetVersion?: MinecraftVersion,
-	currentDepthStrider?: DepthStriderLevels,
 	targetDepthStrider?: DepthStriderLevels,
 ): Promise<number> {
 	const versionMultiplier = {
@@ -144,15 +152,27 @@ async function calcSpeed(
 		'1.21': 0.5,
 	};
 
-	let speed = currentSpeed;
+	let speed = designSpeed.speed;
 
-	if (currentDepthStrider && targetDepthStrider) {
-		speed *= targetDepthStrider / currentDepthStrider;
+	if (designSpeed.depthStrider && targetDepthStrider) {
+		speed *= targetDepthStrider / designSpeed.depthStrider;
 	}
 
-	if (usesSoulSand && designVersion && targetVersion) {
-		speed *= versionMultiplier[targetVersion] / versionMultiplier[designVersion];
+	if (designSpeed.soulSand && designSpeed.buildVersion && targetVersion) {
+		speed *= versionMultiplier[targetVersion] / versionMultiplier[designSpeed.buildVersion];
 	}
 
 	return speed;
+}
+
+async function calcBlocksPerSecond(speed: number, yaw: number): Promise<number> {
+	if (speed <= 0) return Infinity;
+
+	yaw = ((yaw % 360) + 360) % 360;
+
+	const angleOffset = yaw % 90;
+	const effectiveSpeed = angleOffset === 0 ? speed : speed * Math.cos((angleOffset * Math.PI) / 180);
+
+	// https://minecraft.fandom.com/wiki/Walking
+	return effectiveSpeed * 4.317 / 100;
 }
