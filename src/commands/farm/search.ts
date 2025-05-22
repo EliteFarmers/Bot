@@ -1,4 +1,5 @@
 import { UserSettings } from 'api/elite.js';
+import { eliteCropOption } from 'autocomplete/crops.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from 'classes/commands/index.js';
 import { AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js';
 
@@ -9,12 +10,7 @@ const command = new EliteCommand({
 	type: CommandType.Slash,
 	subCommand: true,
 	options: {
-		design: {
-			name: 'crop',
-			description: 'Search for a farm design!',
-			type: SlashCommandOptionType.String,
-			required: true,
-		},
+		crop: eliteCropOption,
 	},
 	execute: execute,
 });
