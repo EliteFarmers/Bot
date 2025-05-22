@@ -99,7 +99,7 @@ export const farmsData: Record<string, farmInfo> = {
 			video: 'https://www.youtube.com/watch?v=s4HV0RyWcoI',
 			garden: 'IdkVenom',
 		},
-		authors: ['AgitatedSnake92', 'MelonKingDe', 'SunTzu101', 'IdkVenom', 'DeadlyIPanda'],
+		authors: ['AgitatedSnake92', 'MelonKingDe', 'IdkVenom', 'DeadlyIPanda'],
 	},
 	chisslMelon: {
 		name: 'Chissl Waterless Melon/Pumpkin',
@@ -119,7 +119,7 @@ export const farmsData: Record<string, farmInfo> = {
 		tutorials: {
 			garden: 'Chissl',
 		},
-		authors: ['Chissl'],
+		authors: ['AgitatedSnake92', 'Chissl'],
 		notes: ['Very difficult and time consuming to build, only worthwhile for extreme farmers'],
 	},
 	dropdownWheat: {
@@ -210,7 +210,7 @@ export const farmsData: Record<string, farmInfo> = {
 			video: 'https://www.youtube.com/watch?v=9yVNsafjOCA',
 			garden: 'Z109',
 		},
-		authors: ['Z109'],
+		authors: ['AgitatedSnake92', 'Z109'],
 	},
 	blackCatWheat: {
 		name: 'Black Cat Wheat/Potato/Carrot',
@@ -304,7 +304,7 @@ export const farmsData: Record<string, farmInfo> = {
 		tutorials: {
 			garden: 'IdkPoison_',
 		},
-		authors: ['IdkPoison_'],
+		authors: ['AgitatedSnake92', 'IdkPoison_'],
 	},
 	blackCatCocoa: {
 		name: 'Black Cat Cocoa',
@@ -320,7 +320,7 @@ export const farmsData: Record<string, farmInfo> = {
 			yaw: 0,
 			pitch: -45,
 		},
-		bps: 19.95,
+		bps: 19.98,
 		laneDepth: 3,
 		tutorials: {
 			thread: 'https://discord.com/channels/1096051612373487687/1159959995329298443',
@@ -349,7 +349,7 @@ export const farmsData: Record<string, farmInfo> = {
 			garden: 'not_a_cowfr',
 		},
 		authors: ['not a cow', 'Binrich'],
-		notes: ["Easier to build than regular cocoa, but wont work if you don't hold D"],
+		notes: ["Easier to build and use than regular cocoa, but wont work if you don't hold D (but doing so is better anyway so it doesn't really matter)"],
 	},
 	blackCatCactus: {
 		name: 'Black Cat Cactus',
@@ -417,7 +417,7 @@ export const farmsData: Record<string, farmInfo> = {
 		tutorials: {
 			thread: 'https://discord.com/channels/1096051612373487687/1159960545487761479',
 			video: 'https://www.youtube.com/watch?v=nQ5yjQU9gmo',
-			garden: 'FarmingHub',
+			garden: 'MelonKingDe',
 		},
 	},
 	farminghubCane: {
