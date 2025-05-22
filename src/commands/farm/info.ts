@@ -52,37 +52,31 @@ async function autocomplete(interaction: AutocompleteInteraction) {
 export default command;
 
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
-	let design = farmsData.chisslMelon;
-	let depthStriderLevel = 1 as DepthStriderLevels;
-	let orienation = "North" as Direction;
-	let version = "1.8.9" as MinecraftVersion;
+	const design = farmsData.chisslMelon;
+	const depthStriderLevel = 1 as DepthStriderLevels;
+	const orienation = 'North' as Direction;
+	const version = '1.8.9' as MinecraftVersion;
 
-	let farmInfoComponent = new ContainerBuilder()
+	const farmInfoComponent = new ContainerBuilder()
+		.addTextDisplayComponents(new TextDisplayBuilder().setContent(`# ${design.name}`))
 		.addTextDisplayComponents(
-			new TextDisplayBuilder().setContent(`# ${design.name}`),
+			new TextDisplayBuilder().setContent(
+				`Yaw: ${design.angle.yaw}, Pitch: ${design.angle.pitch}\nSpeed: ${design.speed.speed}, Depth strider level: ${depthStriderLevel}`,
+			),
 		)
-		.addTextDisplayComponents(
-			new TextDisplayBuilder().setContent(`Yaw: ${design.angle.yaw}, Pitch: ${design.angle.pitch}\nSpeed: ${design.speed.speed}, Depth strider level: ${depthStriderLevel}`),
-		)
-		.addSeparatorComponents(
-			new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
-		)
-		.addTextDisplayComponents(
-			new TextDisplayBuilder().setContent(`bps: ${design.bps}\nLane time: \nKeys used: `),
-		)
-		.addSeparatorComponents(
-			new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
-		)
+		.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true))
+		.addTextDisplayComponents(new TextDisplayBuilder().setContent(`bps: ${design.bps}\nLane time: \nKeys used: `))
+		.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true))
 		.addTextDisplayComponents(
 			// todo: dont have field/value if there isnt an example
-			new TextDisplayBuilder().setContent(`Tutorial video: ${design.tutorials?.video ?? 'n/a'}\nDiscussion thread: ${design.tutorials?.thread ?? 'n/a'}\nVisitable  example: ${design.tutorials?.garden ?? 'n/a'}`),
+			new TextDisplayBuilder().setContent(
+				`Tutorial video: ${design.tutorials?.video ?? 'n/a'}\nDiscussion thread: ${design.tutorials?.thread ?? 'n/a'}\nVisitable  example: ${design.tutorials?.garden ?? 'n/a'}`,
+			),
 		)
-		.addSeparatorComponents(
-			new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
-		)
+		.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true))
 		.addTextDisplayComponents(
 			// todo: dont have field if there isnt any authors
-			new TextDisplayBuilder().setContent(`-# Authors: ${design.authors?.join(", ") ?? 'n/a'}`),
+			new TextDisplayBuilder().setContent(`-# Authors: ${design.authors?.join(', ') ?? 'n/a'}`),
 		);
 
 	const settingsComponent = new ContainerBuilder()
