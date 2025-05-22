@@ -106,8 +106,8 @@ export const farmsData: Record<string, farmInfo> = {
 		crops: [Crop.Melon, Crop.Pumpkin],
 		speed: {
 			speed: 365,
-			soulSand: false,
-			buildVersion: '1.8.9', // todo: check
+			soulSand: false, // todo: check
+			buildVersion: '1.8.9', 
 			method: 'straight', // todo: check
 		},
 		angle: {
