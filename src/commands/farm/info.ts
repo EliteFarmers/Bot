@@ -45,22 +45,22 @@ const command = new EliteCommand({
 	execute: execute,
 });
 
-export const allowedDesigns = Object.entries(farmsData)
+export const allowedDesigns = Object.entries(farmsData);
 
 const mcVersions = ['1.8.9', '1.21'] as const;
-type Version = typeof mcVersions[number];
+type Version = (typeof mcVersions)[number];
 
 const depthStriderLevels = [1, 2, 3] as const;
-type DSLevel = typeof depthStriderLevels[number];
+type DSLevel = (typeof depthStriderLevels)[number];
 
 const directions = ['North', 'South', 'East', 'West'] as const;
-type Direction = typeof directions[number];
+type Direction = (typeof directions)[number];
 
 const autocompleteData: Record<string, Array<{ name: string; value: string | number }>> = {
 	direction: directions.map((v) => ({ name: v, value: v })),
 	'depth strider': depthStriderLevels.map((n) => ({ name: `Depth Strider ${n}`, value: n })),
 	version: mcVersions.map((v) => ({ name: v, value: v })),
-    design: allowedDesigns.map(([key, data]) => ({ name: data.name, value: key })),
+	design: allowedDesigns.map(([key, data]) => ({ name: data.name, value: key })),
 };
 
 async function autocomplete(interaction: AutocompleteInteraction) {
@@ -80,43 +80,36 @@ async function autocomplete(interaction: AutocompleteInteraction) {
 export default command;
 
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
-    const versionRaw = interaction.options.getString('version', false)?.trim();
-    const version = mcVersions.includes(versionRaw as Version)
-        ? (versionRaw as Version)
-        : undefined;
+	const versionRaw = interaction.options.getString('version', false)?.trim();
+	const version = mcVersions.includes(versionRaw as Version) ? (versionRaw as Version) : undefined;
 
-    const dsRaw = interaction.options.getString('depth_strider', false)?.trim();
-    const dsLevel = depthStriderLevels.includes(Number(dsRaw) as DSLevel)
-        ? (Number(dsRaw) as DSLevel)
-        : undefined;
+	const dsRaw = interaction.options.getString('depth_strider', false)?.trim();
+	const dsLevel = depthStriderLevels.includes(Number(dsRaw) as DSLevel) ? (Number(dsRaw) as DSLevel) : undefined;
 
-    const directionRaw = interaction.options.getString('direction', false)?.trim();
-    const direction = directions.includes(directionRaw as Direction)
-        ? (directionRaw as Direction)
-        : undefined;
+	const directionRaw = interaction.options.getString('direction', false)?.trim();
+	const direction = directions.includes(directionRaw as Direction) ? (directionRaw as Direction) : undefined;
 
-    const farm = farmsData[interaction.options.getString('design', true) as keyof typeof farmsData];
+	const farm = farmsData[interaction.options.getString('design', true) as keyof typeof farmsData];
 
-    await interaction
-        .reply({
-            content: `${calcSpeed(farm.speed.speed, farm.speed.soulSand, farm.speed.buildVersion, version, farm.speed.depthStrider, dsLevel)}`,
-            allowedMentions: { repliedUser: false },
-        })
-        .catch(() => undefined);
-
+	await interaction
+		.reply({
+			content: `${calcSpeed(farm.speed.speed, farm.speed.soulSand, farm.speed.buildVersion, version, farm.speed.depthStrider, dsLevel)}`,
+			allowedMentions: { repliedUser: false },
+		})
+		.catch(() => undefined);
 }
 
 async function calcSpeed(
 	currentSpeed: number,
 	usesSoulSand?: boolean,
-	designVersion?: "1.8.9" | "1.21",
-	targetVersion?: "1.8.9" | "1.21",
+	designVersion?: '1.8.9' | '1.21',
+	targetVersion?: '1.8.9' | '1.21',
 	currentDepthStrider?: 1 | 2 | 3,
 	targetDepthStrider?: 1 | 2 | 3,
 ): Promise<number> {
 	const versionMultiplier = {
-		"1.8.9": 0.4,
-		"1.21": 0.5,
+		'1.8.9': 0.4,
+		'1.21': 0.5,
 	};
 
 	let speed = currentSpeed;

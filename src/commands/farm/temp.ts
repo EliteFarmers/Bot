@@ -8,7 +8,7 @@ interface farmInfo {
 		speed: number;
 		depthStrider?: 1 | 2 | 3;
 		soulSand: boolean;
-		buildVersion: "1.8.9" | "1.21"
+		buildVersion: '1.8.9' | '1.21';
 		method: 'straight' | 'running into wall' | 'angled into wall' | 'crouching';
 	};
 	angle: {
@@ -37,7 +37,7 @@ export const farmsData: Record<string, farmInfo> = {
 		speed: {
 			speed: 155,
 			soulSand: false,
-			buildVersion: "1.8.9",
+			buildVersion: '1.8.9',
 			method: 'straight',
 		},
 		angle: {
@@ -60,7 +60,7 @@ export const farmsData: Record<string, farmInfo> = {
 			speed: 400,
 			depthStrider: 3,
 			soulSand: true,
-			buildVersion: "1.8.9",
+			buildVersion: '1.8.9',
 			method: 'running into wall',
 		},
 		angle: {
@@ -85,7 +85,7 @@ export const farmsData: Record<string, farmInfo> = {
 			speed: 400,
 			depthStrider: 3,
 			soulSand: true,
-			buildVersion: "1.8.9",
+			buildVersion: '1.8.9',
 			method: 'running into wall',
 		},
 		angle: {
@@ -107,7 +107,7 @@ export const farmsData: Record<string, farmInfo> = {
 		speed: {
 			speed: 365,
 			soulSand: false,
-			buildVersion: "1.8.9", // todo: check
+			buildVersion: '1.8.9', // todo: check
 			method: 'straight', // todo: check
 		},
 		angle: {
@@ -129,7 +129,7 @@ export const farmsData: Record<string, farmInfo> = {
 			speed: 93,
 			depthStrider: 3,
 			soulSand: false,
-			buildVersion: "1.8.9",
+			buildVersion: '1.8.9',
 			method: 'straight',
 		},
 		angle: {
@@ -148,7 +148,7 @@ export const farmsData: Record<string, farmInfo> = {
 			speed: 347,
 			depthStrider: 2,
 			soulSand: true,
-			buildVersion: "1.8.9",
+			buildVersion: '1.8.9',
 			method: 'running into wall',
 		},
 		angle: {
@@ -170,7 +170,7 @@ export const farmsData: Record<string, farmInfo> = {
 			speed: 328,
 			depthStrider: 3,
 			soulSand: false,
-			buildVersion: "1.8.9",
+			buildVersion: '1.8.9',
 			method: 'angled into wall',
 		},
 		angle: {
@@ -196,7 +196,7 @@ export const farmsData: Record<string, farmInfo> = {
 			speed: 328,
 			depthStrider: 3,
 			soulSand: false,
-			buildVersion: "1.8.9",
+			buildVersion: '1.8.9',
 			method: 'angled into wall',
 		},
 		angle: {
@@ -219,7 +219,7 @@ export const farmsData: Record<string, farmInfo> = {
 			speed: 347,
 			depthStrider: 2,
 			soulSand: true,
-			buildVersion: "1.8.9",
+			buildVersion: '1.8.9',
 			method: 'running into wall',
 		},
 		angle: {
@@ -244,7 +244,7 @@ export const farmsData: Record<string, farmInfo> = {
 			speed: 347,
 			depthStrider: 2,
 			soulSand: true,
-			buildVersion: "1.8.9",
+			buildVersion: '1.8.9',
 			method: 'running into wall',
 		},
 		angle: {
@@ -269,7 +269,7 @@ export const farmsData: Record<string, farmInfo> = {
 			speed: 233,
 			depthStrider: 3,
 			soulSand: true,
-			buildVersion: "1.8.9",
+			buildVersion: '1.8.9',
 			method: 'angled into wall',
 		},
 		angle: {
@@ -292,7 +292,7 @@ export const farmsData: Record<string, farmInfo> = {
 		speed: {
 			speed: 259,
 			soulSand: false,
-			buildVersion: "1.8.9",
+			buildVersion: '1.8.9',
 			method: 'angled into wall',
 		},
 		angle: {
@@ -313,7 +313,7 @@ export const farmsData: Record<string, farmInfo> = {
 			speed: 400,
 			depthStrider: 3,
 			soulSand: true,
-			buildVersion: "1.8.9",
+			buildVersion: '1.8.9',
 			method: 'running into wall',
 		},
 		angle: {
@@ -336,7 +336,7 @@ export const farmsData: Record<string, farmInfo> = {
 		speed: {
 			speed: 215,
 			soulSand: false,
-			buildVersion: "1.8.9",
+			buildVersion: '1.8.9',
 			method: 'running into wall',
 		},
 		angle: {
@@ -349,7 +349,9 @@ export const farmsData: Record<string, farmInfo> = {
 			garden: 'not_a_cowfr',
 		},
 		authors: ['not a cow', 'Binrich'],
-		notes: ["Easier to build and use than regular cocoa, but wont work if you don't hold D (but doing so is better anyway so it doesn't really matter)"],
+		notes: [
+			"Easier to build and use than regular cocoa, but wont work if you don't hold D (but doing so is better anyway so it doesn't really matter)",
+		],
 	},
 	blackCatCactus: {
 		name: 'Black Cat Cactus',
@@ -358,7 +360,7 @@ export const farmsData: Record<string, farmInfo> = {
 			speed: 464,
 			depthStrider: 3,
 			soulSand: false,
-			buildVersion: "1.8.9",
+			buildVersion: '1.8.9',
 			method: 'straight',
 		},
 		angle: {
@@ -384,7 +386,7 @@ export const farmsData: Record<string, farmInfo> = {
 			speed: 464,
 			depthStrider: 3,
 			soulSand: false,
-			buildVersion: "1.8.9",
+			buildVersion: '1.8.9',
 			method: 'straight',
 		},
 		angle: {
@@ -405,7 +407,7 @@ export const farmsData: Record<string, farmInfo> = {
 		speed: {
 			speed: 328,
 			soulSand: false,
-			buildVersion: "1.8.9",
+			buildVersion: '1.8.9',
 			method: 'angled into wall',
 		},
 		angle: {
@@ -426,7 +428,7 @@ export const farmsData: Record<string, farmInfo> = {
 		speed: {
 			speed: 328,
 			soulSand: false,
-			buildVersion: "1.8.9",
+			buildVersion: '1.8.9',
 			method: 'angled into wall',
 		},
 		angle: {
