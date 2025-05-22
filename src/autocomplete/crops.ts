@@ -1,7 +1,7 @@
 import { CROP_ARRAY } from 'classes/Util.js';
 import { EliteSlashCommandOption, SlashCommandOptionType } from 'classes/commands/options.js';
 import { AutocompleteInteraction } from 'discord.js';
-import { Crop, getCropDisplayName } from 'farming-weight';
+import { getCropDisplayName } from 'farming-weight';
 
 export const eliteCropOption: EliteSlashCommandOption = {
 	name: 'crop',
