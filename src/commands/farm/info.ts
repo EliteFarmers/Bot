@@ -8,11 +8,14 @@ import {
 	ChatInputCommandInteraction,
 	ContainerBuilder,
 	MessageActionRowComponentBuilder,
+	SeparatorBuilder,
+	SeparatorSpacingSize,
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
 	TextDisplayBuilder,
 } from 'discord.js';
-import { DepthStriderLevels, MinecraftVersion, farmDesigns } from 'farming-weight';
+import { DepthStriderLevels, Direction, MinecraftVersion, farmDesigns, farmsData } from 'farming-weight';
+import { $ZodAny } from 'zod/v4/core';
 
 const command = new EliteCommand({
 	name: 'info',
@@ -49,10 +52,41 @@ async function autocomplete(interaction: AutocompleteInteraction) {
 export default command;
 
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
+	let design = farmsData.chisslMelon;
+	let depthStriderLevel = 1 as DepthStriderLevels;
+	let orienation = "North" as Direction;
+	let version = "1.8.9" as MinecraftVersion;
+
 	const components = [
-		new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent('stuff goes here')),
 		new ContainerBuilder()
-			.addTextDisplayComponents(new TextDisplayBuilder().setContent('Settings'))
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(`# ${design.name}`),
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(`Yaw: ${design.angle.yaw}, Pitch: ${design.angle.pitch}\nSpeed: ${design.speed.speed}, Depth strider level: ${depthStriderLevel}`),
+            )
+            .addSeparatorComponents(
+                new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(`bps: ${design.bps}\nLane time: \nKeys used: `),
+            )
+            .addSeparatorComponents(
+                new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+            )
+            .addTextDisplayComponents(
+				// todo: dont have field/value if there isnt an example
+				new TextDisplayBuilder().setContent(`Tutorial video: ${design.tutorials?.video ?? 'n/a'}\nDiscussion thread: ${design.tutorials?.thread ?? 'n/a'}\nVisitable  example: ${design.tutorials?.garden ?? 'n/a'}`),
+            )
+            .addSeparatorComponents(
+				new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+            )
+            .addTextDisplayComponents(
+				// todo: dont have field if there isnt any authors
+                new TextDisplayBuilder().setContent(`-# Authors: ${design.authors?.join(", ") ?? 'n/a'}`),
+            ),
+		new ContainerBuilder()
+			.addTextDisplayComponents(new TextDisplayBuilder().setContent('# Settings'))
 			.addActionRowComponents(
 				new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
 					new StringSelectMenuBuilder()
