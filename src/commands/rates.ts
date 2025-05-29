@@ -1,9 +1,17 @@
-import { ChatInputCommandInteraction, ComponentType, SlashCommandBuilder } from 'discord.js';
-import { Crop, calculateAverageSpecialCrops, calculateDetailedAverageDrops, getCropDisplayName } from 'farming-weight';
-import { UserSettings } from '../api/elite.js';
+import { ChatInputCommandInteraction, MessageFlags, StringSelectMenuInteraction } from 'discord.js';
+import {
+	CROP_INFO,
+	Crop,
+	calculateAverageSpecialCrops,
+	calculateDetailedAverageDrops,
+	getCropDisplayName,
+	getPossibleResultsFromCrops,
+} from 'farming-weight';
+import { FetchProducts, UserSettings } from '../api/elite.js';
 import { CropSelectRow, GetCropEmoji } from '../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
-import { EliteEmbed, EmptyField, NotYoursReply } from '../classes/embeds.js';
+import { EliteContainer } from '../classes/components.js';
+import { EliteEmbed, NotYoursReply } from '../classes/embeds.js';
 
 const TIME_OPTIONS = {
 	24_000: 'Jacob Contest',
@@ -74,19 +82,53 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	delete expectedDrops[Crop.Seeds];
 
+	const allIds = Object.values(CROP_INFO)
+		.map((info) => info.crafts.map((c) => c.item))
+		.flat();
+	const { data: bazaar } = await FetchProducts(allIds);
+
 	let amountLength = 0;
 	let profitLength = 0;
+	let bzLength = 0;
 
 	const formatted = Object.entries(expectedDrops)
 		.map(([crop, details]) => {
 			const cropName = getCropDisplayName(crop as Crop);
 			const profit = details.npcCoins ?? 0;
+			const otherCoins = details.npcCoins - details.coinSources['Collection'];
+
+			const crafts = getPossibleResultsFromCrops(crop as Crop, details.collection);
+			const bz = [];
+
+			for (const [itemId, craft] of Object.entries(crafts)) {
+				if (itemId === crop) continue;
+				const bzData = bazaar?.items?.[itemId];
+				if (!bzData?.bazaar) continue;
+
+				const profit = craft.fractionalItems * bzData.bazaar.averageSellOrder - craft.fractionalCost;
+
+				bz.push({
+					name: bzData.name,
+					items: craft.fractionalItems,
+					cost: craft.fractionalCost,
+					profit: Math.floor(profit),
+					total: Math.floor(profit + otherCoins),
+				});
+			}
+
+			bz.sort((a, b) => b.total - a.total);
+
+			const highestBz = bz[0];
 
 			if (profit.toLocaleString().length > amountLength) amountLength = profit.toLocaleString().length;
 			if (profit.toLocaleString().length > profitLength) profitLength = profit.toLocaleString().length;
+			if (highestBz && highestBz.total.toLocaleString().length > bzLength)
+				bzLength = highestBz.total.toLocaleString().length;
 
 			return {
+				crop: crop as Crop,
 				emoji: GetCropEmoji(cropName),
+				bz: bz,
 				details,
 				profit,
 			};
@@ -102,21 +144,21 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		})
 		.join('\n');
 
-	const bpsText = `**${bps % 1 === 0 ? bps : bps.toFixed(2)}**/20 BPS (${((bps / 20) * 100).toFixed(1)}%)`;
+	const bpsText = `-# **${bps % 1 === 0 ? bps : bps.toFixed(2)}**/20 BPS (${((bps / 20) * 100).toFixed(1)}%)`;
 	const description =
 		`Expected rates for **${fortuneInput?.toLocaleString() ?? 'MAX'}** Farming Fortune in **${timeName}**! ` +
 		`\nUsing **${reforge === 'bountiful' ? 'Bountiful' : 'Blessed'}**, ` +
 		`**${pet === 'mooshroom' ? 'Mooshroom Cow' : 'Elephant'}**, and **4/4ths Fermento Armor**!\n` +
 		bpsText;
 
-	const embed = EliteEmbed(settings)
-		.setTitle('NPC Profit Calculator')
-		.setDescription(description)
-		.addFields({
-			name: 'Crops',
-			value: text || 'Error!',
-			inline: true,
-		});
+	await interaction.deferReply();
+
+	const row = CropSelectRow('crop-select-rates', 'Select a crop to view its rates!');
+
+	const container = new EliteContainer(settings)
+		.addTitle('## Farming Rates Calculator')
+		.addDescription(description)
+		.addTextDisplayComponents((t) => t.setContent(text || 'ERROR!'));
 
 	let details = settings
 		? `You can view your rates with your farming gear on the [website here](<https://elitebot.dev/@${interaction.user.id}/rates>)!`
@@ -124,40 +166,42 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	if (fortuneInput !== undefined) {
 		details +=
-			'\n\n**Custom Fortune Warning**\nThe amount of fortune available varies depending on the crop. For the best results, only look at the crop your entered fortune is for.';
+			'\n\n**Custom Fortune Warning**\n-# The amount of fortune available varies depending on the crop. For the best results, only look at the crop your entered fortune is for.';
 	}
 
-	embed.addFields({
-		name: "What's My Fortune?",
-		value: details,
-		inline: true,
-	});
+	container.addSeperator();
+	container.addTextDisplayComponents((t) => t.setContent("**What's my fortune?**\n-# " + details));
+	container.addFooter();
 
-	const row = CropSelectRow('crop-select-rates', 'Select a crop to view its rates!');
-
-	const reply = await interaction.reply({
-		embeds: [embed],
-		components: [row],
-		fetchReply: true,
+	const reply = await interaction.editReply({
+		components: [container, row],
+		flags: [MessageFlags.IsComponentsV2],
 	});
 
 	const collector = reply.createMessageComponentCollector({
-		componentType: ComponentType.StringSelect,
 		time: 120_000,
 	});
 
-	collector.on('collect', async (inter) => {
-		if (inter.customId !== 'crop-select-rates') return;
+	let cropContainer: EliteContainer | undefined;
 
+	collector.on('collect', async (inter) => {
 		if (inter.user.id !== interaction.user.id) {
 			return NotYoursReply(inter);
 		}
 
+		collector.resetTimer();
+
+		if (cropContainer?.handleCollapsibleInteraction(inter)) {
+			return inter.update({ components: [cropContainer, row] });
+		}
+
+		if (inter.customId !== 'crop-select-rates' || !(inter instanceof StringSelectMenuInteraction)) return;
+
 		const selected = +inter.values[0];
 
-		const [crop, cropInfo] = Object.entries(expectedDrops)[selected];
-		const coinSources = Object.entries(cropInfo.coinSources).sort((a, b) => b[1] - a[1]);
-		const collections = Object.entries(cropInfo.otherCollection).sort((a, b) => b[1] - a[1]);
+		const { crop, ...cropInfo } = formatted[selected];
+		const coinSources = Object.entries(cropInfo.details.coinSources).sort((a, b) => b[1] - a[1]);
+		const collections = Object.entries(cropInfo.details.otherCollection).sort((a, b) => b[1] - a[1]);
 		const cropName = getCropDisplayName(crop as Crop);
 
 		const cropDetails =
@@ -166,59 +210,72 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			`and **4/4ths Fermento Armor**!`;
 
 		const threeFourths = calculateAverageSpecialCrops(blocksBroken, crop as Crop, 3);
-		const fromSpecial = cropInfo.coinSources[threeFourths.type] ?? 0;
+		const fromSpecial = cropInfo.details.coinSources[threeFourths.type] ?? 0;
 		const specialDifference = fromSpecial - threeFourths.npc;
-		const threeFourthsTotal = cropInfo.npcCoins - specialDifference;
+		const threeFourthsTotal = cropInfo.details.npcCoins - specialDifference;
 
-		const cropEmbed = EliteEmbed(settings)
-			.setTitle(`${cropName} Rates`)
-			.setDescription(
-				`Expected rates for **${fortuneInput?.toLocaleString() ?? `${cropInfo.fortune.toLocaleString()} (MAX)`}** Farming Fortune in **${timeName}**!${cropDetails}\n${bpsText}`,
+		cropContainer = new EliteContainer(settings)
+			.addTitle('## ' + cropName + ' Rates', false)
+			.addDescription(
+				`Expected rates for **${fortuneInput?.toLocaleString() ?? `${cropInfo.details.fortune.toLocaleString()} (MAX)`}** Farming Fortune in **${timeName}**!${cropDetails}\n${bpsText}`,
 			)
-			.addFields([
-				{
-					name: 'Total NPC Profit',
-					value: ':coin: ' + cropInfo.npcCoins.toLocaleString() || '0',
-					inline: true,
+			.addSeperator()
+			.addCollapsible({
+				header: '**NPC Profit**',
+				collapsed: {
+					text: '### :coin: ' + cropInfo.details.npcCoins.toLocaleString() || '0',
 				},
-				{
-					name: 'Collection Gain',
-					value: GetCropEmoji(cropName) + ' ' + cropInfo.collection.toLocaleString(),
-					inline: true,
+				expanded: {
+					text:
+						coinSources
+							.map(([source, amount]) => {
+								return `- **${source}:** ${amount?.toLocaleString()}`;
+							})
+							.join('\n') +
+						`\n### 3/4ths Fermento Armor\n:coin: ${threeFourthsTotal?.toLocaleString() ?? '0'} ⠀ ${(specialDifference).toLocaleString()} less coins (~${threeFourths.amount.toLocaleString()} ${threeFourths.type})`,
 				},
-				EmptyField(),
-				{
-					name: 'Profit Breakdown',
-					value: coinSources
+			})
+			.addSeperator()
+			.addCollapsible({
+				header: '**Bazaar Profit**',
+				collapsed: {
+					text: '### <:bz:1376714811894796328> ' + cropInfo.bz[0].total.toLocaleString() || '0',
+				},
+				expanded: {
+					text:
+						cropInfo.bz
+							.map(({ name, items, profit, total }, i) => {
+								return `${i === 0 ? ':star: ' : ''}**${name}**: ${total.toLocaleString()} \n-# **${Math.floor(items).toLocaleString()}** items for **${profit.toLocaleString()}** coins plus other items`;
+							})
+							.join('\n') +
+						`\n\n-# Other items: **${Math.floor(cropInfo.bz[0].total - cropInfo.bz[0].profit).toLocaleString()}** coins to NPC`,
+				},
+			})
+			.addSeperator()
+			.addCollapsible({
+				header: '**Collection Gain**',
+				collapsed: {
+					text: '### ' + GetCropEmoji(cropName) + ' ' + cropInfo.details.collection.toLocaleString(),
+				},
+				expanded: {
+					text: collections
 						.map(([source, amount]) => {
-							return `**${source}:** ${amount?.toLocaleString()}`;
+							return `- **${source}:** ${amount?.toLocaleString()}`;
 						})
 						.join('\n'),
-					inline: true,
 				},
-				{
-					name: 'Collection Breakdown',
-					value: collections
-						.map(([source, amount]) => {
-							return `**${source}:** ${amount?.toLocaleString()}`;
-						})
-						.join('\n'),
-					inline: true,
-				},
-			]);
+			})
+			.addFooter();
 
-		cropEmbed.addFields([
-			EmptyField(),
-			{
-				name: '3/4ths Fermento Armor',
-				value: `:coin: ${threeFourthsTotal?.toLocaleString() ?? '0'} ⠀ ${(specialDifference).toLocaleString()} less coins (~${threeFourths.amount.toLocaleString()} ${threeFourths.type})`,
-			},
-		]);
-
-		inter.update({ embeds: [cropEmbed] });
+		inter.update({ components: [cropContainer, row] });
 	});
 
 	collector.on('end', async () => {
-		reply.edit({ components: [] }).catch(() => undefined);
+		if (cropContainer) {
+			cropContainer.disableEverything();
+			await interaction.editReply({ components: [cropContainer] });
+		} else {
+			interaction.editReply({ components: [] }).catch(() => undefined);
+		}
 	});
 }

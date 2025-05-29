@@ -15,28 +15,28 @@
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@types/node-fetch": "^2.6.12",
-		"dotenv": "^16.4.7",
+		"dotenv": "^16.5.0",
 		"tslib": "^2.8.1",
 		"tsx": "^3.14.0",
-		"typescript": "^5.8.2"
+		"typescript": "^5.8.3"
 	},
 	"dependencies": {
 		"@date-fns/utc": "^2.1.0",
-		"@napi-rs/canvas": "^0.1.68",
-		"@sentry/cli": "^2.43.0",
+		"@napi-rs/canvas": "^0.1.70",
+		"@sentry/cli": "^2.45.0",
 		"@sentry/node": "^8.55.0",
 		"@sentry/profiling-node": "^8.55.0",
 		"@types/amqplib": "^0.10.7",
-		"@types/node": "^20.17.28",
+		"@types/node": "^20.17.50",
 		"bufferutil": "^4.0.9",
 		"cron": "^3.5.0",
 		"date-fns": "^4.1.0",
-		"discord.js": "^14.18.0",
-		"farming-weight": "^0.8.3",
-		"openapi-fetch": "^0.13.5",
-		"redis": "^4.7.0",
+		"discord.js": "^14.19.3",
+		"farming-weight": "^0.8.6",
+		"openapi-fetch": "^0.13.8",
+		"redis": "^4.7.1",
 		"utf-8-validate": "^6.0.5",
-		"zlib-sync": "^0.1.9",
-		"zod": "^3.24.2"
+		"zlib-sync": "^0.1.10",
+		"zod": "^3.25.28"
 	}
 }

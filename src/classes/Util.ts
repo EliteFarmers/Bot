@@ -142,6 +142,10 @@ export function GetCropColor(crop: string) {
 
 export function GetCropTuple(crop: string): [number, number, number] {
 	const hex = GetCropColor(crop);
+	return GetColorTuple(hex);
+}
+
+export function GetColorTuple(hex: string) {
 	return [hex.slice(1, 3), hex.slice(3, 5), hex.slice(5, 7)].map((c) => parseInt(c, 16)) as [number, number, number];
 }
 

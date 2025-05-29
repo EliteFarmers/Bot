@@ -811,6 +811,42 @@
 				]
 			}
 		},
+		"/admin/link-account": {
+			"post": {
+				"tags": ["Admin"],
+				"summary": "Link an Account",
+				"operationId": "EliteAPIFeaturesAdminLinkAccountLinkAccountEndpoint",
+				"requestBody": {
+					"x-name": "AdminLinkAccountRequest",
+					"description": "",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AdminLinkAccountRequest"
+							}
+						}
+					},
+					"required": true,
+					"x-position": 1
+				},
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
 		"/admin/guild/{guildId}/refresh": {
 			"post": {
 				"tags": ["Admin"],
@@ -841,6 +877,42 @@
 								}
 							}
 						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/admin/unlink-account": {
+			"post": {
+				"tags": ["Admin"],
+				"summary": "Unlink an Account",
+				"operationId": "EliteAPIFeaturesAdminUnlinkAccountUnlinkAccountEndpoint",
+				"requestBody": {
+					"x-name": "AdminUnlinkAccountRequest",
+					"description": "",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AdminUnlinkAccountRequest"
+							}
+						}
+					},
+					"required": true,
+					"x-position": 1
+				},
+				"responses": {
+					"204": {
+						"description": "No Content"
 					},
 					"401": {
 						"description": "Unauthorized"
@@ -2757,7 +2829,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/EventMemberBannedDto"
+									"$ref": "#/components/schemas/AdminEventMemberDto"
 								}
 							}
 						}
@@ -2839,11 +2911,71 @@
 				]
 			}
 		},
+		"/guild/{discordId}/events/collection": {
+			"post": {
+				"tags": ["Guild"],
+				"summary": "Create Collection Event",
+				"operationId": "EliteAPIFeaturesEventsAdminCreateEventCollectionCreateCollectionEventEndpoint",
+				"parameters": [
+					{
+						"name": "discordId",
+						"in": "path",
+						"required": true,
+						"description": "Discord Snowflake ID of the requested resource (guild, user, etc.)",
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "event",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateCollectionEventDto"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/EventDetailsDto"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
 		"/guild/{discordId}/events/medals": {
 			"post": {
 				"tags": ["Guild"],
-				"summary": "Create Weight Event",
-				"operationId": "EliteAPIFeaturesEventsAdminCreateMedalEventCreateMedalEventEndpoint",
+				"summary": "Create Medal Event",
+				"operationId": "EliteAPIFeaturesEventsAdminCreateEventMedalsCreateMedalEventEndpoint",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -2862,6 +2994,126 @@
 						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/CreateMedalEventDto"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/EventDetailsDto"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/guild/{discordId}/events/pests": {
+			"post": {
+				"tags": ["Guild"],
+				"summary": "Create Pests Event",
+				"operationId": "EliteAPIFeaturesEventsAdminCreateEventPestsCreatePestsEventEndpoint",
+				"parameters": [
+					{
+						"name": "discordId",
+						"in": "path",
+						"required": true,
+						"description": "Discord Snowflake ID of the requested resource (guild, user, etc.)",
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "event",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreatePestEventDto"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/EventDetailsDto"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/guild/{discordId}/events/weight": {
+			"post": {
+				"tags": ["Guild"],
+				"summary": "Create Weight Event",
+				"operationId": "EliteAPIFeaturesEventsAdminCreateEventWeightCreateWeightEventEndpoint",
+				"parameters": [
+					{
+						"name": "discordId",
+						"in": "path",
+						"required": true,
+						"description": "Discord Snowflake ID of the requested resource (guild, user, etc.)",
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "event",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateWeightEventDto"
 							}
 						}
 					},
@@ -2924,6 +3176,14 @@
 							"type": "integer",
 							"format": "uint64"
 						}
+					},
+					{
+						"name": "userId",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
 					}
 				],
 				"requestBody": {
@@ -2940,66 +3200,6 @@
 				"responses": {
 					"204": {
 						"description": "No Content"
-					},
-					"400": {
-						"description": "Bad Request",
-						"content": {
-							"application/problem+json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized"
-					}
-				},
-				"security": [
-					{
-						"JWTBearerAuth": []
-					}
-				]
-			}
-		},
-		"/guild/{discordId}/events/weight": {
-			"post": {
-				"tags": ["Guild"],
-				"summary": "Create Weight Event",
-				"operationId": "EliteAPIFeaturesEventsAdminCreateWeightEventCreateWeightEventEndpoint",
-				"parameters": [
-					{
-						"name": "discordId",
-						"in": "path",
-						"required": true,
-						"description": "Discord Snowflake ID of the requested resource (guild, user, etc.)",
-						"schema": {
-							"type": "integer",
-							"format": "int64"
-						}
-					}
-				],
-				"requestBody": {
-					"x-name": "event",
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/CreateWeightEventDto"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"description": "Success",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/EventDetailsDto"
-								}
-							}
-						}
 					},
 					"400": {
 						"description": "Bad Request",
@@ -3449,6 +3649,75 @@
 						"JWTBearerAuth": []
 					}
 				]
+			},
+			"patch": {
+				"tags": ["Guild"],
+				"summary": "Update a team",
+				"operationId": "EliteAPIFeaturesEventsAdminUpdateTeamUpdateTeamEndpoint",
+				"parameters": [
+					{
+						"name": "discordId",
+						"in": "path",
+						"required": true,
+						"description": "Discord Snowflake ID of the requested resource (guild, user, etc.)",
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					{
+						"name": "eventId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "uint64"
+						}
+					},
+					{
+						"name": "teamId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "team",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateEventTeamDto"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
 			}
 		},
 		"/guild/{discordId}/event/{eventId}/bans": {
@@ -3485,7 +3754,7 @@
 								"schema": {
 									"type": "array",
 									"items": {
-										"$ref": "#/components/schemas/EventMemberBannedDto"
+										"$ref": "#/components/schemas/AdminEventMemberDto"
 									}
 								}
 							}
@@ -3576,7 +3845,7 @@
 		"/guild/{discordId}/event/{eventId}/admin": {
 			"get": {
 				"tags": ["Guild"],
-				"summary": "Get all events for a guild",
+				"summary": "Get an event for a guild",
 				"operationId": "EliteAPIFeaturesEventsAdminGetGuildEventGetGuildEventEndpoint",
 				"parameters": [
 					{
@@ -3731,6 +4000,68 @@
 								}
 							}
 						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/guild/{discordId}/events/{eventId}/teams/{teamId}/owner": {
+			"put": {
+				"tags": ["Guild"],
+				"summary": "Set player as team owner",
+				"operationId": "EliteAPIFeaturesEventsAdminSetTeamOwnerSetTeamOwnerEndpoint",
+				"parameters": [
+					{
+						"name": "discordId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "uint64"
+						}
+					},
+					{
+						"name": "eventId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "uint64"
+						}
+					},
+					{
+						"name": "teamId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "SetTeamOwnerRequest",
+					"description": "",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetTeamOwnerRequest"
+							}
+						}
+					},
+					"required": true,
+					"x-position": 1
+				},
+				"responses": {
+					"204": {
+						"description": "No Content"
 					},
 					"401": {
 						"description": "Unauthorized"
@@ -4098,6 +4429,19 @@
 				"tags": ["Event"],
 				"summary": "Get upcoming events",
 				"operationId": "EliteAPIFeaturesEventsPublicGetUpcomingGetUpcomingEventsEndpoint",
+				"parameters": [
+					{
+						"name": "offset",
+						"in": "query",
+						"description": "Offset by an amount of days to also include recently ended events.",
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"default": 0,
+							"nullable": true
+						}
+					}
+				],
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -4340,6 +4684,59 @@
 						}
 					}
 				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/event/{eventId}/team/{teamId}/owner": {
+			"put": {
+				"tags": ["Event"],
+				"summary": "Set player as team owner",
+				"operationId": "EliteAPIFeaturesEventsUserSetTeamOwnerSetTeamOwnerEndpoint",
+				"parameters": [
+					{
+						"name": "eventId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "uint64"
+						}
+					},
+					{
+						"name": "teamId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "ChangeTeamOwnerRequest",
+					"description": "",
+					"content": {
+						"*/*": {
+							"schema": {
+								"$ref": "#/components/schemas/ChangeTeamOwnerRequest"
+							}
+						}
+					},
+					"required": true,
+					"x-position": 1
+				},
 				"responses": {
 					"204": {
 						"description": "No Content"
@@ -6006,11 +6403,44 @@
 						}
 					},
 					{
+						"name": "interval",
+						"in": "query",
+						"description": "Time interval key of a monthly leaderboard. Format: yyyy-MM",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "mode",
+						"in": "query",
+						"description": "Game mode to filter leaderboard by. Leave empty to get all modes.\nOptions: \"ironman\", \"island\", \"classic\"",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "removed",
+						"in": "query",
+						"description": "Removed filter to get leaderboard entries that have been removed from the leaderboard.\nDefault is profiles that have not been removed/wiped.\n0 = Not Removed\n1 = Removed\n2 = All",
+						"schema": {
+							"default": 0,
+							"nullable": true,
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/RemovedFilter"
+								}
+							]
+						}
+					},
+					{
 						"name": "new",
 						"in": "query",
 						"description": "Use new leaderboard backend (will be default in the future)",
 						"schema": {
 							"type": "boolean",
+							"default": true,
 							"nullable": true
 						}
 					}
@@ -6170,10 +6600,43 @@
 					{
 						"name": "new",
 						"in": "query",
-						"description": "Use new leaderboard backend (will be default in the future)",
+						"description": "Use new leaderboard backend (will be removed in the future)",
 						"schema": {
 							"type": "boolean",
+							"default": true,
 							"nullable": true
+						}
+					},
+					{
+						"name": "interval",
+						"in": "query",
+						"description": "Time interval key of a monthly leaderboard. Format: yyyy-MM",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "mode",
+						"in": "query",
+						"description": "Game mode to filter leaderboard by. Leave empty to get all modes.\nOptions: \"ironman\", \"island\", \"classic\"",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "removed",
+						"in": "query",
+						"description": "Removed filter to get leaderboard entries that have been removed from the leaderboard.\nDefault is profiles that have not been removed/wiped.\n0 = Not Removed\n1 = Removed\n2 = All",
+						"schema": {
+							"default": 0,
+							"nullable": true,
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/RemovedFilter"
+								}
+							]
 						}
 					}
 				],
@@ -6264,7 +6727,37 @@
 						"in": "query",
 						"schema": {
 							"type": "boolean",
+							"default": true,
 							"nullable": true
+						}
+					},
+					{
+						"name": "interval",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "mode",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "removed",
+						"in": "query",
+						"schema": {
+							"default": 0,
+							"nullable": true,
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/RemovedFilter"
+								}
+							]
 						}
 					}
 				],
@@ -6400,7 +6893,40 @@
 						"description": "Use new leaderboard backend (will be default in the future)",
 						"schema": {
 							"type": "boolean",
+							"default": true,
 							"nullable": true
+						}
+					},
+					{
+						"name": "interval",
+						"in": "query",
+						"description": "Time interval key of a monthly leaderboard. Format: yyyy-MM",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "mode",
+						"in": "query",
+						"description": "Game mode to filter leaderboard by. Leave empty to get all modes.\nOptions: \"ironman\", \"island\", \"classic\"",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "removed",
+						"in": "query",
+						"description": "Removed filter to get leaderboard entries that have been removed from the leaderboard.\nDefault is profiles that have not been removed/wiped.\n0 = Not Removed\n1 = Removed\n2 = All",
+						"schema": {
+							"default": 0,
+							"nullable": true,
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/RemovedFilter"
+								}
+							]
 						}
 					}
 				],
@@ -6483,7 +7009,37 @@
 						"in": "query",
 						"schema": {
 							"type": "boolean",
+							"default": true,
 							"nullable": true
+						}
+					},
+					{
+						"name": "interval",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "mode",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "removed",
+						"in": "query",
+						"schema": {
+							"default": 0,
+							"nullable": true,
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/RemovedFilter"
+								}
+							]
 						}
 					}
 				],
@@ -6810,6 +7366,147 @@
 					},
 					"404": {
 						"description": "Not Found"
+					}
+				}
+			}
+		},
+		"/resources/bazaar/{itemId}": {
+			"get": {
+				"tags": ["Resources"],
+				"summary": "Get Bazaar Product",
+				"description": "Get a specific bazaar product and it's npc price (if it exists)",
+				"operationId": "EliteAPIFeaturesResourcesBazaarEndpointsGetBazaarProductEndpoint",
+				"parameters": [
+					{
+						"name": "itemId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetBazaarProductResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/resources/bazaar": {
+			"get": {
+				"tags": ["Resources"],
+				"summary": "Get Bazaar Products",
+				"description": "Get all bazaar products.",
+				"operationId": "EliteAPIFeaturesResourcesBazaarEndpointsGetBazaarProductsEndpoint",
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetBazaarProductsResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/resources/items": {
+			"get": {
+				"tags": ["Resources"],
+				"summary": "Get Skyblock Items",
+				"description": "Get all items in the Hypixel resources endpoint",
+				"operationId": "EliteAPIFeaturesResourcesItemsEndpointsGetSkyblockItemsEndpoint",
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetSkyblockItemsResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": ["Resources"],
+				"summary": "Get Specific Skyblock Items",
+				"description": "Get specific skyblock items from the Hypixel resources endpoint, along with bazaar data for each.",
+				"operationId": "EliteAPIFeaturesResourcesItemsEndpointsGetSpecifiedSkyblockItemsEndpoint",
+				"requestBody": {
+					"x-name": "GetSpecifiedSkyblockItemsRequest",
+					"description": "",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/GetSpecifiedSkyblockItemsRequest"
+							}
+						}
+					},
+					"required": true,
+					"x-position": 1
+				},
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetSpecifiedSkyblockItemsResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/resources/items/{itemId}": {
+			"get": {
+				"tags": ["Resources"],
+				"summary": "Get Skyblock Item",
+				"description": "Get the Hypixel provided data of a specific item, as well as a bazaar summary.",
+				"operationId": "EliteAPIFeaturesResourcesItemsEndpointsSkybProductEndpoint",
+				"parameters": [
+					{
+						"name": "itemId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SkyblockItemResponse"
+								}
+							}
+						}
 					}
 				}
 			}
@@ -7457,18 +8154,20 @@
 				]
 			}
 		},
-		"/product/{ProductId}": {
+		"/product/{discordId}": {
 			"patch": {
 				"tags": ["Product"],
 				"summary": "Update Shop Product",
 				"operationId": "EliteAPIFeaturesShopProductsAdminUpdateProductUpdateProductEndpoint",
 				"parameters": [
 					{
-						"name": "productId",
+						"name": "discordId",
 						"in": "path",
 						"required": true,
+						"description": "Discord Snowflake ID of the requested resource (guild, user, etc.)",
 						"schema": {
-							"type": "string"
+							"type": "integer",
+							"format": "int64"
 						}
 					}
 				],
@@ -7509,9 +8208,7 @@
 						"JWTBearerAuth": []
 					}
 				]
-			}
-		},
-		"/product/{discordId}": {
+			},
 			"get": {
 				"tags": ["Product"],
 				"summary": "Get Shop Product",
@@ -8154,7 +8851,7 @@
 			"ProfileDetailsDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["profileId", "profileName", "gameMode", "selected", "bankBalance", "members"],
+				"required": ["profileId", "profileName", "gameMode", "selected", "bankBalance", "deleted", "members"],
 				"properties": {
 					"profileId": {
 						"type": "string"
@@ -8171,6 +8868,9 @@
 					"bankBalance": {
 						"type": "number",
 						"format": "double"
+					},
+					"deleted": {
+						"type": "boolean"
 					},
 					"members": {
 						"type": "array",
@@ -8201,6 +8901,73 @@
 					"farmingWeight": {
 						"type": "number",
 						"format": "double"
+					},
+					"meta": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/MemberCosmeticsDto"
+							}
+						]
+					}
+				}
+			},
+			"MemberCosmeticsDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"prefix": {
+						"type": "string",
+						"maxLength": 16,
+						"nullable": true
+					},
+					"suffix": {
+						"type": "string",
+						"maxLength": 16,
+						"nullable": true
+					},
+					"leaderboard": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/MemberLeaderboardCosmeticsDto"
+							}
+						]
+					}
+				}
+			},
+			"MemberLeaderboardCosmeticsDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"styleId": {
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					},
+					"backgroundColor": {
+						"type": "string",
+						"nullable": true
+					},
+					"borderColor": {
+						"type": "string",
+						"nullable": true
+					},
+					"textColor": {
+						"type": "string",
+						"nullable": true
+					},
+					"rankColor": {
+						"type": "string",
+						"nullable": true
+					},
+					"backgroundImage": {
+						"type": "string",
+						"nullable": true
+					},
+					"overlayImage": {
+						"type": "string",
+						"nullable": true
 					}
 				}
 			},
@@ -8909,8 +9676,8 @@
 			"EventType": {
 				"type": "integer",
 				"description": "",
-				"x-enumNames": ["None", "FarmingWeight", "Collection", "Experience", "Medals"],
-				"enum": [0, 1, 2, 3, 4]
+				"x-enumNames": ["None", "FarmingWeight", "Collection", "Experience", "Medals", "Pests"],
+				"enum": [0, 1, 2, 3, 4, 5]
 			},
 			"SetEventApprovalRequest": {
 				"type": "object",
@@ -8946,9 +9713,35 @@
 					}
 				}
 			},
+			"AdminLinkAccountRequest": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["discordId", "player"],
+				"properties": {
+					"discordId": {
+						"type": "string"
+					},
+					"player": {
+						"type": "string"
+					}
+				}
+			},
 			"GuildIdRequest": {
 				"type": "object",
 				"additionalProperties": false
+			},
+			"AdminUnlinkAccountRequest": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["discordId", "player"],
+				"properties": {
+					"discordId": {
+						"type": "string"
+					},
+					"player": {
+						"type": "string"
+					}
+				}
 			},
 			"AuthSessionDto": {
 				"type": "object",
@@ -9007,28 +9800,24 @@
 			"DiscordLoginDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["access_token", "expires_in", "refresh_token"],
+				"required": ["code", "redirect_uri"],
 				"properties": {
-					"access_token": {
+					"code": {
 						"type": "string",
-						"description": "Discord access token from OAuth2"
+						"description": "Discord login code from OAuth2"
 					},
-					"expires_in": {
+					"redirect_uri": {
 						"type": "string",
-						"description": "Unix timestamp in seconds"
-					},
-					"refresh_token": {
-						"type": "string",
-						"description": "Discord refresh token from OAuth2"
+						"description": "Redirect URI from OAuth2"
 					}
 				}
 			},
 			"AuthRefreshDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["access_token", "refresh_token"],
+				"required": ["user_id", "refresh_token"],
 				"properties": {
-					"access_token": {
+					"user_id": {
 						"type": "string",
 						"description": "User ID"
 					},
@@ -10209,16 +10998,16 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"EventMemberBannedDto": {
+			"AdminEventMemberDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["id"],
+				"required": ["eventId", "status", "id"],
 				"properties": {
-					"id": {
-						"type": "integer",
-						"format": "int32"
-					},
 					"playerUuid": {
+						"type": "string",
+						"nullable": true
+					},
+					"profileId": {
 						"type": "string",
 						"nullable": true
 					},
@@ -10226,27 +11015,193 @@
 						"type": "string",
 						"nullable": true
 					},
+					"eventId": {
+						"type": "string"
+					},
 					"teamId": {
 						"type": "string",
 						"nullable": true
 					},
-					"score": {
-						"type": "string",
-						"nullable": true
+					"status": {
+						"$ref": "#/components/schemas/EventMemberStatus"
 					},
-					"notes": {
+					"score": {
 						"type": "string",
 						"nullable": true
 					},
 					"lastUpdated": {
 						"type": "string",
 						"nullable": true
+					},
+					"disqualified": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"data": {
+						"nullable": true
+					},
+					"meta": {
+						"description": "Metadata of the entry",
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/MemberCosmeticsDto"
+							}
+						]
+					},
+					"id": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"accountId": {
+						"type": "string",
+						"nullable": true
+					},
+					"estimatedTimeActive": {
+						"type": "string",
+						"nullable": true
+					},
+					"notes": {
+						"type": "string",
+						"maxLength": 128,
+						"nullable": true
 					}
 				}
+			},
+			"EventMemberStatus": {
+				"type": "integer",
+				"description": "",
+				"x-enumNames": ["Inactive", "Active", "Left", "Disqualified"],
+				"enum": [0, 1, 2, 3]
 			},
 			"DeleteEventRequest": {
 				"type": "object",
 				"additionalProperties": false
+			},
+			"CreateCollectionEventDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["name", "guildId", "startTime", "endTime", "maxTeams", "maxTeamMembers"],
+				"properties": {
+					"name": {
+						"type": "string",
+						"description": "The name of the event",
+						"maxLength": 64,
+						"minLength": 1
+					},
+					"type": {
+						"description": "The type of the event",
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/EventType"
+							}
+						]
+					},
+					"guildId": {
+						"type": "string",
+						"description": "The Discord server id as a string for the event",
+						"minLength": 1
+					},
+					"description": {
+						"type": "string",
+						"description": "An optional description for the event",
+						"maxLength": 1024,
+						"nullable": true
+					},
+					"rules": {
+						"type": "string",
+						"description": "An optional set of rules for the event",
+						"maxLength": 1024,
+						"nullable": true
+					},
+					"prizeInfo": {
+						"type": "string",
+						"description": "An optional description of prizes for the event",
+						"maxLength": 1024,
+						"nullable": true
+					},
+					"startTime": {
+						"type": "integer",
+						"description": "Unix timestamp for the start time of the event in seconds",
+						"format": "int64"
+					},
+					"endTime": {
+						"type": "integer",
+						"description": "Unix timestamp for the end time of the event in seconds",
+						"format": "int64"
+					},
+					"joinTime": {
+						"type": "integer",
+						"description": "Unix timestamp for the latest time a new member can join the event in seconds",
+						"format": "int64",
+						"nullable": true
+					},
+					"dynamicStartTime": {
+						"type": "boolean",
+						"description": "Currently unused",
+						"nullable": true
+					},
+					"requiredRole": {
+						"type": "string",
+						"description": "A Discord role id that is required to participate in the event",
+						"maxLength": 24,
+						"nullable": true
+					},
+					"blockedRole": {
+						"type": "string",
+						"description": "A Discord role id that is blocked from participating in the event",
+						"maxLength": 24,
+						"nullable": true
+					},
+					"maxTeams": {
+						"type": "integer",
+						"description": "Max amount of teams allowed in the event, 0 if solo event, -1 if unlimited",
+						"format": "int32"
+					},
+					"maxTeamMembers": {
+						"type": "integer",
+						"description": "Max amount of members allowed in a team, 0 if solo event, -1 if unlimited",
+						"format": "int32"
+					},
+					"data": {
+						"description": "Data specific to the pest event",
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/CollectionEventData"
+							}
+						]
+					}
+				}
+			},
+			"CollectionEventData": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["collectionWeights"],
+				"properties": {
+					"collectionWeights": {
+						"type": "object",
+						"additionalProperties": {
+							"$ref": "#/components/schemas/CollectionWeight"
+						}
+					}
+				}
+			},
+			"CollectionWeight": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["weight"],
+				"properties": {
+					"name": {
+						"type": "string",
+						"nullable": true
+					},
+					"weight": {
+						"type": "number",
+						"format": "double"
+					}
+				}
 			},
 			"CreateMedalEventDto": {
 				"type": "object",
@@ -10368,26 +11323,137 @@
 				"x-enumNames": ["None", "Bronze", "Silver", "Gold", "Platinum", "Diamond"],
 				"enum": [0, 1, 2, 3, 4, 5]
 			},
-			"CreateEventTeamDto": {
+			"CreatePestEventDto": {
 				"type": "object",
 				"additionalProperties": false,
+				"required": ["name", "guildId", "startTime", "endTime", "maxTeams", "maxTeamMembers"],
 				"properties": {
 					"name": {
-						"type": "array",
-						"description": "An array of strings for the team name, example: [ \"Bountiful\", \"Farmers\" ]",
-						"maxItems": 3,
-						"minItems": 1,
-						"nullable": true,
-						"items": {
-							"type": "string"
-						}
-					},
-					"color": {
 						"type": "string",
-						"maxLength": 7,
+						"description": "The name of the event",
+						"maxLength": 64,
+						"minLength": 1
+					},
+					"type": {
+						"description": "The type of the event",
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/EventType"
+							}
+						]
+					},
+					"guildId": {
+						"type": "string",
+						"description": "The Discord server id as a string for the event",
+						"minLength": 1
+					},
+					"description": {
+						"type": "string",
+						"description": "An optional description for the event",
+						"maxLength": 1024,
 						"nullable": true
+					},
+					"rules": {
+						"type": "string",
+						"description": "An optional set of rules for the event",
+						"maxLength": 1024,
+						"nullable": true
+					},
+					"prizeInfo": {
+						"type": "string",
+						"description": "An optional description of prizes for the event",
+						"maxLength": 1024,
+						"nullable": true
+					},
+					"startTime": {
+						"type": "integer",
+						"description": "Unix timestamp for the start time of the event in seconds",
+						"format": "int64"
+					},
+					"endTime": {
+						"type": "integer",
+						"description": "Unix timestamp for the end time of the event in seconds",
+						"format": "int64"
+					},
+					"joinTime": {
+						"type": "integer",
+						"description": "Unix timestamp for the latest time a new member can join the event in seconds",
+						"format": "int64",
+						"nullable": true
+					},
+					"dynamicStartTime": {
+						"type": "boolean",
+						"description": "Currently unused",
+						"nullable": true
+					},
+					"requiredRole": {
+						"type": "string",
+						"description": "A Discord role id that is required to participate in the event",
+						"maxLength": 24,
+						"nullable": true
+					},
+					"blockedRole": {
+						"type": "string",
+						"description": "A Discord role id that is blocked from participating in the event",
+						"maxLength": 24,
+						"nullable": true
+					},
+					"maxTeams": {
+						"type": "integer",
+						"description": "Max amount of teams allowed in the event, 0 if solo event, -1 if unlimited",
+						"format": "int32"
+					},
+					"maxTeamMembers": {
+						"type": "integer",
+						"description": "Max amount of members allowed in a team, 0 if solo event, -1 if unlimited",
+						"format": "int32"
+					},
+					"data": {
+						"description": "Data specific to the pest event",
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/PestEventData"
+							}
+						]
 					}
 				}
+			},
+			"PestEventData": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["pestWeights"],
+				"properties": {
+					"pestWeights": {
+						"type": "object",
+						"x-dictionaryKey": {
+							"$ref": "#/components/schemas/Pest"
+						},
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				}
+			},
+			"Pest": {
+				"type": "integer",
+				"description": "",
+				"x-enumNames": [
+					"Mite",
+					"Cricket",
+					"Moth",
+					"Earthworm",
+					"Slug",
+					"Beetle",
+					"Locust",
+					"Rat",
+					"Mosquito",
+					"Fly",
+					"Mouse"
+				],
+				"enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 			},
 			"CreateWeightEventDto": {
 				"type": "object",
@@ -10522,6 +11588,27 @@
 				],
 				"enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 			},
+			"CreateEventTeamDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"name": {
+						"type": "array",
+						"description": "An array of strings for the team name, example: [ \"Bountiful\", \"Farmers\" ]",
+						"maxItems": 3,
+						"minItems": 1,
+						"nullable": true,
+						"items": {
+							"type": "string"
+						}
+					},
+					"color": {
+						"type": "string",
+						"maxLength": 7,
+						"nullable": true
+					}
+				}
+			},
 			"DeleteEventBannerRequest": {
 				"type": "object",
 				"additionalProperties": false
@@ -10541,60 +11628,6 @@
 			"GetBannedMembersRequest": {
 				"type": "object",
 				"additionalProperties": false
-			},
-			"AdminEventMemberDto": {
-				"type": "object",
-				"additionalProperties": false,
-				"required": ["eventId", "status", "id"],
-				"properties": {
-					"playerUuid": {
-						"type": "string",
-						"nullable": true
-					},
-					"profileId": {
-						"type": "string",
-						"nullable": true
-					},
-					"playerName": {
-						"type": "string",
-						"nullable": true
-					},
-					"eventId": {
-						"type": "string"
-					},
-					"teamId": {
-						"type": "string",
-						"nullable": true
-					},
-					"status": {
-						"$ref": "#/components/schemas/EventMemberStatus"
-					},
-					"score": {
-						"type": "string",
-						"nullable": true
-					},
-					"lastUpdated": {
-						"type": "string",
-						"nullable": true
-					},
-					"disqualified": {
-						"type": "boolean",
-						"nullable": true
-					},
-					"data": {
-						"nullable": true
-					},
-					"id": {
-						"type": "integer",
-						"format": "int32"
-					}
-				}
-			},
-			"EventMemberStatus": {
-				"type": "integer",
-				"description": "",
-				"x-enumNames": ["Inactive", "Active", "Left", "Disqualified"],
-				"enum": [0, 1, 2, 3]
 			},
 			"GetEventMembersRequest": {
 				"type": "object",
@@ -10695,6 +11728,15 @@
 						"type": "string",
 						"maxLength": 128,
 						"nullable": true
+					},
+					"meta": {
+						"description": "Metadata of the entry",
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/MemberCosmeticsDto"
+							}
+						]
 					}
 				}
 			},
@@ -10706,9 +11748,15 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"UnbanMemberRequest": {
+			"SetTeamOwnerRequest": {
 				"type": "object",
-				"additionalProperties": false
+				"additionalProperties": false,
+				"required": ["player"],
+				"properties": {
+					"player": {
+						"type": "string"
+					}
+				}
 			},
 			"EditEventBannerDto": {
 				"type": "object",
@@ -10720,6 +11768,10 @@
 						"nullable": true
 					}
 				}
+			},
+			"UnbanMemberRequest": {
+				"type": "object",
+				"additionalProperties": false
 			},
 			"GetEventRequest": {
 				"type": "object",
@@ -10799,13 +11851,55 @@
 								"$ref": "#/components/schemas/MedalEventData"
 							}
 						]
+					},
+					"pestData": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/PestEventData"
+							}
+						]
+					},
+					"collectionData": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/CollectionEventData"
+							}
+						]
+					}
+				}
+			},
+			"UpdateEventTeamDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"name": {
+						"type": "array",
+						"description": "An array of strings for the team name, example: [ \"Bountiful\", \"Farmers\" ]",
+						"maxItems": 3,
+						"minItems": 1,
+						"nullable": true,
+						"items": {
+							"type": "string"
+						}
+					},
+					"color": {
+						"type": "string",
+						"maxLength": 7,
+						"nullable": true
+					},
+					"changeCode": {
+						"type": "boolean",
+						"description": "If join code should be changed",
+						"nullable": true
 					}
 				}
 			},
 			"EventDefaultsDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["cropWeights", "medalValues"],
+				"required": ["cropWeights", "medalValues", "pestWeights"],
 				"properties": {
 					"cropWeights": {
 						"type": "object",
@@ -10821,6 +11915,16 @@
 						"type": "object",
 						"x-dictionaryKey": {
 							"$ref": "#/components/schemas/ContestMedal"
+						},
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int32"
+						}
+					},
+					"pestWeights": {
+						"type": "object",
+						"x-dictionaryKey": {
+							"$ref": "#/components/schemas/Pest"
 						},
 						"additionalProperties": {
 							"type": "integer",
@@ -10874,6 +11978,15 @@
 					},
 					"data": {
 						"nullable": true
+					},
+					"meta": {
+						"description": "Metadata of the entry",
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/MemberCosmeticsDto"
+							}
+						]
 					}
 				}
 			},
@@ -10914,6 +12027,10 @@
 					}
 				}
 			},
+			"GetUpcomingEventsRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
 			"DeleteTeamRequest2": {
 				"type": "object",
 				"additionalProperties": false
@@ -10934,30 +12051,19 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"ChangeTeamOwnerRequest": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["player"],
+				"properties": {
+					"player": {
+						"type": "string"
+					}
+				}
+			},
 			"UpdateTeamJoinCodeRequest": {
 				"type": "object",
 				"additionalProperties": false
-			},
-			"UpdateEventTeamDto": {
-				"type": "object",
-				"additionalProperties": false,
-				"properties": {
-					"name": {
-						"type": "array",
-						"description": "An array of strings for the team name, example: [ \"Bountiful\", \"Farmers\" ]",
-						"maxItems": 3,
-						"minItems": 1,
-						"nullable": true,
-						"items": {
-							"type": "string"
-						}
-					},
-					"color": {
-						"type": "string",
-						"maxLength": 7,
-						"nullable": true
-					}
-				}
 			},
 			"GardenDto": {
 				"type": "object",
@@ -11691,6 +12797,10 @@
 						"type": "string",
 						"nullable": true
 					},
+					"interval": {
+						"type": "string",
+						"nullable": true
+					},
 					"limit": {
 						"type": "integer",
 						"format": "int32"
@@ -11808,19 +12918,33 @@
 						"description": "Initial score of the entry",
 						"format": "double"
 					},
+					"mode": {
+						"type": "string",
+						"description": "Game mode of the entry. Classic profiles are considered default/null.",
+						"nullable": true
+					},
 					"members": {
 						"type": "array",
 						"nullable": true,
 						"items": {
 							"$ref": "#/components/schemas/ProfileLeaderboardMemberDto"
 						}
+					},
+					"meta": {
+						"description": "Metadata of the entry",
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/MemberCosmeticsDto"
+							}
+						]
 					}
 				}
 			},
 			"ProfileLeaderboardMemberDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["ign", "uuid", "xp"],
+				"required": ["ign", "uuid", "xp", "removed"],
 				"properties": {
 					"ign": {
 						"type": "string"
@@ -11832,12 +12956,21 @@
 						"type": "integer",
 						"description": "Skyblock xp of the player (used for sorting)",
 						"format": "int32"
+					},
+					"removed": {
+						"type": "boolean"
 					}
 				}
 			},
 			"LeaderboardSliceRequest": {
 				"type": "object",
 				"additionalProperties": false
+			},
+			"RemovedFilter": {
+				"type": "integer",
+				"description": "",
+				"x-enumNames": ["NotRemoved", "Removed", "All"],
+				"enum": [0, 1, 2]
 			},
 			"LeaderboardsResponse": {
 				"type": "object",
@@ -11969,22 +13102,36 @@
 			"LeaderboardPositionDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["rank", "amount", "upcomingRank"],
+				"required": ["rank", "amount", "initialAmount", "minAmount", "upcomingRank"],
 				"properties": {
 					"rank": {
 						"type": "integer",
+						"description": "Current rank of the player (-1 if not on leaderboard)",
 						"format": "int32"
 					},
 					"amount": {
 						"type": "number",
+						"description": "Current score of the player (0 if not on leaderboard)",
+						"format": "double"
+					},
+					"initialAmount": {
+						"type": "number",
+						"description": "The starting amount of the leaderboard entry for interval based leaderboards",
+						"format": "double"
+					},
+					"minAmount": {
+						"type": "number",
+						"description": "The minimum amount required to be on the leaderboard. If this is a time based leaderboard,\nthis score is instead required on the normal leaderboard before the player can be on the\ntime based leaderboard",
 						"format": "double"
 					},
 					"upcomingRank": {
 						"type": "integer",
+						"description": "The starting rank of the returned upcoming players list",
 						"format": "int32"
 					},
 					"upcomingPlayers": {
 						"type": "array",
+						"description": "List of upcoming players",
 						"nullable": true,
 						"items": {
 							"$ref": "#/components/schemas/LeaderboardEntryDto"
@@ -12108,6 +13255,14 @@
 					"bankBalance": {
 						"type": "number",
 						"format": "double"
+					},
+					"meta": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/MemberCosmeticsDto"
+							}
+						]
 					},
 					"collections": {
 						"type": "object",
@@ -12850,6 +14005,494 @@
 					}
 				}
 			},
+			"GetBazaarProductResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["productId", "product"],
+				"properties": {
+					"productId": {
+						"type": "string"
+					},
+					"product": {
+						"$ref": "#/components/schemas/BazaarProductSummaryDto"
+					}
+				}
+			},
+			"BazaarProductSummaryDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"npc",
+					"sell",
+					"buy",
+					"sellOrder",
+					"buyOrder",
+					"averageSell",
+					"averageBuy",
+					"averageSellOrder",
+					"averageBuyOrder"
+				],
+				"properties": {
+					"name": {
+						"type": "string",
+						"description": "Name of the item if it exists.",
+						"nullable": true
+					},
+					"npc": {
+						"type": "number",
+						"description": "NPC sell price of the item if it exists.",
+						"format": "double"
+					},
+					"sell": {
+						"type": "number",
+						"description": "Instamt Sell price taken directly from most recently fetched data",
+						"format": "double"
+					},
+					"buy": {
+						"type": "number",
+						"description": "Instant Buy price taken directly from most recently fetched data",
+						"format": "double"
+					},
+					"sellOrder": {
+						"type": "number",
+						"description": "Sell Order price calculated from most recently fetched data",
+						"format": "double"
+					},
+					"buyOrder": {
+						"type": "number",
+						"description": "Buy Order price calculated from most recently fetched data",
+						"format": "double"
+					},
+					"averageSell": {
+						"type": "number",
+						"description": "Calculated average Instant Sell price that should be more resistant to price fluctuations",
+						"format": "double"
+					},
+					"averageBuy": {
+						"type": "number",
+						"description": "Calculated average Instant Buy price that should be more resistant to price fluctuations",
+						"format": "double"
+					},
+					"averageSellOrder": {
+						"type": "number",
+						"description": "Calculated average Sell Order price that should be more resistant to price fluctuations",
+						"format": "double"
+					},
+					"averageBuyOrder": {
+						"type": "number",
+						"description": "Calculated average Buy Order price that should be more resistant to price fluctuations",
+						"format": "double"
+					}
+				}
+			},
+			"GetBazaarProductRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetBazaarProductsResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["products"],
+				"properties": {
+					"products": {
+						"type": "object",
+						"additionalProperties": {
+							"$ref": "#/components/schemas/BazaarProductSummaryDto"
+						}
+					}
+				}
+			},
+			"GetSkyblockItemsResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["items"],
+				"properties": {
+					"items": {
+						"type": "object",
+						"additionalProperties": {
+							"nullable": true,
+							"oneOf": [
+								{
+									"$ref": "#/components/schemas/ItemResponse"
+								}
+							]
+						}
+					}
+				}
+			},
+			"ItemResponse": {
+				"type": "object",
+				"additionalProperties": {},
+				"required": [
+					"durability",
+					"unstackable",
+					"glowing",
+					"npc_sell_price",
+					"can_auction",
+					"can_trade",
+					"can_place",
+					"museum",
+					"generator_tier",
+					"hide_from_viewrecipe_command",
+					"salvagable_from_recipe"
+				],
+				"properties": {
+					"id": {
+						"type": "string",
+						"nullable": true
+					},
+					"material": {
+						"type": "string",
+						"nullable": true
+					},
+					"color": {
+						"type": "string",
+						"nullable": true
+					},
+					"durability": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"skin": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/ItemSkin"
+							}
+						]
+					},
+					"name": {
+						"type": "string",
+						"nullable": true
+					},
+					"category": {
+						"type": "string",
+						"nullable": true
+					},
+					"tier": {
+						"type": "string",
+						"nullable": true
+					},
+					"unstackable": {
+						"type": "boolean"
+					},
+					"glowing": {
+						"type": "boolean"
+					},
+					"npc_sell_price": {
+						"type": "number",
+						"format": "double"
+					},
+					"can_auction": {
+						"type": "boolean"
+					},
+					"can_trade": {
+						"type": "boolean"
+					},
+					"can_place": {
+						"type": "boolean"
+					},
+					"gemstone_slots": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"$ref": "#/components/schemas/ItemGemstoneSlot"
+						}
+					},
+					"requirements": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"$ref": "#/components/schemas/ItemRequirement"
+						}
+					},
+					"museum": {
+						"type": "boolean"
+					},
+					"museum_data": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/ItemMuseumData"
+							}
+						]
+					},
+					"stats": {
+						"type": "object",
+						"nullable": true,
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"generator_tier": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"dungeon_item_conversion_cost": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/DungeonItemConversionCost"
+							}
+						]
+					},
+					"upgrade_costs": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"type": "array",
+							"items": {
+								"$ref": "#/components/schemas/UpgradeCosts"
+							}
+						}
+					},
+					"catacombs_requirements": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"$ref": "#/components/schemas/CatacombsRequirements"
+						}
+					},
+					"hide_from_viewrecipe_command": {
+						"type": "boolean"
+					},
+					"salvagable_from_recipe": {
+						"type": "boolean"
+					},
+					"item_specific": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/JsonDocument"
+							}
+						]
+					}
+				}
+			},
+			"ItemSkin": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["value", "signature"],
+				"properties": {
+					"value": {
+						"type": "string"
+					},
+					"signature": {
+						"type": "string"
+					}
+				}
+			},
+			"ItemGemstoneSlot": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["slot_type", "costs"],
+				"properties": {
+					"slot_type": {
+						"type": "string"
+					},
+					"costs": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/ItemGemstoneSlotCosts"
+						}
+					}
+				}
+			},
+			"ItemGemstoneSlotCosts": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["type", "coins"],
+				"properties": {
+					"type": {
+						"type": "string"
+					},
+					"item_id": {
+						"type": "string",
+						"nullable": true
+					},
+					"coins": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"ItemRequirement": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["type", "level"],
+				"properties": {
+					"type": {
+						"type": "string"
+					},
+					"skill": {
+						"type": "string",
+						"nullable": true
+					},
+					"level": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"ItemMuseumData": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["donation_xp", "parent"],
+				"properties": {
+					"donation_xp": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"parent": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "string"
+						}
+					},
+					"type": {
+						"type": "string",
+						"nullable": true
+					},
+					"armor_set_donation_xp": {
+						"type": "object",
+						"nullable": true,
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int32"
+						}
+					},
+					"game_stage": {
+						"type": "string",
+						"nullable": true
+					}
+				}
+			},
+			"DungeonItemConversionCost": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["amount"],
+				"properties": {
+					"essence_type": {
+						"type": "string",
+						"nullable": true
+					},
+					"amount": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"UpgradeCosts": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["amount"],
+				"properties": {
+					"type": {
+						"type": "string",
+						"nullable": true
+					},
+					"essence_type": {
+						"type": "string",
+						"nullable": true
+					},
+					"amount": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"CatacombsRequirements": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["level"],
+				"properties": {
+					"type": {
+						"type": "string",
+						"nullable": true
+					},
+					"dungeon_type": {
+						"type": "string",
+						"nullable": true
+					},
+					"level": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"JsonDocument": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["rootElement"],
+				"properties": {
+					"rootElement": {}
+				}
+			},
+			"GetSpecifiedSkyblockItemsResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["items"],
+				"properties": {
+					"items": {
+						"type": "object",
+						"additionalProperties": {
+							"$ref": "#/components/schemas/SkyblockItemResponse"
+						}
+					}
+				}
+			},
+			"SkyblockItemResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["itemId"],
+				"properties": {
+					"itemId": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string",
+						"nullable": true
+					},
+					"data": {
+						"description": "Data from the Hypixel items endpoint",
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/ItemResponse"
+							}
+						]
+					},
+					"bazaar": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/BazaarProductSummaryDto"
+							}
+						]
+					}
+				}
+			},
+			"GetSpecifiedSkyblockItemsRequest": {
+				"type": "object",
+				"example": {
+					"items": ["NETHER_STALK", "ENCHANTED_NETHER_STALK", "MUTANT_NETHER_STALK"]
+				},
+				"additionalProperties": false,
+				"required": ["items"],
+				"properties": {
+					"items": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"SkybProductRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
 			"AddProductToCategoryRequest": {
 				"type": "object",
 				"additionalProperties": false
@@ -12920,7 +14563,7 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"RemoveProductToCategoryRequest": {
+			"RemoveProductFromCategoryRequest": {
 				"type": "object",
 				"additionalProperties": false
 			},
