@@ -240,6 +240,11 @@ export class EliteContainer extends ContainerBuilder {
 					}
 				});
 			}
+			if (c instanceof SectionComponent) {
+				if (c.accessory instanceof ButtonBuilder) {
+					c.accessory.setDisabled(true);
+				}
+			}
 		});
 
 		this.collapsibles.forEach((c) => {

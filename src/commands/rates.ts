@@ -157,10 +157,16 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		.addDescription(description)
 		.addSeperator();
 
+	const compactContainer = new EliteContainer(settings)
+		.addTitle('## Farming Rates Calculator', false)
+		.addDescription(description)
+		.addSeperator();
+
 	const cropList = Object.keys(EliteCropEmojis) as Crop[];
 
 	for (const { emoji, profit, bz, crop } of formatted) {
-		const text = `-# ${emoji} **${getCropDisplayName(crop)}**\n:coin: \`${profit.toLocaleString().padStart(profitLength, ' ')}\` **BZ** \`${bz[0].total.toLocaleString().padStart(bzLength, ' ')}\``;
+		const values = `:coin: \`${profit.toLocaleString().padStart(profitLength, ' ')}\` **BZ** \`${bz[0].total.toLocaleString().padStart(bzLength, ' ')}\``;
+		const text = `-# ${emoji} **${getCropDisplayName(crop)}**\n${values}`;
 		container.addSectionComponents((s) =>
 			s
 				.addTextDisplayComponents((t) => t.setContent(text))
@@ -172,6 +178,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 						.setStyle(ButtonStyle.Secondary),
 				),
 		);
+
+		compactContainer.addText(`${emoji} ${values}`);
 	}
 
 	let details = settings
@@ -184,8 +192,12 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	}
 
 	container.addSeperator();
-	container.addTextDisplayComponents((t) => t.setContent("**What's my fortune?**\n-# " + details));
+	container.addText("**What's my fortune?**\n-# " + details);
 	container.addFooter();
+
+	compactContainer.addSeperator();
+	compactContainer.addText("**What's my fortune?**\n-# " + details);
+	compactContainer.addFooter();
 
 	const reply = await interaction.editReply({
 		components: [container, row],
@@ -214,6 +226,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				components: [container, row],
 				flags: [MessageFlags.IsComponentsV2],
 			});
+			cropContainer = undefined;
 			return;
 		}
 
@@ -298,7 +311,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			cropContainer.disableEverything();
 			await interaction.editReply({ components: [cropContainer] });
 		} else {
-			interaction.editReply({ components: [] }).catch(() => undefined);
+			interaction.editReply({ components: [compactContainer] }).catch(() => undefined);
 		}
 	});
 }
