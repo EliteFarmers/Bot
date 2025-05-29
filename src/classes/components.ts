@@ -32,8 +32,16 @@ export class EliteContainer extends ContainerBuilder {
 		}
 	}
 
-	addTitle(title: string, seperator = true) {
-		this.addText(title);
+	addTitle(title: string, seperator = true, backButton = '') {
+		if (backButton) {
+			this.addSectionComponents((s) =>
+				s
+					.addTextDisplayComponents((t) => t.setContent(title))
+					.setButtonAccessory(new ButtonBuilder().setCustomId('back').setLabel('Back').setStyle(ButtonStyle.Secondary)),
+			);
+		} else {
+			this.addText(title);
+		}
 
 		if (seperator) this.addSeperator();
 		return this;
@@ -58,7 +66,7 @@ export class EliteContainer extends ContainerBuilder {
 		return this;
 	}
 
-	addFooter(seperator = true) {
+	addFooter(seperator = true, backButton = '') {
 		if (seperator) {
 			this.addSeperator();
 		}
@@ -72,6 +80,15 @@ export class EliteContainer extends ContainerBuilder {
 			//     .setSKUId(process.env.FOOTER_SKU));
 
 			text += ` • Support development with [Elite Premium](<https://elitebot.dev/shop/${process.env.FOOTER_SKU}>)!`;
+		}
+
+		if (backButton) {
+			this.addSectionComponents((s) =>
+				s
+					.addTextDisplayComponents((t) => t.setContent(text))
+					.setButtonAccessory(new ButtonBuilder().setCustomId('back').setLabel('Back').setStyle(ButtonStyle.Secondary)),
+			);
+			return this;
 		}
 
 		this.addTextDisplayComponents((t) => t.setContent(text));

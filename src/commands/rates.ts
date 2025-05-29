@@ -1,4 +1,10 @@
-import { ChatInputCommandInteraction, MessageFlags, StringSelectMenuInteraction } from 'discord.js';
+import {
+	ButtonBuilder,
+	ButtonStyle,
+	ChatInputCommandInteraction,
+	MessageFlags,
+	StringSelectMenuInteraction,
+} from 'discord.js';
 import {
 	CROP_INFO,
 	Crop,
@@ -8,10 +14,10 @@ import {
 	getPossibleResultsFromCrops,
 } from 'farming-weight';
 import { FetchProducts, UserSettings } from '../api/elite.js';
-import { CropSelectRow, GetCropEmoji } from '../classes/Util.js';
+import { CropSelectRow, EliteCropEmojis, GetCropEmoji } from '../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 import { EliteContainer } from '../classes/components.js';
-import { EliteEmbed, NotYoursReply } from '../classes/embeds.js';
+import { NotYoursReply } from '../classes/embeds.js';
 
 const TIME_OPTIONS = {
 	24_000: 'Jacob Contest',
@@ -135,15 +141,6 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		})
 		.sort((a, b) => b.profit - a.profit);
 
-	const text = formatted
-		.map(({ emoji, details, profit }) => {
-			const amountStr = details.collection.toLocaleString().padStart(amountLength, ' ');
-			const profitStr = profit.toLocaleString().padStart(profitLength, ' ');
-
-			return `${emoji} \`${amountStr}\` :coin: \`${profitStr}\``;
-		})
-		.join('\n');
-
 	const bpsText = `-# **${bps % 1 === 0 ? bps : bps.toFixed(2)}**/20 BPS (${((bps / 20) * 100).toFixed(1)}%)`;
 	const description =
 		`Expected rates for **${fortuneInput?.toLocaleString() ?? 'MAX'}** Farming Fortune in **${timeName}**! ` +
@@ -156,9 +153,26 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const row = CropSelectRow('crop-select-rates', 'Select a crop to view its rates!');
 
 	const container = new EliteContainer(settings)
-		.addTitle('## Farming Rates Calculator')
+		.addTitle('## Farming Rates Calculator', false)
 		.addDescription(description)
-		.addTextDisplayComponents((t) => t.setContent(text || 'ERROR!'));
+		.addSeperator();
+
+	const cropList = Object.keys(EliteCropEmojis) as Crop[];
+
+	for (const { emoji, profit, bz, crop } of formatted) {
+		const text = `-# ${emoji} **${getCropDisplayName(crop)}**\n:coin: \`${profit.toLocaleString().padStart(profitLength, ' ')}\` **BZ** \`${bz[0].total.toLocaleString().padStart(bzLength, ' ')}\``;
+		container.addSectionComponents((s) =>
+			s
+				.addTextDisplayComponents((t) => t.setContent(text))
+				.setButtonAccessory(
+					new ButtonBuilder()
+						.setCustomId(`crop-select-rates-${cropList.indexOf(crop)}`)
+						.setEmoji(emoji)
+						.setLabel('>')
+						.setStyle(ButtonStyle.Secondary),
+				),
+		);
+	}
 
 	let details = settings
 		? `You can view your rates with your farming gear on the [website here](<https://elitebot.dev/@${interaction.user.id}/rates>)!`
@@ -195,11 +209,20 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			return inter.update({ components: [cropContainer, row] });
 		}
 
-		if (inter.customId !== 'crop-select-rates' || !(inter instanceof StringSelectMenuInteraction)) return;
+		if (inter.customId == 'back') {
+			await inter.update({
+				components: [container, row],
+				flags: [MessageFlags.IsComponentsV2],
+			});
+			return;
+		}
 
-		const selected = +inter.values[0];
+		if (inter.customId !== 'crop-select-rates' && !inter.customId.startsWith('crop-select-rates-')) return;
 
-		const { crop, ...cropInfo } = formatted[selected];
+		const selected = inter instanceof StringSelectMenuInteraction ? +inter.values[0] : +inter.customId.split('-')[3];
+		const selectedCrop = cropList[selected] as Crop;
+
+		const { crop, ...cropInfo } = formatted.find((c) => c.crop === selectedCrop) || formatted[selected];
 		const coinSources = Object.entries(cropInfo.details.coinSources).sort((a, b) => b[1] - a[1]);
 		const collections = Object.entries(cropInfo.details.otherCollection).sort((a, b) => b[1] - a[1]);
 		const cropName = getCropDisplayName(crop as Crop);
@@ -245,7 +268,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 					text:
 						cropInfo.bz
 							.map(({ name, items, profit, total }, i) => {
-								return `${i === 0 ? ':star: ' : ''}**${name}**: ${total.toLocaleString()} \n-# **${Math.floor(items).toLocaleString()}** items for **${profit.toLocaleString()}** coins plus other items`;
+								return `${i === 0 ? ':star: ' : ''}**${name}:** ${total.toLocaleString()} \n-# **${Math.floor(items).toLocaleString()}** items for **${profit.toLocaleString()}** coins plus other items`;
 							})
 							.join('\n') +
 						`\n\n-# Other items: **${Math.floor(cropInfo.bz[0].total - cropInfo.bz[0].profit).toLocaleString()}** coins to NPC`,
@@ -265,7 +288,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 						.join('\n'),
 				},
 			})
-			.addFooter();
+			.addFooter(true, 'Back');
 
 		inter.update({ components: [cropContainer, row] });
 	});

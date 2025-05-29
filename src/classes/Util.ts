@@ -286,7 +286,7 @@ const CropEmojis = {
 	},
 };
 
-const EliteCropEmojis = {
+export const EliteCropEmojis = {
 	[Crop.Cactus]: CropEmojis.Cactus,
 	[Crop.Carrot]: CropEmojis.Carrot,
 	[Crop.CocoaBeans]: CropEmojis['Cocoa Beans'],
