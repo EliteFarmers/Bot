@@ -101,9 +101,9 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		.map(([crop, details]) => {
 			const cropName = getCropDisplayName(crop as Crop);
 			const profit = details.npcCoins ?? 0;
-			const otherCoins = details.npcCoins - details.coinSources['Collection'];
+			const otherCoins = details.npcCoins - (details.items[crop] ?? 0) * details.npcPrice;
 
-			const crafts = getPossibleResultsFromCrops(crop as Crop, details.collection);
+			const crafts = getPossibleResultsFromCrops(crop as Crop, details.items[crop] ?? details.collection);
 			const bz = [];
 
 			for (const [itemId, craft] of Object.entries(crafts)) {
@@ -117,6 +117,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 					name: bzData.name,
 					items: craft.fractionalItems,
 					cost: craft.fractionalCost,
+					per: bzData.bazaar.averageSellOrder,
 					profit: Math.floor(profit),
 					total: Math.floor(profit + otherCoins),
 				});
@@ -280,11 +281,12 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				expanded: {
 					text:
 						cropInfo.bz
-							.map(({ name, items, profit, total }, i) => {
-								return `${i === 0 ? ':star: ' : ''}**${name}:** ${total.toLocaleString()} \n-# **${Math.floor(items).toLocaleString()}** items for **${profit.toLocaleString()}** coins plus other items`;
+							.map(({ name, items, profit, total, per }, i) => {
+								return `${i === 0 ? ':star: ' : ''}**${name}:** ${total.toLocaleString()} \n-# **${Math.floor(items).toLocaleString()}** items at **${per.toLocaleString()}** coins each for **${profit.toLocaleString()}** coins plus other items`;
 							})
 							.join('\n') +
-						`\n\n-# Other items: **${Math.floor(cropInfo.bz[0].total - cropInfo.bz[0].profit).toLocaleString()}** coins to NPC`,
+						`\n\n-# Other items: **${Math.floor(cropInfo.bz[0].total - cropInfo.bz[0].profit).toLocaleString()}** coins to NPC` +
+						`\n-# Prices used are averaged sell order prices, not insta-sell prices.`,
 				},
 			})
 			.addSeperator()
