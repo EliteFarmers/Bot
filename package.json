@@ -27,7 +27,7 @@
 		"@sentry/node": "^8.55.0",
 		"@sentry/profiling-node": "^8.55.0",
 		"@types/amqplib": "^0.10.7",
-		"@types/node": "^20.17.50",
+		"@types/node": "^22.0.0",
 		"bufferutil": "^4.0.9",
 		"cron": "^3.5.0",
 		"date-fns": "^4.1.0",
