@@ -405,3 +405,10 @@ export const RefreshUserEntitlements = (discordId: string) =>
 			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
 		},
 	});
+
+export const FetchProducts = (list: string[]) =>
+	POST('/resources/items', {
+		body: {
+			items: list,
+		},
+	});

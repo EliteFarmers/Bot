@@ -302,6 +302,23 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/admin/link-account': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Link an Account */
+		post: operations['EliteAPIFeaturesAdminLinkAccountLinkAccountEndpoint'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/admin/guild/{guildId}/refresh': {
 		parameters: {
 			query?: never;
@@ -316,6 +333,23 @@ export interface paths {
 		 * @description This fetches the latest data from Discord for the specified guild
 		 */
 		post: operations['EliteAPIFeaturesAdminRefreshDiscordGuildRefreshDiscordGuildEndpoint'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/unlink-account': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Unlink an Account */
+		post: operations['EliteAPIFeaturesAdminUnlinkAccountUnlinkAccountEndpoint'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -916,6 +950,23 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/guild/{discordId}/events/collection': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Create Collection Event */
+		post: operations['EliteAPIFeaturesEventsAdminCreateEventCollectionCreateCollectionEventEndpoint'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/guild/{discordId}/events/medals': {
 		parameters: {
 			query?: never;
@@ -925,8 +976,42 @@ export interface paths {
 		};
 		get?: never;
 		put?: never;
+		/** Create Medal Event */
+		post: operations['EliteAPIFeaturesEventsAdminCreateEventMedalsCreateMedalEventEndpoint'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/guild/{discordId}/events/pests': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Create Pests Event */
+		post: operations['EliteAPIFeaturesEventsAdminCreateEventPestsCreatePestsEventEndpoint'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/guild/{discordId}/events/weight': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
 		/** Create Weight Event */
-		post: operations['EliteAPIFeaturesEventsAdminCreateMedalEventCreateMedalEventEndpoint'];
+		post: operations['EliteAPIFeaturesEventsAdminCreateEventWeightCreateWeightEventEndpoint'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -947,23 +1032,6 @@ export interface paths {
 		 * @description This generally should only be used for events with a set amount of teams (when users are not allowed to create their own teams)
 		 */
 		post: operations['EliteAPIFeaturesEventsAdminCreateTeamCreateTeamEndpoint'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/guild/{discordId}/events/weight': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		/** Create Weight Event */
-		post: operations['EliteAPIFeaturesEventsAdminCreateWeightEventCreateWeightEventEndpoint'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -1041,7 +1109,8 @@ export interface paths {
 		delete: operations['EliteAPIFeaturesEventsAdminDeleteTeamDeleteTeamEndpoint'];
 		options?: never;
 		head?: never;
-		patch?: never;
+		/** Update a team */
+		patch: operations['EliteAPIFeaturesEventsAdminUpdateTeamUpdateTeamEndpoint'];
 		trace?: never;
 	};
 	'/guild/{discordId}/event/{eventId}/bans': {
@@ -1085,7 +1154,7 @@ export interface paths {
 			path?: never;
 			cookie?: never;
 		};
-		/** Get all events for a guild */
+		/** Get an event for a guild */
 		get: operations['EliteAPIFeaturesEventsAdminGetGuildEventGetGuildEventEndpoint'];
 		put?: never;
 		post?: never;
@@ -1122,6 +1191,23 @@ export interface paths {
 		/** Get event teams */
 		get: operations['EliteAPIFeaturesEventsAdminGetTeamsGetTeamsEndpoint'];
 		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/guild/{discordId}/events/{eventId}/teams/{teamId}/owner': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		/** Set player as team owner */
+		put: operations['EliteAPIFeaturesEventsAdminSetTeamOwnerSetTeamOwnerEndpoint'];
 		post?: never;
 		delete?: never;
 		options?: never;
@@ -1356,6 +1442,23 @@ export interface paths {
 		put?: never;
 		/** Leave a team */
 		post: operations['EliteAPIFeaturesEventsUserLeaveTeamLeaveTeamEndpoint'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/event/{eventId}/team/{teamId}/owner': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		/** Set player as team owner */
+		put: operations['EliteAPIFeaturesEventsUserSetTeamOwnerSetTeamOwnerEndpoint'];
+		post?: never;
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -2072,6 +2175,90 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/resources/bazaar/{itemId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Bazaar Product
+		 * @description Get a specific bazaar product and it's npc price (if it exists)
+		 */
+		get: operations['EliteAPIFeaturesResourcesBazaarEndpointsGetBazaarProductEndpoint'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/resources/bazaar': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Bazaar Products
+		 * @description Get all bazaar products.
+		 */
+		get: operations['EliteAPIFeaturesResourcesBazaarEndpointsGetBazaarProductsEndpoint'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/resources/items': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Skyblock Items
+		 * @description Get all items in the Hypixel resources endpoint
+		 */
+		get: operations['EliteAPIFeaturesResourcesItemsEndpointsGetSkyblockItemsEndpoint'];
+		put?: never;
+		/**
+		 * Get Specific Skyblock Items
+		 * @description Get specific skyblock items from the Hypixel resources endpoint, along with bazaar data for each.
+		 */
+		post: operations['EliteAPIFeaturesResourcesItemsEndpointsGetSpecifiedSkyblockItemsEndpoint'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/resources/items/{itemId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Skyblock Item
+		 * @description Get the Hypixel provided data of a specific item, as well as a bazaar summary.
+		 */
+		get: operations['EliteAPIFeaturesResourcesItemsEndpointsSkybProductEndpoint'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/shop/category/{categoryId}/product/{productId}': {
 		parameters: {
 			query?: never;
@@ -2279,23 +2466,6 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
-	'/product/{ProductId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		/** Update Shop Product */
-		patch: operations['EliteAPIFeaturesShopProductsAdminUpdateProductUpdateProductEndpoint'];
-		trace?: never;
-	};
 	'/product/{discordId}': {
 		parameters: {
 			query?: never;
@@ -2310,7 +2480,8 @@ export interface paths {
 		delete?: never;
 		options?: never;
 		head?: never;
-		patch?: never;
+		/** Update Shop Product */
+		patch: operations['EliteAPIFeaturesShopProductsAdminUpdateProductUpdateProductEndpoint'];
 		trace?: never;
 	};
 	'/products': {
@@ -2545,6 +2716,7 @@ export interface components {
 			selected: boolean;
 			/** Format: double */
 			bankBalance: number;
+			deleted: boolean;
 			members: components['schemas']['MemberDetailsDto'][];
 		};
 		MemberDetailsDto: {
@@ -2554,6 +2726,22 @@ export interface components {
 			active: boolean;
 			/** Format: double */
 			farmingWeight: number;
+			meta?: components['schemas']['MemberCosmeticsDto'] | null;
+		};
+		MemberCosmeticsDto: {
+			prefix?: string | null;
+			suffix?: string | null;
+			leaderboard?: components['schemas']['MemberLeaderboardCosmeticsDto'] | null;
+		};
+		MemberLeaderboardCosmeticsDto: {
+			/** Format: int32 */
+			styleId?: number | null;
+			backgroundColor?: string | null;
+			borderColor?: string | null;
+			textColor?: string | null;
+			rankColor?: string | null;
+			backgroundImage?: string | null;
+			overlayImage?: string | null;
 		};
 		UserBadgeDto: {
 			/** Format: int32 */
@@ -2823,7 +3011,7 @@ export interface components {
 			data?: unknown;
 		};
 		/** @enum {integer} */
-		EventType: 0 | 1 | 2 | 3 | 4;
+		EventType: 0 | 1 | 2 | 3 | 4 | 5;
 		SetEventApprovalRequest: Record<string, never>;
 		AccountWithPermsDto: {
 			id: string;
@@ -2833,7 +3021,15 @@ export interface components {
 			discriminator?: string | null;
 			avatar?: string | null;
 		};
+		AdminLinkAccountRequest: {
+			discordId: string;
+			player: string;
+		};
 		GuildIdRequest: Record<string, never>;
+		AdminUnlinkAccountRequest: {
+			discordId: string;
+			player: string;
+		};
 		AuthSessionDto: {
 			/** @description Discord user ID */
 			id: string;
@@ -2857,16 +3053,14 @@ export interface components {
 			refresh_token: string;
 		};
 		DiscordLoginDto: {
-			/** @description Discord access token from OAuth2 */
-			access_token: string;
-			/** @description Unix timestamp in seconds */
-			expires_in: string;
-			/** @description Discord refresh token from OAuth2 */
-			refresh_token: string;
+			/** @description Discord login code from OAuth2 */
+			code: string;
+			/** @description Redirect URI from OAuth2 */
+			redirect_uri: string;
 		};
 		AuthRefreshDto: {
 			/** @description User ID */
-			access_token: string;
+			user_id: string;
 			/** @description Refresh token for the user */
 			refresh_token: string;
 		};
@@ -3194,17 +3388,85 @@ export interface components {
 		GetEntitlementsRequest: Record<string, never>;
 		UserEntitlementRequest: Record<string, never>;
 		AddTeamMemberRequest: Record<string, never>;
-		EventMemberBannedDto: {
+		AdminEventMemberDto: {
+			playerUuid?: string | null;
+			profileId?: string | null;
+			playerName?: string | null;
+			eventId: string;
+			teamId?: string | null;
+			status: components['schemas']['EventMemberStatus'];
+			score?: string | null;
+			lastUpdated?: string | null;
+			disqualified?: boolean | null;
+			data?: unknown;
+			/** @description Metadata of the entry */
+			meta?: components['schemas']['MemberCosmeticsDto'] | null;
 			/** Format: int32 */
 			id: number;
-			playerUuid?: string | null;
-			playerName?: string | null;
-			teamId?: string | null;
-			score?: string | null;
+			accountId?: string | null;
+			estimatedTimeActive?: string | null;
 			notes?: string | null;
-			lastUpdated?: string | null;
 		};
+		/** @enum {integer} */
+		EventMemberStatus: 0 | 1 | 2 | 3;
 		DeleteEventRequest: Record<string, never>;
+		CreateCollectionEventDto: {
+			/** @description The name of the event */
+			name: string;
+			/** @description The type of the event */
+			type?: components['schemas']['EventType'] | null;
+			/** @description The Discord server id as a string for the event */
+			guildId: string;
+			/** @description An optional description for the event */
+			description?: string | null;
+			/** @description An optional set of rules for the event */
+			rules?: string | null;
+			/** @description An optional description of prizes for the event */
+			prizeInfo?: string | null;
+			/**
+			 * Format: int64
+			 * @description Unix timestamp for the start time of the event in seconds
+			 */
+			startTime: number;
+			/**
+			 * Format: int64
+			 * @description Unix timestamp for the end time of the event in seconds
+			 */
+			endTime: number;
+			/**
+			 * Format: int64
+			 * @description Unix timestamp for the latest time a new member can join the event in seconds
+			 */
+			joinTime?: number | null;
+			/** @description Currently unused */
+			dynamicStartTime?: boolean | null;
+			/** @description A Discord role id that is required to participate in the event */
+			requiredRole?: string | null;
+			/** @description A Discord role id that is blocked from participating in the event */
+			blockedRole?: string | null;
+			/**
+			 * Format: int32
+			 * @description Max amount of teams allowed in the event, 0 if solo event, -1 if unlimited
+			 */
+			maxTeams: number;
+			/**
+			 * Format: int32
+			 * @description Max amount of members allowed in a team, 0 if solo event, -1 if unlimited
+			 */
+			maxTeamMembers: number;
+			/** @description Data specific to the pest event */
+			data?: components['schemas']['CollectionEventData'] | null;
+		};
+		CollectionEventData: {
+			collectionWeights: {
+				[key: string]: components['schemas']['CollectionWeight'];
+			};
+		};
+		CollectionWeight: {
+			name?: string | null;
+			/** Format: double */
+			weight: number;
+		};
 		CreateMedalEventDto: {
 			/** @description The name of the event */
 			name: string;
@@ -3259,11 +3521,60 @@ export interface components {
 		};
 		/** @enum {integer} */
 		ContestMedal: 0 | 1 | 2 | 3 | 4 | 5;
-		CreateEventTeamDto: {
-			/** @description An array of strings for the team name, example: [ "Bountiful", "Farmers" ] */
-			name?: string[] | null;
-			color?: string | null;
+		CreatePestEventDto: {
+			/** @description The name of the event */
+			name: string;
+			/** @description The type of the event */
+			type?: components['schemas']['EventType'] | null;
+			/** @description The Discord server id as a string for the event */
+			guildId: string;
+			/** @description An optional description for the event */
+			description?: string | null;
+			/** @description An optional set of rules for the event */
+			rules?: string | null;
+			/** @description An optional description of prizes for the event */
+			prizeInfo?: string | null;
+			/**
+			 * Format: int64
+			 * @description Unix timestamp for the start time of the event in seconds
+			 */
+			startTime: number;
+			/**
+			 * Format: int64
+			 * @description Unix timestamp for the end time of the event in seconds
+			 */
+			endTime: number;
+			/**
+			 * Format: int64
+			 * @description Unix timestamp for the latest time a new member can join the event in seconds
+			 */
+			joinTime?: number | null;
+			/** @description Currently unused */
+			dynamicStartTime?: boolean | null;
+			/** @description A Discord role id that is required to participate in the event */
+			requiredRole?: string | null;
+			/** @description A Discord role id that is blocked from participating in the event */
+			blockedRole?: string | null;
+			/**
+			 * Format: int32
+			 * @description Max amount of teams allowed in the event, 0 if solo event, -1 if unlimited
+			 */
+			maxTeams: number;
+			/**
+			 * Format: int32
+			 * @description Max amount of members allowed in a team, 0 if solo event, -1 if unlimited
+			 */
+			maxTeamMembers: number;
+			/** @description Data specific to the pest event */
+			data?: components['schemas']['PestEventData'] | null;
 		};
+		PestEventData: {
+			pestWeights: {
+				[key: string]: number;
+			};
+		};
+		/** @enum {integer} */
+		Pest: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 		CreateWeightEventDto: {
 			/** @description The name of the event */
 			name: string;
@@ -3319,27 +3630,16 @@ export interface components {
 		};
 		/** @enum {integer} */
 		Crop: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+		CreateEventTeamDto: {
+			/** @description An array of strings for the team name, example: [ "Bountiful", "Farmers" ] */
+			name?: string[] | null;
+			color?: string | null;
+		};
 		DeleteEventBannerRequest: Record<string, never>;
 		DeleteMemberRequest: Record<string, never>;
 		DeleteTeamRequest: Record<string, never>;
 		ForceAddMemberRequest: Record<string, never>;
 		GetBannedMembersRequest: Record<string, never>;
-		AdminEventMemberDto: {
-			playerUuid?: string | null;
-			profileId?: string | null;
-			playerName?: string | null;
-			eventId: string;
-			teamId?: string | null;
-			status: components['schemas']['EventMemberStatus'];
-			score?: string | null;
-			lastUpdated?: string | null;
-			disqualified?: boolean | null;
-			data?: unknown;
-			/** Format: int32 */
-			id: number;
-		};
-		/** @enum {integer} */
-		EventMemberStatus: 0 | 1 | 2 | 3;
 		GetEventMembersRequest: Record<string, never>;
 		GetAdminGuildEventRequest: Record<string, never>;
 		EventTeamWithMembersDto: {
@@ -3367,14 +3667,19 @@ export interface components {
 			lastUpdated?: string | null;
 			disqualified: boolean;
 			notes?: string | null;
+			/** @description Metadata of the entry */
+			meta?: components['schemas']['MemberCosmeticsDto'] | null;
 		};
 		GetTeamsRequest: Record<string, never>;
 		KickTeamMemberRequest: Record<string, never>;
-		UnbanMemberRequest: Record<string, never>;
+		SetTeamOwnerRequest: {
+			player: string;
+		};
 		EditEventBannerDto: {
 			/** Format: binary */
 			image?: string | null;
 		};
+		UnbanMemberRequest: Record<string, never>;
 		GetEventRequest: Record<string, never>;
 		EditEventDto: {
 			name?: string | null;
@@ -3395,12 +3700,24 @@ export interface components {
 			guildId?: string | null;
 			weightData?: components['schemas']['WeightEventData'] | null;
 			medalData?: components['schemas']['MedalEventData'] | null;
+			pestData?: components['schemas']['PestEventData'] | null;
+			collectionData?: components['schemas']['CollectionEventData'] | null;
+		};
+		UpdateEventTeamDto: {
+			/** @description An array of strings for the team name, example: [ "Bountiful", "Farmers" ] */
+			name?: string[] | null;
+			color?: string | null;
+			/** @description If join code should be changed */
+			changeCode?: boolean | null;
 		};
 		EventDefaultsDto: {
 			cropWeights: {
 				[key: string]: number;
 			};
 			medalValues: {
+				[key: string]: number;
+			};
+			pestWeights: {
 				[key: string]: number;
 			};
 		};
@@ -3416,6 +3733,8 @@ export interface components {
 			lastUpdated?: string | null;
 			disqualified?: boolean | null;
 			data?: unknown;
+			/** @description Metadata of the entry */
+			meta?: components['schemas']['MemberCosmeticsDto'] | null;
 		};
 		GetEventMembersRequest2: Record<string, never>;
 		GetEventTeamRequest: Record<string, never>;
@@ -3425,17 +3744,16 @@ export interface components {
 			second: string[];
 			third: string[];
 		};
+		GetUpcomingEventsRequest: Record<string, never>;
 		DeleteTeamRequest2: Record<string, never>;
 		JoinEventRequest: Record<string, never>;
 		KickTeamMemberRequest2: Record<string, never>;
 		LeaveEventRequest: Record<string, never>;
 		LeaveTeamRequest: Record<string, never>;
-		UpdateTeamJoinCodeRequest: Record<string, never>;
-		UpdateEventTeamDto: {
-			/** @description An array of strings for the team name, example: [ "Bountiful", "Farmers" ] */
-			name?: string[] | null;
-			color?: string | null;
+		ChangeTeamOwnerRequest: {
+			player: string;
 		};
+		UpdateTeamJoinCodeRequest: Record<string, never>;
 		GardenDto: {
 			/** @description Profile ID */
 			profileId: string;
@@ -3668,6 +3986,7 @@ export interface components {
 			id: string;
 			title: string;
 			shortTitle?: string | null;
+			interval?: string | null;
 			/** Format: int32 */
 			limit: number;
 			/** Format: int32 */
@@ -3718,7 +4037,11 @@ export interface components {
 			 * @description Initial score of the entry
 			 */
 			initialAmount: number;
+			/** @description Game mode of the entry. Classic profiles are considered default/null. */
+			mode?: string | null;
 			members?: components['schemas']['ProfileLeaderboardMemberDto'][] | null;
+			/** @description Metadata of the entry */
+			meta?: components['schemas']['MemberCosmeticsDto'] | null;
 		};
 		ProfileLeaderboardMemberDto: {
 			ign: string;
@@ -3728,8 +4051,11 @@ export interface components {
 			 * @description Skyblock xp of the player (used for sorting)
 			 */
 			xp: number;
+			removed: boolean;
 		};
 		LeaderboardSliceRequest: Record<string, never>;
+		/** @enum {integer} */
+		RemovedFilter: 0 | 1 | 2;
 		LeaderboardsResponse: {
 			leaderboards: {
 				[key: string]: components['schemas']['LeaderboardInfoDto'];
@@ -3779,12 +4105,34 @@ export interface components {
 		};
 		LeaderboardRanksRequest: Record<string, never>;
 		LeaderboardPositionDto: {
-			/** Format: int32 */
+			/**
+			 * Format: int32
+			 * @description Current rank of the player (-1 if not on leaderboard)
+			 */
 			rank: number;
-			/** Format: double */
+			/**
+			 * Format: double
+			 * @description Current score of the player (0 if not on leaderboard)
+			 */
 			amount: number;
-			/** Format: int32 */
+			/**
+			 * Format: double
+			 * @description The starting amount of the leaderboard entry for interval based leaderboards
+			 */
+			initialAmount: number;
+			/**
+			 * Format: double
+			 * @description The minimum amount required to be on the leaderboard. If this is a time based leaderboard,
+			 *     this score is instead required on the normal leaderboard before the player can be on the
+			 *     time based leaderboard
+			 */
+			minAmount: number;
+			/**
+			 * Format: int32
+			 * @description The starting rank of the returned upcoming players list
+			 */
 			upcomingRank: number;
+			/** @description List of upcoming players */
 			upcomingPlayers?: components['schemas']['LeaderboardEntryDto'][] | null;
 		};
 		GetPlayerRankRequest: Record<string, never>;
@@ -3821,6 +4169,7 @@ export interface components {
 			purse: number;
 			/** Format: double */
 			bankBalance: number;
+			meta?: components['schemas']['MemberCosmeticsDto'] | null;
 			collections: {
 				[key: string]: number;
 			};
@@ -4089,6 +4438,180 @@ export interface components {
 			name: string;
 			selected: boolean;
 		};
+		GetBazaarProductResponse: {
+			productId: string;
+			product: components['schemas']['BazaarProductSummaryDto'];
+		};
+		BazaarProductSummaryDto: {
+			/** @description Name of the item if it exists. */
+			name?: string | null;
+			/**
+			 * Format: double
+			 * @description NPC sell price of the item if it exists.
+			 */
+			npc: number;
+			/**
+			 * Format: double
+			 * @description Instamt Sell price taken directly from most recently fetched data
+			 */
+			sell: number;
+			/**
+			 * Format: double
+			 * @description Instant Buy price taken directly from most recently fetched data
+			 */
+			buy: number;
+			/**
+			 * Format: double
+			 * @description Sell Order price calculated from most recently fetched data
+			 */
+			sellOrder: number;
+			/**
+			 * Format: double
+			 * @description Buy Order price calculated from most recently fetched data
+			 */
+			buyOrder: number;
+			/**
+			 * Format: double
+			 * @description Calculated average Instant Sell price that should be more resistant to price fluctuations
+			 */
+			averageSell: number;
+			/**
+			 * Format: double
+			 * @description Calculated average Instant Buy price that should be more resistant to price fluctuations
+			 */
+			averageBuy: number;
+			/**
+			 * Format: double
+			 * @description Calculated average Sell Order price that should be more resistant to price fluctuations
+			 */
+			averageSellOrder: number;
+			/**
+			 * Format: double
+			 * @description Calculated average Buy Order price that should be more resistant to price fluctuations
+			 */
+			averageBuyOrder: number;
+		};
+		GetBazaarProductRequest: Record<string, never>;
+		GetBazaarProductsResponse: {
+			products: {
+				[key: string]: components['schemas']['BazaarProductSummaryDto'];
+			};
+		};
+		GetSkyblockItemsResponse: {
+			items: {
+				[key: string]: components['schemas']['ItemResponse'] | null;
+			};
+		};
+		ItemResponse: {
+			id?: string | null;
+			material?: string | null;
+			color?: string | null;
+			/** Format: int32 */
+			durability: number;
+			skin?: components['schemas']['ItemSkin'] | null;
+			name?: string | null;
+			category?: string | null;
+			tier?: string | null;
+			unstackable: boolean;
+			glowing: boolean;
+			/** Format: double */
+			npc_sell_price: number;
+			can_auction: boolean;
+			can_trade: boolean;
+			can_place: boolean;
+			gemstone_slots?: components['schemas']['ItemGemstoneSlot'][] | null;
+			requirements?: components['schemas']['ItemRequirement'][] | null;
+			museum: boolean;
+			museum_data?: components['schemas']['ItemMuseumData'] | null;
+			stats?: {
+				[key: string]: number;
+			} | null;
+			/** Format: int32 */
+			generator_tier: number;
+			dungeon_item_conversion_cost?: components['schemas']['DungeonItemConversionCost'] | null;
+			upgrade_costs?: components['schemas']['UpgradeCosts'][][] | null;
+			catacombs_requirements?: components['schemas']['CatacombsRequirements'][] | null;
+			hide_from_viewrecipe_command: boolean;
+			salvagable_from_recipe: boolean;
+			item_specific?: components['schemas']['JsonDocument'] | null;
+		} & {
+			[key: string]: unknown;
+		};
+		ItemSkin: {
+			value: string;
+			signature: string;
+		};
+		ItemGemstoneSlot: {
+			slot_type: string;
+			costs: components['schemas']['ItemGemstoneSlotCosts'][];
+		};
+		ItemGemstoneSlotCosts: {
+			type: string;
+			item_id?: string | null;
+			/** Format: int32 */
+			coins: number;
+		};
+		ItemRequirement: {
+			type: string;
+			skill?: string | null;
+			/** Format: int32 */
+			level: number;
+		};
+		ItemMuseumData: {
+			/** Format: int32 */
+			donation_xp: number;
+			parent: {
+				[key: string]: string;
+			};
+			type?: string | null;
+			armor_set_donation_xp?: {
+				[key: string]: number;
+			} | null;
+			game_stage?: string | null;
+		};
+		DungeonItemConversionCost: {
+			essence_type?: string | null;
+			/** Format: int32 */
+			amount: number;
+		};
+		UpgradeCosts: {
+			type?: string | null;
+			essence_type?: string | null;
+			/** Format: int32 */
+			amount: number;
+		};
+		CatacombsRequirements: {
+			type?: string | null;
+			dungeon_type?: string | null;
+			/** Format: int32 */
+			level: number;
+		};
+		JsonDocument: {
+			rootElement: unknown;
+		};
+		GetSpecifiedSkyblockItemsResponse: {
+			items: {
+				[key: string]: components['schemas']['SkyblockItemResponse'];
+			};
+		};
+		SkyblockItemResponse: {
+			itemId: string;
+			name?: string | null;
+			/** @description Data from the Hypixel items endpoint */
+			data?: components['schemas']['ItemResponse'] | null;
+			bazaar?: components['schemas']['BazaarProductSummaryDto'] | null;
+		};
+		/** @example {
+		 *       "items": [
+		 *         "NETHER_STALK",
+		 *         "ENCHANTED_NETHER_STALK",
+		 *         "MUTANT_NETHER_STALK"
+		 *       ]
+		 *     } */
+		GetSpecifiedSkyblockItemsRequest: {
+			items: string[];
+		};
+		SkybProductRequest: Record<string, never>;
 		AddProductToCategoryRequest: Record<string, never>;
 		CreateCategoryDto: {
 			title: string;
@@ -4109,7 +4632,7 @@ export interface components {
 		};
 		GetCategoriesRequest: Record<string, never>;
 		GetCategoryRequest: Record<string, never>;
-		RemoveProductToCategoryRequest: Record<string, never>;
+		RemoveProductFromCategoryRequest: Record<string, never>;
 		ReorderIntRequest: {
 			elements: components['schemas']['ReorderElementOfInt32'][];
 		};
@@ -5135,6 +5658,42 @@ export interface operations {
 			};
 		};
 	};
+	EliteAPIFeaturesAdminLinkAccountLinkAccountEndpoint: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['AdminLinkAccountRequest'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
 	EliteAPIFeaturesAdminRefreshDiscordGuildRefreshDiscordGuildEndpoint: {
 		parameters: {
 			query?: never;
@@ -5161,6 +5720,42 @@ export interface operations {
 				content: {
 					'application/problem+json': components['schemas']['ErrorResponse'];
 				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	EliteAPIFeaturesAdminUnlinkAccountUnlinkAccountEndpoint: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['AdminUnlinkAccountRequest'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
 			};
 			/** @description Unauthorized */
 			401: {
@@ -6584,7 +7179,7 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					'application/json': components['schemas']['EventMemberBannedDto'];
+					'application/json': components['schemas']['AdminEventMemberDto'];
 				};
 			};
 			/** @description Bad Request */
@@ -6643,7 +7238,50 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminCreateMedalEventCreateMedalEventEndpoint: {
+	EliteAPIFeaturesEventsAdminCreateEventCollectionCreateCollectionEventEndpoint: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description Discord Snowflake ID of the requested resource (guild, user, etc.) */
+				discordId: number;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['CreateCollectionEventDto'];
+			};
+		};
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['EventDetailsDto'];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	EliteAPIFeaturesEventsAdminCreateEventMedalsCreateMedalEventEndpoint: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6686,29 +7324,30 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminCreateTeamCreateTeamEndpoint: {
+	EliteAPIFeaturesEventsAdminCreateEventPestsCreatePestsEventEndpoint: {
 		parameters: {
 			query?: never;
 			header?: never;
 			path: {
 				/** @description Discord Snowflake ID of the requested resource (guild, user, etc.) */
 				discordId: number;
-				eventId: number;
 			};
 			cookie?: never;
 		};
 		requestBody: {
 			content: {
-				'application/json': components['schemas']['CreateEventTeamDto'];
+				'application/json': components['schemas']['CreatePestEventDto'];
 			};
 		};
 		responses: {
-			/** @description No Content */
-			204: {
+			/** @description Success */
+			200: {
 				headers: {
 					[name: string]: unknown;
 				};
-				content?: never;
+				content: {
+					'application/json': components['schemas']['EventDetailsDto'];
+				};
 			};
 			/** @description Bad Request */
 			400: {
@@ -6728,7 +7367,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminCreateWeightEventCreateWeightEventEndpoint: {
+	EliteAPIFeaturesEventsAdminCreateEventWeightCreateWeightEventEndpoint: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6752,6 +7391,50 @@ export interface operations {
 				content: {
 					'application/json': components['schemas']['EventDetailsDto'];
 				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	EliteAPIFeaturesEventsAdminCreateTeamCreateTeamEndpoint: {
+		parameters: {
+			query?: {
+				userId?: string | null;
+			};
+			header?: never;
+			path: {
+				/** @description Discord Snowflake ID of the requested resource (guild, user, etc.) */
+				discordId: number;
+				eventId: number;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['CreateEventTeamDto'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
 			};
 			/** @description Bad Request */
 			400: {
@@ -7053,6 +7736,49 @@ export interface operations {
 			};
 		};
 	};
+	EliteAPIFeaturesEventsAdminUpdateTeamUpdateTeamEndpoint: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description Discord Snowflake ID of the requested resource (guild, user, etc.) */
+				discordId: number;
+				eventId: number;
+				teamId: number;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['UpdateEventTeamDto'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
 	EliteAPIFeaturesEventsAdminGetBannedMembersGetBannedMembersEndpoint: {
 		parameters: {
 			query?: never;
@@ -7072,7 +7798,7 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					'application/json': components['schemas']['EventMemberBannedDto'][];
+					'application/json': components['schemas']['AdminEventMemberDto'][];
 				};
 			};
 			/** @description Bad Request */
@@ -7241,6 +7967,39 @@ export interface operations {
 				content: {
 					'application/problem+json': components['schemas']['ErrorResponse'];
 				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	EliteAPIFeaturesEventsAdminSetTeamOwnerSetTeamOwnerEndpoint: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				discordId: number;
+				eventId: number;
+				teamId: number;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['SetTeamOwnerRequest'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
 			};
 			/** @description Unauthorized */
 			401: {
@@ -7505,7 +8264,10 @@ export interface operations {
 	};
 	EliteAPIFeaturesEventsPublicGetUpcomingGetUpcomingEventsEndpoint: {
 		parameters: {
-			query?: never;
+			query?: {
+				/** @description Offset by an amount of days to also include recently ended events. */
+				offset?: number | null;
+			};
 			header?: never;
 			path?: never;
 			cookie?: never;
@@ -7689,6 +8451,38 @@ export interface operations {
 			};
 		};
 	};
+	EliteAPIFeaturesEventsUserSetTeamOwnerSetTeamOwnerEndpoint: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				eventId: number;
+				teamId: number;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'*/*': components['schemas']['ChangeTeamOwnerRequest'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
 	EliteAPIFeaturesEventsUserUpdateTeamCodeUpdateTeamJoinCodeEndpoint: {
 		parameters: {
 			query?: never;
@@ -7799,9 +8593,9 @@ export interface operations {
 				/** @description Unix timestamp in seconds for the start of the data to return */
 				from?: number | null;
 				/** @description Amount of days after the "from" timestamp to include */
-				days?: number;
+				days?: number | null;
 				/** @description Data points returned per 24-hour period */
-				perDay?: number;
+				perDay?: number | null;
 			};
 			header?: never;
 			path: {
@@ -7850,8 +8644,8 @@ export interface operations {
 		parameters: {
 			query?: {
 				from?: number | null;
-				days?: number;
-				perDay?: number;
+				days?: number | null;
+				perDay?: number | null;
 			};
 			header?: never;
 			path: {
@@ -7900,8 +8694,8 @@ export interface operations {
 		parameters: {
 			query?: {
 				from?: number | null;
-				days?: number;
-				perDay?: number;
+				days?: number | null;
+				perDay?: number | null;
 			};
 			header?: never;
 			path: {
@@ -7936,8 +8730,8 @@ export interface operations {
 		parameters: {
 			query?: {
 				from?: number | null;
-				days?: number;
-				perDay?: number;
+				days?: number | null;
+				perDay?: number | null;
 			};
 			header?: never;
 			path: {
@@ -7972,7 +8766,7 @@ export interface operations {
 		parameters: {
 			query?: {
 				/** @description Amount of previous SkyBlock months to include in the average */
-				months?: number;
+				months?: number | null;
 			};
 			header?: never;
 			path?: never;
@@ -7995,7 +8789,7 @@ export interface operations {
 		parameters: {
 			query?: {
 				/** @description Amount of previous SkyBlock months to include in the average */
-				months?: number;
+				months?: number | null;
 			};
 			header?: never;
 			path: {
@@ -8032,9 +8826,9 @@ export interface operations {
 		parameters: {
 			query?: {
 				/** @description Amount of previous SkyBlock years to include in the average */
-				years?: number;
+				years?: number | null;
 				/** @description Amount of previous SkyBlock months to include in the average */
-				months?: number;
+				months?: number | null;
 			};
 			header?: never;
 			path: {
@@ -8146,7 +8940,7 @@ export interface operations {
 	EliteAPIFeaturesGuildsAdminSetJacobLeaderboardsSetJacobFeatureEndpoint: {
 		parameters: {
 			query?: {
-				enable?: boolean;
+				enable?: boolean | null;
 				max?: number | null;
 			};
 			header?: never;
@@ -8194,7 +8988,7 @@ export interface operations {
 		parameters: {
 			query?: {
 				/** @description If server subscriptions shouldn't override feature values */
-				locked?: boolean;
+				locked?: boolean | null;
 			};
 			header?: never;
 			path: {
@@ -8240,7 +9034,7 @@ export interface operations {
 	EliteAPIFeaturesGuildsAdminSetPublicSetGuildPublicEndpoint: {
 		parameters: {
 			query?: {
-				public?: boolean;
+				public?: boolean | null;
 			};
 			header?: never;
 			path: {
@@ -8840,7 +9634,18 @@ export interface operations {
 		parameters: {
 			query?: {
 				offset?: number | null;
-				limit?: number;
+				limit?: number | null;
+				/** @description Time interval key of a monthly leaderboard. Format: yyyy-MM */
+				interval?: string | null;
+				/** @description Game mode to filter leaderboard by. Leave empty to get all modes.
+				 *     Options: "ironman", "island", "classic" */
+				mode?: string | null;
+				/** @description Removed filter to get leaderboard entries that have been removed from the leaderboard.
+				 *     Default is profiles that have not been removed/wiped.
+				 *     0 = Not Removed
+				 *     1 = Removed
+				 *     2 = All */
+				removed?: components['schemas']['RemovedFilter'] | null;
 				/** @description Use new leaderboard backend (will be default in the future) */
 				new?: boolean | null;
 			};
@@ -8928,8 +9733,19 @@ export interface operations {
 				upcoming?: number | null;
 				/** @description Start at a specified rank for upcoming players */
 				atRank?: number | null;
-				/** @description Use new leaderboard backend (will be default in the future) */
+				/** @description Use new leaderboard backend (will be removed in the future) */
 				new?: boolean | null;
+				/** @description Time interval key of a monthly leaderboard. Format: yyyy-MM */
+				interval?: string | null;
+				/** @description Game mode to filter leaderboard by. Leave empty to get all modes.
+				 *     Options: "ironman", "island", "classic" */
+				mode?: string | null;
+				/** @description Removed filter to get leaderboard entries that have been removed from the leaderboard.
+				 *     Default is profiles that have not been removed/wiped.
+				 *     0 = Not Removed
+				 *     1 = Removed
+				 *     2 = All */
+				removed?: components['schemas']['RemovedFilter'] | null;
 			};
 			header?: never;
 			path: {
@@ -8969,6 +9785,9 @@ export interface operations {
 				upcoming?: number | null;
 				atRank?: number | null;
 				new?: boolean | null;
+				interval?: string | null;
+				mode?: string | null;
+				removed?: components['schemas']['RemovedFilter'] | null;
 			};
 			header?: never;
 			path: {
@@ -9043,6 +9862,17 @@ export interface operations {
 				atRank?: number | null;
 				/** @description Use new leaderboard backend (will be default in the future) */
 				new?: boolean | null;
+				/** @description Time interval key of a monthly leaderboard. Format: yyyy-MM */
+				interval?: string | null;
+				/** @description Game mode to filter leaderboard by. Leave empty to get all modes.
+				 *     Options: "ironman", "island", "classic" */
+				mode?: string | null;
+				/** @description Removed filter to get leaderboard entries that have been removed from the leaderboard.
+				 *     Default is profiles that have not been removed/wiped.
+				 *     0 = Not Removed
+				 *     1 = Removed
+				 *     2 = All */
+				removed?: components['schemas']['RemovedFilter'] | null;
 			};
 			header?: never;
 			path: {
@@ -9081,6 +9911,9 @@ export interface operations {
 				upcoming?: number | null;
 				atRank?: number | null;
 				new?: boolean | null;
+				interval?: string | null;
+				mode?: string | null;
+				removed?: components['schemas']['RemovedFilter'] | null;
 			};
 			header?: never;
 			path: {
@@ -9361,6 +10194,123 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content?: never;
+			};
+		};
+	};
+	EliteAPIFeaturesResourcesBazaarEndpointsGetBazaarProductEndpoint: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				itemId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetBazaarProductResponse'];
+				};
+			};
+		};
+	};
+	EliteAPIFeaturesResourcesBazaarEndpointsGetBazaarProductsEndpoint: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetBazaarProductsResponse'];
+				};
+			};
+		};
+	};
+	EliteAPIFeaturesResourcesItemsEndpointsGetSkyblockItemsEndpoint: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetSkyblockItemsResponse'];
+				};
+			};
+		};
+	};
+	EliteAPIFeaturesResourcesItemsEndpointsGetSpecifiedSkyblockItemsEndpoint: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['GetSpecifiedSkyblockItemsRequest'];
+			};
+		};
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetSpecifiedSkyblockItemsResponse'];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+		};
+	};
+	EliteAPIFeaturesResourcesItemsEndpointsSkybProductEndpoint: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				itemId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['SkyblockItemResponse'];
+				};
 			};
 		};
 	};
@@ -9925,12 +10875,44 @@ export interface operations {
 			};
 		};
 	};
+	EliteAPIFeaturesShopProductsGetProductGetProductEndpoint: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				discordId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ProductDto'];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+		};
+	};
 	EliteAPIFeaturesShopProductsAdminUpdateProductUpdateProductEndpoint: {
 		parameters: {
 			query?: never;
 			header?: never;
 			path: {
-				productId: string;
+				/** @description Discord Snowflake ID of the requested resource (guild, user, etc.) */
+				discordId: number;
 			};
 			cookie?: never;
 		};
@@ -9969,37 +10951,6 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content?: never;
-			};
-		};
-	};
-	EliteAPIFeaturesShopProductsGetProductGetProductEndpoint: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				discordId: number;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Success */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['ProductDto'];
-				};
-			};
-			/** @description Bad Request */
-			400: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/problem+json': components['schemas']['ErrorResponse'];
-				};
 			};
 		};
 	};

@@ -2,6 +2,7 @@ namespace NodeJS {
 	interface ProcessEnv {
 		BOT_TOKEN: string;
 		CLIENT_ID: string;
+		FOOTER_SKU: string;
 
 		ELITE_API_URL: string;
 		ENTITLEMENT_CHANNEL: string;
