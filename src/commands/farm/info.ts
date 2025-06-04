@@ -19,11 +19,11 @@ import {
 	Direction,
 	FarmingMethod,
 	MinecraftVersion,
+	ResourceType,
 	farmDesigns,
 	farmInfo,
 	farmsData,
 } from 'farming-weight';
-import { $ZodAny } from 'zod/v4/core';
 
 const command = new EliteCommand({
 	name: 'info',
@@ -60,10 +60,16 @@ async function autocomplete(interaction: AutocompleteInteraction) {
 export default command;
 
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
-	const design = farmsData.chisslMelon;
-	const depthStriderLevel = 1 as DepthStriderLevels;
+	const design = farmsData[interaction.options.getString('design', false) ?? -1];
+	if (!design) return;
+
+	const depthStriderLevel = design.speed.depthStrider;
 	const orienation = 'North' as Direction;
 	const version = '1.8.9' as MinecraftVersion;
+
+	const resources = design.resources
+		?.filter((r) => r.type !== ResourceType.Schematic)
+		.map((r) => `${r.type}: ${r.source}`).join("\n");
 
 	const speed = await calcSpeed(design.speed, version, depthStriderLevel);
 
@@ -80,18 +86,23 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		.addTextDisplayComponents(
 			new TextDisplayBuilder().setContent(`bps: ${design.bps}\nLane time: ${480 / blocksPerSecond}\nKeys used: `),
 		)
-		.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true))
-		.addTextDisplayComponents(
-			// todo: dont have field/value if there isnt an example
-			new TextDisplayBuilder().setContent(
-				`Tutorial video: ${design.tutorials?.video ?? 'n/a'}\nDiscussion thread: ${design.tutorials?.thread ?? 'n/a'}\nVisitable  example: ${design.tutorials?.garden ?? 'n/a'}`,
-			),
-		)
-		.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true))
-		.addTextDisplayComponents(
-			// todo: dont have field if there isnt any authors
-			new TextDisplayBuilder().setContent(`-# Authors: ${design.authors?.join(', ') ?? 'n/a'}`),
-		);
+
+			
+	if (resources) {
+		farmInfoComponent
+			.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true))
+			.addTextDisplayComponents(
+				new TextDisplayBuilder().setContent(resources),
+			);
+	}
+
+	if (design.authors) {
+		farmInfoComponent
+			.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true))
+			.addTextDisplayComponents(
+				new TextDisplayBuilder().setContent(`-# Authors: ${design.authors.join(', ')}`),
+			);
+	}
 
 	const settingsComponent = new ContainerBuilder()
 		.addTextDisplayComponents(new TextDisplayBuilder().setContent('# Settings'))
@@ -150,6 +161,7 @@ async function calcSpeed(
 	targetVersion?: MinecraftVersion,
 	targetDepthStrider?: DepthStriderLevels,
 ): Promise<number> {
+	// todo: fix
 	const versionMultiplier = {
 		'1.8.9': 0.4,
 		'1.21': 0.5,
