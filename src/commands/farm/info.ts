@@ -59,49 +59,47 @@ async function autocomplete(interaction: AutocompleteInteraction) {
 
 export default command;
 
-async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
+async function execute(interaction: ChatInputCommandInteraction) {
 	const design = farmsData[interaction.options.getString('design', false) ?? -1];
 	if (!design) return;
 
 	const depthStriderLevel = design.speed.depthStrider;
-	const orienation = 'North' as Direction;
+	const direction = 'North' as Direction;
 	const version = '1.8.9' as MinecraftVersion;
 
 	const resources = design.resources
 		?.filter((r) => r.type !== ResourceType.Schematic)
-		.map((r) => `${r.type}: ${r.source}`).join("\n");
+		.map((r) => `${r.type}: ${r.source}`)
+		.join('\n');
 
 	const speed = await calcSpeed(design.speed, version, depthStriderLevel);
 
 	const blocksPerSecond = await calcBlocksPerSecond(speed, design.angle.yaw, design.speed.method);
 
+	const yaw = await fixDesignAngle(design.angle.yaw, direction);
+
 	const farmInfoComponent = new ContainerBuilder()
 		.addTextDisplayComponents(new TextDisplayBuilder().setContent(`# ${design.name}`))
 		.addTextDisplayComponents(
 			new TextDisplayBuilder().setContent(
-				`Yaw: ${design.angle.yaw}, Pitch: ${design.angle.pitch}\nSpeed: ${speed}, Depth strider level: ${depthStriderLevel}`,
+				`Yaw: ${yaw}, Pitch: ${design.angle.pitch}\nSpeed: ${speed}, Depth strider level: ${depthStriderLevel}`,
 			),
 		)
 		.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true))
 		.addTextDisplayComponents(
 			new TextDisplayBuilder().setContent(`bps: ${design.bps}\nLane time: ${480 / blocksPerSecond}\nKeys used: `),
-		)
+		);
 
-			
 	if (resources) {
 		farmInfoComponent
 			.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true))
-			.addTextDisplayComponents(
-				new TextDisplayBuilder().setContent(resources),
-			);
+			.addTextDisplayComponents(new TextDisplayBuilder().setContent(resources));
 	}
 
 	if (design.authors) {
 		farmInfoComponent
 			.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true))
-			.addTextDisplayComponents(
-				new TextDisplayBuilder().setContent(`-# Authors: ${design.authors.join(', ')}`),
-			);
+			.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# Authors: ${design.authors.join(', ')}`));
 	}
 
 	const settingsComponent = new ContainerBuilder()
@@ -192,4 +190,25 @@ async function calcBlocksPerSecond(speed: number, yaw: number, method: FarmingMe
 
 	// https://minecraft.fandom.com/wiki/Walking
 	return (effectiveSpeed * 4.3171) / 100;
+}
+
+async function fixDesignAngle(designYaw: number, direction: Direction): Promise<number> {
+	const yaw = designYaw + directionYawOffset('South', direction);
+
+	return normalizeAngle(yaw);
+}
+
+function directionYawOffset(from: Direction, to: Direction): number {
+	const yawMap: Record<Direction, number> = {
+		North: 180,
+		East: -90,
+		South: 0,
+		West: 90,
+	};
+
+	return normalizeAngle(yawMap[to] - yawMap[from]);
+}
+
+function normalizeAngle(angle: number) {
+	return ((angle + 180) % 360) - 180;
 }
