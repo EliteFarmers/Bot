@@ -4,8 +4,6 @@ import { EliteContainer } from 'classes/components.js';
 import {
 	ActionRowBuilder,
 	AutocompleteInteraction,
-	ButtonBuilder,
-	ButtonStyle,
 	ChatInputCommandInteraction,
 	MessageActionRowComponentBuilder,
 	StringSelectMenuBuilder,
@@ -77,20 +75,18 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const farmInfoComponent = new EliteContainer(settings)
 		.addTitle(`# ${design.name}`)
-		.addDescription(`Yaw: ${yaw}, Pitch: ${design.angle.pitch}\nSpeed: ${speed}, Depth strider level: ${depthStriderLevel}`)
+		.addDescription(
+			`Yaw: ${yaw}, Pitch: ${design.angle.pitch}\nSpeed: ${speed}, Depth strider level: ${depthStriderLevel}`,
+		)
 		.addSeperator()
 		.addDescription(`bps: ${design.bps}\nLane time: ${480 / blocksPerSecond}\nKeys used: `);
 
 	if (resources) {
-		farmInfoComponent
-			.addSeperator()
-			.addDescription(resources);
+		farmInfoComponent.addSeperator().addDescription(resources);
 	}
 
 	if (design.authors) {
-		farmInfoComponent
-			.addSeperator()
-			.addDescription(`-# Authors: ${design.authors.join(', ')}`);
+		farmInfoComponent.addSeperator().addDescription(`-# Authors: ${design.authors.join(', ')}`);
 	}
 
 	farmInfoComponent.addFooter();
