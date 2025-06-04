@@ -55,16 +55,16 @@ async function autocomplete(interaction: AutocompleteInteraction) {
 export default command;
 
 interface FarmSettings {
-	depthStrider: DepthStriderLevels,
-	direction: Direction,
-	version: MinecraftVersion,
+	depthStrider: DepthStriderLevels;
+	direction: Direction;
+	version: MinecraftVersion;
 }
 
 const farmSettings: FarmSettings = {
 	depthStrider: 3,
 	direction: 'East',
 	version: '1.8.9',
-}
+};
 
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	const design = farmsData[interaction.options.getString('design', false) ?? -1];
