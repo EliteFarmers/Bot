@@ -126,9 +126,6 @@ Get info on a specific farm design including, angles, speeds, tutorials and more
 
 **Usage:** `/farm info` \
 `[design]: <design name>`
-`(direction): <cardinal direction>`
-`(depth strider): <depth strider level>`
-`(version): <minecraft version>`
 
 <img src="" alt="farm info" style="width:500px;"/>
 
