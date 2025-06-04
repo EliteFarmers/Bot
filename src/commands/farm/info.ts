@@ -93,6 +93,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			.addDescription(`-# Authors: ${design.authors.join(', ')}`);
 	}
 
+	farmInfoComponent.addFooter();
+
 	const settingsComponent = new EliteContainer(settings)
 		.addTitle('# Settings')
 		.addActionRowComponents(
@@ -130,7 +132,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 						new StringSelectMenuOptionBuilder().setLabel('1.21').setValue('1.21'),
 					),
 			),
-		);
+		)
+		.addFooter();
 
 	await interaction
 		.reply({
