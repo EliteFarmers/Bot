@@ -54,29 +54,39 @@ async function autocomplete(interaction: AutocompleteInteraction) {
 
 export default command;
 
+interface FarmSettings {
+	depthStrider: DepthStriderLevels,
+	direction: Direction,
+	version: MinecraftVersion,
+}
+
+const farmSettings: FarmSettings = {
+	depthStrider: 3,
+	direction: 'East',
+	version: '1.8.9',
+}
+
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	const design = farmsData[interaction.options.getString('design', false) ?? -1];
 	if (!design) return;
 
-	const depthStriderLevel = design.speed.depthStrider;
-	const direction = 'North' as Direction;
-	const version = '1.8.9' as MinecraftVersion;
+	farmSettings.depthStrider = design.speed.depthStrider ?? 3;
 
 	const resources = design.resources
 		?.filter((r) => r.type !== ResourceType.Schematic)
 		.map((r) => `${r.type}: ${r.source}`)
 		.join('\n');
 
-	const speed = await calcSpeed(design.speed, version, depthStriderLevel);
+	const speed = await calcSpeed(design.speed, farmSettings.version, farmSettings.depthStrider);
 
 	const blocksPerSecond = await calcBlocksPerSecond(speed, design.angle.yaw, design.speed.method);
 
-	const yaw = await fixDesignAngle(design.angle.yaw, direction);
+	const yaw = await fixDesignAngle(design.angle.yaw, farmSettings.direction);
 
 	const farmInfoComponent = new EliteContainer(settings)
 		.addTitle(`# ${design.name}`)
 		.addDescription(
-			`Yaw: ${yaw}, Pitch: ${design.angle.pitch}\nSpeed: ${speed}, Depth strider level: ${depthStriderLevel}`,
+			`Yaw: ${yaw}, Pitch: ${design.angle.pitch}\nSpeed: ${speed}, Depth Strider level: ${farmSettings.depthStrider}`,
 		)
 		.addSeperator()
 		.addDescription(`bps: ${design.bps}\nLane time: ${480 / blocksPerSecond}\nKeys used: `);
@@ -96,7 +106,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		.addActionRowComponents(
 			new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
 				new StringSelectMenuBuilder()
-					.setCustomId('depth_strider')
+					.setCustomId('depthStrider')
 					.setPlaceholder('Select the depth strider level you use')
 					.addOptions(
 						new StringSelectMenuOptionBuilder().setLabel('Depth Strider 1').setValue('1'),
@@ -124,7 +134,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 					.setCustomId('version')
 					.setPlaceholder('Select Minecaft version')
 					.addOptions(
-						new StringSelectMenuOptionBuilder().setLabel('1.8.9').setValue('1.8.9'),
+						new StringSelectMenuOptionBuilder().setLabel('1.8.9').setValue('1.8.9').setDefault(true),
 						new StringSelectMenuOptionBuilder().setLabel('1.21').setValue('1.21'),
 					),
 			),
