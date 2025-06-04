@@ -1,18 +1,15 @@
 import { UserSettings } from 'api/elite.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from 'classes/commands/index.js';
+import { EliteContainer } from 'classes/components.js';
 import {
 	ActionRowBuilder,
 	AutocompleteInteraction,
 	ButtonBuilder,
 	ButtonStyle,
 	ChatInputCommandInteraction,
-	ContainerBuilder,
 	MessageActionRowComponentBuilder,
-	SeparatorBuilder,
-	SeparatorSpacingSize,
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
-	TextDisplayBuilder,
 } from 'discord.js';
 import {
 	DepthStriderLevels,
@@ -59,7 +56,7 @@ async function autocomplete(interaction: AutocompleteInteraction) {
 
 export default command;
 
-async function execute(interaction: ChatInputCommandInteraction) {
+async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	const design = farmsData[interaction.options.getString('design', false) ?? -1];
 	if (!design) return;
 
@@ -78,32 +75,26 @@ async function execute(interaction: ChatInputCommandInteraction) {
 
 	const yaw = await fixDesignAngle(design.angle.yaw, direction);
 
-	const farmInfoComponent = new ContainerBuilder()
-		.addTextDisplayComponents(new TextDisplayBuilder().setContent(`# ${design.name}`))
-		.addTextDisplayComponents(
-			new TextDisplayBuilder().setContent(
-				`Yaw: ${yaw}, Pitch: ${design.angle.pitch}\nSpeed: ${speed}, Depth strider level: ${depthStriderLevel}`,
-			),
-		)
-		.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true))
-		.addTextDisplayComponents(
-			new TextDisplayBuilder().setContent(`bps: ${design.bps}\nLane time: ${480 / blocksPerSecond}\nKeys used: `),
-		);
+	const farmInfoComponent = new EliteContainer(settings)
+		.addTitle(`# ${design.name}`)
+		.addDescription(`Yaw: ${yaw}, Pitch: ${design.angle.pitch}\nSpeed: ${speed}, Depth strider level: ${depthStriderLevel}`)
+		.addSeperator()
+		.addDescription(`bps: ${design.bps}\nLane time: ${480 / blocksPerSecond}\nKeys used: `);
 
 	if (resources) {
 		farmInfoComponent
-			.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true))
-			.addTextDisplayComponents(new TextDisplayBuilder().setContent(resources));
+			.addSeperator()
+			.addDescription(resources);
 	}
 
 	if (design.authors) {
 		farmInfoComponent
-			.addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true))
-			.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# Authors: ${design.authors.join(', ')}`));
+			.addSeperator()
+			.addDescription(`-# Authors: ${design.authors.join(', ')}`);
 	}
 
-	const settingsComponent = new ContainerBuilder()
-		.addTextDisplayComponents(new TextDisplayBuilder().setContent('# Settings'))
+	const settingsComponent = new EliteContainer(settings)
+		.addTitle('# Settings')
 		.addActionRowComponents(
 			new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
 				new StringSelectMenuBuilder()
@@ -138,11 +129,6 @@ async function execute(interaction: ChatInputCommandInteraction) {
 						new StringSelectMenuOptionBuilder().setLabel('1.8.9').setValue('1.8.9'),
 						new StringSelectMenuOptionBuilder().setLabel('1.21').setValue('1.21'),
 					),
-			),
-		)
-		.addActionRowComponents(
-			new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-				new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel('Remember my choices').setCustomId('save'),
 			),
 		);
 
