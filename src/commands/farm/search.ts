@@ -31,7 +31,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			.sort(([, a], [, b]) => b.bps - a.bps),
 	);
 
-	const component = new EliteContainer(settings).addTitle(`Farm designs for ${cropName}`);
+	const component = new EliteContainer(settings).addTitle(`# Farm designs for ${cropName}`);
 
 	Object.entries(farms).forEach(([, data], i) => {
 		if (i !== 1) {
