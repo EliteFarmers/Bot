@@ -4,7 +4,7 @@ import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from
 import { EliteContainer } from 'classes/components.js';
 import { NotYoursReply } from 'classes/embeds.js';
 import { ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, MessageFlags, SectionBuilder } from 'discord.js';
-import { farmsData, getCropFromName } from 'farming-weight';
+import { Crop, farmsData, getCropDisplayName, getCropFromName } from 'farming-weight';
 import { execute as farmInfoCommand } from './info.js';
 
 const command = new EliteCommand({
@@ -24,9 +24,7 @@ export default command;
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	await interaction.deferReply();
 
-	const cropName = interaction.options.getString('crop', false);
-	if (!cropName) return;
-	const crop = getCropFromName(cropName);
+	const crop = interaction.options.getString('crop', false) as Crop;
 	if (!crop) return;
 
 	const farms = Object.fromEntries(
@@ -35,7 +33,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			.sort(([, a], [, b]) => b.bps - a.bps),
 	);
 
-	const component = new EliteContainer(settings).addTitle(`# Farm designs for ${cropName}`);
+	const component = new EliteContainer(settings).addTitle(`# Farm designs for ${getCropDisplayName(crop)}`);
 
 	Object.entries(farms).forEach(([id, data], i) => {
 		if (i !== 1) {
