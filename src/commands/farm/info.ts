@@ -96,15 +96,15 @@ export async function execute(
 		.addDescription(
 			`Yaw: ${yaw}, Pitch: ${design.angle.pitch}\nSpeed: ${speed}, Depth Strider level: ${farmSettings.depthStrider}`,
 		)
-		.addSeperator()
+		.addSeparator()
 		.addDescription(`bps: ${design.bps}\nLane time: ${480 / blocksPerSecond}\nKeys used: `);
 
 	if (resources) {
-		farmInfoComponent.addSeperator().addDescription(resources);
+		farmInfoComponent.addSeparator().addDescription(resources);
 	}
 
 	if (design.authors) {
-		farmInfoComponent.addSeperator().addDescription(`-# Authors: ${design.authors.join(', ')}`);
+		farmInfoComponent.addSeparator().addDescription(`-# Authors: ${design.authors.join(', ')}`);
 	}
 
 	farmInfoComponent.addFooter();

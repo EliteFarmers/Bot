@@ -3,7 +3,7 @@ import { eliteCropOption } from 'autocomplete/crops.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from 'classes/commands/index.js';
 import { EliteContainer } from 'classes/components.js';
 import { NotYoursReply } from 'classes/embeds.js';
-import { ButtonStyle, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+import { ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, MessageFlags, SectionBuilder } from 'discord.js';
 import { farmsData, getCropFromName } from 'farming-weight';
 import { execute as farmInfoCommand } from './info.js';
 
@@ -37,10 +37,18 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const component = new EliteContainer(settings).addTitle(`# Farm designs for ${cropName}`);
 
-	Object.entries(farms).forEach(([id, data], i, arr) => {
+	Object.entries(farms).forEach(([id, data], i) => {
+		if (i !== 1) {
+			component.addSeparator();
+		}
+
 		component
 			.addDescription(`### ${data.name}`)
-			.addDescription(`bps: ${data.bps}`, i < arr.length - 1, [data.name, id, ButtonStyle.Secondary]);
+			.addSectionComponents(
+				new SectionBuilder()
+					.addTextDisplayComponents((t) => t.setContent(`bps: ${data.bps}`))
+					.setButtonAccessory(new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel(data.name).setCustomId(id)),
+			);
 	});
 
 	const reply = await interaction.editReply({
