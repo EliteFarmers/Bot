@@ -47,10 +47,19 @@ export class EliteContainer extends ContainerBuilder {
 		return this;
 	}
 
-	addDescription(description: string, seperator = false) {
-		this.addText(description);
+	addDescription(description: string, separator = false, button?: [string, string, ButtonStyle]) {
+		if (button) {
+			this.addSectionComponents(
+				new EliteSectionBuilder()
+					.setButtonAccessory(new ButtonBuilder().setStyle(button[2]).setLabel(button[0]).setCustomId(button[1]))
+					.addText(description),
+			);
+		} else {
+			this.addText(description);
+		}
 
-		if (seperator) this.addSeperator();
+		if (separator) this.addSeperator();
+
 		return this;
 	}
 
@@ -252,6 +261,13 @@ export class EliteContainer extends ContainerBuilder {
 			c.expanded.button.setDisabled(true);
 		});
 
+		return this;
+	}
+}
+
+export class EliteSectionBuilder extends SectionBuilder {
+	addText(text: string) {
+		this.addTextDisplayComponents((t) => t.setContent(text));
 		return this;
 	}
 }

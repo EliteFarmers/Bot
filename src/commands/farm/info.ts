@@ -4,7 +4,10 @@ import { EliteContainer } from 'classes/components.js';
 import {
 	ActionRowBuilder,
 	AutocompleteInteraction,
+	ButtonBuilder,
+	ButtonStyle,
 	ChatInputCommandInteraction,
+	ComponentBuilder,
 	MessageActionRowComponentBuilder,
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
@@ -66,11 +69,16 @@ const farmSettings: FarmSettings = {
 	version: '1.8.9',
 };
 
-async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
-	const design = farmsData[interaction.options.getString('design', false) ?? -1];
+export async function execute(
+	interaction: ChatInputCommandInteraction,
+	settings?: UserSettings,
+	designOverride?: string,
+) {
+	const designId = designOverride ?? interaction.options.getString('design', false) ?? '';
+	const design = farmsData[designId];
 	if (!design) return;
 
-	farmSettings.depthStrider = design.speed.depthStrider ?? 3;
+	const components: (EliteContainer | ActionRowBuilder<MessageActionRowComponentBuilder>)[] = [];
 
 	const resources = design.resources
 		?.filter((r) => r.type !== ResourceType.Schematic)
@@ -100,6 +108,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	}
 
 	farmInfoComponent.addFooter();
+
+	components.push(farmInfoComponent);
 
 	const settingsComponent = new EliteContainer(settings)
 		.addTitle('# Settings')
@@ -141,9 +151,17 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		)
 		.addFooter();
 
+	components.push(settingsComponent);
+
+	const settingsButton = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+		new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel('Open Settings').setCustomId('settings'),
+	);
+
+	components.push(settingsButton);
+
 	await interaction
 		.reply({
-			components: [farmInfoComponent, settingsComponent],
+			components,
 			allowedMentions: { repliedUser: false },
 		})
 		.catch(() => undefined);
