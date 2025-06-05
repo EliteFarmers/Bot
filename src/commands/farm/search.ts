@@ -33,12 +33,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const component = new EliteContainer(settings).addTitle(`# Farm designs for ${cropName}`);
 
-	Object.entries(farms).forEach(([, data], i) => {
-		if (i !== 1) {
-			component.addSeperator();
-		}
-
-		component.addDescription(`### ${data.name}`).addDescription(`bps: ${data.bps}`);
+	Object.values(farms).forEach((data, i, arr) => {
+		component.addDescription(`### ${data.name}`).addDescription(`bps: ${data.bps}`, i < arr.length - 1);
 	});
 
 	await interaction
