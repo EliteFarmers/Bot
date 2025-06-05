@@ -156,12 +156,12 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const container = new EliteContainer(settings)
 		.addTitle('## Farming Rates Calculator', false)
 		.addDescription(description)
-		.addSeperator();
+		.addSeparator();
 
 	const compactContainer = new EliteContainer(settings)
 		.addTitle('## Farming Rates Calculator', false)
 		.addDescription(description)
-		.addSeperator();
+		.addSeparator();
 
 	const cropList = Object.keys(EliteCropEmojis) as Crop[];
 
@@ -192,11 +192,11 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			'\n\n**Custom Fortune Warning**\n-# The amount of fortune available varies depending on the crop. For the best results, only look at the crop your entered fortune is for.';
 	}
 
-	container.addSeperator();
+	container.addSeparator();
 	container.addText("**What's my fortune?**\n-# " + details);
 	container.addFooter();
 
-	compactContainer.addSeperator();
+	compactContainer.addSeparator();
 	compactContainer.addText("**What's my fortune?**\n-# " + details);
 	compactContainer.addFooter();
 
@@ -256,7 +256,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			.addDescription(
 				`Expected rates for **${fortuneInput?.toLocaleString() ?? `${cropInfo.details.fortune.toLocaleString()} (MAX)`}** Farming Fortune in **${timeName}**!${cropDetails}\n${bpsText}`,
 			)
-			.addSeperator()
+			.addSeparator()
 			.addCollapsible({
 				header: '**NPC Profit**',
 				collapsed: {
@@ -272,7 +272,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 						`\n### 3/4ths Fermento Armor\n:coin: ${threeFourthsTotal?.toLocaleString() ?? '0'} ⠀ ${(specialDifference).toLocaleString()} less coins (~${threeFourths.amount.toLocaleString()} ${threeFourths.type})`,
 				},
 			})
-			.addSeperator()
+			.addSeparator()
 			.addCollapsible({
 				header: '**Bazaar Profit**',
 				collapsed: {
@@ -289,7 +289,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 						`\n-# Prices used are averaged sell order prices, not insta-sell prices.`,
 				},
 			})
-			.addSeperator()
+			.addSeparator()
 			.addCollapsible({
 				header: '**Collection Gain**',
 				collapsed: {
