@@ -22,12 +22,12 @@
 	},
 	"dependencies": {
 		"@date-fns/utc": "^2.1.0",
-		"@napi-rs/canvas": "^0.1.70",
-		"@sentry/cli": "^2.45.0",
+		"@napi-rs/canvas": "^0.1.71",
+		"@sentry/cli": "^2.46.0",
 		"@sentry/node": "^8.55.0",
 		"@sentry/profiling-node": "^8.55.0",
 		"@types/amqplib": "^0.10.7",
-		"@types/node": "^20.17.50",
+		"@types/node": "^20.19.0",
 		"bufferutil": "^4.0.9",
 		"cron": "^3.5.0",
 		"date-fns": "^4.1.0",
@@ -37,6 +37,6 @@
 		"redis": "^4.7.1",
 		"utf-8-validate": "^6.0.5",
 		"zlib-sync": "^0.1.10",
-		"zod": "^3.25.28"
+		"zod": "^3.25.57"
 	}
 }
