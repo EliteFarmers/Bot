@@ -3,7 +3,6 @@ import {
 	ActionRowBuilder,
 	BaseSelectMenuBuilder,
 	ButtonBuilder,
-	ButtonInteraction,
 	ButtonStyle,
 	ContainerBuilder,
 	Interaction,
@@ -32,7 +31,7 @@ export class EliteContainer extends ContainerBuilder {
 		}
 	}
 
-	addTitle(title: string, seperator = true, backButton = '') {
+	addTitle(title: string, separator = true, backButton = '') {
 		if (backButton) {
 			this.addSectionComponents((s) =>
 				s
@@ -43,18 +42,18 @@ export class EliteContainer extends ContainerBuilder {
 			this.addText(title);
 		}
 
-		if (seperator) this.addSeperator();
+		if (separator) this.addSeparator();
 		return this;
 	}
 
-	addDescription(description: string, seperator = false) {
+	addDescription(description: string, separator = false) {
 		this.addText(description);
 
-		if (seperator) this.addSeperator();
+		if (separator) this.addSeparator();
 		return this;
 	}
 
-	addSeperator(big = false, display = true) {
+	addSeparator(big = false, display = true) {
 		this.addSeparatorComponents((a) =>
 			a.setSpacing(big ? SeparatorSpacingSize.Large : SeparatorSpacingSize.Small).setDivider(display),
 		);
@@ -66,9 +65,9 @@ export class EliteContainer extends ContainerBuilder {
 		return this;
 	}
 
-	addFooter(seperator = true, backButton = '') {
-		if (seperator) {
-			this.addSeperator();
+	addFooter(separator = true, backButton = '') {
+		if (separator) {
+			this.addSeparator();
 		}
 
 		let text = '-# <:icon:1376644165588488212> [elitebot.dev](<https://elitebot.dev/>)';
