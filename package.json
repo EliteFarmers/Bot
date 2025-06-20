@@ -13,7 +13,7 @@
 	},
 	"packageManager": "pnpm@9.15.9",
 	"devDependencies": {
-		"@biomejs/biome": "2.0.0",
+		"@biomejs/biome": "2.0.2",
 		"@types/node-fetch": "^2.6.12",
 		"dotenv": "^16.5.0",
 		"tslib": "^2.8.1",
@@ -33,7 +33,7 @@
 		"date-fns": "^4.1.0",
 		"discord.js": "^14.20.0",
 		"farming-weight": "^0.9.4",
-		"openapi-fetch": "^0.13.8",
+		"openapi-fetch": "^0.14.0",
 		"redis": "^4.7.1",
 		"utf-8-validate": "^6.0.5",
 		"zlib-sync": "^0.1.10",
