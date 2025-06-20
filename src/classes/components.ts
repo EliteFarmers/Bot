@@ -7,7 +7,6 @@ import {
 	ContainerBuilder,
 	Interaction,
 	SectionBuilder,
-	SectionComponent,
 	SeparatorSpacingSize,
 	TextDisplayBuilder,
 } from 'discord.js';
@@ -254,7 +253,7 @@ export class EliteContainer extends ContainerBuilder {
 					}
 				});
 			}
-			if (c instanceof SectionComponent) {
+			if (c instanceof SectionBuilder) {
 				if (c.accessory instanceof ButtonBuilder) {
 					c.accessory.setDisabled(true);
 				}

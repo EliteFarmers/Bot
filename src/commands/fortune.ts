@@ -195,6 +195,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	});
 
 	let cropContainer: EliteContainer | undefined;
+	let currentContainer: EliteContainer | undefined;
 
 	collector.on('collect', async (inter) => {
 		if (inter.user.id !== interaction.user.id) {
@@ -216,16 +217,17 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			await inter.update({ components: [cropContainer] });
 			return;
 		}
+		cropContainer = undefined;
 
 		if (inter.customId === 'general') {
-			const generalContainer = getGeneralFortuneProgress();
-			await inter.update({ components: [generalContainer] });
+			currentContainer = getGeneralFortuneProgress();
+			await inter.update({ components: [currentContainer] });
 			return;
 		}
 
 		if (inter.customId === 'gear') {
-			const gearContainer = getGearFortuneProgress();
-			await inter.update({ components: [gearContainer] });
+			currentContainer = getGearFortuneProgress();
+			await inter.update({ components: [currentContainer] });
 			return;
 		}
 
@@ -240,11 +242,13 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				return;
 			}
 
-			const gearContainer = getGearPieceFortuneProgress(slot, piece);
+			currentContainer = getGearPieceFortuneProgress(slot, piece);
 
-			await inter.update({ components: [gearContainer] });
+			await inter.update({ components: [currentContainer] });
 			return;
 		}
+
+		currentContainer = undefined;
 
 		if (inter.customId === 'back') {
 			await inter.update({ components: [container] });
@@ -253,7 +257,16 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	});
 
 	collector.on('end', async () => {
-		reply.edit({ components: [] }).catch(() => undefined);
+		if (cropContainer) {
+			cropContainer.disableEverything();
+			interaction.editReply({ components: [cropContainer] }).catch(() => undefined);
+		} else if (currentContainer) {
+			currentContainer.disableEverything();
+			interaction.editReply({ components: [currentContainer] }).catch(() => undefined);
+		} else {
+			container.disableEverything();
+			interaction.editReply({ components: [container] }).catch(() => undefined);
+		}
 	});
 
 	function getCropFortuneProgress(crop: Crop) {
@@ -273,16 +286,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			.addSeparator();
 
 		let needsDisclaimer = thisSource?.progress?.some((source) => source.api === false) ?? false;
-		for (const source of progress) {
-			if (source === thisSource) continue;
-			if (source.api === false) {
-				needsDisclaimer = true;
-			}
-			container.addText(sourceProgress(source));
-		}
 
 		if (thisSource) {
-			container.addSeparator();
 			container.addCollapsible({
 				header: `### ${removeColorCodes(tool?.item.name ?? '') || 'Farming Tool Progress'}`,
 				collapsed: {
@@ -294,6 +299,15 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 					button: 'Close',
 				},
 			});
+			container.addSeparator();
+		}
+
+		for (const source of progress) {
+			if (source === thisSource) continue;
+			if (source.api === false) {
+				needsDisclaimer = true;
+			}
+			container.addText(sourceProgress(source));
 		}
 
 		if (thisSource?.nextInfo) {
@@ -331,16 +345,22 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const progress = piece.getProgress();
 
 		const container = new EliteContainer(settings)
-			.addTitle(`## ${fortuneEmoji} ${slot} Fortune${containerTitleSuffix}`, false)
-			.addDescription(`Total ${slot} Fortune • **${piece.fortune.toLocaleString()}**`)
+			.addTitle(`## ${fortuneEmoji} ${slot} Fortune ${containerTitleSuffix}`, false)
 			.addSeparator();
+
+		const armorSources = player.armorSet.getProgress();
+		const thisSource = armorSources.find((source) => source.name === slot);
+
+		if (thisSource) {
+			container.addText(
+				`### ${removeColorCodes(piece?.item.name ?? '') || slot}\n${sourceProgress(thisSource).split('\n')[1] || 'No progress found.'}`,
+			);
+			container.addSeparator();
+		}
 
 		for (const source of progress) {
 			container.addText(sourceProgress(source));
 		}
-
-		const armorSources = player.armorSet.getProgress();
-		const thisSource = armorSources.find((source) => source.name === slot);
 
 		if (thisSource?.nextInfo) {
 			const next = thisSource.nextInfo;
