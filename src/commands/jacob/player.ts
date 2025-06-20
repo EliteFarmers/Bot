@@ -10,10 +10,10 @@ import {
 } from 'discord.js';
 import { FetchProfile, UserSettings } from '../../api/elite.js';
 import { elitePlayerOption } from '../../autocomplete/player.js';
-import { GetReadableDate } from '../../classes/SkyblockDate.js';
-import { GetCropEmoji, GetMedalEmoji, escapeIgn } from '../../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../../classes/commands/index.js';
-import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../../classes/embeds.js';
+import { EliteEmbed, ErrorEmbed } from '../../classes/embeds.js';
+import { GetReadableDate } from '../../classes/SkyblockDate.js';
+import { escapeIgn, GetCropEmoji, GetMedalEmoji } from '../../classes/Util.js';
 import { getAccount } from '../../classes/validate.js';
 
 const command = new EliteCommand({

@@ -1,14 +1,12 @@
 import {
-	AutocompleteInteraction,
 	Client,
 	ContextMenuCommandBuilder,
 	SlashCommandBuilder,
-	SlashCommandOptionsOnlyBuilder,
 	SlashCommandSubcommandBuilder,
 	SlashCommandSubcommandsOnlyBuilder,
 } from 'discord.js';
 import { EliteCommand } from './command.js';
-import { EliteCommandOption, EliteSlashCommandOption } from './index.js';
+import { EliteSlashCommandOption } from './index.js';
 
 export interface CommandBase {
 	name: string;

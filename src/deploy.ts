@@ -8,6 +8,7 @@ import {
 import dotenv from 'dotenv';
 import { CommandGroup, EliteCommand } from './classes/commands/index.js';
 import { registerCommandGroups, registerFiles } from './classes/register.js';
+
 dotenv.config();
 
 /*

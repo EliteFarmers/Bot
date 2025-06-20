@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/node';
 import { nodeProfilingIntegration } from '@sentry/profiling-node';
 
 import dotenv from 'dotenv';
+
 dotenv.config();
 
 if (process.env.SENTRY_DSN) {

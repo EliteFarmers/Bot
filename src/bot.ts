@@ -3,14 +3,14 @@ import { GlobalFonts } from '@napi-rs/canvas';
 import * as Sentry from '@sentry/node';
 import { CronJob } from 'cron';
 import { ActivityType, Client, ClientEvents, Collection, Events, GatewayIntentBits } from 'discord.js';
+import dotenv from 'dotenv';
+import path from 'path';
 import { ConnectToRedis } from './api/redis.js';
-import { SignalRecieverOptions } from './classes/Signal.js';
 import { CommandGroup, CronTask, EliteCommand } from './classes/commands/index.js';
 import { registerCommandGroups, registerFiles } from './classes/register.js';
+import { SignalRecieverOptions } from './classes/Signal.js';
 import { LoadWeightStyles } from './weight/custom.js';
 
-import path from 'path';
-import dotenv from 'dotenv';
 dotenv.config();
 
 export const client = new Client({

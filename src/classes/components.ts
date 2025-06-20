@@ -1,9 +1,8 @@
 import {
-	APIContainerComponent,
 	ActionRowBuilder,
+	APIContainerComponent,
 	BaseSelectMenuBuilder,
 	ButtonBuilder,
-	ButtonInteraction,
 	ButtonStyle,
 	ContainerBuilder,
 	Interaction,
@@ -32,29 +31,31 @@ export class EliteContainer extends ContainerBuilder {
 		}
 	}
 
-	addTitle(title: string, seperator = true, backButton = '') {
+	addTitle(title: string, separator = true, backButton = '') {
 		if (backButton) {
 			this.addSectionComponents((s) =>
 				s
 					.addTextDisplayComponents((t) => t.setContent(title))
-					.setButtonAccessory(new ButtonBuilder().setCustomId('back').setLabel('Back').setStyle(ButtonStyle.Secondary)),
+					.setButtonAccessory(
+						new ButtonBuilder().setCustomId(backButton).setLabel('Back').setStyle(ButtonStyle.Secondary),
+					),
 			);
 		} else {
 			this.addText(title);
 		}
 
-		if (seperator) this.addSeperator();
+		if (separator) this.addSeparator();
 		return this;
 	}
 
-	addDescription(description: string, seperator = false) {
+	addDescription(description: string, separator = false) {
 		this.addText(description);
 
-		if (seperator) this.addSeperator();
+		if (separator) this.addSeparator();
 		return this;
 	}
 
-	addSeperator(big = false, display = true) {
+	addSeparator(big = false, display = true) {
 		this.addSeparatorComponents((a) =>
 			a.setSpacing(big ? SeparatorSpacingSize.Large : SeparatorSpacingSize.Small).setDivider(display),
 		);
@@ -66,9 +67,9 @@ export class EliteContainer extends ContainerBuilder {
 		return this;
 	}
 
-	addFooter(seperator = true, backButton = '') {
-		if (seperator) {
-			this.addSeperator();
+	addFooter(separator = true, backButton = '') {
+		if (separator) {
+			this.addSeparator();
 		}
 
 		let text = '-# <:icon:1376644165588488212> [elitebot.dev](<https://elitebot.dev/>)';
@@ -86,13 +87,26 @@ export class EliteContainer extends ContainerBuilder {
 			this.addSectionComponents((s) =>
 				s
 					.addTextDisplayComponents((t) => t.setContent(text))
-					.setButtonAccessory(new ButtonBuilder().setCustomId('back').setLabel('Back').setStyle(ButtonStyle.Secondary)),
+					.setButtonAccessory(
+						new ButtonBuilder().setCustomId(backButton).setLabel('Back').setStyle(ButtonStyle.Secondary),
+					),
 			);
 			return this;
 		}
 
 		this.addTextDisplayComponents((t) => t.setContent(text));
 
+		return this;
+	}
+
+	addButtonSection(button: ButtonBuilder, ...textComponents: string[]) {
+		const section = new SectionBuilder().setId(10000 + Math.floor(Math.random() * 90000)).setButtonAccessory(button);
+
+		if (textComponents.length > 0) {
+			section.addTextDisplayComponents(...textComponents.map((text) => new TextDisplayBuilder().setContent(text)));
+		}
+
+		this.addSectionComponents(section);
 		return this;
 	}
 
@@ -112,7 +126,7 @@ export class EliteContainer extends ContainerBuilder {
 						? collapsed.button
 						: new ButtonBuilder()
 								.setCustomId(`collapsible-open-${sectionId}`)
-								.setLabel('Expand')
+								.setLabel(collapsed.button ?? 'Expand')
 								.setStyle(ButtonStyle.Primary),
 			},
 			expanded: {
@@ -126,7 +140,7 @@ export class EliteContainer extends ContainerBuilder {
 						? expanded.button
 						: new ButtonBuilder()
 								.setCustomId(`collapsible-close-${sectionId}`)
-								.setLabel('Collapse')
+								.setLabel(expanded.button ?? 'Collapse')
 								.setStyle(ButtonStyle.Secondary),
 			},
 		} as CollapsibleSection;
@@ -277,11 +291,11 @@ interface CollapsibleSectionData {
 	header?: string | TextDisplayBuilder;
 	collapsed: {
 		text: string | TextDisplayBuilder;
-		button?: ButtonBuilder;
+		button?: ButtonBuilder | string;
 	};
 	expanded: {
 		appendText?: boolean;
 		text: string | TextDisplayBuilder;
-		button?: ButtonBuilder;
+		button?: ButtonBuilder | string;
 	};
 }

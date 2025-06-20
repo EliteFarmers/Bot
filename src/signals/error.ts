@@ -1,6 +1,6 @@
 import { AttachmentBuilder } from 'discord.js';
-import { Signal, SignalRecieverOptions } from '../classes/Signal.js';
 import { ErrorEmbed } from '../classes/embeds.js';
+import { Signal, SignalRecieverOptions } from '../classes/Signal.js';
 
 const settings: SignalRecieverOptions = {
 	name: 'error',

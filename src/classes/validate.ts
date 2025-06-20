@@ -1,9 +1,9 @@
 import { EmbedBuilder } from 'discord.js';
 import type { components } from '../api/api.js';
 import { FetchAccount } from '../api/elite.js';
-import { escapeIgn } from './Util.js';
 import { EliteCommand } from './commands/index.js';
 import { ErrorEmbed } from './embeds.js';
+import { escapeIgn } from './Util.js';
 
 type AccountWithNameAndId = Required<Pick<components['schemas']['MinecraftAccountDto'], 'id' | 'name'>> &
 	components['schemas']['MinecraftAccountDto'];

@@ -1,7 +1,6 @@
-import { RedisClientOptions, RedisFunctions, RedisModules, RedisScripts, createClient } from 'redis';
+import { createClient, RedisClientOptions, RedisFunctions, RedisModules, RedisScripts } from 'redis';
 import { client, client as discordClient, signals } from '../bot.js';
-import { Signal } from '../classes/Signal.js';
-import { SignalRecieverOptions } from '../classes/Signal.js';
+import { Signal, SignalRecieverOptions } from '../classes/Signal.js';
 
 // Channel name needs to match the one used in the EliteAPI
 const REDIS_CHANNEL_NAME = 'eliteapi_messages';

@@ -1,27 +1,26 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.9.3/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
 	"vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": ["node_modules", "dist/**", "globals.d.ts"]
+		"includes": ["**", "!**/node_modules", "!**/dist/**", "!**/globals.d.ts"]
 	},
 	"formatter": {
 		"enabled": true,
 		"indentStyle": "tab",
 		"lineWidth": 120
 	},
-	"organizeImports": { "enabled": true },
+	"assist": { "actions": { "source": { "organizeImports": "on" } } },
 	"linter": {
 		"enabled": true,
 		"rules": {
 			"recommended": false,
 			"complexity": {
 				"noExtraBooleanCast": "error",
-				"noMultipleSpacesInRegularExpressionLiterals": "error",
 				"noUselessCatch": "error",
 				"noUselessThisAlias": "error",
 				"noUselessTypeConstraint": "error",
-				"noWith": "error"
+				"noAdjacentSpacesInRegex": "error"
 			},
 			"correctness": {
 				"noConstAssign": "error",
@@ -44,16 +43,20 @@
 				"noUnusedLabels": "error",
 				"noUnusedPrivateClassMembers": "error",
 				"noUnusedVariables": "error",
-				"useArrayLiterals": "off",
+				"noUnusedImports": {
+					"level": "error",
+					"fix": "safe"
+				},
 				"useIsNan": "error",
 				"useValidForDirection": "error",
-				"useYield": "error"
+				"useYield": "error",
+				"useValidTypeof": "error"
 			},
 			"style": {
 				"noNamespace": "error",
-				"noVar": "error",
 				"useAsConstAssertion": "error",
-				"useConst": "error"
+				"useConst": "error",
+				"useArrayLiterals": "off"
 			},
 			"suspicious": {
 				"noAssignInExpressions": "error",
@@ -85,10 +88,11 @@
 				"noUnsafeNegation": "error",
 				"useGetterReturn": "error",
 				"useNamespaceKeyword": "error",
-				"useValidTypeof": "error"
+				"noWith": "error",
+				"noVar": "error"
 			}
 		},
-		"ignore": ["**/node_modules", "**/dist"]
+		"includes": ["**", "!**/node_modules", "!**/dist"]
 	},
 	"javascript": {
 		"formatter": {
@@ -100,12 +104,10 @@
 	},
 	"overrides": [
 		{
-			"include": ["*.ts", "*.tsx", "*.mts", "*.cts"],
+			"includes": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
 			"linter": {
 				"rules": {
 					"style": {
-						"noArguments": "error",
-						"noVar": "error",
 						"useConst": "error"
 					},
 					"suspicious": {
@@ -116,7 +118,11 @@
 						"noImportAssign": "error",
 						"noRedeclare": "error",
 						"noUnsafeNegation": "error",
-						"useGetterReturn": "error"
+						"useGetterReturn": "error",
+						"noVar": "error"
+					},
+					"complexity": {
+						"noArguments": "error"
 					}
 				}
 			}
