@@ -91,9 +91,13 @@ async function updateActivity() {
 	if (!client.user) return;
 
 	await client.application?.fetch();
-	const installs =
-		(client.application?.approximateGuildCount ?? 0) + (client.application?.approximateUserInstallCount ?? 0);
+	const guilds = client.application?.approximateGuildCount ?? 0;
+	const users = client.application?.approximateUserInstallCount ?? 0;
+	const installs = guilds + users;
 
+	console.log(
+		`Updating activity to ${installs.toLocaleString()} installs (${guilds} guilds, ${users} users) (𝚫${client.shard?.ids[0] ?? '0'})`,
+	);
 	client.user.setActivity(`${installs.toLocaleString()} installs (𝚫${client.shard?.ids[0] ?? '0'})`, {
 		type: ActivityType.Watching,
 	});

@@ -1,4 +1,3 @@
-import { EliteContainer } from 'classes/components.js';
 import { ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import {
 	Crop,
@@ -19,6 +18,7 @@ import {
 import { FetchProfile, UserSettings } from '../api/elite.js';
 import { elitePlayerOption } from '../autocomplete/player.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
+import { EliteContainer } from '../classes/components.js';
 import { ErrorEmbed, NotYoursReply } from '../classes/embeds.js';
 import { progressBar } from '../classes/progressbar.js';
 import {
