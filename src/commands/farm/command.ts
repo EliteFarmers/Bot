@@ -2,7 +2,7 @@ import { CommandAccess, CommandGroup, CommandType } from '../../classes/commands
 
 const command = new CommandGroup({
 	name: 'farm',
-	description: 'hjskadhksaj',
+	description: 'Commands to view farm designs',
 	execute: () => undefined,
 	access: CommandAccess.Everywhere,
 	type: CommandType.Group,
