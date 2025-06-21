@@ -1,11 +1,11 @@
 import { UserSettings } from 'api/elite.js';
 import { eliteCropOption } from 'autocomplete/crops.js';
-import { CROP_ARRAY } from 'classes/Util.js';
-import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from 'classes/commands/index.js';
+import { CommandAccess, CommandType, EliteCommand } from 'classes/commands/index.js';
 import { EliteContainer } from 'classes/components.js';
 import { NotYoursReply } from 'classes/embeds.js';
+import { CROP_ARRAY } from 'classes/Util.js';
 import { ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, MessageFlags, SectionBuilder } from 'discord.js';
-import { Crop, farmsData, getCropDisplayName } from 'farming-weight';
+import { farmsData, getCropDisplayName } from 'farming-weight';
 import { execute as farmInfoCommand } from './info.js';
 
 const command = new EliteCommand({

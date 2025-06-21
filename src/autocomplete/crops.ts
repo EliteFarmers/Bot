@@ -1,5 +1,5 @@
-import { CROP_ARRAY } from 'classes/Util.js';
 import { EliteSlashCommandOption, SlashCommandOptionType } from 'classes/commands/options.js';
+import { CROP_ARRAY } from 'classes/Util.js';
 import { AutocompleteInteraction } from 'discord.js';
 import { getCropDisplayName } from 'farming-weight';
 

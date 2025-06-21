@@ -15,11 +15,11 @@ import {
 	DepthStriderLevels,
 	Direction,
 	FarmingMethod,
-	MinecraftVersion,
-	ResourceType,
 	farmDesigns,
 	farmInfo,
 	farmsData,
+	MinecraftVersion,
+	ResourceType,
 } from 'farming-weight';
 
 const command = new EliteCommand({
