@@ -61,11 +61,13 @@ async function autocomplete(interaction: AutocompleteInteraction) {
 export default command;
 
 interface FarmSettings {
+	active: boolean;
 	direction: Direction;
 	version: MinecraftVersion;
 }
 
 const farmSettings: FarmSettings = {
+	active: true,
 	direction: 'South',
 	version: '1.8.9',
 };
@@ -92,7 +94,6 @@ export async function execute(
 	const design = farmsData[designId];
 
 	if (!design) {
-		// console.log('test\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\n')
 		await interaction.editReply({
 			embeds: [noDesign],
 			allowedMentions: { repliedUser: false },
@@ -100,6 +101,57 @@ export async function execute(
 		return;
 	}
 
+	const components = await getFarmInfoComponents(design, settings);
+
+	const reply = await interaction.editReply({
+		components,
+		allowedMentions: { repliedUser: false },
+		flags: [MessageFlags.IsComponentsV2],
+	});
+
+	const collector = reply.createMessageComponentCollector({
+		time: 120_000,
+	});
+
+	collector.on('collect', async (inter) => {
+		if (inter.user.id !== interaction.user.id) {
+			return NotYoursReply(inter);
+		}
+
+		await inter.deferReply();
+
+		collector.resetTimer();
+
+		if (inter.isStringSelectMenu()) {
+			if (inter.customId === "design-direction") {
+				farmSettings.direction = inter.values[0] as Direction;
+			} else if (inter.customId === "design-version") {
+				farmSettings.version = inter.values[0] as MinecraftVersion;
+			}
+		} else if (inter.isButton()) {
+			if (inter.customId === "design-settings") {
+				farmSettings.active = !farmSettings.active;
+			}
+		}
+
+					const components = await getFarmInfoComponents(design, settings);
+
+			await interaction.editReply({
+				components,
+				allowedMentions: { repliedUser: false },
+				flags: [MessageFlags.IsComponentsV2],
+			});
+
+			await inter.deleteReply();
+
+		return;
+	});
+}
+
+async function getFarmInfoComponents(
+	design: farmInfo,
+	settings?: UserSettings,
+): Promise<(EliteContainer | ActionRowBuilder<MessageActionRowComponentBuilder>)[]> {
 	const components: (EliteContainer | ActionRowBuilder<MessageActionRowComponentBuilder>)[] = [];
 
 	const resources = design.resources
@@ -155,74 +207,45 @@ export async function execute(
 
 	components.push(farmInfoComponent);
 
-	const settingsComponent = new EliteContainer(settings)
-		.addTitle('# Settings')
-		.addActionRowComponents(
-			new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-				new StringSelectMenuBuilder()
-					.setCustomId('design-direction')
-					.setPlaceholder('Select the direction your farm faces')
-					.addOptions(
-						new StringSelectMenuOptionBuilder().setLabel('North').setValue('North'),
-						new StringSelectMenuOptionBuilder().setLabel('South').setValue('South'),
-						new StringSelectMenuOptionBuilder().setLabel('East').setValue('East'),
-						new StringSelectMenuOptionBuilder().setLabel('West').setValue('West'),
-					),
-			),
-		)
-		.addActionRowComponents(
-			new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-				new StringSelectMenuBuilder()
-					.setCustomId('design-version')
-					.setPlaceholder('Select Minecaft version')
-					.addOptions(
-						new StringSelectMenuOptionBuilder().setLabel('1.8.9').setValue('1.8.9').setDefault(true),
-						new StringSelectMenuOptionBuilder().setLabel('1.21').setValue('1.21'),
-					),
-			),
-		)
-		.addFooter();
+	if (farmSettings.active) {
+		const settingsComponent = new EliteContainer(settings)
+			.addTitle('# Settings')
+			.addActionRowComponents(
+				new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+					new StringSelectMenuBuilder()
+						.setCustomId('design-direction')
+						.setPlaceholder('Select the direction your farm faces')
+						.addOptions(
+							new StringSelectMenuOptionBuilder().setLabel('North').setValue('North').setDefault(farmSettings.direction == 'North'),
+							new StringSelectMenuOptionBuilder().setLabel('South').setValue('South').setDefault(farmSettings.direction == 'South'),
+							new StringSelectMenuOptionBuilder().setLabel('East').setValue('East').setDefault(farmSettings.direction == 'East'),
+							new StringSelectMenuOptionBuilder().setLabel('West').setValue('West').setDefault(farmSettings.direction == 'West'),
+						),
+				),
+			)
+			.addActionRowComponents(
+				new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+					new StringSelectMenuBuilder()
+						.setCustomId('design-version')
+						.setPlaceholder('Select Minecaft version')
+						.addOptions(
+							new StringSelectMenuOptionBuilder().setLabel('1.8.9').setValue('1.8.9').setDefault(farmSettings.version == '1.8.9'),
+							new StringSelectMenuOptionBuilder().setLabel('1.21').setValue('1.21').setDefault(farmSettings.version == '1.21'),
+						),
+				),
+			)
+			.addFooter();
 
-	components.push(settingsComponent);
+		components.push(settingsComponent);
+	}
 
 	const settingsButton = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-		new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel('Open Settings').setCustomId('design-settings'),
+		new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel(`${farmSettings.active ? 'Close' : 'Open'} Settings`).setCustomId('design-settings'),
 	);
 
 	components.push(settingsButton);
 
-	const reply = await interaction.editReply({
-		components,
-		allowedMentions: { repliedUser: false },
-		flags: [MessageFlags.IsComponentsV2],
-	});
-
-	const collector = reply.createMessageComponentCollector({
-		time: 120_000,
-	});
-
-	collector.on('collect', async (inter) => {
-		if (inter.user.id !== interaction.user.id) {
-			return NotYoursReply(inter);
-		}
-
-		inter.deferReply();
-
-		collector.resetTimer();
-
-		if (inter.isStringSelectMenu()) {
-			console.log(inter.customId + '\t' + inter.values.join(', '));
-
-			if (inter.customId === "design-direction") {
-				farmSettings.direction = inter.values[0] as Direction;
-				await execute(interaction, settings, undefined, true);
-				inter.deleteReply();
-				collector.stop();
-			}
-		}
-
-		return;
-	});
+	return components
 }
 
 async function calcSpeed(
