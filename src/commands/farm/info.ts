@@ -206,10 +206,19 @@ export async function execute(
 			return NotYoursReply(inter);
 		}
 
+		inter.deferReply();
+
 		collector.resetTimer();
 
 		if (inter.isStringSelectMenu()) {
 			console.log(inter.customId + '\t' + inter.values.join(', '));
+
+			if (inter.customId === "design-direction") {
+				farmSettings.direction = inter.values[0] as Direction;
+				await execute(interaction, settings, undefined, true);
+				inter.deleteReply();
+				collector.stop();
+			}
 		}
 
 		return;
