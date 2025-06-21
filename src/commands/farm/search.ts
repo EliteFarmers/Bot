@@ -68,6 +68,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		await farmInfoCommand(interaction, settings, inter.customId, true);
 
+		collector.stop();
+
 		return;
 	});
 }

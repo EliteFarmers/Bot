@@ -90,7 +90,6 @@ export async function execute(
 
 	const designId = designOverride ?? interaction.options.getString('design', false) ?? '';
 	const design = farmsData[designId];
-	console.log(design)
 
 	if (!design) {
 		// console.log('test\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\n')
@@ -161,7 +160,7 @@ export async function execute(
 		.addActionRowComponents(
 			new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
 				new StringSelectMenuBuilder()
-					.setCustomId('direction')
+					.setCustomId('design-direction')
 					.setPlaceholder('Select the direction your farm faces')
 					.addOptions(
 						new StringSelectMenuOptionBuilder().setLabel('North').setValue('North'),
@@ -174,7 +173,7 @@ export async function execute(
 		.addActionRowComponents(
 			new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
 				new StringSelectMenuBuilder()
-					.setCustomId('version')
+					.setCustomId('design-version')
 					.setPlaceholder('Select Minecaft version')
 					.addOptions(
 						new StringSelectMenuOptionBuilder().setLabel('1.8.9').setValue('1.8.9').setDefault(true),
@@ -187,7 +186,7 @@ export async function execute(
 	components.push(settingsComponent);
 
 	const settingsButton = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-		new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel('Open Settings').setCustomId('settings'),
+		new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel('Open Settings').setCustomId('design-settings'),
 	);
 
 	components.push(settingsButton);
