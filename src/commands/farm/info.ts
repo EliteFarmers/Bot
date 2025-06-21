@@ -123,14 +123,12 @@ export async function execute(
 		.addTitle(`# ${design.name}`)
 		.addDescription(
 `**Yaw**: ${yaw}, **Pitch**: ${design.angle.pitch}
-**Speed**: ${speed}
-**Depth Strider level**: ${design.speed.depthStrider}`,
+**Speed**: ${speed}${design.speed.depthStrider ? `\n**Depth Strider level**: ${design.speed.depthStrider}` : ''}`,
 		)
 		.addSeparator()
 		.addDescription(
 `**bps**: ${design.bps}
-**Lane time**: ${480 / blocksPerSecond}
-**Keys used**: `
+**Lane time**: ${480 / blocksPerSecond}`
 		);
 
 	if (resources) {
