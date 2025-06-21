@@ -76,12 +76,6 @@ const noDesign = ErrorEmbed('Design Not Found!').setDescription(
 	"The design you're looking for doesn't exist! If you believe this to be a mistake or want a design added, make a suggestion in the discord.",
 );
 
-// todo: fix
-const soulSandVersionMultiplier = {
-	'1.8.9': 0.4,
-	'1.21': 0.5,
-};
-
 export async function execute(
 	interaction: ChatInputCommandInteraction,
 	settings?: UserSettings,
@@ -167,23 +161,19 @@ async function getFarmInfoComponents(
 		})
 		.join('\n');
 
-	const speed = await calcSpeed(design.speed, farmSettings.version);
+	const speed = design.speed.soulSand ? design.speed[farmSettings.version] : design.speed['1.8.9'];
 
-	const blocksPerSecond = await calcBlocksPerSecond(speed, design.angle.yaw, design.speed.method);
+	const blocksPerSecond = await calcBlocksPerSecond(design.angle.yaw, design.speed.method, speed);
 
 	const yaw = await fixDesignAngle(design.angle.yaw, farmSettings.direction);
 
 	const farmInfoComponent = new EliteContainer(settings)
 		.addTitle(`# ${design.name}`)
 		.addDescription(
-			`**Yaw**: ${yaw}, **Pitch**: ${design.angle.pitch}
-**Speed**: ${speed}${design.speed.depthStrider ? `\n**Depth Strider level**: ${design.speed.depthStrider}` : ''}`,
+			`**Yaw**: ${yaw}, **Pitch**: ${design.angle.pitch}\n**Speed**: ${speed ?? '1.21 speed has not yet been determined'}${design.speed.depthStrider ? `\n**Depth Strider level**: ${design.speed.depthStrider}` : ''}`,
 		)
 		.addSeparator()
-		.addDescription(
-			`**bps**: ${design.bps}
-**Lane time**: ${480 / blocksPerSecond}`,
-		);
+		.addDescription(`**bps**: ${design.bps}${blocksPerSecond ? `\n**Lane time**: ${480 / blocksPerSecond}` : ''}`);
 
 	if (resources) {
 		farmInfoComponent.addSeparator().addDescription(resources);
@@ -269,17 +259,8 @@ async function getFarmInfoComponents(
 	return components;
 }
 
-async function calcSpeed(designSpeed: farmInfo['speed'], targetVersion?: MinecraftVersion): Promise<number> {
-	let speed = designSpeed.speed;
-
-	if (designSpeed.soulSand && designSpeed.buildVersion && targetVersion) {
-		speed *= soulSandVersionMultiplier[targetVersion] / soulSandVersionMultiplier[designSpeed.buildVersion];
-	}
-
-	return speed;
-}
-
-async function calcBlocksPerSecond(speed: number, yaw: number, method: FarmingMethod): Promise<number> {
+async function calcBlocksPerSecond(yaw: number, method: FarmingMethod, speed?: number): Promise<number | undefined> {
+	if (!speed) return undefined;
 	if (method === 'running into wall' && yaw === 0) {
 		speed *= 1.02042464775;
 		yaw = 45;
