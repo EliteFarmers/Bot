@@ -99,10 +99,16 @@ export async function execute(
 	const farmInfoComponent = new EliteContainer(settings)
 		.addTitle(`# ${design.name}`)
 		.addDescription(
-			`Yaw: ${yaw}, Pitch: ${design.angle.pitch}\nSpeed: ${speed}, Depth Strider level: ${farmSettings.depthStrider}`,
+`**Yaw**: ${yaw}, **Pitch**: ${design.angle.pitch}
+**Speed**: ${speed}
+**Depth Strider level**: ${farmSettings.depthStrider}`,
 		)
 		.addSeparator()
-		.addDescription(`bps: ${design.bps}\nLane time: ${480 / blocksPerSecond}\nKeys used: `);
+		.addDescription(
+`**bps**: ${design.bps}
+**Lane time**: ${480 / blocksPerSecond}
+**Keys used**: `
+		);
 
 	if (resources) {
 		farmInfoComponent.addSeparator().addDescription(resources);
@@ -119,7 +125,7 @@ export async function execute(
 			})
 			.join(', ');
 
-		farmInfoComponent.addSeparator().addDescription(`-# Authors: ${authors}`);
+		farmInfoComponent.addSeparator().addDescription(`-# **Authors**: ${authors}`);
 	}
 
 	farmInfoComponent.addFooter();
@@ -174,7 +180,7 @@ export async function execute(
 
 	components.push(settingsButton);
 
-	const _reply = await interaction.editReply({
+	await interaction.editReply({
 		components,
 		allowedMentions: { repliedUser: false },
 		flags: [MessageFlags.IsComponentsV2],
