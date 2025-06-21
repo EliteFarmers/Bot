@@ -14,10 +14,10 @@ import {
 	getPossibleResultsFromCrops,
 } from 'farming-weight';
 import { FetchProducts, UserSettings } from '../api/elite.js';
-import { CropSelectRow, EliteCropEmojis, GetCropEmoji } from '../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 import { EliteContainer } from '../classes/components.js';
 import { NotYoursReply } from '../classes/embeds.js';
+import { CropSelectRow, EliteCropEmojis, GetCropEmoji } from '../classes/Util.js';
 
 const TIME_OPTIONS = {
 	24_000: 'Jacob Contest',
@@ -303,7 +303,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 						.join('\n'),
 				},
 			})
-			.addFooter(true, 'Back');
+			.addFooter(true, 'back');
 
 		inter.update({ components: [cropContainer, row] });
 	});

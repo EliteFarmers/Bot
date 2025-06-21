@@ -1,8 +1,8 @@
 import { User } from 'discord.js';
+import dotenv from 'dotenv';
 import createClient from 'openapi-fetch';
 import { components, paths } from './api.d.js';
 
-import dotenv from 'dotenv';
 dotenv.config();
 
 const { GET, PUT, POST, DELETE, PATCH } = createClient<paths>({

@@ -2,7 +2,7 @@ import { AttachmentBuilder, EmbedBuilder } from 'discord.js';
 import { components } from '../api/api.js';
 import { FetchWeightStyles, UserSettings } from '../api/elite.js';
 import { ErrorEmbed } from '../classes/embeds.js';
-import { WeightStyle, validStyle } from '../schemas/style.js';
+import { validStyle, WeightStyle } from '../schemas/style.js';
 import { DEFAULT_STYLE } from './defaultstyle.js';
 import { createWeightEmbed } from './embed.js';
 import { createFromData } from './maker.js';

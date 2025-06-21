@@ -13,17 +13,17 @@ import {
 } from 'discord.js';
 import { components } from '../api/api.js';
 import { FetchAccount, FetchContests, FetchGuildJacob, UpdateGuildJacob } from '../api/elite.js';
+import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
+import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 import { GetReadableDate } from '../classes/SkyblockDate.js';
 import {
+	escapeIgn,
 	GetCropEmoji,
 	GetCropTuple,
 	GetCropURL,
 	GetEmbeddedTimestamp,
 	UserHyperLink,
-	escapeIgn,
 } from '../classes/Util.js';
-import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
-import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 
 const command = new EliteCommand({
 	name: 'LBSUBMIT',
@@ -315,7 +315,7 @@ async function execute(interaction: ButtonInteraction) {
 			if (old.uuid !== account.id) {
 				message += `\n<@${interaction.user.id}> **(${escapeIgn(
 					account.name,
-				)})** has beaten <@${old.discordId}> (${old.ign}) by **${(
+				)})** has beaten <@${old.discordId}> (${escapeIgn(old.ign)}) by **${(
 					collected - old.record.collected
 				).toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${
 					contest.timestamp ?? 0
@@ -325,7 +325,7 @@ async function execute(interaction: ButtonInteraction) {
 				if (scores.length > 2 && !scores.some((s) => s.discordId === interaction.user.id)) {
 					const knockedOut = scores[2];
 					if (knockedOut.discordId !== interaction.user.id) {
-						message += `\n-# <@${knockedOut.discordId}> (${knockedOut.ign}) has been knocked out of the top 3!`;
+						message += `\n-# <@${knockedOut.discordId}> (${escapeIgn(knockedOut.ign)}) has been knocked out of the top 3!`;
 					}
 				}
 			} else {

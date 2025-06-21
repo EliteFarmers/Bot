@@ -3,14 +3,14 @@ import { GlobalFonts } from '@napi-rs/canvas';
 import * as Sentry from '@sentry/node';
 import { CronJob } from 'cron';
 import { ActivityType, Client, ClientEvents, Collection, Events, GatewayIntentBits } from 'discord.js';
+import dotenv from 'dotenv';
+import path from 'path';
 import { ConnectToRedis } from './api/redis.js';
-import { SignalRecieverOptions } from './classes/Signal.js';
 import { CommandGroup, CronTask, EliteCommand } from './classes/commands/index.js';
 import { registerCommandGroups, registerFiles } from './classes/register.js';
+import { SignalRecieverOptions } from './classes/Signal.js';
 import { LoadWeightStyles } from './weight/custom.js';
 
-import path from 'path';
-import dotenv from 'dotenv';
 dotenv.config();
 
 export const client = new Client({
@@ -91,9 +91,13 @@ async function updateActivity() {
 	if (!client.user) return;
 
 	await client.application?.fetch();
-	const installs =
-		(client.application?.approximateGuildCount ?? 0) + (client.application?.approximateUserInstallCount ?? 0);
+	const guilds = client.application?.approximateGuildCount ?? 0;
+	const users = client.application?.approximateUserInstallCount ?? 0;
+	const installs = guilds + users;
 
+	console.log(
+		`Updating activity to ${installs.toLocaleString()} installs (${guilds} guilds, ${users} users) (𝚫${client.shard?.ids[0] ?? '0'})`,
+	);
 	client.user.setActivity(`${installs.toLocaleString()} installs (𝚫${client.shard?.ids[0] ?? '0'})`, {
 		type: ActivityType.Watching,
 	});

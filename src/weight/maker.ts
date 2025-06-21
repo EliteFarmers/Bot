@@ -1,10 +1,10 @@
-import { Canvas, Image, SKRSContext2D, createCanvas, loadImage } from '@napi-rs/canvas';
+import { Canvas, createCanvas, Image, loadImage, SKRSContext2D } from '@napi-rs/canvas';
 import { AttachmentBuilder } from 'discord.js';
 import { getCropFromName } from 'farming-weight';
 import { components } from '../api/api.js';
 import { UserSettings } from '../api/elite.js';
-import { CreateRoundCornerPath } from '../classes/Util.js';
 import { ErrorEmbed } from '../classes/embeds.js';
+import { CreateRoundCornerPath } from '../classes/Util.js';
 import { BackgroundGradient, BackgroundStyle, ElementPosition, Position, WeightStyleDecal } from '../schemas/style.js';
 import { CustomFormatterOptions } from './custom.js';
 

@@ -1,13 +1,12 @@
 import {
-	APIContainerComponent,
 	ActionRowBuilder,
+	APIContainerComponent,
 	BaseSelectMenuBuilder,
 	ButtonBuilder,
 	ButtonStyle,
 	ContainerBuilder,
 	Interaction,
 	SectionBuilder,
-	SectionComponent,
 	SeparatorSpacingSize,
 	TextDisplayBuilder,
 } from 'discord.js';
@@ -36,7 +35,9 @@ export class EliteContainer extends ContainerBuilder {
 			this.addSectionComponents((s) =>
 				s
 					.addTextDisplayComponents((t) => t.setContent(title))
-					.setButtonAccessory(new ButtonBuilder().setCustomId('back').setLabel('Back').setStyle(ButtonStyle.Secondary)),
+					.setButtonAccessory(
+						new ButtonBuilder().setCustomId(backButton).setLabel('Back').setStyle(ButtonStyle.Secondary),
+					),
 			);
 		} else {
 			this.addText(title);
@@ -85,13 +86,26 @@ export class EliteContainer extends ContainerBuilder {
 			this.addSectionComponents((s) =>
 				s
 					.addTextDisplayComponents((t) => t.setContent(text))
-					.setButtonAccessory(new ButtonBuilder().setCustomId('back').setLabel('Back').setStyle(ButtonStyle.Secondary)),
+					.setButtonAccessory(
+						new ButtonBuilder().setCustomId(backButton).setLabel('Back').setStyle(ButtonStyle.Secondary),
+					),
 			);
 			return this;
 		}
 
 		this.addTextDisplayComponents((t) => t.setContent(text));
 
+		return this;
+	}
+
+	addButtonSection(button: ButtonBuilder, ...textComponents: string[]) {
+		const section = new SectionBuilder().setId(10000 + Math.floor(Math.random() * 90000)).setButtonAccessory(button);
+
+		if (textComponents.length > 0) {
+			section.addTextDisplayComponents(...textComponents.map((text) => new TextDisplayBuilder().setContent(text)));
+		}
+
+		this.addSectionComponents(section);
 		return this;
 	}
 
@@ -111,7 +125,7 @@ export class EliteContainer extends ContainerBuilder {
 						? collapsed.button
 						: new ButtonBuilder()
 								.setCustomId(`collapsible-open-${sectionId}`)
-								.setLabel('Expand')
+								.setLabel(collapsed.button ?? 'Expand')
 								.setStyle(ButtonStyle.Primary),
 			},
 			expanded: {
@@ -125,7 +139,7 @@ export class EliteContainer extends ContainerBuilder {
 						? expanded.button
 						: new ButtonBuilder()
 								.setCustomId(`collapsible-close-${sectionId}`)
-								.setLabel('Collapse')
+								.setLabel(expanded.button ?? 'Collapse')
 								.setStyle(ButtonStyle.Secondary),
 			},
 		} as CollapsibleSection;
@@ -239,7 +253,7 @@ export class EliteContainer extends ContainerBuilder {
 					}
 				});
 			}
-			if (c instanceof SectionComponent) {
+			if (c instanceof SectionBuilder) {
 				if (c.accessory instanceof ButtonBuilder) {
 					c.accessory.setDisabled(true);
 				}
@@ -276,11 +290,11 @@ interface CollapsibleSectionData {
 	header?: string | TextDisplayBuilder;
 	collapsed: {
 		text: string | TextDisplayBuilder;
-		button?: ButtonBuilder;
+		button?: ButtonBuilder | string;
 	};
 	expanded: {
 		appendText?: boolean;
 		text: string | TextDisplayBuilder;
-		button?: ButtonBuilder;
+		button?: ButtonBuilder | string;
 	};
 }

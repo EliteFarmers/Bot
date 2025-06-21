@@ -12,8 +12,8 @@ import {
 } from 'discord.js';
 import { FetchGuild, FetchUserSettings } from '../api/elite.js';
 import { commands } from '../bot.js';
-import { HasRole, isValidAccess } from '../classes/Util.js';
 import { CommandGroup, EliteCommand } from '../classes/commands/index.js';
+import { HasRole, isValidAccess } from '../classes/Util.js';
 
 const settings = {
 	event: Events.InteractionCreate,

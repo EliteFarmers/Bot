@@ -8,9 +8,9 @@ import {
 	Interaction,
 } from 'discord.js';
 import { FetchAccount, GrantUserBadge, UserSettings } from '../api/elite.js';
-import { escapeIgn } from '../classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed } from '../classes/embeds.js';
+import { escapeIgn } from '../classes/Util.js';
 
 const command = new EliteCommand({
 	name: 'badges',

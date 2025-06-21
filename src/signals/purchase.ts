@@ -1,6 +1,6 @@
 import { FetchProduct } from '../api/elite.js';
-import { Signal, SignalRecieverOptions } from '../classes/Signal.js';
 import { EliteEmbed } from '../classes/embeds.js';
+import { Signal, SignalRecieverOptions } from '../classes/Signal.js';
 
 const settings: SignalRecieverOptions = {
 	name: 'purchase',
