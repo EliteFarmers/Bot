@@ -8,6 +8,7 @@ import {
 	ButtonStyle,
 	ChatInputCommandInteraction,
 	MessageActionRowComponentBuilder,
+	MessageFlags,
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
 } from 'discord.js';
@@ -76,6 +77,8 @@ export async function execute(
 	settings?: UserSettings,
 	designOverride?: string,
 ) {
+	await interaction.deferReply();
+
 	const designId = designOverride ?? interaction.options.getString('design', false) ?? '';
 	const design = farmsData[designId];
 	if (!design) return;
@@ -161,12 +164,11 @@ export async function execute(
 
 	components.push(settingsButton);
 
-	await interaction
-		.reply({
-			components,
-			allowedMentions: { repliedUser: false },
-		})
-		.catch(() => undefined);
+	const _reply = await interaction.editReply({
+		components,
+		allowedMentions: { repliedUser: false },
+		flags: [MessageFlags.IsComponentsV2],
+	});
 }
 
 async function calcSpeed(
