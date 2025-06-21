@@ -1,6 +1,7 @@
 import { UserSettings } from 'api/elite.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from 'classes/commands/index.js';
 import { EliteContainer } from 'classes/components.js';
+import { ErrorEmbed } from 'classes/embeds.js';
 import {
 	ActionRowBuilder,
 	AutocompleteInteraction,
@@ -72,6 +73,10 @@ const farmSettings: FarmSettings = {
 	version: '1.8.9',
 };
 
+const noDesign = ErrorEmbed('Design Not Found!').setDescription(
+	"The design you're looking for doesn't exist! If you believe this to be a mistake or want a design added, make a suggestion in the discord.",
+);
+
 export async function execute(
 	interaction: ChatInputCommandInteraction,
 	settings?: UserSettings,
@@ -81,7 +86,13 @@ export async function execute(
 
 	const designId = designOverride ?? interaction.options.getString('design', false) ?? '';
 	const design = farmsData[designId];
-	if (!design) return;
+	if (!design) {
+		await interaction.editReply({
+			embeds: [noDesign],
+			allowedMentions: { repliedUser: false },
+		});
+		return;
+	}
 
 	const components: (EliteContainer | ActionRowBuilder<MessageActionRowComponentBuilder>)[] = [];
 
