@@ -81,8 +81,9 @@ export async function execute(
 	interaction: ChatInputCommandInteraction,
 	settings?: UserSettings,
 	designOverride?: string,
+	skipDefer?: boolean,
 ) {
-	await interaction.deferReply();
+	if (!skipDefer) await interaction.deferReply();
 
 	const designId = designOverride ?? interaction.options.getString('design', false) ?? '';
 	const design = farmsData[designId];
