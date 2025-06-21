@@ -109,7 +109,17 @@ export async function execute(
 	}
 
 	if (design.authors) {
-		farmInfoComponent.addSeparator().addDescription(`-# Authors: ${design.authors.join(', ')}`);
+		const authors = design.authors
+			.map((author) => {
+				if (author.url) {
+					return `[${author.name}](${author.url})`;
+				} else {
+					return author.name;
+				}
+			})
+			.join(', ');
+
+		farmInfoComponent.addSeparator().addDescription(`-# Authors: ${authors}`);
 	}
 
 	farmInfoComponent.addFooter();
