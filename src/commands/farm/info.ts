@@ -14,7 +14,6 @@ import {
 	StringSelectMenuOptionBuilder,
 } from 'discord.js';
 import {
-	DepthStriderLevels,
 	Direction,
 	FarmingMethod,
 	farmDesigns,
@@ -62,13 +61,11 @@ async function autocomplete(interaction: AutocompleteInteraction) {
 export default command;
 
 interface FarmSettings {
-	depthStrider: DepthStriderLevels;
 	direction: Direction;
 	version: MinecraftVersion;
 }
 
 const farmSettings: FarmSettings = {
-	depthStrider: 3,
 	direction: 'East',
 	version: '1.8.9',
 };
@@ -76,6 +73,12 @@ const farmSettings: FarmSettings = {
 const noDesign = ErrorEmbed('Design Not Found!').setDescription(
 	"The design you're looking for doesn't exist! If you believe this to be a mistake or want a design added, make a suggestion in the discord.",
 );
+
+// todo: fix
+const soulSandVersionMultiplier = {
+	'1.8.9': 0.4,
+	'1.21': 0.5,
+};
 
 export async function execute(
 	interaction: ChatInputCommandInteraction,
@@ -110,7 +113,7 @@ export async function execute(
 		})
 		.join('\n');
 
-	const speed = await calcSpeed(design.speed, farmSettings.version, farmSettings.depthStrider);
+	const speed = await calcSpeed(design.speed, farmSettings.version);
 
 	const blocksPerSecond = await calcBlocksPerSecond(speed, design.angle.yaw, design.speed.method);
 
@@ -121,7 +124,7 @@ export async function execute(
 		.addDescription(
 `**Yaw**: ${yaw}, **Pitch**: ${design.angle.pitch}
 **Speed**: ${speed}
-**Depth Strider level**: ${farmSettings.depthStrider}`,
+**Depth Strider level**: ${design.speed.depthStrider}`,
 		)
 		.addSeparator()
 		.addDescription(
@@ -154,18 +157,6 @@ export async function execute(
 
 	const settingsComponent = new EliteContainer(settings)
 		.addTitle('# Settings')
-		.addActionRowComponents(
-			new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-				new StringSelectMenuBuilder()
-					.setCustomId('depthStrider')
-					.setPlaceholder('Select the depth strider level you use')
-					.addOptions(
-						new StringSelectMenuOptionBuilder().setLabel('Depth Strider 1').setValue('1'),
-						new StringSelectMenuOptionBuilder().setLabel('Depth Strider 2').setValue('2'),
-						new StringSelectMenuOptionBuilder().setLabel('Depth Strider 3').setValue('3'),
-					),
-			),
-		)
 		.addActionRowComponents(
 			new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
 				new StringSelectMenuBuilder()
@@ -210,22 +201,11 @@ export async function execute(
 async function calcSpeed(
 	designSpeed: farmInfo['speed'],
 	targetVersion?: MinecraftVersion,
-	targetDepthStrider?: DepthStriderLevels,
 ): Promise<number> {
-	// todo: fix
-	const versionMultiplier = {
-		'1.8.9': 0.4,
-		'1.21': 0.5,
-	};
-
 	let speed = designSpeed.speed;
 
-	if (designSpeed.depthStrider && targetDepthStrider) {
-		speed *= targetDepthStrider / designSpeed.depthStrider;
-	}
-
 	if (designSpeed.soulSand && designSpeed.buildVersion && targetVersion) {
-		speed *= versionMultiplier[targetVersion] / versionMultiplier[designSpeed.buildVersion];
+		speed *= soulSandVersionMultiplier[targetVersion] / soulSandVersionMultiplier[designSpeed.buildVersion];
 	}
 
 	return speed;
