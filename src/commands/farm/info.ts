@@ -98,7 +98,15 @@ export async function execute(
 
 	const resources = design.resources
 		?.filter((r) => r.type !== ResourceType.Schematic)
-		.map((r) => `${r.type}: ${r.source}`)
+		.map((r) => {
+			let source: string;
+			if (r.type === ResourceType.Garden) {
+				source = `\`/visit ${r.source}\``;
+			} else {
+				source = r.source;
+			}
+			return `**${ResourceType[r.type]}**: ${source}`;
+		})
 		.join('\n');
 
 	const speed = await calcSpeed(design.speed, farmSettings.version, farmSettings.depthStrider);
