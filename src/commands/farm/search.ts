@@ -36,7 +36,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const component = new EliteContainer(settings).addTitle(`# Farm designs for ${getCropDisplayName(crop)}`);
 
 	Object.entries(farms).forEach(([id, data], i) => {
-		if (i !== 1) {
+		if (i !== 0) {
 			component.addSeparator();
 		}
 
