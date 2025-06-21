@@ -66,12 +66,6 @@ interface FarmSettings {
 	version: MinecraftVersion;
 }
 
-const farmSettings: FarmSettings = {
-	active: true,
-	direction: 'South',
-	version: '1.8.9',
-};
-
 const noDesign = ErrorEmbed('Design Not Found!').setDescription(
 	"The design you're looking for doesn't exist! If you believe this to be a mistake or want a design added, make a suggestion in the discord.",
 );
@@ -84,6 +78,12 @@ export async function execute(
 ) {
 	if (!skipDefer) await interaction.deferReply();
 
+	const farmSettings: FarmSettings = {
+		active: true,
+		direction: 'South',
+		version: '1.8.9',
+	};
+
 	const designId = designOverride ?? interaction.options.getString('design', false) ?? '';
 	const design = farmsData[designId];
 
@@ -95,7 +95,7 @@ export async function execute(
 		return;
 	}
 
-	const components = await getFarmInfoComponents(design, settings);
+	const components = await getFarmInfoComponents(design, farmSettings, settings);
 
 	const reply = await interaction.editReply({
 		components,
@@ -128,7 +128,7 @@ export async function execute(
 			}
 		}
 
-		const components = await getFarmInfoComponents(design, settings);
+		const components = await getFarmInfoComponents(design, farmSettings, settings);
 
 		await interaction.editReply({
 			components,
@@ -144,6 +144,7 @@ export async function execute(
 
 async function getFarmInfoComponents(
 	design: farmInfo,
+	farmSettings: FarmSettings,
 	settings?: UserSettings,
 ): Promise<(EliteContainer | ActionRowBuilder<MessageActionRowComponentBuilder>)[]> {
 	const components: (EliteContainer | ActionRowBuilder<MessageActionRowComponentBuilder>)[] = [];
