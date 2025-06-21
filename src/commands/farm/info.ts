@@ -1,7 +1,7 @@
 import { UserSettings } from 'api/elite.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from 'classes/commands/index.js';
 import { EliteContainer } from 'classes/components.js';
-import { ErrorEmbed } from 'classes/embeds.js';
+import { ErrorEmbed, NotYoursReply } from 'classes/embeds.js';
 import {
 	ActionRowBuilder,
 	AutocompleteInteraction,
@@ -66,7 +66,7 @@ interface FarmSettings {
 }
 
 const farmSettings: FarmSettings = {
-	direction: 'East',
+	direction: 'South',
 	version: '1.8.9',
 };
 
@@ -90,7 +90,10 @@ export async function execute(
 
 	const designId = designOverride ?? interaction.options.getString('design', false) ?? '';
 	const design = farmsData[designId];
+	console.log(design)
+
 	if (!design) {
+		// console.log('test\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\ntest\n')
 		await interaction.editReply({
 			embeds: [noDesign],
 			allowedMentions: { repliedUser: false },
@@ -189,10 +192,28 @@ export async function execute(
 
 	components.push(settingsButton);
 
-	await interaction.editReply({
+	const reply = await interaction.editReply({
 		components,
 		allowedMentions: { repliedUser: false },
 		flags: [MessageFlags.IsComponentsV2],
+	});
+
+	const collector = reply.createMessageComponentCollector({
+		time: 120_000,
+	});
+
+	collector.on('collect', async (inter) => {
+		if (inter.user.id !== interaction.user.id) {
+			return NotYoursReply(inter);
+		}
+
+		collector.resetTimer();
+
+		if (inter.isStringSelectMenu()) {
+			console.log(inter.customId + '\t' + inter.values.join(', '));
+		}
+
+		return;
 	});
 }
 
