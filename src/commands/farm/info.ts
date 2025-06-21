@@ -123,26 +123,26 @@ export async function execute(
 		collector.resetTimer();
 
 		if (inter.isStringSelectMenu()) {
-			if (inter.customId === "design-direction") {
+			if (inter.customId === 'design-direction') {
 				farmSettings.direction = inter.values[0] as Direction;
-			} else if (inter.customId === "design-version") {
+			} else if (inter.customId === 'design-version') {
 				farmSettings.version = inter.values[0] as MinecraftVersion;
 			}
 		} else if (inter.isButton()) {
-			if (inter.customId === "design-settings") {
+			if (inter.customId === 'design-settings') {
 				farmSettings.active = !farmSettings.active;
 			}
 		}
 
-					const components = await getFarmInfoComponents(design, settings);
+		const components = await getFarmInfoComponents(design, settings);
 
-			await interaction.editReply({
-				components,
-				allowedMentions: { repliedUser: false },
-				flags: [MessageFlags.IsComponentsV2],
-			});
+		await interaction.editReply({
+			components,
+			allowedMentions: { repliedUser: false },
+			flags: [MessageFlags.IsComponentsV2],
+		});
 
-			await inter.deleteReply();
+		await inter.deleteReply();
 
 		return;
 	});
@@ -176,13 +176,13 @@ async function getFarmInfoComponents(
 	const farmInfoComponent = new EliteContainer(settings)
 		.addTitle(`# ${design.name}`)
 		.addDescription(
-`**Yaw**: ${yaw}, **Pitch**: ${design.angle.pitch}
+			`**Yaw**: ${yaw}, **Pitch**: ${design.angle.pitch}
 **Speed**: ${speed}${design.speed.depthStrider ? `\n**Depth Strider level**: ${design.speed.depthStrider}` : ''}`,
 		)
 		.addSeparator()
 		.addDescription(
-`**bps**: ${design.bps}
-**Lane time**: ${480 / blocksPerSecond}`
+			`**bps**: ${design.bps}
+**Lane time**: ${480 / blocksPerSecond}`,
 		);
 
 	if (resources) {
@@ -216,10 +216,22 @@ async function getFarmInfoComponents(
 						.setCustomId('design-direction')
 						.setPlaceholder('Select the direction your farm faces')
 						.addOptions(
-							new StringSelectMenuOptionBuilder().setLabel('North').setValue('North').setDefault(farmSettings.direction == 'North'),
-							new StringSelectMenuOptionBuilder().setLabel('South').setValue('South').setDefault(farmSettings.direction == 'South'),
-							new StringSelectMenuOptionBuilder().setLabel('East').setValue('East').setDefault(farmSettings.direction == 'East'),
-							new StringSelectMenuOptionBuilder().setLabel('West').setValue('West').setDefault(farmSettings.direction == 'West'),
+							new StringSelectMenuOptionBuilder()
+								.setLabel('North')
+								.setValue('North')
+								.setDefault(farmSettings.direction == 'North'),
+							new StringSelectMenuOptionBuilder()
+								.setLabel('South')
+								.setValue('South')
+								.setDefault(farmSettings.direction == 'South'),
+							new StringSelectMenuOptionBuilder()
+								.setLabel('East')
+								.setValue('East')
+								.setDefault(farmSettings.direction == 'East'),
+							new StringSelectMenuOptionBuilder()
+								.setLabel('West')
+								.setValue('West')
+								.setDefault(farmSettings.direction == 'West'),
 						),
 				),
 			)
@@ -229,8 +241,14 @@ async function getFarmInfoComponents(
 						.setCustomId('design-version')
 						.setPlaceholder('Select Minecaft version')
 						.addOptions(
-							new StringSelectMenuOptionBuilder().setLabel('1.8.9').setValue('1.8.9').setDefault(farmSettings.version == '1.8.9'),
-							new StringSelectMenuOptionBuilder().setLabel('1.21').setValue('1.21').setDefault(farmSettings.version == '1.21'),
+							new StringSelectMenuOptionBuilder()
+								.setLabel('1.8.9')
+								.setValue('1.8.9')
+								.setDefault(farmSettings.version == '1.8.9'),
+							new StringSelectMenuOptionBuilder()
+								.setLabel('1.21')
+								.setValue('1.21')
+								.setDefault(farmSettings.version == '1.21'),
 						),
 				),
 			)
@@ -240,18 +258,18 @@ async function getFarmInfoComponents(
 	}
 
 	const settingsButton = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-		new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel(`${farmSettings.active ? 'Close' : 'Open'} Settings`).setCustomId('design-settings'),
+		new ButtonBuilder()
+			.setStyle(ButtonStyle.Secondary)
+			.setLabel(`${farmSettings.active ? 'Close' : 'Open'} Settings`)
+			.setCustomId('design-settings'),
 	);
 
 	components.push(settingsButton);
 
-	return components
+	return components;
 }
 
-async function calcSpeed(
-	designSpeed: farmInfo['speed'],
-	targetVersion?: MinecraftVersion,
-): Promise<number> {
+async function calcSpeed(designSpeed: farmInfo['speed'], targetVersion?: MinecraftVersion): Promise<number> {
 	let speed = designSpeed.speed;
 
 	if (designSpeed.soulSand && designSpeed.buildVersion && targetVersion) {
