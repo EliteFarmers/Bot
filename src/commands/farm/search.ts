@@ -1,10 +1,11 @@
 import { UserSettings } from 'api/elite.js';
 import { eliteCropOption } from 'autocomplete/crops.js';
+import { CROP_ARRAY } from 'classes/Util.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from 'classes/commands/index.js';
 import { EliteContainer } from 'classes/components.js';
 import { NotYoursReply } from 'classes/embeds.js';
 import { ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, MessageFlags, SectionBuilder } from 'discord.js';
-import { Crop, farmsData, getCropDisplayName, getCropFromName } from 'farming-weight';
+import { Crop, farmsData, getCropDisplayName } from 'farming-weight';
 import { execute as farmInfoCommand } from './info.js';
 
 const command = new EliteCommand({
@@ -24,8 +25,7 @@ export default command;
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	await interaction.deferReply();
 
-	const crop = interaction.options.getString('crop', false) as Crop;
-	if (!crop) return;
+	const crop = CROP_ARRAY[parseInt(interaction.options.getString('crop', false)!)];
 
 	const farms = Object.fromEntries(
 		Object.entries(farmsData)

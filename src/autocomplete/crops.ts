@@ -15,7 +15,10 @@ export async function autocomplete(interaction: AutocompleteInteraction) {
 	if (interaction.responded) return;
 
 	const option = interaction.options.getFocused(true);
-	const options = CROP_ARRAY.map((v) => ({ name: getCropDisplayName(v), value: v }));
+	const options = CROP_ARRAY.map((v, i) => ({
+		name: getCropDisplayName(v),
+		value: i.toString(),
+	}));
 	if (!options) return;
 
 	const input = option.value.toLowerCase();

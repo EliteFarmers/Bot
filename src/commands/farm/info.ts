@@ -7,7 +7,6 @@ import {
 	ButtonBuilder,
 	ButtonStyle,
 	ChatInputCommandInteraction,
-	ComponentBuilder,
 	MessageActionRowComponentBuilder,
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
@@ -45,7 +44,10 @@ async function autocomplete(interaction: AutocompleteInteraction) {
 	if (interaction.responded) return;
 
 	const option = interaction.options.getFocused(true);
-	const options = farmDesigns.map(([key, data]) => ({ name: data.name, value: key }));
+	const options = farmDesigns.map(([key, data]) => ({
+		name: data.name,
+		value: key,
+	}));
 	if (!options) return;
 
 	const input = option.value.toLowerCase();
