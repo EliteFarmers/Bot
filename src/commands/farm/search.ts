@@ -66,9 +66,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		collector.resetTimer();
 
-		await farmInfoCommand(interaction, settings, inter.customId);
-
-		await inter.deleteReply();
+		await farmInfoCommand(interaction, settings, inter.customId, false);
 
 		return;
 	});
