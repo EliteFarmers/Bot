@@ -182,6 +182,10 @@ async function getFarmInfoComponents(
 		FarmDesignInfoComponent.addSeparator().addDescription(resources);
 	}
 
+	if (design.notes) {
+		FarmDesignInfoComponent.addSeparator().addDescription(design.notes.join('\n'));
+	}
+
 	if (design.authors) {
 		const authors = design.authors
 			.map((author) => {
