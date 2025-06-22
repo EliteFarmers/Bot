@@ -1,5 +1,5 @@
 import { ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, MessageFlags, SectionBuilder } from 'discord.js';
-import { farmsData, getCropDisplayName } from 'farming-weight';
+import { FARM_DESIGNS, getCropDisplayName } from 'farming-weight';
 import { UserSettings } from '../../api/elite.js';
 import { eliteCropOption } from '../../autocomplete/crops.js';
 import { CommandAccess, CommandType, EliteCommand } from '../../classes/commands/index.js';
@@ -28,7 +28,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const crop = CROP_ARRAY[parseInt(interaction.options.getString('crop', false)!)];
 
 	const farms = Object.fromEntries(
-		Object.entries(farmsData)
+		Object.entries(FARM_DESIGNS)
 			.filter(([, farm]) => farm.crops.includes(crop))
 			.sort(([, a], [, b]) => b.bps - a.bps),
 	);

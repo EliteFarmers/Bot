@@ -9,15 +9,7 @@ import {
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
 } from 'discord.js';
-import {
-	Direction,
-	FarmingMethod,
-	farmDesigns,
-	farmInfo,
-	farmsData,
-	MinecraftVersion,
-	ResourceType,
-} from 'farming-weight';
+import { Direction, FARM_DESIGNS, FarmDesignInfo, FarmingMethod, MinecraftVersion, ResourceType } from 'farming-weight';
 import { UserSettings } from '../../api/elite.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../../classes/commands/index.js';
 import { EliteContainer } from '../../classes/components.js';
@@ -45,7 +37,7 @@ async function autocomplete(interaction: AutocompleteInteraction) {
 	if (interaction.responded) return;
 
 	const option = interaction.options.getFocused(true);
-	const options = farmDesigns.map(([key, data]) => ({
+	const options = Object.entries(FARM_DESIGNS).map(([key, data]) => ({
 		name: data.name,
 		value: key,
 	}));
@@ -85,7 +77,7 @@ export async function execute(
 	};
 
 	const designId = designOverride ?? interaction.options.getString('design', false) ?? '';
-	const design = farmsData[designId];
+	const design = FARM_DESIGNS[designId];
 
 	if (!design) {
 		await interaction.editReply({
@@ -143,7 +135,7 @@ export async function execute(
 }
 
 async function getFarmInfoComponents(
-	design: farmInfo,
+	design: FarmDesignInfo,
 	farmSettings: FarmSettings,
 	settings?: UserSettings,
 ): Promise<(EliteContainer | ActionRowBuilder<MessageActionRowComponentBuilder>)[]> {
@@ -168,7 +160,7 @@ async function getFarmInfoComponents(
 
 	const yaw = await fixDesignAngle(design.angle.yaw, farmSettings.direction);
 
-	const farmInfoComponent = new EliteContainer(settings)
+	const FarmDesignInfoComponent = new EliteContainer(settings)
 		.addTitle(`# ${design.name}`)
 		.addDescription(
 			`**Yaw**: ${yaw}, **Pitch**: ${design.angle.pitch}\n**Speed**: ${speed ?? '1.21 speed has not yet been determined'}${design.speed.depthStrider ? `\n**Depth Strider level**: ${design.speed.depthStrider}` : ''}`,
@@ -177,7 +169,7 @@ async function getFarmInfoComponents(
 		.addDescription(`**bps**: ${design.bps}${blocksPerSecond ? `\n**Lane time**: ${480 / blocksPerSecond}` : ''}`);
 
 	if (resources) {
-		farmInfoComponent.addSeparator().addDescription(resources);
+		FarmDesignInfoComponent.addSeparator().addDescription(resources);
 	}
 
 	if (design.authors) {
@@ -191,12 +183,12 @@ async function getFarmInfoComponents(
 			})
 			.join(', ');
 
-		farmInfoComponent.addSeparator().addDescription(`-# **Authors**: ${authors}`);
+		FarmDesignInfoComponent.addSeparator().addDescription(`-# **Authors**: ${authors}`);
 	}
 
-	farmInfoComponent.addFooter();
+	FarmDesignInfoComponent.addFooter();
 
-	components.push(farmInfoComponent);
+	components.push(FarmDesignInfoComponent);
 
 	if (farmSettings.active) {
 		const settingsComponent = new EliteContainer(settings)
