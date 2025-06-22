@@ -1,7 +1,3 @@
-import { UserSettings } from 'api/elite.js';
-import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from 'classes/commands/index.js';
-import { EliteContainer } from 'classes/components.js';
-import { ErrorEmbed, NotYoursReply } from 'classes/embeds.js';
 import {
 	ActionRowBuilder,
 	AutocompleteInteraction,
@@ -22,6 +18,10 @@ import {
 	MinecraftVersion,
 	ResourceType,
 } from 'farming-weight';
+import { UserSettings } from '../../api/elite.js';
+import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../../classes/commands/index.js';
+import { EliteContainer } from '../../classes/components.js';
+import { ErrorEmbed, NotYoursReply } from '../../classes/embeds.js';
 
 const command = new EliteCommand({
 	name: 'info',
