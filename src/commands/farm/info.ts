@@ -258,8 +258,7 @@ async function getFarmInfoComponents(
 								.setDefault(farmSettings.version == '1.21'),
 						),
 				),
-			)
-			.addFooter();
+			);
 
 		components.push(settingsComponent);
 	}
