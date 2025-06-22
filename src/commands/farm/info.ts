@@ -9,7 +9,7 @@ import {
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
 } from 'discord.js';
-import { Direction, FARM_DESIGNS, FarmDesignInfo, FarmingMethod, MinecraftVersion, ResourceType } from 'farming-weight';
+import { Direction, FARM_DESIGNS, FarmDesignInfo, MinecraftVersion, ResourceType } from 'farming-weight';
 import { UserSettings } from '../../api/elite.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../../classes/commands/index.js';
 import { EliteContainer } from '../../classes/components.js';
@@ -162,9 +162,11 @@ async function getFarmInfoComponents(
 
 	const speed = design.speed.soulSand ? design.speed[farmSettings.version] : design.speed['1.8.9'];
 
-	const blocksPerSecond = await calcBlocksPerSecond(design.angle.yaw, design.speed.method, speed);
-
 	const yaw = await fixDesignAngle(design.angle.yaw, farmSettings.direction);
+
+	const laneTime = Math.round((480 / (20 / design.laneDepth)) * 10) / 10;
+	const laneTimeMinutes = Math.floor(laneTime / 60);
+	const laneTimeSeconds = laneTime % 60;
 
 	const FarmDesignInfoComponent = new EliteContainer(settings)
 		.addTitle(`# ${design.name}`)
@@ -172,7 +174,9 @@ async function getFarmInfoComponents(
 			`**Yaw**: ${yaw}, **Pitch**: ${design.angle.pitch}\n**Speed**: ${speed ?? '1.21 speed has not yet been determined'}${design.speed.depthStrider ? `\n**Depth Strider level**: ${design.speed.depthStrider}` : ''}`,
 		)
 		.addSeparator()
-		.addDescription(`**bps**: ${design.bps}${blocksPerSecond ? `\n**Lane time**: ${480 / blocksPerSecond}` : ''}`);
+		.addDescription(
+			`**bps**: ${design.bps}\n**Lane Time**: ${laneTimeMinutes !== 0 ? `${laneTimeMinutes}m ${laneTimeSeconds}s` : laneTimeSeconds + 's'}`,
+		);
 
 	if (replacedBy) {
 		FarmDesignInfoComponent.addSeparator().addDescription(`**Design is outdated, use one of these**:\n${replacedBy}`);
@@ -264,21 +268,6 @@ async function getFarmInfoComponents(
 	components.push(settingsButton);
 
 	return components;
-}
-
-async function calcBlocksPerSecond(yaw: number, method: FarmingMethod, speed?: number): Promise<number | undefined> {
-	if (!speed) return undefined;
-	if (method === 'running into wall' && yaw === 0) {
-		speed *= 1.02042464775;
-		yaw = 45;
-	}
-
-	const angleOffset = Math.abs(yaw) % 90;
-
-	const effectiveSpeed = angleOffset === 0 ? speed : speed * Math.cos((angleOffset * Math.PI) / 180);
-
-	// https://minecraft.fandom.com/wiki/Walking
-	return (effectiveSpeed * 4.3171) / 100;
 }
 
 async function fixDesignAngle(designYaw: number, direction: Direction): Promise<number> {
