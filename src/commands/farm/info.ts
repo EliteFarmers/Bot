@@ -104,8 +104,6 @@ export async function execute(
 			return NotYoursReply(inter);
 		}
 
-		await inter.deferReply();
-
 		collector.resetTimer();
 
 		if (inter.isStringSelectMenu()) {
@@ -122,13 +120,9 @@ export async function execute(
 
 		const components = await getFarmInfoComponents(design, farmSettings, settings);
 
-		await interaction.editReply({
+		await inter.update({
 			components,
-			allowedMentions: { repliedUser: false },
-			flags: [MessageFlags.IsComponentsV2],
 		});
-
-		await inter.deleteReply();
 
 		return;
 	});
