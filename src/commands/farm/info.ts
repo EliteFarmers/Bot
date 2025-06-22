@@ -160,6 +160,12 @@ async function getFarmInfoComponents(
 		})
 		.join('\n');
 
+	const notes = design.notes
+		?.map((n) => {
+			return '- ' + n;
+		})
+		.join('\n');
+
 	const speed = design.speed.soulSand ? design.speed[farmSettings.version] : design.speed['1.8.9'];
 
 	const yaw = await fixDesignAngle(design.angle.yaw, farmSettings.direction);
@@ -186,8 +192,8 @@ async function getFarmInfoComponents(
 		FarmDesignInfoComponent.addSeparator().addDescription(resources);
 	}
 
-	if (design.notes) {
-		FarmDesignInfoComponent.addSeparator().addDescription(design.notes.join('\n'));
+	if (notes) {
+		FarmDesignInfoComponent.addSeparator().addDescription(notes);
 	}
 
 	if (design.authors) {
