@@ -154,6 +154,12 @@ async function getFarmInfoComponents(
 		})
 		.join('\n');
 
+	const replacedBy = design.replacedBy
+		?.map((d) => {
+			return FARM_DESIGNS[d].name;
+		})
+		.join('\n');
+
 	const speed = design.speed.soulSand ? design.speed[farmSettings.version] : design.speed['1.8.9'];
 
 	const blocksPerSecond = await calcBlocksPerSecond(design.angle.yaw, design.speed.method, speed);
@@ -167,6 +173,10 @@ async function getFarmInfoComponents(
 		)
 		.addSeparator()
 		.addDescription(`**bps**: ${design.bps}${blocksPerSecond ? `\n**Lane time**: ${480 / blocksPerSecond}` : ''}`);
+
+	if (replacedBy) {
+		FarmDesignInfoComponent.addSeparator().addDescription(`**Design is outdated, use one of these**:\n${replacedBy}`);
+	}
 
 	if (resources) {
 		FarmDesignInfoComponent.addSeparator().addDescription(resources);
