@@ -152,10 +152,10 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 						value: [
 							"Here's an example result: ",
 							`**Diamond Bracket**`,
-							`${GetCropEmoji('Wheat')} \`  472,132\` ${fortuneEmoji} \` 1,868\``,
+							`${GetCropEmoji('Wheat')} \`472.1K\` ${fortuneEmoji} \`1,868\``,
 							'1. **Diamond Bracket** - The bracket the results under it are for.',
 							`2. ${GetCropEmoji('Wheat')} - The crop you're reading the results for (Wheat in this case).`,
-							'3. `472,132` - The calculated average collection required to get the medal.',
+							'3. `472.1K` - The calculated average collection required to get the medal.',
 							'4. `1,868` - The estimated fortune required to get that collection.',
 							'',
 							'If the fortune required is zero, you can get the medal by farming for the whole contest without any fortune.' +
@@ -308,15 +308,15 @@ function makeField(
 				0,
 			);
 
-			let collect = collection.toLocaleString();
-			if (collect.length < 9) collect = collect.padStart(9, ' ');
+			let collect = amountFormat(collection).toLocaleString();
+			if (collect.length < 6) collect = collect.padStart(6, ' ');
 			let fort = fortune.toLocaleString();
-			if (fort.length < 9) fort = fort.padStart(9, ' ');
+			if (fort.length < 5) fort = fort.padStart(5, ' ');
 
 			const emote = GetCropEmoji(cropName);
 			if (emote === '') return '';
 
-			return `${GetCropEmoji(cropName)} \`${collection.toLocaleString().padStart(9, ' ')}\` ${fortuneEmoji} \`${fortune.toLocaleString().padStart(5, ' ')}\``;
+			return `${GetCropEmoji(cropName)} \`${collect}\` ${fortuneEmoji} \`${fort}\``;
 		})
 		.filter((a) => a !== '');
 
@@ -325,4 +325,11 @@ function makeField(
 		value: cropNames.join('\n'),
 		inline: true,
 	};
+}
+
+function amountFormat(amount: number) {
+	if (amount < 1_000) return amount.toString();
+	if (amount < 1_000_000) return `${(amount / 1_000).toFixed(1)}K`;
+	if (amount < 1_000_000_000) return `${(amount / 1_000_000).toFixed(2)}M`;
+	return `${(amount / 1_000_000_000).toFixed(3)}B`;
 }
