@@ -34,7 +34,7 @@ async function execute(signal: Signal) {
 	}));
 
 	const container = new EliteContainer()
-		.addTitle('Free item claimed!')
+		.addTitle('### Free item claimed!', false)
 		.addDescription(`<@${data.userId}> claimed product \`${product?.name}\`!`);
 
 	channel

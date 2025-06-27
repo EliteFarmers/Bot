@@ -34,7 +34,7 @@ async function execute(signal: Signal) {
 	}));
 
 	const container = new EliteContainer()
-		.addTitle('New Purchase!')
+		.addTitle('### New Purchase!', false)
 		.addDescription(`New purchase from <@${data.userId}> for product \`${product?.name}\`!`);
 
 	channel
