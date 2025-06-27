@@ -4,7 +4,7 @@ import { EliteContainer } from '../classes/components.js';
 import { Signal, SignalRecieverOptions } from '../classes/Signal.js';
 
 const settings: SignalRecieverOptions = {
-	name: 'purchase',
+	name: 'claim',
 	execute: execute,
 };
 
@@ -34,8 +34,8 @@ async function execute(signal: Signal) {
 	}));
 
 	const container = new EliteContainer()
-		.addTitle('New Purchase!')
-		.addDescription(`New purchase from <@${data.userId}> for product \`${product?.name}\`!`);
+		.addTitle('Free item claimed!')
+		.addDescription(`<@${data.userId}> claimed product \`${product?.name}\`!`);
 
 	channel
 		?.send({
