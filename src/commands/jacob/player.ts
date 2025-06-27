@@ -65,7 +65,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 		return;
 	}
 
-	const { account, profile, name: playerName } = result;
+	const { account, profile, name: playerName, rawName } = result;
 	const profileName = profile.profileName;
 
 	const member = await FetchProfile(account.id, profile.profileId)
@@ -83,7 +83,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 			})
 			.addFields({
 				name: 'Want to view online?',
-				value: `Please go to [elitebot.dev/@${playerName}/${profileName}](https://elitebot.dev/@${playerName}/${encodeURIComponent(profileName)})`,
+				value: `Please go to [elitebot.dev/@${rawName}/${profileName}](https://elitebot.dev/@${rawName}/${encodeURIComponent(profileName)})`,
 			});
 		await interaction.deleteReply().catch(() => undefined);
 		interaction.followUp({ embeds: [embed], ephemeral: true });
@@ -98,11 +98,11 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 
 	const partic =
 		jacob.participations && jacob.participations > 0 && jacob.contests && jacob.contests.length > 0
-			? `Out of **${jacob.participations?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests, **${escapeIgn(account.name)}** has been 1st **${jacob.contests
+			? `Out of **${jacob.participations?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests, **${escapeIgn(playerName)}** has been 1st **${jacob.contests
 					?.filter((c) => c.position === 0)
 					.length.toString()
 					.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** times!`
-			: `**${escapeIgn(account.name)}** has participated in **${jacob.participations?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests!`;
+			: `**${escapeIgn(playerName)}** has participated in **${jacob.participations?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** contests!`;
 
 	const embed = EliteEmbed(settings)
 		.setTitle(`Jacob's Stats for ${escapeIgn(playerName)}${profileName ? ` on ${profileName}` : ``}`)
@@ -119,7 +119,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 	let page = 0;
 
 	const args = {
-		components: getComponents(page, playerName, profileName),
+		components: getComponents(page, rawName, profileName),
 		embeds: [embed],
 		allowedMentions: { repliedUser: false },
 		fetchReply: true,
@@ -147,7 +147,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 
 			i.update({
 				embeds: [embed],
-				components: getComponents(page, playerName, profileName),
+				components: getComponents(page, rawName, profileName),
 			}).catch(() => {
 				collector.stop();
 			});
@@ -159,7 +159,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 
 			const updated = await i.update({
 				embeds: [recentsEmbed],
-				components: getComponents(page, playerName, profileName),
+				components: getComponents(page, rawName, profileName),
 				fetchReply: true,
 			});
 
@@ -189,7 +189,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 				inter
 					.update({
 						embeds: [cropsEmbed],
-						components: getComponents(page, playerName, profileName),
+						components: getComponents(page, rawName, profileName),
 					})
 					.catch(() => undefined);
 			});

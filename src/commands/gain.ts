@@ -58,9 +58,9 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	}
 
 	if (collections.length === 0) {
-		const embed = WarningEmbed(`Crop Gain for ${escapeIgn(account.name)} (${profile.profileName})`)
+		const embed = WarningEmbed(`Crop Gain for ${escapeIgn(playerName)} (${profile.profileName})`)
 			.setDescription(
-				`No collection data found. ${escapeIgn(account.name)} may not have farmed recently or has collections API disabled.` +
+				`No collection data found. ${escapeIgn(playerName)} may not have farmed recently or has collections API disabled.` +
 					` [Check Online Profile](https://elitebot.dev/@${account.id})`,
 			)
 			.setThumbnail(`https://mc-heads.net/head/${account.id}/left`);
@@ -115,9 +115,9 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	}
 
 	const embed = EliteEmbed(settings)
-		.setTitle(`Crop Gain for ${escapeIgn(account.name)} (${profile.profileName})`)
+		.setTitle(`Crop Gain for ${escapeIgn(playerName)} (${profile.profileName})`)
 		.setDescription(
-			`-# View charts and older data for ${escapeIgn(account.name)} [here!](https://elitebot.dev/@${account.id}/${profile.profileId}/charts)`,
+			`-# View charts and older data for ${escapeIgn(playerName)} [here!](https://elitebot.dev/@${account.id}/${profile.profileId}/charts)`,
 		);
 
 	const fields = [];

@@ -18,6 +18,7 @@ export type GetAccountReturn =
 			account: AccountWithNameAndId;
 			profile: components['schemas']['ProfileDetailsDto'];
 			name: string;
+			rawName: string;
 	  };
 
 export async function getAccount(
@@ -88,5 +89,11 @@ export async function getAccount(
 		return { success: false, embed };
 	}
 
-	return { success: true, account: account as AccountWithNameAndId, profile, name: account.name };
+	return {
+		success: true,
+		account: account as AccountWithNameAndId,
+		profile,
+		name: account.formattedName || account.name,
+		rawName: account.name,
+	};
 }

@@ -1,5 +1,5 @@
 {
-	"x-generator": "NSwag v14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))",
+	"x-generator": "NSwag v14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))",
 	"openapi": "3.0.0",
 	"info": {
 		"title": "Elite API",
@@ -432,6 +432,16 @@
 				"responses": {
 					"204": {
 						"description": "No Content"
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
 					},
 					"401": {
 						"description": "Unauthorized"
@@ -2003,7 +2013,8 @@
 						"description": "A contest key in the format from the Hypixel API",
 						"schema": {
 							"type": "string"
-						}
+						},
+						"example": "285:2_11:CACTUS"
 					}
 				],
 				"responses": {
@@ -2445,204 +2456,6 @@
 						}
 					}
 				}
-			}
-		},
-		"/account/{discordId}/entitlements": {
-			"get": {
-				"tags": ["Account"],
-				"summary": "Get all entitlements for a user or guild",
-				"operationId": "EliteAPIFeaturesEntitlementsGetEntitlementsGetEntitlementsEndpoint",
-				"parameters": [
-					{
-						"name": "discordId",
-						"in": "path",
-						"required": true,
-						"description": "Discord Snowflake ID of the requested resource (guild, user, etc.)",
-						"schema": {
-							"type": "integer",
-							"format": "int64"
-						}
-					},
-					{
-						"name": "target",
-						"in": "query",
-						"schema": {
-							"nullable": true,
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/EntitlementTarget"
-								}
-							]
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Success",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "array",
-									"items": {
-										"$ref": "#/components/schemas/EntitlementDto"
-									}
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"content": {
-							"application/problem+json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized"
-					},
-					"403": {
-						"description": "Forbidden"
-					}
-				},
-				"security": [
-					{
-						"JWTBearerAuth": []
-					}
-				]
-			}
-		},
-		"/account/{discordId}/entitlement/{productId}": {
-			"post": {
-				"tags": ["Account"],
-				"summary": "Grant a test entitlement to a user or guild",
-				"description": "This passes along a request to Discord to grant a test entitlement to a user or guild, which only works on subscription products.",
-				"operationId": "EliteAPIFeaturesEntitlementsGrantTestEntitlementGrantTestEntitlementEndpoint",
-				"parameters": [
-					{
-						"name": "discordId",
-						"in": "path",
-						"required": true,
-						"description": "Discord Snowflake ID of the requested resource (guild, user, etc.)",
-						"schema": {
-							"type": "integer",
-							"format": "int64"
-						}
-					},
-					{
-						"name": "productId",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "integer",
-							"format": "int64"
-						}
-					},
-					{
-						"name": "target",
-						"in": "query",
-						"schema": {
-							"nullable": true,
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/EntitlementTarget"
-								}
-							]
-						}
-					}
-				],
-				"responses": {
-					"204": {
-						"description": "No Content"
-					},
-					"400": {
-						"description": "Bad Request",
-						"content": {
-							"application/problem+json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized"
-					},
-					"403": {
-						"description": "Forbidden"
-					}
-				},
-				"security": [
-					{
-						"JWTBearerAuth": []
-					}
-				]
-			},
-			"delete": {
-				"tags": ["Account"],
-				"summary": "Remove a test entitlement from a user or guild",
-				"description": "This passes along a request to Discord to remove a test entitlement from a user or guild.",
-				"operationId": "EliteAPIFeaturesEntitlementsRemoveTestEntitlementRemoveTestEntitlementEndpoint",
-				"parameters": [
-					{
-						"name": "discordId",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "integer",
-							"format": "int64"
-						}
-					},
-					{
-						"name": "productId",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "integer",
-							"format": "int64"
-						}
-					},
-					{
-						"name": "target",
-						"in": "query",
-						"schema": {
-							"nullable": true,
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/EntitlementTarget"
-								}
-							]
-						}
-					}
-				],
-				"responses": {
-					"204": {
-						"description": "No Content"
-					},
-					"400": {
-						"description": "Bad Request",
-						"content": {
-							"application/problem+json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized"
-					},
-					"403": {
-						"description": "Forbidden"
-					}
-				},
-				"security": [
-					{
-						"JWTBearerAuth": []
-					}
-				]
 			}
 		},
 		"/guild/{discordId}/events/{eventId}/teams/{teamId}/members/{player}": {
@@ -4805,7 +4618,8 @@
 						"required": true,
 						"schema": {
 							"type": "string"
-						}
+						},
+						"example": "7da0c47581dc42b4962118f8049147b7"
 					}
 				],
 				"responses": {
@@ -4848,7 +4662,8 @@
 						"required": true,
 						"schema": {
 							"type": "string"
-						}
+						},
+						"example": "7da0c47581dc42b4962118f8049147b7"
 					}
 				],
 				"responses": {
@@ -4890,7 +4705,8 @@
 						"required": true,
 						"schema": {
 							"type": "string"
-						}
+						},
+						"example": "7da0c47581dc42b4962118f8049147b7"
 					},
 					{
 						"name": "profileUuid",
@@ -4898,7 +4714,8 @@
 						"required": true,
 						"schema": {
 							"type": "string"
-						}
+						},
+						"example": "7da0c47581dc42b4962118f8049147b7"
 					},
 					{
 						"name": "from",
@@ -4909,7 +4726,8 @@
 							"format": "int64",
 							"default": 0,
 							"nullable": true
-						}
+						},
+						"example": 0
 					},
 					{
 						"name": "days",
@@ -4920,7 +4738,8 @@
 							"format": "int32",
 							"default": 7,
 							"nullable": true
-						}
+						},
+						"example": 7
 					},
 					{
 						"name": "perDay",
@@ -4931,7 +4750,8 @@
 							"format": "int32",
 							"default": 4,
 							"nullable": true
-						}
+						},
+						"example": 4
 					}
 				],
 				"responses": {
@@ -4984,7 +4804,8 @@
 						"required": true,
 						"schema": {
 							"type": "string"
-						}
+						},
+						"example": "7da0c47581dc42b4962118f8049147b7"
 					},
 					{
 						"name": "profileUuid",
@@ -4992,7 +4813,8 @@
 						"required": true,
 						"schema": {
 							"type": "string"
-						}
+						},
+						"example": "7da0c47581dc42b4962118f8049147b7"
 					},
 					{
 						"name": "from",
@@ -5002,7 +4824,8 @@
 							"format": "int64",
 							"default": 0,
 							"nullable": true
-						}
+						},
+						"example": 0
 					},
 					{
 						"name": "days",
@@ -5012,7 +4835,8 @@
 							"format": "int32",
 							"default": 7,
 							"nullable": true
-						}
+						},
+						"example": 7
 					},
 					{
 						"name": "perDay",
@@ -5022,7 +4846,8 @@
 							"format": "int32",
 							"default": 4,
 							"nullable": true
-						}
+						},
+						"example": 4
 					}
 				],
 				"responses": {
@@ -5075,7 +4900,8 @@
 						"required": true,
 						"schema": {
 							"type": "string"
-						}
+						},
+						"example": "7da0c47581dc42b4962118f8049147b7"
 					},
 					{
 						"name": "profileUuid",
@@ -5083,7 +4909,8 @@
 						"required": true,
 						"schema": {
 							"type": "string"
-						}
+						},
+						"example": "7da0c47581dc42b4962118f8049147b7"
 					},
 					{
 						"name": "from",
@@ -5093,7 +4920,8 @@
 							"format": "int64",
 							"default": 0,
 							"nullable": true
-						}
+						},
+						"example": 0
 					},
 					{
 						"name": "days",
@@ -5103,7 +4931,8 @@
 							"format": "int32",
 							"default": 7,
 							"nullable": true
-						}
+						},
+						"example": 7
 					},
 					{
 						"name": "perDay",
@@ -5113,7 +4942,8 @@
 							"format": "int32",
 							"default": 4,
 							"nullable": true
-						}
+						},
+						"example": 4
 					}
 				],
 				"responses": {
@@ -5155,7 +4985,8 @@
 						"required": true,
 						"schema": {
 							"type": "string"
-						}
+						},
+						"example": "7da0c47581dc42b4962118f8049147b7"
 					},
 					{
 						"name": "profileUuid",
@@ -5163,7 +4994,8 @@
 						"required": true,
 						"schema": {
 							"type": "string"
-						}
+						},
+						"example": "7da0c47581dc42b4962118f8049147b7"
 					},
 					{
 						"name": "from",
@@ -5173,7 +5005,8 @@
 							"format": "int64",
 							"default": 0,
 							"nullable": true
-						}
+						},
+						"example": 0
 					},
 					{
 						"name": "days",
@@ -5183,7 +5016,8 @@
 							"format": "int32",
 							"default": 7,
 							"nullable": true
-						}
+						},
+						"example": 7
 					},
 					{
 						"name": "perDay",
@@ -5193,7 +5027,8 @@
 							"format": "int32",
 							"default": 4,
 							"nullable": true
-						}
+						},
+						"example": 4
 					}
 				],
 				"responses": {
@@ -6220,6 +6055,48 @@
 				]
 			}
 		},
+		"/user/guild/{discordId}/refresh": {
+			"post": {
+				"tags": ["User"],
+				"summary": "Request Guild Refresh",
+				"description": "This fetches the latest data from Discord for the specified guild",
+				"operationId": "EliteAPIFeaturesGuildsUserRequestRefreshRequestGuildRefreshEndpoint",
+				"parameters": [
+					{
+						"name": "discordId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
 		"/user/guild/{discordId}/adminrole": {
 			"put": {
 				"tags": ["User"],
@@ -7067,6 +6944,204 @@
 				}
 			}
 		},
+		"/account/{discordId}/entitlements": {
+			"get": {
+				"tags": ["Account"],
+				"summary": "Get all entitlements for a user or guild",
+				"operationId": "EliteAPIFeaturesMonetizationEndpointsGetEntitlementsGetEntitlementsEndpoint",
+				"parameters": [
+					{
+						"name": "discordId",
+						"in": "path",
+						"required": true,
+						"description": "Discord Snowflake ID of the requested resource (guild, user, etc.)",
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					{
+						"name": "target",
+						"in": "query",
+						"schema": {
+							"nullable": true,
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/EntitlementTarget"
+								}
+							]
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/EntitlementDto"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/account/{discordId}/entitlement/{productId}": {
+			"post": {
+				"tags": ["Account"],
+				"summary": "Grant a test entitlement to a user or guild",
+				"description": "This passes along a request to Discord to grant a test entitlement to a user or guild, which only works on subscription products.",
+				"operationId": "EliteAPIFeaturesMonetizationEndpointsGrantTestEntitlementGrantTestEntitlementEndpoint",
+				"parameters": [
+					{
+						"name": "discordId",
+						"in": "path",
+						"required": true,
+						"description": "Discord Snowflake ID of the requested resource (guild, user, etc.)",
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					{
+						"name": "productId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					{
+						"name": "target",
+						"in": "query",
+						"schema": {
+							"nullable": true,
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/EntitlementTarget"
+								}
+							]
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			},
+			"delete": {
+				"tags": ["Account"],
+				"summary": "Remove a test entitlement from a user or guild",
+				"description": "This passes along a request to Discord to remove a test entitlement from a user or guild.",
+				"operationId": "EliteAPIFeaturesMonetizationEndpointsRemoveTestEntitlementRemoveTestEntitlementEndpoint",
+				"parameters": [
+					{
+						"name": "discordId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					{
+						"name": "productId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					{
+						"name": "target",
+						"in": "query",
+						"schema": {
+							"nullable": true,
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/EntitlementTarget"
+								}
+							]
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
 		"/player/{discordId}": {
 			"get": {
 				"tags": ["Player"],
@@ -7370,6 +7445,26 @@
 				}
 			}
 		},
+		"/resources/auctions": {
+			"get": {
+				"tags": ["Resources"],
+				"summary": "Get Auction House",
+				"description": "Get lowest auction house prices.",
+				"operationId": "EliteAPIFeaturesResourcesAuctionsEndpointsGetAuctionHouseProductsEndpoint",
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuctionHouseDto"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/resources/bazaar/{itemId}": {
 			"get": {
 				"tags": ["Resources"],
@@ -7413,6 +7508,39 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/GetBazaarProductsResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/resources/item-parse": {
+			"post": {
+				"tags": ["Resources"],
+				"summary": "Parse Skyblock Item from Bytes",
+				"description": "Get an ItemDto from raw bytes from Hypixel",
+				"operationId": "EliteAPIFeaturesResourcesItemsEndpointsGetItemsFromBytesEndpoint",
+				"requestBody": {
+					"x-name": "GetItemsFromBytesRequest",
+					"description": "",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/GetItemsFromBytesRequest"
+							}
+						}
+					},
+					"required": true,
+					"x-position": 1
+				},
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetItemsFromBytesResponse"
 								}
 							}
 						}
@@ -7486,7 +7614,7 @@
 				"tags": ["Resources"],
 				"summary": "Get Skyblock Item",
 				"description": "Get the Hypixel provided data of a specific item, as well as a bazaar summary.",
-				"operationId": "EliteAPIFeaturesResourcesItemsEndpointsSkybProductEndpoint",
+				"operationId": "EliteAPIFeaturesResourcesItemsEndpointsSkyblockProductEndpoint",
 				"parameters": [
 					{
 						"name": "itemId",
@@ -8248,6 +8376,47 @@
 				}
 			}
 		},
+		"/product/{discordId}/claim": {
+			"post": {
+				"tags": ["Product"],
+				"summary": "Claim Free Shop Product",
+				"operationId": "EliteAPIFeaturesShopProductsClaimProductClaimProductEndpoint",
+				"parameters": [
+					{
+						"name": "discordId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
 		"/products": {
 			"get": {
 				"tags": ["Product"],
@@ -8708,12 +8877,15 @@
 			"MinecraftAccountDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["id", "name", "primaryAccount", "settings", "properties", "profiles", "badges"],
+				"required": ["id", "name", "formattedName", "primaryAccount", "settings", "properties", "profiles", "badges"],
 				"properties": {
 					"id": {
 						"type": "string"
 					},
 					"name": {
+						"type": "string"
+					},
+					"formattedName": {
 						"type": "string"
 					},
 					"primaryAccount": {
@@ -8766,6 +8938,16 @@
 				"type": "object",
 				"additionalProperties": false,
 				"properties": {
+					"prefix": {
+						"type": "string",
+						"description": "Custom name prefix",
+						"nullable": true
+					},
+					"suffix": {
+						"type": "string",
+						"description": "Custom name suffix",
+						"nullable": true
+					},
 					"features": {
 						"description": "Configurated features for the user",
 						"nullable": true,
@@ -8777,6 +8959,15 @@
 					},
 					"weightStyle": {
 						"description": "Selected weight style for the user",
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/WeightStyleLinkedDto"
+							}
+						]
+					},
+					"leaderboardStyle": {
+						"description": "Selected leaderboard style for the user",
 						"nullable": true,
 						"oneOf": [
 							{
@@ -8815,6 +9006,12 @@
 					"hideShopPromotions": {
 						"type": "boolean",
 						"description": "If shop promotions should be hidden.",
+						"nullable": true
+					},
+					"emojiUrl": {
+						"type": "string",
+						"description": "Custom name emoji URL.",
+						"maxLength": 256,
 						"nullable": true
 					}
 				}
@@ -9426,8 +9623,8 @@
 			"ProductType": {
 				"type": "integer",
 				"description": "",
-				"x-enumNames": ["Durable", "Consumable", "Subscription", "SubscriptionGroup"],
-				"enum": [2, 3, 5, 6]
+				"x-enumNames": ["Durable", "Consumable", "Subscription", "SubscriptionGroup", "Custom"],
+				"enum": [2, 3, 5, 6, -1]
 			},
 			"UnlockedProductFeaturesDto": {
 				"type": "object",
@@ -9468,6 +9665,11 @@
 					"moreInfoDefault": {
 						"type": "boolean",
 						"description": "Show \"More Info\" on weight command by default.",
+						"nullable": true
+					},
+					"customEmoji": {
+						"type": "boolean",
+						"description": "Ability to have custom name emoji for the user.",
 						"nullable": true
 					},
 					"maxMonthlyEvents": {
@@ -9520,6 +9722,16 @@
 				"type": "object",
 				"additionalProperties": false,
 				"properties": {
+					"prefix": {
+						"type": "string",
+						"description": "Custom name prefix",
+						"nullable": true
+					},
+					"suffix": {
+						"type": "string",
+						"description": "Custom name suffix",
+						"nullable": true
+					},
 					"features": {
 						"description": "Configurated features for the user",
 						"nullable": true,
@@ -9532,6 +9744,12 @@
 					"weightStyleId": {
 						"type": "integer",
 						"description": "Selected weight style for the user",
+						"format": "int32",
+						"nullable": true
+					},
+					"leaderboardStyleId": {
+						"type": "integer",
+						"description": "Selected leaderboard style for the user",
 						"format": "int32",
 						"nullable": true
 					}
@@ -9763,6 +9981,11 @@
 					"ign": {
 						"type": "string",
 						"description": "Primary Minecraft IGN"
+					},
+					"fIgn": {
+						"type": "string",
+						"description": "Formatted Primary Minecraft IGN",
+						"nullable": true
 					},
 					"uuid": {
 						"type": "string",
@@ -10983,14 +11206,6 @@
 				}
 			},
 			"SkyBlockYearRequest": {
-				"type": "object",
-				"additionalProperties": false
-			},
-			"GetEntitlementsRequest": {
-				"type": "object",
-				"additionalProperties": false
-			},
-			"UserEntitlementRequest": {
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -13189,6 +13404,14 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"GetEntitlementsRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserEntitlementRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
 			"LinkedAccountsDto": {
 				"type": "object",
 				"additionalProperties": false,
@@ -13354,7 +13577,7 @@
 			"PetDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["type", "exp", "active", "candyUsed"],
+				"required": ["type", "exp", "active", "candyUsed", "level"],
 				"properties": {
 					"uuid": {
 						"type": "string",
@@ -13384,6 +13607,10 @@
 					"skin": {
 						"type": "string",
 						"nullable": true
+					},
+					"level": {
+						"type": "integer",
+						"format": "int32"
 					}
 				}
 			},
@@ -13753,26 +13980,32 @@
 				"properties": {
 					"id": {
 						"type": "integer",
+						"description": "Old Minecraft id of the item",
 						"format": "int32"
 					},
 					"count": {
 						"type": "integer",
+						"description": "Minecraft stack count of the item",
 						"format": "byte"
 					},
 					"skyblockId": {
 						"type": "string",
+						"description": "Skyblock ID of the item",
 						"nullable": true
 					},
 					"uuid": {
 						"type": "string",
+						"description": "Item UUID to uniquely identify a specific instance of this item",
 						"nullable": true
 					},
 					"name": {
 						"type": "string",
+						"description": "Item name, first line of the lore",
 						"nullable": true
 					},
 					"lore": {
 						"type": "array",
+						"description": "List of item lore in order",
 						"nullable": true,
 						"items": {
 							"type": "string"
@@ -13780,6 +14013,7 @@
 					},
 					"enchantments": {
 						"type": "object",
+						"description": "Applied enchantments with their levels",
 						"nullable": true,
 						"additionalProperties": {
 							"type": "integer",
@@ -13788,6 +14022,15 @@
 					},
 					"attributes": {
 						"type": "object",
+						"description": "ExtraAttributes not included elsewhere",
+						"nullable": true,
+						"additionalProperties": {
+							"type": "string"
+						}
+					},
+					"itemAttributes": {
+						"type": "object",
+						"description": "ExtraAtrributes.Attributes for attribute shards",
 						"nullable": true,
 						"additionalProperties": {
 							"type": "string"
@@ -13795,10 +14038,53 @@
 					},
 					"gems": {
 						"type": "object",
+						"description": "Applied gems with gem rarity, null for an unlocked gem slot without a gem",
 						"nullable": true,
 						"additionalProperties": {
-							"type": "string"
+							"type": "string",
+							"nullable": true
 						}
+					},
+					"petInfo": {
+						"description": "Pet info if item is a pet",
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/ItemPetInfoDto"
+							}
+						]
+					}
+				}
+			},
+			"ItemPetInfoDto": {
+				"type": "object",
+				"additionalProperties": {},
+				"required": ["type", "active", "exp", "level", "tier", "candyUsed"],
+				"properties": {
+					"type": {
+						"type": "string"
+					},
+					"active": {
+						"type": "boolean"
+					},
+					"exp": {
+						"type": "number",
+						"format": "decimal"
+					},
+					"level": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"tier": {
+						"type": "string"
+					},
+					"candyUsed": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"heldItem": {
+						"type": "string",
+						"nullable": true
 					}
 				}
 			},
@@ -14005,6 +14291,145 @@
 					}
 				}
 			},
+			"AuctionHouseDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["items"],
+				"properties": {
+					"items": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "array",
+							"items": {
+								"$ref": "#/components/schemas/AuctionItemDto"
+							}
+						}
+					}
+				}
+			},
+			"AuctionItemDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"skyblockId",
+					"variantKey",
+					"variedBy",
+					"lowest",
+					"lowestVolume",
+					"lowest3Day",
+					"lowest3DayVolume",
+					"lowest7Day",
+					"lowest7DayVolume"
+				],
+				"properties": {
+					"skyblockId": {
+						"type": "string"
+					},
+					"variantKey": {
+						"type": "string"
+					},
+					"variedBy": {
+						"description": "Data used to generate variant key (easier to parse)",
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/AuctionItemVariation"
+							}
+						]
+					},
+					"lowest": {
+						"type": "number",
+						"description": "Lowest price seen recently (excluding outliers)",
+						"format": "decimal"
+					},
+					"lowestVolume": {
+						"type": "integer",
+						"description": "Volume of prices used to get the lowest recent price",
+						"format": "int32"
+					},
+					"lowest3Day": {
+						"type": "number",
+						"description": "Lowest price seen in 3 days (excluding outliers)",
+						"format": "decimal"
+					},
+					"lowest3DayVolume": {
+						"type": "integer",
+						"description": "Volume of prices used to get the lowest 3 day price",
+						"format": "int32"
+					},
+					"lowest7Day": {
+						"type": "number",
+						"description": "Lowest price seen in 7 days (excluding outliers)",
+						"format": "decimal"
+					},
+					"lowest7DayVolume": {
+						"type": "integer",
+						"description": "Volume of prices ued to get lowest 3 day price",
+						"format": "int32"
+					}
+				}
+			},
+			"AuctionItemVariation": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"rarity": {
+						"type": "string",
+						"nullable": true
+					},
+					"enchantments": {
+						"type": "object",
+						"nullable": true,
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int32"
+						}
+					},
+					"pet": {
+						"type": "string",
+						"nullable": true
+					},
+					"petLevel": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/AuctionItemVariation_PetLevelGroup"
+							}
+						]
+					},
+					"itemAttributes": {
+						"type": "object",
+						"nullable": true,
+						"additionalProperties": {
+							"type": "string"
+						}
+					},
+					"extra": {
+						"type": "object",
+						"nullable": true,
+						"additionalProperties": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"AuctionItemVariation_PetLevelGroup": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["key", "min", "max"],
+				"properties": {
+					"key": {
+						"type": "string"
+					},
+					"min": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"max": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
 			"GetBazaarProductResponse": {
 				"type": "object",
 				"additionalProperties": false,
@@ -14045,7 +14470,7 @@
 					},
 					"sell": {
 						"type": "number",
-						"description": "Instamt Sell price taken directly from most recently fetched data",
+						"description": "Instant Sell price taken directly from most recently fetched data",
 						"format": "double"
 					},
 					"buy": {
@@ -14099,6 +14524,34 @@
 						"additionalProperties": {
 							"$ref": "#/components/schemas/BazaarProductSummaryDto"
 						}
+					}
+				}
+			},
+			"GetItemsFromBytesResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["items"],
+				"properties": {
+					"items": {
+						"type": "array",
+						"items": {
+							"nullable": true,
+							"oneOf": [
+								{
+									"$ref": "#/components/schemas/ItemDto"
+								}
+							]
+						}
+					}
+				}
+			},
+			"GetItemsFromBytesRequest": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["bytes"],
+				"properties": {
+					"bytes": {
+						"type": "string"
 					}
 				}
 			},
@@ -14301,7 +14754,7 @@
 			},
 			"ItemGemstoneSlotCosts": {
 				"type": "object",
-				"additionalProperties": false,
+				"additionalProperties": {},
 				"required": ["type", "coins"],
 				"properties": {
 					"type": {
@@ -14319,7 +14772,7 @@
 			},
 			"ItemRequirement": {
 				"type": "object",
-				"additionalProperties": false,
+				"additionalProperties": {},
 				"required": ["type", "level"],
 				"properties": {
 					"type": {
@@ -14337,7 +14790,7 @@
 			},
 			"ItemMuseumData": {
 				"type": "object",
-				"additionalProperties": false,
+				"additionalProperties": {},
 				"required": ["donation_xp", "parent"],
 				"properties": {
 					"donation_xp": {
@@ -14470,6 +14923,13 @@
 								"$ref": "#/components/schemas/BazaarProductSummaryDto"
 							}
 						]
+					},
+					"auctions": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"$ref": "#/components/schemas/AuctionItemDto"
+						}
 					}
 				}
 			},
@@ -14483,13 +14943,14 @@
 				"properties": {
 					"items": {
 						"type": "array",
+						"example": ["NETHER_STALK", "ENCHANTED_NETHER_STALK", "MUTANT_NETHER_STALK"],
 						"items": {
 							"type": "string"
 						}
 					}
 				}
 			},
-			"SkybProductRequest": {
+			"SkyblockProductRequest": {
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -14714,7 +15175,11 @@
 					"data": {
 						"minLength": 1,
 						"nullable": false,
-						"$ref": "#/components/schemas/WeightStyleData"
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/WeightStyleData"
+							}
+						]
 					}
 				}
 			},

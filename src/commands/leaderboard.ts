@@ -212,7 +212,7 @@ async function getEmbed(
 
 function getPlayerLbFields(entries: components['schemas']['LeaderboardEntryDto'][], index: number) {
 	return entries.map((entry, i) => ({
-		name: `#${index + i + 1} ${escapeIgn(entry.ign) ?? 'Unknown'}⠀`,
+		name: `#${index + i + 1} ${lbIgn(entry) ?? 'Unknown'}⠀`,
 		value: `[⧉](https://elitebot.dev/@${entry.ign}/${encodeURIComponent(entry.profile ?? '')}) ${(entry.amount ?? 0).toLocaleString()}`,
 		inline: true,
 	}));
@@ -277,4 +277,9 @@ function getButtonRow(index: number, maxIndex = 1000) {
 
 function FetchLeaderboard(leaderboardId: string, offset: number, limit: number) {
 	return FetchLeaderboardSlice(leaderboardId, offset, limit);
+}
+
+function lbIgn(entry: components['schemas']['LeaderboardEntryDto']) {
+	if (!entry.meta) return escapeIgn(entry.ign ?? 'N/A');
+	return escapeIgn(`${entry.meta?.prefix ?? ''} ${entry.ign ?? 'N/A'} ${entry.meta?.suffix ?? ''}`.trim());
 }

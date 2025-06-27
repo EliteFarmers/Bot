@@ -873,47 +873,6 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
-	'/account/{discordId}/entitlements': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** Get all entitlements for a user or guild */
-		get: operations['EliteAPIFeaturesEntitlementsGetEntitlementsGetEntitlementsEndpoint'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/account/{discordId}/entitlement/{productId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		/**
-		 * Grant a test entitlement to a user or guild
-		 * @description This passes along a request to Discord to grant a test entitlement to a user or guild, which only works on subscription products.
-		 */
-		post: operations['EliteAPIFeaturesEntitlementsGrantTestEntitlementGrantTestEntitlementEndpoint'];
-		/**
-		 * Remove a test entitlement from a user or guild
-		 * @description This passes along a request to Discord to remove a test entitlement from a user or guild.
-		 */
-		delete: operations['EliteAPIFeaturesEntitlementsRemoveTestEntitlementRemoveTestEntitlementEndpoint'];
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
 	'/guild/{discordId}/events/{eventId}/teams/{teamId}/members/{player}': {
 		parameters: {
 			query?: never;
@@ -1866,6 +1825,26 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/user/guild/{discordId}/refresh': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Request Guild Refresh
+		 * @description This fetches the latest data from Discord for the specified guild
+		 */
+		post: operations['EliteAPIFeaturesGuildsUserRequestRefreshRequestGuildRefreshEndpoint'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/user/guild/{discordId}/adminrole': {
 		parameters: {
 			query?: never;
@@ -2056,6 +2035,47 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/account/{discordId}/entitlements': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get all entitlements for a user or guild */
+		get: operations['EliteAPIFeaturesMonetizationEndpointsGetEntitlementsGetEntitlementsEndpoint'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/account/{discordId}/entitlement/{productId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Grant a test entitlement to a user or guild
+		 * @description This passes along a request to Discord to grant a test entitlement to a user or guild, which only works on subscription products.
+		 */
+		post: operations['EliteAPIFeaturesMonetizationEndpointsGrantTestEntitlementGrantTestEntitlementEndpoint'];
+		/**
+		 * Remove a test entitlement from a user or guild
+		 * @description This passes along a request to Discord to remove a test entitlement from a user or guild.
+		 */
+		delete: operations['EliteAPIFeaturesMonetizationEndpointsRemoveTestEntitlementRemoveTestEntitlementEndpoint'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/player/{discordId}': {
 		parameters: {
 			query?: never;
@@ -2175,6 +2195,26 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/resources/auctions': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Auction House
+		 * @description Get lowest auction house prices.
+		 */
+		get: operations['EliteAPIFeaturesResourcesAuctionsEndpointsGetAuctionHouseProductsEndpoint'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/resources/bazaar/{itemId}': {
 		parameters: {
 			query?: never;
@@ -2209,6 +2249,26 @@ export interface paths {
 		get: operations['EliteAPIFeaturesResourcesBazaarEndpointsGetBazaarProductsEndpoint'];
 		put?: never;
 		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/resources/item-parse': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Parse Skyblock Item from Bytes
+		 * @description Get an ItemDto from raw bytes from Hypixel
+		 */
+		post: operations['EliteAPIFeaturesResourcesItemsEndpointsGetItemsFromBytesEndpoint'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -2250,7 +2310,7 @@ export interface paths {
 		 * Get Skyblock Item
 		 * @description Get the Hypixel provided data of a specific item, as well as a bazaar summary.
 		 */
-		get: operations['EliteAPIFeaturesResourcesItemsEndpointsSkybProductEndpoint'];
+		get: operations['EliteAPIFeaturesResourcesItemsEndpointsSkyblockProductEndpoint'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2484,6 +2544,23 @@ export interface paths {
 		patch: operations['EliteAPIFeaturesShopProductsAdminUpdateProductUpdateProductEndpoint'];
 		trace?: never;
 	};
+	'/product/{discordId}/claim': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Claim Free Shop Product */
+		post: operations['EliteAPIFeaturesShopProductsClaimProductClaimProductEndpoint'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/products': {
 		parameters: {
 			query?: never;
@@ -2669,6 +2746,7 @@ export interface components {
 		MinecraftAccountDto: {
 			id: string;
 			name: string;
+			formattedName: string;
 			primaryAccount: boolean;
 			discordId?: string | null;
 			discordUsername?: string | null;
@@ -2680,10 +2758,16 @@ export interface components {
 			playerData?: components['schemas']['PlayerDataDto'] | null;
 		};
 		UserSettingsDto: {
+			/** @description Custom name prefix */
+			prefix?: string | null;
+			/** @description Custom name suffix */
+			suffix?: string | null;
 			/** @description Configurated features for the user */
 			features?: components['schemas']['ConfiguredProductFeaturesDto'] | null;
 			/** @description Selected weight style for the user */
 			weightStyle?: components['schemas']['WeightStyleLinkedDto'] | null;
+			/** @description Selected leaderboard style for the user */
+			leaderboardStyle?: components['schemas']['WeightStyleLinkedDto'] | null;
 		};
 		ConfiguredProductFeaturesDto: {
 			/**
@@ -2699,6 +2783,8 @@ export interface components {
 			moreInfoDefault?: boolean | null;
 			/** @description If shop promotions should be hidden. */
 			hideShopPromotions?: boolean | null;
+			/** @description Custom name emoji URL. */
+			emojiUrl?: string | null;
 		};
 		WeightStyleLinkedDto: {
 			/** Format: int32 */
@@ -2908,7 +2994,7 @@ export interface components {
 			isUserSubscription: boolean;
 		};
 		/** @enum {integer} */
-		ProductType: 2 | 3 | 5 | 6;
+		ProductType: 2 | 3 | 5 | 6 | -1;
 		UnlockedProductFeaturesDto: {
 			/**
 			 * Format: int32
@@ -2925,6 +3011,8 @@ export interface components {
 			hideShopPromotions?: boolean | null;
 			/** @description Show "More Info" on weight command by default. */
 			moreInfoDefault?: boolean | null;
+			/** @description Ability to have custom name emoji for the user. */
+			customEmoji?: boolean | null;
 			/**
 			 * Format: int32
 			 * @description Maximum number of events that can be created in a month. (For guilds)
@@ -2945,6 +3033,10 @@ export interface components {
 		};
 		SearchRequest: Record<string, never>;
 		UpdateUserSettingsDto: {
+			/** @description Custom name prefix */
+			prefix?: string | null;
+			/** @description Custom name suffix */
+			suffix?: string | null;
 			/** @description Configurated features for the user */
 			features?: components['schemas']['ConfiguredProductFeaturesDto'] | null;
 			/**
@@ -2952,6 +3044,11 @@ export interface components {
 			 * @description Selected weight style for the user
 			 */
 			weightStyleId?: number | null;
+			/**
+			 * Format: int32
+			 * @description Selected leaderboard style for the user
+			 */
+			leaderboardStyleId?: number | null;
 		};
 		EditUserBadgeDto: {
 			/** Format: int32 */
@@ -3039,6 +3136,8 @@ export interface components {
 			avatar: string;
 			/** @description Primary Minecraft IGN */
 			ign: string;
+			/** @description Formatted Primary Minecraft IGN */
+			fIgn?: string | null;
 			/** @description Primary Minecraft UUID */
 			uuid: string;
 			/** @description List of user roles */
@@ -3385,8 +3484,6 @@ export interface components {
 			participants: number;
 		};
 		SkyBlockYearRequest: Record<string, never>;
-		GetEntitlementsRequest: Record<string, never>;
-		UserEntitlementRequest: Record<string, never>;
 		AddTeamMemberRequest: Record<string, never>;
 		AdminEventMemberDto: {
 			playerUuid?: string | null;
@@ -4154,6 +4251,8 @@ export interface components {
 			};
 		};
 		GetProfileRankRequest: Record<string, never>;
+		GetEntitlementsRequest: Record<string, never>;
+		UserEntitlementRequest: Record<string, never>;
 		LinkedAccountsDto: {
 			selectedUuid?: string | null;
 			players: components['schemas']['PlayerDataDto'][];
@@ -4208,6 +4307,8 @@ export interface components {
 			heldItem?: string | null;
 			candyUsed: number;
 			skin?: string | null;
+			/** Format: int32 */
+			level: number;
 		};
 		UnparsedApiDataDto: {
 			/** Format: int32 */
@@ -4342,23 +4443,56 @@ export interface components {
 			accessories: components['schemas']['ItemDto'][];
 		};
 		ItemDto: {
-			/** Format: int32 */
+			/**
+			 * Format: int32
+			 * @description Old Minecraft id of the item
+			 */
 			id: number;
-			/** Format: byte */
+			/**
+			 * Format: byte
+			 * @description Minecraft stack count of the item
+			 */
 			count: number;
+			/** @description Skyblock ID of the item */
 			skyblockId?: string | null;
+			/** @description Item UUID to uniquely identify a specific instance of this item */
 			uuid?: string | null;
+			/** @description Item name, first line of the lore */
 			name?: string | null;
+			/** @description List of item lore in order */
 			lore?: string[] | null;
+			/** @description Applied enchantments with their levels */
 			enchantments?: {
 				[key: string]: number;
 			} | null;
+			/** @description ExtraAttributes not included elsewhere */
 			attributes?: {
 				[key: string]: string;
 			} | null;
-			gems?: {
+			/** @description ExtraAtrributes.Attributes for attribute shards */
+			itemAttributes?: {
 				[key: string]: string;
 			} | null;
+			/** @description Applied gems with gem rarity, null for an unlocked gem slot without a gem */
+			gems?: {
+				[key: string]: string | null;
+			} | null;
+			/** @description Pet info if item is a pet */
+			petInfo?: components['schemas']['ItemPetInfoDto'] | null;
+		};
+		ItemPetInfoDto: {
+			type: string;
+			active: boolean;
+			/** Format: decimal */
+			exp: number;
+			/** Format: int32 */
+			level: number;
+			tier: string;
+			/** Format: int32 */
+			candyUsed: number;
+			heldItem?: string | null;
+		} & {
+			[key: string]: unknown;
 		};
 		SkillsDto: {
 			/** Format: double */
@@ -4438,6 +4572,68 @@ export interface components {
 			name: string;
 			selected: boolean;
 		};
+		AuctionHouseDto: {
+			items: {
+				[key: string]: components['schemas']['AuctionItemDto'][];
+			};
+		};
+		AuctionItemDto: {
+			skyblockId: string;
+			variantKey: string;
+			/** @description Data used to generate variant key (easier to parse) */
+			variedBy: components['schemas']['AuctionItemVariation'];
+			/**
+			 * Format: decimal
+			 * @description Lowest price seen recently (excluding outliers)
+			 */
+			lowest: number;
+			/**
+			 * Format: int32
+			 * @description Volume of prices used to get the lowest recent price
+			 */
+			lowestVolume: number;
+			/**
+			 * Format: decimal
+			 * @description Lowest price seen in 3 days (excluding outliers)
+			 */
+			lowest3Day: number;
+			/**
+			 * Format: int32
+			 * @description Volume of prices used to get the lowest 3 day price
+			 */
+			lowest3DayVolume: number;
+			/**
+			 * Format: decimal
+			 * @description Lowest price seen in 7 days (excluding outliers)
+			 */
+			lowest7Day: number;
+			/**
+			 * Format: int32
+			 * @description Volume of prices ued to get lowest 3 day price
+			 */
+			lowest7DayVolume: number;
+		};
+		AuctionItemVariation: {
+			rarity?: string | null;
+			enchantments?: {
+				[key: string]: number;
+			} | null;
+			pet?: string | null;
+			petLevel?: components['schemas']['AuctionItemVariation_PetLevelGroup'] | null;
+			itemAttributes?: {
+				[key: string]: string;
+			} | null;
+			extra?: {
+				[key: string]: string;
+			} | null;
+		};
+		AuctionItemVariation_PetLevelGroup: {
+			key: string;
+			/** Format: int32 */
+			min: number;
+			/** Format: int32 */
+			max: number;
+		};
 		GetBazaarProductResponse: {
 			productId: string;
 			product: components['schemas']['BazaarProductSummaryDto'];
@@ -4452,7 +4648,7 @@ export interface components {
 			npc: number;
 			/**
 			 * Format: double
-			 * @description Instamt Sell price taken directly from most recently fetched data
+			 * @description Instant Sell price taken directly from most recently fetched data
 			 */
 			sell: number;
 			/**
@@ -4496,6 +4692,12 @@ export interface components {
 			products: {
 				[key: string]: components['schemas']['BazaarProductSummaryDto'];
 			};
+		};
+		GetItemsFromBytesResponse: {
+			items: (components['schemas']['ItemDto'] | null)[];
+		};
+		GetItemsFromBytesRequest: {
+			bytes: string;
 		};
 		GetSkyblockItemsResponse: {
 			items: {
@@ -4550,12 +4752,16 @@ export interface components {
 			item_id?: string | null;
 			/** Format: int32 */
 			coins: number;
+		} & {
+			[key: string]: unknown;
 		};
 		ItemRequirement: {
 			type: string;
 			skill?: string | null;
 			/** Format: int32 */
 			level: number;
+		} & {
+			[key: string]: unknown;
 		};
 		ItemMuseumData: {
 			/** Format: int32 */
@@ -4568,6 +4774,8 @@ export interface components {
 				[key: string]: number;
 			} | null;
 			game_stage?: string | null;
+		} & {
+			[key: string]: unknown;
 		};
 		DungeonItemConversionCost: {
 			essence_type?: string | null;
@@ -4600,6 +4808,7 @@ export interface components {
 			/** @description Data from the Hypixel items endpoint */
 			data?: components['schemas']['ItemResponse'] | null;
 			bazaar?: components['schemas']['BazaarProductSummaryDto'] | null;
+			auctions?: components['schemas']['AuctionItemDto'][] | null;
 		};
 		/** @example {
 		 *       "items": [
@@ -4609,9 +4818,14 @@ export interface components {
 		 *       ]
 		 *     } */
 		GetSpecifiedSkyblockItemsRequest: {
+			/** @example [
+			 *       "NETHER_STALK",
+			 *       "ENCHANTED_NETHER_STALK",
+			 *       "MUTANT_NETHER_STALK"
+			 *     ] */
 			items: string[];
 		};
-		SkybProductRequest: Record<string, never>;
+		SkyblockProductRequest: Record<string, never>;
 		AddProductToCategoryRequest: Record<string, never>;
 		CreateCategoryDto: {
 			title: string;
@@ -5294,6 +5508,15 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content?: never;
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
 			};
 			/** @description Unauthorized */
 			401: {
@@ -6627,7 +6850,10 @@ export interface operations {
 			query?: never;
 			header?: never;
 			path: {
-				/** @description A contest key in the format from the Hypixel API */
+				/**
+				 * @description A contest key in the format from the Hypixel API
+				 * @example 285:2_11:CACTUS
+				 */
 				contestKey: string;
 			};
 			cookie?: never;
@@ -6932,147 +7158,6 @@ export interface operations {
 				content: {
 					'application/problem+json': components['schemas']['ErrorResponse'];
 				};
-			};
-		};
-	};
-	EliteAPIFeaturesEntitlementsGetEntitlementsGetEntitlementsEndpoint: {
-		parameters: {
-			query?: {
-				target?: components['schemas']['EntitlementTarget'] | null;
-			};
-			header?: never;
-			path: {
-				/** @description Discord Snowflake ID of the requested resource (guild, user, etc.) */
-				discordId: number;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Success */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['EntitlementDto'][];
-				};
-			};
-			/** @description Bad Request */
-			400: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/problem+json': components['schemas']['ErrorResponse'];
-				};
-			};
-			/** @description Unauthorized */
-			401: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-			/** @description Forbidden */
-			403: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-		};
-	};
-	EliteAPIFeaturesEntitlementsGrantTestEntitlementGrantTestEntitlementEndpoint: {
-		parameters: {
-			query?: {
-				target?: components['schemas']['EntitlementTarget'] | null;
-			};
-			header?: never;
-			path: {
-				/** @description Discord Snowflake ID of the requested resource (guild, user, etc.) */
-				discordId: number;
-				productId: number;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description No Content */
-			204: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-			/** @description Bad Request */
-			400: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/problem+json': components['schemas']['ErrorResponse'];
-				};
-			};
-			/** @description Unauthorized */
-			401: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-			/** @description Forbidden */
-			403: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-		};
-	};
-	EliteAPIFeaturesEntitlementsRemoveTestEntitlementRemoveTestEntitlementEndpoint: {
-		parameters: {
-			query?: {
-				target?: components['schemas']['EntitlementTarget'] | null;
-			};
-			header?: never;
-			path: {
-				discordId: number;
-				productId: number;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description No Content */
-			204: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-			/** @description Bad Request */
-			400: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/problem+json': components['schemas']['ErrorResponse'];
-				};
-			};
-			/** @description Unauthorized */
-			401: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-			/** @description Forbidden */
-			403: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
 			};
 		};
 	};
@@ -8516,6 +8601,7 @@ export interface operations {
 			query?: never;
 			header?: never;
 			path: {
+				/** @example 7da0c47581dc42b4962118f8049147b7 */
 				profileUuid: string;
 			};
 			cookie?: never;
@@ -8554,6 +8640,7 @@ export interface operations {
 			query?: never;
 			header?: never;
 			path: {
+				/** @example 7da0c47581dc42b4962118f8049147b7 */
 				playerUuid: string;
 			};
 			cookie?: never;
@@ -8590,16 +8677,27 @@ export interface operations {
 	EliteAPIFeaturesGraphsGetAdminCropGraphsGetAdminCropGraphsEndpoint: {
 		parameters: {
 			query?: {
-				/** @description Unix timestamp in seconds for the start of the data to return */
+				/**
+				 * @description Unix timestamp in seconds for the start of the data to return
+				 * @example 0
+				 */
 				from?: number | null;
-				/** @description Amount of days after the "from" timestamp to include */
+				/**
+				 * @description Amount of days after the "from" timestamp to include
+				 * @example 7
+				 */
 				days?: number | null;
-				/** @description Data points returned per 24-hour period */
+				/**
+				 * @description Data points returned per 24-hour period
+				 * @example 4
+				 */
 				perDay?: number | null;
 			};
 			header?: never;
 			path: {
+				/** @example 7da0c47581dc42b4962118f8049147b7 */
 				playerUuid: string;
+				/** @example 7da0c47581dc42b4962118f8049147b7 */
 				profileUuid: string;
 			};
 			cookie?: never;
@@ -8643,13 +8741,18 @@ export interface operations {
 	EliteAPIFeaturesGraphsGetAdminSkillGraphsGetAdminSkillGraphsEndpoint: {
 		parameters: {
 			query?: {
+				/** @example 0 */
 				from?: number | null;
+				/** @example 7 */
 				days?: number | null;
+				/** @example 4 */
 				perDay?: number | null;
 			};
 			header?: never;
 			path: {
+				/** @example 7da0c47581dc42b4962118f8049147b7 */
 				playerUuid: string;
+				/** @example 7da0c47581dc42b4962118f8049147b7 */
 				profileUuid: string;
 			};
 			cookie?: never;
@@ -8693,13 +8796,18 @@ export interface operations {
 	EliteAPIFeaturesGraphsGetCropGraphsGetCropGraphsEndpoint: {
 		parameters: {
 			query?: {
+				/** @example 0 */
 				from?: number | null;
+				/** @example 7 */
 				days?: number | null;
+				/** @example 4 */
 				perDay?: number | null;
 			};
 			header?: never;
 			path: {
+				/** @example 7da0c47581dc42b4962118f8049147b7 */
 				playerUuid: string;
+				/** @example 7da0c47581dc42b4962118f8049147b7 */
 				profileUuid: string;
 			};
 			cookie?: never;
@@ -8729,13 +8837,18 @@ export interface operations {
 	EliteAPIFeaturesGraphsGetSkillGraphsGetSkillGraphsEndpoint: {
 		parameters: {
 			query?: {
+				/** @example 0 */
 				from?: number | null;
+				/** @example 7 */
 				days?: number | null;
+				/** @example 4 */
 				perDay?: number | null;
 			};
 			header?: never;
 			path: {
+				/** @example 7da0c47581dc42b4962118f8049147b7 */
 				playerUuid: string;
+				/** @example 7da0c47581dc42b4962118f8049147b7 */
 				profileUuid: string;
 			};
 			cookie?: never;
@@ -9512,6 +9625,42 @@ export interface operations {
 			};
 		};
 	};
+	EliteAPIFeaturesGuildsUserRequestRefreshRequestGuildRefreshEndpoint: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				discordId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
 	EliteAPIFeaturesGuildsUserSetAdminRoleSetAdminRoleEndpoint: {
 		parameters: {
 			query?: never;
@@ -9944,6 +10093,147 @@ export interface operations {
 			};
 		};
 	};
+	EliteAPIFeaturesMonetizationEndpointsGetEntitlementsGetEntitlementsEndpoint: {
+		parameters: {
+			query?: {
+				target?: components['schemas']['EntitlementTarget'] | null;
+			};
+			header?: never;
+			path: {
+				/** @description Discord Snowflake ID of the requested resource (guild, user, etc.) */
+				discordId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['EntitlementDto'][];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	EliteAPIFeaturesMonetizationEndpointsGrantTestEntitlementGrantTestEntitlementEndpoint: {
+		parameters: {
+			query?: {
+				target?: components['schemas']['EntitlementTarget'] | null;
+			};
+			header?: never;
+			path: {
+				/** @description Discord Snowflake ID of the requested resource (guild, user, etc.) */
+				discordId: number;
+				productId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	EliteAPIFeaturesMonetizationEndpointsRemoveTestEntitlementRemoveTestEntitlementEndpoint: {
+		parameters: {
+			query?: {
+				target?: components['schemas']['EntitlementTarget'] | null;
+			};
+			header?: never;
+			path: {
+				discordId: number;
+				productId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
 	EliteAPIFeaturesPlayerGetLinkedAccountsGetLinkedAccountsEndpoint: {
 		parameters: {
 			query?: never;
@@ -10197,6 +10487,26 @@ export interface operations {
 			};
 		};
 	};
+	EliteAPIFeaturesResourcesAuctionsEndpointsGetAuctionHouseProductsEndpoint: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AuctionHouseDto'];
+				};
+			};
+		};
+	};
 	EliteAPIFeaturesResourcesBazaarEndpointsGetBazaarProductEndpoint: {
 		parameters: {
 			query?: never;
@@ -10235,6 +10545,30 @@ export interface operations {
 				};
 				content: {
 					'application/json': components['schemas']['GetBazaarProductsResponse'];
+				};
+			};
+		};
+	};
+	EliteAPIFeaturesResourcesItemsEndpointsGetItemsFromBytesEndpoint: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['GetItemsFromBytesRequest'];
+			};
+		};
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetItemsFromBytesResponse'];
 				};
 			};
 		};
@@ -10292,7 +10626,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesResourcesItemsEndpointsSkybProductEndpoint: {
+	EliteAPIFeaturesResourcesItemsEndpointsSkyblockProductEndpoint: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10947,6 +11281,42 @@ export interface operations {
 			};
 			/** @description Forbidden */
 			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	EliteAPIFeaturesShopProductsClaimProductClaimProductEndpoint: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				discordId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
 				headers: {
 					[name: string]: unknown;
 				};
