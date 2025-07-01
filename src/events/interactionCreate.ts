@@ -98,9 +98,13 @@ async function OnAutocompleteInteraction(interaction: AutocompleteInteraction) {
 	if (interaction.responded) return;
 
 	const command = GetCommand(interaction.commandName);
-	if (!command || command instanceof CommandGroup) return;
+	if (!command) return;
 
 	try {
+		if (command instanceof CommandGroup) {
+			await command.autocomplete(interaction);
+			return;
+		}
 		const auto = command.getAutocomplete(interaction);
 		await auto?.(interaction);
 	} catch (error) {
