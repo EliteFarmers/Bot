@@ -57,8 +57,8 @@ importers:
         specifier: ^0.1.10
         version: 0.1.10
       zod:
-        specifier: ^3.25.57
-        version: 3.25.67
+        specifier: ^4.0.0
+        version: 4.0.0
     devDependencies:
       '@biomejs/biome':
         specifier: 2.0.2
@@ -84,6 +84,7 @@ packages:
   '@biomejs/biome@2.0.2':
     resolution: {integrity: sha512-IEeXplI1jwI1NJLTW4Oj0ieyVaDtyAOnpZu567qd6JCBc64HmTSlmY9j/7lWK2cmfLvGv6fS6JNClT6VobzjmQ==}
     engines: {node: '>=14.21.3'}
+    deprecated: This version of Biome has a broken manifest and we don't recommend to use it. Please update to v2.0.4 or later.
     hasBin: true
 
   '@biomejs/cli-darwin-arm64@2.0.2':
@@ -1096,8 +1097,8 @@ packages:
   zlib-sync@0.1.10:
     resolution: {integrity: sha512-t7/pYg5tLBznL1RuhmbAt8rNp5tbhr+TSrJFnMkRtrGIaPJZ6Dc0uR4u3OoQI2d6cGlVI62E3Gy6gwkxyIqr/w==}
 
-  zod@3.25.67:
-    resolution: {integrity: sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==}
+  zod@4.0.0:
+    resolution: {integrity: sha512-9diLdTPc/L7w/5jI4C3gHYNiGHDV9IZYxo1e5LSD8cabi65WVTWWb+g2BGPEpUUCOxR4D+6O5B0AzyMdUAXwrw==}
 
 snapshots:
 
@@ -2124,4 +2125,4 @@ snapshots:
     dependencies:
       nan: 2.22.2
 
-  zod@3.25.67: {}
+  zod@4.0.0: {}
