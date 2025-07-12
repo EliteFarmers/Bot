@@ -1,5 +1,7 @@
+import { createCanvas } from '@napi-rs/canvas';
 import {
 	ActionRowBuilder,
+	AttachmentBuilder,
 	AutocompleteInteraction,
 	ButtonBuilder,
 	ButtonStyle,
@@ -89,10 +91,14 @@ export async function execute(
 
 	const components = await getFarmInfoComponents(design, farmSettings, settings);
 
+	const yaw = await fixDesignAngle(design.angle.yaw, farmSettings.direction);
+	const image = pitchAndYawImage({ pitch: design.angle.pitch, yaw }, farmSettings.direction);
+
 	const reply = await interaction.editReply({
 		components,
 		allowedMentions: { repliedUser: false },
 		flags: [MessageFlags.IsComponentsV2],
+		files: [image],
 	});
 
 	const collector = reply.createMessageComponentCollector({
@@ -122,6 +128,12 @@ export async function execute(
 
 		await inter.update({
 			components,
+			files: [
+				pitchAndYawImage(
+					{ pitch: design.angle.pitch, yaw: await fixDesignAngle(design.angle.yaw, farmSettings.direction) },
+					farmSettings.direction,
+				),
+			],
 		});
 
 		return;
@@ -174,6 +186,12 @@ async function getFarmInfoComponents(
 			`**Yaw**: ${yaw}, **Pitch**: ${design.angle.pitch}\n**Speed**: ${speed ?? '1.21 speed has not yet been determined'}${design.speed.depthStrider ? `\n**Depth Strider level**: ${design.speed.depthStrider}` : ''}`,
 		)
 		.addSeparator()
+		.addText(`**Max BPS**: \`${design.bps}\``)
+		.addImage(
+			'attachment://yaw-pitch.webp',
+			`Farm with [Yaw: ${yaw}, Pitch: ${design.angle.pitch}] while facing ${farmSettings.direction}`,
+		)
+		.addSeparator()
 		.addDescription(
 			`**bps**: ${design.bps}\n**Lane Time**: ${laneTimeMinutes !== 0 ? `${laneTimeMinutes}m ${laneTimeSeconds}s` : laneTimeSeconds + 's'}`,
 		);
@@ -183,7 +201,13 @@ async function getFarmInfoComponents(
 	}
 
 	if (resources) {
-		FarmDesignInfoComponent.addSeparator().addDescription(resources);
+		const youtube = design.resources?.find((r) => r.type === ResourceType.Video)?.source;
+		if (youtube) {
+			const id = youtube.split('/').pop();
+			FarmDesignInfoComponent.addImageSection(`https://img.youtube.com/vi/${id}/mqdefault.jpg`, resources);
+		} else {
+			FarmDesignInfoComponent.addSeparator().addDescription(resources);
+		}
 	}
 
 	if (notes) {
@@ -288,4 +312,68 @@ function directionYawOffset(from: Direction, to: Direction): number {
 
 function normalizeAngle(angle: number) {
 	return ((angle + 180) % 360) - 180;
+}
+
+function pitchAndYawImage(angle: { pitch: number; yaw: number }, direction: Direction = 'South') {
+	const bgWidth = 1200;
+	const bgHeight = 100;
+
+	const canvas = createCanvas(bgWidth, bgHeight);
+	const ctx = canvas.getContext('2d');
+
+	ctx.fillStyle = '#84baff';
+	ctx.rect(0, 0, bgWidth, bgHeight);
+	ctx.fill();
+
+	ctx.fillStyle = '#ffffff';
+	ctx.font = '65px "Open Sans"';
+	ctx.fillText(`F3 Angle: (${angle.yaw.toFixed(1)} / ${angle.pitch.toFixed(1)})`, 10, 72);
+
+	// Draw a basic compass shape in the right middle
+	ctx.fillStyle = '#bfbfbf';
+	ctx.beginPath();
+	ctx.arc(bgWidth - 60, bgHeight / 2, bgHeight / 2 - 10, 0, Math.PI * 2);
+	ctx.fill();
+	ctx.lineWidth = 4;
+	ctx.strokeStyle = '#ffffff';
+	ctx.stroke();
+
+	// 2. A rounded red line from the center of the circle to the top
+	ctx.strokeStyle = '#a20508';
+	ctx.beginPath();
+	switch (direction) {
+		case 'North':
+			ctx.moveTo(bgWidth - 60, bgHeight / 2);
+			ctx.lineTo(bgWidth - 60, bgHeight / 2 - 25);
+			break;
+		case 'East':
+			ctx.moveTo(bgWidth - 60, bgHeight / 2);
+			ctx.lineTo(bgWidth - 60 + 25, bgHeight / 2);
+			break;
+		case 'South':
+			ctx.moveTo(bgWidth - 60, bgHeight / 2);
+			ctx.lineTo(bgWidth - 60, bgHeight / 2 + 25);
+			break;
+		case 'West':
+			ctx.moveTo(bgWidth - 60, bgHeight / 2);
+			ctx.lineTo(bgWidth - 60 - 25, bgHeight / 2);
+			break;
+	}
+	ctx.lineWidth = 4;
+	ctx.lineCap = 'round';
+	ctx.stroke();
+
+	ctx.fillStyle = '#FFFFFF';
+	ctx.font = '14px "Open Sans"';
+
+	ctx.fillText('N', bgWidth - 64, bgHeight / 2 - 25);
+	ctx.fillText('E', bgWidth - 64 + 30, bgHeight / 2 + 4);
+	ctx.fillText('S', bgWidth - 64, bgHeight / 2 + 35);
+	ctx.fillText('W', bgWidth - 64 - 30, bgHeight / 2 + 4);
+
+	const attachment = new AttachmentBuilder(canvas.toBuffer('image/webp'), {
+		name: `yaw-pitch.webp`,
+	});
+
+	return attachment;
 }

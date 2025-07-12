@@ -41,11 +41,11 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		}
 
 		component
-			.addDescription(`### ${data.name}`)
+			.addText(`### ${data.name}`)
 			.addSectionComponents(
 				new SectionBuilder()
-					.addTextDisplayComponents((t) => t.setContent(`bps: ${data.bps}`))
-					.setButtonAccessory(new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel(data.name).setCustomId(id)),
+					.addTextDisplayComponents((t) => t.setContent(`Max BPS: \`${data.bps}\``))
+					.setButtonAccessory(new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel('View').setCustomId(id)),
 			);
 	});
 
