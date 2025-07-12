@@ -120,6 +120,24 @@ Link your Minecraft account so you no longer need to specify your player name! I
 
 <img src="https://github.com/user-attachments/assets/c0296ab1-85cc-4980-ab0a-91533cad8a2e" alt="verify" style="width:500px;"/>
 
+---
+### /farm info
+Get info on a specific farm design including, angles, speeds, tutorials and more.
+
+**Usage:** `/farm info` \
+`[design]: <design name>`
+
+<img src="" alt="farm info" style="width:500px;"/>
+
+---
+### /farm search
+Search for farm designs for a specific crop.
+
+**Usage:** `/farm search` \
+`[crop]: <crop>`
+
+<img src="" alt="farm search" style="width:500px;"/>
+
 ## Info Commands
 
 ### /info

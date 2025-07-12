@@ -6,6 +6,7 @@ import {
 	ButtonStyle,
 	ContainerBuilder,
 	Interaction,
+	MediaGalleryItemBuilder,
 	SectionBuilder,
 	SeparatorSpacingSize,
 	TextDisplayBuilder,
@@ -66,6 +67,30 @@ export class EliteContainer extends ContainerBuilder {
 		return this;
 	}
 
+	addImage(url: string, altText?: string) {
+		const item = new MediaGalleryItemBuilder().setURL(url);
+
+		if (altText) {
+			item.setDescription(altText);
+		}
+
+		this.addMediaGalleryComponents((media) => media.addItems(item));
+		return this;
+	}
+
+	addImages(images: { url: string; altText?: string }[]) {
+		const items = images.map((image) => {
+			const item = new MediaGalleryItemBuilder().setURL(image.url);
+			if (image.altText) {
+				item.setDescription(image.altText);
+			}
+			return item;
+		});
+
+		this.addMediaGalleryComponents((media) => media.addItems(...items));
+		return this;
+	}
+
 	addFooter(separator = true, backButton = '') {
 		if (separator) {
 			this.addSeparator();
@@ -104,6 +129,19 @@ export class EliteContainer extends ContainerBuilder {
 		if (textComponents.length > 0) {
 			section.addTextDisplayComponents(...textComponents.map((text) => new TextDisplayBuilder().setContent(text)));
 		}
+
+		this.addSectionComponents(section);
+		return this;
+	}
+
+	addImageSection(url: string, ...textComponents: string[]) {
+		const section = new SectionBuilder().setId(10000 + Math.floor(Math.random() * 90000));
+
+		if (textComponents.length > 0) {
+			section.addTextDisplayComponents(...textComponents.map((text) => new TextDisplayBuilder().setContent(text)));
+		}
+
+		section.setThumbnailAccessory((a) => a.setURL(url));
 
 		this.addSectionComponents(section);
 		return this;
