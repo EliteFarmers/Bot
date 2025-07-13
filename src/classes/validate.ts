@@ -71,7 +71,7 @@ export async function getAccount(
 	playerId = account.name;
 
 	const profile = profileId
-		? account.profiles?.find((p) => p?.profileName?.toLowerCase() === profileId.toLowerCase())
+		? account.profiles?.find((p) => !p.deleted && p?.profileName?.toLowerCase() === profileId.toLowerCase())
 		: (account.profiles?.find((p) => p.selected) ?? account.profiles?.[0]);
 
 	if (!profile?.profileId || !profile.profileName) {
