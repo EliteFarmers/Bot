@@ -391,7 +391,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	function getGeneralFortuneProgress() {
 		const total = player.getProgress();
-		const current = player.fortune;
+		const current = total.reduce((acc, curr) => acc + curr.fortune, 0);
 		const max = total.reduce((acc, curr) => acc + curr.maxFortune, 0);
 
 		const container = new EliteContainer(settings)
