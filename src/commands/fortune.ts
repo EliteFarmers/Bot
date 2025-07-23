@@ -79,6 +79,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const farmingLevel = getLevel(member?.skills?.farming ?? 0, LEVELING_XP, 50 + (member?.jacob.perks?.levelCap ?? 0));
 
+	const saved = account.settings.fortune?.accounts?.[account.id]?.[profile.profileId];
+
 	const options: PlayerOptions = {
 		collection: member.collections,
 		farmingXp: member.skills?.farming ?? 0,
@@ -104,6 +106,9 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		milestones: getCropMilestoneLevels(member.garden?.crops ?? {}),
 		refinedTruffles: member.chocolateFactory?.refinedTrufflesConsumed,
 		cocoaFortuneUpgrade: member.chocolateFactory?.cocoaFortuneUpgrades,
+		exportableCrops: saved?.exported ?? {},
+		attributes: saved?.attributes ?? {},
+		communityCenter: saved?.communityCenter ?? 0,
 	};
 
 	const player = createFarmingPlayer(options);
@@ -128,13 +133,16 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const sourceProgress = (source: FortuneSourceProgress) => {
 		const total = source.fortune;
 		const max = source.maxFortune;
-		const missing = source.api === false ? ':warning:' : '**' + total.toLocaleString() + '**';
+		const missing =
+			source.api === false && !total
+				? ':warning:'
+				: (source.api === false ? ':warning: **' : '** ') + total.toLocaleString() + '**';
 
 		const name = source.wiki ? `${source.name} [⧉](${source.wiki})` : source.name;
 
 		return (
 			`**${name}** \n` +
-			(source.api === false
+			(source.api === false && !total
 				? `-# Configure [on elitebot.dev!](${url})  ${missing} **/ ${max.toLocaleString()}** ${fortuneEmoji}`
 				: `${progressBar(Math.min(total / max, 1), 10)}  ${missing} / ${max.toLocaleString()} ${fortuneEmoji}`)
 		);
