@@ -79,7 +79,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const farmingLevel = getLevel(member?.skills?.farming ?? 0, LEVELING_XP, 50 + (member?.jacob.perks?.levelCap ?? 0));
 
-	const saved = account.settings.fortune?.accounts?.[account.id]?.[profile.profileId];
+	const saved = account.settings?.fortune?.accounts?.[account.id]?.[profile.profileId];
 
 	const options: PlayerOptions = {
 		collection: member.collections,
