@@ -24,7 +24,7 @@
 		"@date-fns/utc": "^2.1.0",
 		"@napi-rs/canvas": "^0.1.71",
 		"@sentry/cli": "^2.46.0",
-		"@sentry/node": "^8.55.0",
+		"@sentry/node": "^9.0.0",
 		"@sentry/profiling-node": "^8.55.0",
 		"@types/amqplib": "^0.10.7",
 		"@types/node": "^20.19.0",
