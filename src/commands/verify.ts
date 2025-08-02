@@ -58,7 +58,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 
 	try {
 		const { error, response } = await LinkAccount(interaction.user.id, playerName);
-		const errorMsg = error?.errors?.generalErrors?.join('\n') || error?.message || 'Please try again later.';
+		const errorMsg = error?.errors.map((err) => err.reason).join('\n') || error?.detail || 'Please try again later.';
 
 		if (!response.ok) {
 			const embed = ErrorEmbed('Failed to Link Account!')
