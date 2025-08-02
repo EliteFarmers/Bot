@@ -3026,6 +3026,8 @@ export interface components {
 			locale?: string | null;
 			/** @description Discord avatar URL hash */
 			avatar?: string | null;
+			/** @description Discord banner URL hash */
+			banner?: string | null;
 			settings: components['schemas']['UserSettingsDto'];
 			/** @description Purchased entitlements from the Discord store */
 			entitlements: components['schemas']['EntitlementDto'][];
@@ -3139,32 +3141,6 @@ export interface components {
 			badges: components['schemas']['UserBadgeDto'][];
 			skin: components['schemas']['MinecraftSkinDto'];
 		};
-		SearchRequest: Record<string, never>;
-		UpdateUserSettingsDto: {
-			/** @description Custom name prefix */
-			prefix?: string | null;
-			/** @description Custom name suffix */
-			suffix?: string | null;
-			/** @description Configurated features for the user */
-			features?: components['schemas']['ConfiguredProductFeaturesDto'] | null;
-			/**
-			 * Format: int32
-			 * @description Selected weight style for the user
-			 */
-			weightStyleId?: number | null;
-			/**
-			 * Format: int32
-			 * @description Selected leaderboard style for the user
-			 */
-			leaderboardStyleId?: number | null;
-		};
-		EditUserBadgeDto: {
-			/** Format: int32 */
-			badgeId: number;
-			visible?: boolean | null;
-			/** Format: int32 */
-			order?: number | null;
-		};
 		/** @description RFC7807 compatible problem details/ error response class. this can be used by configuring startup like so:
 		 *     app.UseFastEndpoints(c => c.Errors.UseProblemDetails()) */
 		ProblemDetails: {
@@ -3201,6 +3177,37 @@ export interface components {
 			code?: string | null;
 			/** @description the severity of the error */
 			severity?: string | null;
+		};
+		SearchRequest: Record<string, never>;
+		UpdateUserSettingsDto: {
+			/** @description Custom name prefix */
+			prefix?: string | null;
+			/** @description Custom name suffix */
+			suffix?: string | null;
+			/** @description Configurated features for the user */
+			features?: components['schemas']['ConfiguredProductFeaturesDto'] | null;
+			/**
+			 * Format: int32
+			 * @description Selected weight style for the user
+			 */
+			weightStyleId?: number | null;
+			/**
+			 * Format: int32
+			 * @description Selected leaderboard style for the user
+			 */
+			leaderboardStyleId?: number | null;
+			/**
+			 * Format: int32
+			 * @description Selected name style for the user
+			 */
+			nameStyleId?: number | null;
+		};
+		EditUserBadgeDto: {
+			/** Format: int32 */
+			badgeId: number;
+			visible?: boolean | null;
+			/** Format: int32 */
+			order?: number | null;
 		};
 		UserRoleRequest: Record<string, never>;
 		EventIdRequest: Record<string, never>;
@@ -3579,6 +3586,7 @@ export interface components {
 			discriminator?: string | null;
 			avatar?: string | null;
 			locale?: string | null;
+			banner?: string | null;
 		};
 		IncomingGuildDto: {
 			id?: string | null;
@@ -5088,6 +5096,7 @@ export interface components {
 			images: components['schemas']['ImageAttachmentDto'][];
 			products: components['schemas']['ParentProductDto'][];
 			data?: components['schemas']['WeightStyleDataDto'] | null;
+			leaderboard?: components['schemas']['LeaderboardStyleDataDto'] | null;
 		};
 		ParentProductDto: {
 			id: string;
@@ -5127,6 +5136,7 @@ export interface components {
 		WeightStyleBackgroundDto: {
 			size?: components['schemas']['WeightStylePositionDto'] | null;
 			fill?: string | null;
+			align?: string | null;
 			rects?: components['schemas']['WeightStyleBackgroundRectDto'][] | null;
 			imageUrl?: string | null;
 			/** Format: int32 */
@@ -5186,6 +5196,37 @@ export interface components {
 			padding?: number | null;
 			/** Format: int32 */
 			radius?: number | null;
+		};
+		LeaderboardStyleDataDto: {
+			background?: components['schemas']['LeaderboardStyleLayerDto'] | null;
+			overlay?: components['schemas']['LeaderboardStyleLayerDto'] | null;
+			/** Format: double */
+			gradientOpacity?: number | null;
+			gradientColor?: string | null;
+			font?: string | null;
+			name?: components['schemas']['LeaderboardStyleTextDto'] | null;
+			score?: components['schemas']['LeaderboardStyleTextDto'] | null;
+			rank?: components['schemas']['LeaderboardStyleTextDto'] | null;
+			subtitle?: components['schemas']['LeaderboardStyleTextDto'] | null;
+		};
+		LeaderboardStyleLayerDto: {
+			imageUrl?: string | null;
+			imageOpacity?: string | null;
+			fillColor?: string | null;
+			/** Format: double */
+			fillOpacity?: number | null;
+			borderColor?: string | null;
+			/** Format: double */
+			borderOpacity?: number | null;
+			align?: string | null;
+		};
+		LeaderboardStyleTextDto: {
+			color?: string | null;
+			shadowColor?: string | null;
+			/** Format: double */
+			shadowOpacity?: number | null;
+			/** Format: int32 */
+			fontWeight?: number | null;
 		};
 		GetStyleRequest: Record<string, never>;
 		WeightsDto: {
@@ -5297,15 +5338,8 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					'application/problem+json': components['schemas']['ErrorResponse'];
+					'application/problem+json': components['schemas']['ProblemDetails'];
 				};
-			};
-			/** @description Unauthorized */
-			401: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
 			};
 		};
 	};
@@ -5333,15 +5367,8 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					'application/problem+json': components['schemas']['ErrorResponse'];
+					'application/problem+json': components['schemas']['ProblemDetails'];
 				};
-			};
-			/** @description Unauthorized */
-			401: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
 			};
 		};
 	};
@@ -5576,15 +5603,8 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					'application/problem+json': components['schemas']['ErrorResponse'];
+					'application/problem+json': components['schemas']['ProblemDetails'];
 				};
-			};
-			/** @description Unauthorized */
-			401: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
 			};
 		};
 	};
@@ -6067,19 +6087,14 @@ export interface operations {
 				};
 				content?: never;
 			};
-			/** @description Unauthorized */
-			401: {
+			/** @description Bad Request */
+			400: {
 				headers: {
 					[name: string]: unknown;
 				};
-				content?: never;
-			};
-			/** @description Forbidden */
-			403: {
-				headers: {
-					[name: string]: unknown;
+				content: {
+					'application/problem+json': components['schemas']['ProblemDetails'];
 				};
-				content?: never;
 			};
 		};
 	};
@@ -6146,19 +6161,14 @@ export interface operations {
 				};
 				content?: never;
 			};
-			/** @description Unauthorized */
-			401: {
+			/** @description Bad Request */
+			400: {
 				headers: {
 					[name: string]: unknown;
 				};
-				content?: never;
-			};
-			/** @description Forbidden */
-			403: {
-				headers: {
-					[name: string]: unknown;
+				content: {
+					'application/problem+json': components['schemas']['ProblemDetails'];
 				};
-				content?: never;
 			};
 		};
 	};
@@ -6596,7 +6606,7 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					'application/problem+json': components['schemas']['ErrorResponse'];
+					'application/problem+json': components['schemas']['ProblemDetails'];
 				};
 			};
 		};
@@ -6626,7 +6636,7 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					'application/problem+json': components['schemas']['ErrorResponse'];
+					'application/problem+json': components['schemas']['ProblemDetails'];
 				};
 			};
 		};
@@ -6656,7 +6666,7 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					'application/problem+json': components['schemas']['ErrorResponse'];
+					'application/problem+json': components['schemas']['ProblemDetails'];
 				};
 			};
 		};

@@ -185,7 +185,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	let details = settings
 		? `You can view your rates with your farming gear on the [website here](<https://elitebot.dev/@${interaction.user.id}/rates>)!`
-		: `You can view your rates with your farming gear on the "**Rates**" tab of your [online stats](<https://elitebot.dev/>)!`;
+		: `You can view your rates with your farming gear on the "**Fortune**" tab of your [online stats](<https://elitebot.dev/>)!`;
 
 	if (fortuneInput !== undefined) {
 		details +=
