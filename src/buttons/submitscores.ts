@@ -12,7 +12,7 @@ import {
 	TextDisplayBuilder,
 } from 'discord.js';
 import { components } from '../api/api.js';
-import { FetchAccount, FetchContests, FetchGuildJacob, UpdateGuildJacob } from '../api/elite.js';
+import { FetchAccount, FetchContests, FetchGuildJacob, FetchSelectedProfile, UpdateGuildJacob } from '../api/elite.js';
 import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 import { GetReadableDate } from '../classes/SkyblockDate.js';
@@ -155,12 +155,15 @@ async function execute(interaction: ButtonInteraction) {
 		return;
 	}
 
-	const contestRespnse = await FetchContests(account.id)
+	const { data: member } = await FetchSelectedProfile(account.id).catch(() => ({ data: undefined }));
+	const lastUpdated = member?.lastUpdated ?? Math.floor(Date.now() / 1000) - 15 * 60;
+
+	const contestResponse = await FetchContests(account.id)
 		.then((data) => data.data)
 		.catch(() => undefined);
-	const contests = contestRespnse ?? [];
+	const contests = contestResponse ?? [];
 
-	if (!contestRespnse) {
+	if (!contestResponse) {
 		const embed = ErrorEmbed('Contests not found!').setDescription(
 			"Your data wasn't able to be fetched!\nThis is likely an issue with the Elite API, please try again later.",
 		);
@@ -175,6 +178,8 @@ async function execute(interaction: ButtonInteraction) {
 		interaction.editReply({ embeds: [embed] });
 		return;
 	}
+
+	let newContest: (typeof contests)[number] | undefined;
 
 	const validContests = contests.filter((c) => {
 		const time = c.timestamp;
@@ -194,13 +199,27 @@ async function execute(interaction: ButtonInteraction) {
 
 		if (guild.excludedParticipations?.includes(`${c.timestamp}-${c.crop}-${account.id}`)) return false;
 
+		// Check that it has been at least 22 minutes since the contest ended, unless the contest has a medal
+		if (lastUpdated - time < 22 * 60 && !c.medal) {
+			newContest = c;
+			return false;
+		}
+
 		return true;
 	});
 
 	if (validContests.length === 0) {
 		const embed = WarningEmbed('No Valid Contests Found!').setDescription(
-			`No contests found fit the criteria for this leaderboard.\nIf you have participated in a valid contest, please wait up to 10 minutes (until your profile can be fetched again)`,
+			`No contests found fit the criteria for this leaderboard.\nIf you have participated in a valid contest, please wait up to 15 minutes (until your profile can be fetched again)`,
 		);
+
+		if (newContest) {
+			embed.addFields({
+				name: 'Recent Contest Found',
+				value: `A recent contest was found, but it might not be fully updated yet. Please wait until your profile updates again then try again. (This might take up to 15 minutes)`,
+			});
+		}
+
 		interaction.editReply({ embeds: [embed] });
 		return;
 	}
@@ -432,6 +451,14 @@ async function execute(interaction: ButtonInteraction) {
 		const embed = WarningEmbed('No New Records Set!').setDescription(
 			'You did not set any new records.\nIf you think this is a mistake, please wait 10 minutes and try again, otherwise contact `kaeso.dev` on Discord.',
 		);
+
+		if (newContest) {
+			embed.addFields({
+				name: 'Recent Contest Found',
+				value: `A recent contest was found, but it might not be fully updated yet. Please wait until your profile updates again then try again. (This might take up to 15 minutes)`,
+			});
+		}
+
 		interaction.editReply({ embeds: [embed] });
 		// return; Update the leaderboard even if no new records were set (to update changes from the site)
 	} else {
