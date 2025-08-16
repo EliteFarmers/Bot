@@ -20,6 +20,7 @@ import {
 	CommandAccess,
 	CommandBase,
 	CommandGroup,
+	CommandReference,
 	CommandType,
 	ContextMenuCommand,
 	EliteSlashCommandOption,
@@ -46,6 +47,7 @@ export class EliteCommand implements CommandBase {
 	declare options?: Record<string, EliteSlashCommandOption>;
 	declare subCommand: boolean;
 	declare parent?: CommandGroup;
+	declare reference: CommandReference;
 
 	get displayName() {
 		return this.parent ? this.parent?.name + ' ' + this.name : this.name;
@@ -60,6 +62,8 @@ export class EliteCommand implements CommandBase {
 		this.type = settings.type;
 		this.permissions = settings.permissions;
 		this.adminRoleOverride = settings.adminRoleOverride;
+
+		this.reference = new CommandReference(this.name);
 
 		this.execute = settings.execute;
 
@@ -314,6 +318,10 @@ export class EliteCommand implements CommandBase {
 			.join('\n');
 
 		return includeName ? `${commandString}\n${optionsString}` : optionsString;
+	}
+
+	public setId(id: string) {
+		this.reference = new CommandReference(this.name, id);
 	}
 }
 

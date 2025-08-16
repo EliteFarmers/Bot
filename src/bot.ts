@@ -6,7 +6,7 @@ import { ActivityType, Client, ClientEvents, Collection, Events, GatewayIntentBi
 import dotenv from 'dotenv';
 import path from 'path';
 import { ConnectToRedis } from './api/redis.js';
-import { CommandGroup, CronTask, EliteCommand } from './classes/commands/index.js';
+import { CommandGroup, CommandReferences, CronTask, EliteCommand } from './classes/commands/index.js';
 import { registerCommandGroups, registerFiles } from './classes/register.js';
 import { SignalRecieverOptions } from './classes/Signal.js';
 import { LoadWeightStyles } from './weight/custom.js';
@@ -19,6 +19,7 @@ export const client = new Client({
 
 export const commands = new Collection<string, CommandGroup | EliteCommand>();
 export const signals = new Collection<string, SignalRecieverOptions>();
+export const commandReferences = new CommandReferences();
 
 const deploying = process.argv.some((arg) => arg.includes('deploy'));
 
@@ -81,6 +82,20 @@ client.once(Events.ClientReady, async () => {
 
 	LoadWeightStyles();
 	setInterval(LoadWeightStyles, 1000 * 60 * 30); // Update weight styles every 30 minutes
+
+	// Load command references, getting ids from the running bot
+	const clientCommands = await client.application?.commands.fetch();
+	for (const command of commands.values()) {
+		const clientCommand = clientCommands?.find((cmd) => cmd.name === command.name);
+		if (!clientCommand?.id) continue;
+
+		if (command instanceof EliteCommand) {
+			command.setId(clientCommand?.id);
+			if (command.reference) {
+				commandReferences.set(command.name, command.reference);
+			}
+		}
+	}
 
 	console.log('Ready!');
 

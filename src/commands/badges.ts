@@ -8,6 +8,7 @@ import {
 	Interaction,
 } from 'discord.js';
 import { FetchAccount, GrantUserBadge, UserSettings } from '../api/elite.js';
+import { commandReferences } from '../bot.js';
 import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed } from '../classes/embeds.js';
 import { escapeIgn } from '../classes/Util.js';
@@ -102,7 +103,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 			if (!account?.id) {
 				const errorEmbed = ErrorEmbed('Failed to fetch account!').setDescription(
-					'Please make sure your account is linked with `/verify` and try again.',
+					`Please make sure your account is linked with ${commandReferences.get('link')} and try again.`,
 				);
 
 				await i.editReply({ embeds: [errorEmbed], components: [] });

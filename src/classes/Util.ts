@@ -337,12 +337,6 @@ export function CreateClipPath(ctx: SKRSContext2D, x1: number, y1: number, x2: n
 	ctx.closePath();
 }
 
-export function commandMd(client: Client, name: string) {
-	const command = client.application?.commands.cache.find((c) => c.name === name);
-	if (!command) return '`/' + name + '`';
-	return `</${name}:${command.id}>`;
-}
-
 export function removeColorCodes(str: string) {
 	return str.replace(/§[0-9a-fklmnor]/g, '');
 }

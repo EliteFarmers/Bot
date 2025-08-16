@@ -75,3 +75,34 @@ export interface CronTask {
 	cron: string;
 	execute: (client: Client) => void;
 }
+
+export class CommandReference {
+	declare id?: string;
+	declare name: string;
+
+	constructor(name: string, id?: string) {
+		this.id = id;
+		this.name = name;
+	}
+
+	public toString() {
+		if (!this.id) return `\`/${this.name}\``;
+		return `</${this.name}:${this.id}>`;
+	}
+}
+
+export class CommandReferences {
+	private references: Map<string, CommandReference>;
+
+	constructor() {
+		this.references = new Map();
+	}
+
+	public set(name: string, reference: CommandReference) {
+		this.references.set(name, reference);
+	}
+
+	public get(name: string): string {
+		return this.references.get(name)?.toString() ?? `\`/${name}\``;
+	}
+}

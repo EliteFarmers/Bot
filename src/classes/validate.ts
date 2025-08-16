@@ -46,7 +46,7 @@ export async function getAccount(
 				(profileId
 					? `You entered "${escapeIgn(profileId)}" as the \`profile\` option. Did you mean to specify the \`player\` parameter instead?\n\n`
 					: '') +
-					`In order to use this command without specifying a player name, you need to link your account with </verify:1135100641560248334> first!`,
+					`In order to use this command without specifying a player name, you need to link your account with </link:1135100641560248334> first!`,
 			);
 
 			return { success: false, embed };

@@ -112,13 +112,13 @@ View the top players for a specific contest.
 <img src="https://github.com/user-attachments/assets/34c61178-479b-4302-8399-6b468fc4eaaa" alt="contest" style="width:500px;"/>
 
 ---
-### /verify
-Link your Minecraft account so you no longer need to specify your player name! In order for this to work you must have your discord linked on Hypixel. Run the same command again to unlink.
+### /link
+Link your Minecraft account so you no longer need to specify your player name! In order for this to work you must have your discord linked on Hypixel.
 
-**Usage:** `/verify` \
+**Usage:** `/link` \
 `[player]: <ign>`
 
-<img src="https://github.com/user-attachments/assets/c0296ab1-85cc-4980-ab0a-91533cad8a2e" alt="verify" style="width:500px;"/>
+<img src="https://github.com/user-attachments/assets/c0296ab1-85cc-4980-ab0a-91533cad8a2e" alt="link" style="width:500px;"/>
 
 ## Info Commands
 

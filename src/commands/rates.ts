@@ -71,7 +71,8 @@ const command = new EliteCommand({
 export default command;
 
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
-	const fortuneInput = interaction.options.getInteger('fortune', false) ?? undefined;
+	const fortuneRaw = interaction.options.getInteger('fortune', false) ?? undefined;
+	const fortuneInput = fortuneRaw ? fortuneRaw : undefined;
 	const blocks = interaction.options.getInteger('time', false) ?? 72_000;
 	const reforge = interaction.options.getString('reforge', false) ?? 'bountiful';
 	const pet = interaction.options.getString('pet', false) ?? 'mooshroom';

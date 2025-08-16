@@ -13,6 +13,7 @@ import {
 } from 'discord.js';
 import { components } from '../api/api.js';
 import { FetchAccount, FetchContests, FetchGuildJacob, FetchSelectedProfile, UpdateGuildJacob } from '../api/elite.js';
+import { commandReferences } from '../bot.js';
 import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 import { GetReadableDate } from '../classes/SkyblockDate.js';
@@ -149,7 +150,7 @@ async function execute(interaction: ButtonInteraction) {
 
 	if (!account?.id || !account.name) {
 		const embed = ErrorEmbed('Account not found!').setDescription(
-			'You must link your account before submitting scores.\nUse the `/verify` command to link your account.',
+			`You must link your account before submitting scores.\nUse the ${commandReferences.get('link')} command to link your account.`,
 		);
 		interaction.editReply({ embeds: [embed] });
 		return;

@@ -92,7 +92,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			.setDescription('Please try again later. If this issue persists, contact `kaeso.dev` on Discord.')
 			.addFields({
 				name: 'Proper Usage:',
-				value: '`/leaderboard` `player:`(player name)',
+				value: command.reference + ' `player:`(player name)',
 			})
 			.addFields({
 				name: 'Want to view the leaderboard online?',
@@ -139,7 +139,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 					.setDescription('Please try again later. If this issue persists, contact `kaeso.dev` on Discord.')
 					.addFields({
 						name: 'Proper Usage:',
-						value: '`/leaderboard` `player:`(player name)',
+						value: command.reference + ' `player:`(player name)',
 					})
 					.addFields({
 						name: 'Want to view the leaderboard online?',
