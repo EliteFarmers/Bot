@@ -18,7 +18,6 @@ export class Signal<T = unknown> {
 
 		try {
 			json = JSON.parse(data);
-			json.data = json.data ? JSON.parse(json.data) : undefined;
 		} catch (_) {
 			console.log(_);
 			console.error('Failed to parse Redis message.');
