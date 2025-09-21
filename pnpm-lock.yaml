@@ -57,8 +57,8 @@ importers:
         specifier: ^0.1.10
         version: 0.1.10
       zod:
-        specifier: ^3.25.57
-        version: 3.25.76
+        specifier: ^4.0.0
+        version: 4.1.11
     devDependencies:
       '@biomejs/biome':
         specifier: 2.2.4
@@ -1105,8 +1105,8 @@ packages:
   zlib-sync@0.1.10:
     resolution: {integrity: sha512-t7/pYg5tLBznL1RuhmbAt8rNp5tbhr+TSrJFnMkRtrGIaPJZ6Dc0uR4u3OoQI2d6cGlVI62E3Gy6gwkxyIqr/w==}
 
-  zod@3.25.76:
-    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+  zod@4.1.11:
+    resolution: {integrity: sha512-WPsqwxITS2tzx1bzhIKsEs19ABD5vmCVa4xBo2tq/SrV4RNZtfws1EnCWQXM6yh8bD08a1idvkB5MZSBiZsjwg==}
 
 snapshots:
 
@@ -2137,4 +2137,4 @@ snapshots:
     dependencies:
       nan: 2.22.2
 
-  zod@3.25.76: {}
+  zod@4.1.11: {}
