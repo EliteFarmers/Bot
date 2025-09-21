@@ -67,8 +67,8 @@ importers:
         specifier: ^2.6.12
         version: 2.6.13
       dotenv:
-        specifier: ^16.5.0
-        version: 16.6.1
+        specifier: ^17.0.0
+        version: 17.2.2
       tslib:
         specifier: ^2.8.1
         version: 2.8.1
@@ -820,8 +820,8 @@ packages:
     resolution: {integrity: sha512-3k+Kisd/v570Jr68A1kNs7qVhNehDwDJAPe4DZ2Syt+/zobf9zEcuYFvsfIaAOgCa0BiHMfOOKQY4eYINl0z7w==}
     engines: {node: '>=18'}
 
-  dotenv@16.6.1:
-    resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
+  dotenv@17.2.2:
+    resolution: {integrity: sha512-Sf2LSQP+bOlhKWWyhFsn0UsfdK/kCWRv1iuA2gXAwt3dyNabr6QSj00I2V10pidqz69soatm9ZwZvpQMTIOd5Q==}
     engines: {node: '>=12'}
 
   dunder-proto@1.0.1:
@@ -1862,7 +1862,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  dotenv@16.6.1: {}
+  dotenv@17.2.2: {}
 
   dunder-proto@1.0.1:
     dependencies:
