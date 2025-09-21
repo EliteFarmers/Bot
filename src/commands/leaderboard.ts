@@ -96,7 +96,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			})
 			.addFields({
 				name: 'Want to view the leaderboard online?',
-				value: 'Please go to [elitebot.dev/leaderboard/farmingweight](https://elitebot.dev/leaderboard/farmingweight)',
+				value: `Please go to [elitebot.dev/leaderboard/${leaderboardId}](https://elitebot.dev/leaderboard/${leaderboardId})`,
 			});
 		interaction.editReply({ embeds: [errorEmbed] });
 		return;
@@ -104,7 +104,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const reply = await interaction.editReply({
 		embeds: [embed],
-		components: [getButtonRow(index, maxIndex)],
+		components: [getButtonRow(index, maxIndex, leaderboardId)],
 	});
 
 	const collector = reply.createMessageComponentCollector({
@@ -151,7 +151,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			} else {
 				i.update({
 					embeds: [newEmbed],
-					components: [getButtonRow(index, maxIndex)],
+					components: [getButtonRow(index, maxIndex, leaderboardId)],
 				}).catch(() => {
 					collector.stop();
 				});
@@ -246,7 +246,7 @@ function getProfileLbFields(entries: components['schemas']['LeaderboardEntryDto'
 	});
 }
 
-function getButtonRow(index: number, maxIndex = 1000) {
+function getButtonRow(index: number, maxIndex = 1000, leaderboardId?: string) {
 	return new ActionRowBuilder<ButtonBuilder>().addComponents(
 		new ButtonBuilder()
 			.setCustomId('first')
@@ -269,7 +269,7 @@ function getButtonRow(index: number, maxIndex = 1000) {
 			.setStyle(ButtonStyle.Secondary)
 			.setDisabled(index + 12 > maxIndex),
 		new ButtonBuilder()
-			.setURL(`https://elitebot.dev/leaderboard/farmingweight/${index}`)
+			.setURL(`https://elitebot.dev/leaderboard/${leaderboardId ?? 'farmingweight'}/${index + 1}`)
 			.setStyle(ButtonStyle.Link)
 			.setLabel('View Online'),
 	);
