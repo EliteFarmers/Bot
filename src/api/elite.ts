@@ -79,18 +79,14 @@ export const FetchContests = (playerUuid: string) =>
 		},
 	});
 
-export const FetchWeightLeaderboardRank = (playerUuid: string, profileUuid: string, max = 10_000) =>
+export const FetchWeightLeaderboardRank = (playerUuid: string, profileUuid: string) =>
 	GET('/leaderboard/{leaderboard}/{playerUuid}/{profileUuid}', {
 		params: {
 			path: {
 				leaderboard: 'farmingweight',
 				playerUuid,
 				profileUuid,
-			},
-			query: {
-				new: true,
-				max,
-			},
+			}
 		},
 	});
 
@@ -114,9 +110,6 @@ export const FetchLeaderboardRank = (leaderboardId: string, playerUuid: string, 
 				leaderboard: leaderboardId,
 				playerUuid,
 				profileUuid,
-			},
-			query: {
-				new: true,
 			},
 		},
 	});
@@ -325,6 +318,9 @@ export const FetchContest = (timestamp: number) =>
 		params: {
 			path: {
 				timestamp,
+			},
+			query: {
+				limit: -1,
 			},
 		},
 	});
