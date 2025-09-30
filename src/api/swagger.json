@@ -3,10 +3,10 @@
 	"openapi": "3.0.0",
 	"info": {
 		"title": "Elite API",
-		"description": "A backend API for https://elitebot.dev/ that provides Hypixel Skyblock data.\r\n<br>\r\nUse of this API requires following the [Elite API TOS](https://elitebot.dev/apiterms). This API is not affiliated with Hypixel or Mojang.",
+		"description": "A backend API for https://elitebot.dev/ that provides Hypixel Skyblock data.\n<br><br>\nUse of this API requires following the [Elite API TOS](https://elitebot.dev/apiterms). This API is not affiliated with Hypixel or Mojang.",
 		"termsOfService": "https://elitebot.dev/apiterms",
 		"contact": {
-			"name": "- GitHub",
+			"name": "GitHub",
 			"url": "https://github.com/EliteFarmers/API"
 		},
 		"license": {
@@ -24,8 +24,9 @@
 		"/account/{player}": {
 			"get": {
 				"tags": ["Account"],
-				"summary": "Get Minecraft Account",
-				"operationId": "EliteAPIFeaturesAccountGetAccountGetAccountEndpoint",
+				"summary": "Get Account",
+				"description": "Retrieves the Minecraft account information for a given player, along with an overview of their profiles and player data.",
+				"operationId": "GetAccount",
 				"parameters": [
 					{
 						"name": "player",
@@ -34,7 +35,8 @@
 						"description": "Player uuid or ign",
 						"schema": {
 							"type": "string"
-						}
+						},
+						"example": "Ke5o"
 					}
 				],
 				"responses": {
@@ -63,7 +65,7 @@
 			"post": {
 				"tags": ["Account"],
 				"summary": "Link Account",
-				"operationId": "EliteAPIFeaturesAccountLinkAccountLinkAccountEndpoint",
+				"operationId": "LinkOwnAccount",
 				"parameters": [
 					{
 						"name": "player",
@@ -98,7 +100,7 @@
 			"delete": {
 				"tags": ["Account"],
 				"summary": "Unlink Account",
-				"operationId": "EliteAPIFeaturesAccountUnlinkAccountUnlinkAccountEndpoint",
+				"operationId": "UnlinkOwnAccount",
 				"parameters": [
 					{
 						"name": "player",
@@ -136,7 +138,7 @@
 				"tags": ["Account"],
 				"summary": "Get Minecraft Account Face Image",
 				"description": "Returns an 8x8 or 72x72 face png image of the Minecraft account associated with the provided player name or UUID. 72x72 response includes the player's \"hat\" overlay. If not found, returns Steve's face.",
-				"operationId": "EliteAPIFeaturesAccountGetAccountFaceGetAccountFaceEndpoint1",
+				"operationId": "GetAccountFace1",
 				"parameters": [
 					{
 						"name": "player",
@@ -169,7 +171,7 @@
 				"tags": ["Account"],
 				"summary": "Get Minecraft Account Face Image",
 				"description": "Returns an 8x8 or 72x72 face png image of the Minecraft account associated with the provided player name or UUID. 72x72 response includes the player's \"hat\" overlay. If not found, returns Steve's face.",
-				"operationId": "EliteAPIFeaturesAccountGetAccountFaceGetAccountFaceEndpoint2",
+				"operationId": "GetAccountFace2",
 				"parameters": [
 					{
 						"name": "player",
@@ -201,7 +203,7 @@
 			"get": {
 				"tags": ["Account"],
 				"summary": "Get Minecraft Account from Discord Id",
-				"operationId": "EliteAPIFeaturesAccountGetAccountFromDiscordGetAccountFromDiscordEndpoint",
+				"operationId": "GetAccountFromDiscord",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -242,7 +244,7 @@
 			"get": {
 				"tags": ["Account"],
 				"summary": "Get Account Settings",
-				"operationId": "EliteAPIFeaturesAccountGetAccountSettingsGetAccountSettingsEndpoint",
+				"operationId": "GetAccountSettings",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -282,7 +284,7 @@
 			"get": {
 				"tags": ["Account"],
 				"summary": "Get Logged-In Account",
-				"operationId": "EliteAPIFeaturesAccountGetAuthAccountGetAuthAccountEndpoint",
+				"operationId": "GetAuthAccount",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -309,7 +311,7 @@
 			"post": {
 				"tags": ["Account"],
 				"summary": "Refresh Purchases",
-				"operationId": "EliteAPIFeaturesAccountRefreshPurchasesRefreshPurchasesEndpoint",
+				"operationId": "RefreshPurchases",
 				"responses": {
 					"204": {
 						"description": "No Content"
@@ -329,7 +331,7 @@
 			"get": {
 				"tags": ["Account"],
 				"summary": "Search for Minecraft Account",
-				"operationId": "EliteAPIFeaturesAccountSearchAccountsSearchAccountsEndpoint",
+				"operationId": "SearchAccounts",
 				"parameters": [
 					{
 						"name": "q",
@@ -381,7 +383,7 @@
 			"post": {
 				"tags": ["Account"],
 				"summary": "Set Primary Account",
-				"operationId": "EliteAPIFeaturesAccountSetPrimaryAccountSetPrimaryAccountEndpoint",
+				"operationId": "SetPrimaryAccount",
 				"parameters": [
 					{
 						"name": "player",
@@ -418,7 +420,7 @@
 			"post": {
 				"tags": ["Account"],
 				"summary": "Update Account Settings",
-				"operationId": "EliteAPIFeaturesAccountUpdateBadgesUpdateBadgesEndpoint",
+				"operationId": "UpdateBadges",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -472,7 +474,7 @@
 			"post": {
 				"tags": ["Account"],
 				"summary": "Update Fortune Settings for Account",
-				"operationId": "EliteAPIFeaturesAccountUpdateFortuneSettingsUpdateFortuneSettingsEndpoint",
+				"operationId": "UpdateFortuneSettings",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -528,7 +530,7 @@
 			"patch": {
 				"tags": ["Account"],
 				"summary": "Update Account Settings",
-				"operationId": "EliteAPIFeaturesAccountUpdateSettingsUpdateAccountEndpoint",
+				"operationId": "UpdateAccount",
 				"requestBody": {
 					"x-name": "UpdateUserSettingsDto",
 					"description": "",
@@ -568,7 +570,7 @@
 			"post": {
 				"tags": ["Admin"],
 				"summary": "Add a role to a user",
-				"operationId": "EliteAPIFeaturesAdminAdminsAddRoleToUserAddRoleToUserEndpoint",
+				"operationId": "AddRoleToUser",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -619,7 +621,7 @@
 			"delete": {
 				"tags": ["Admin"],
 				"summary": "Remove a role from a user",
-				"operationId": "EliteAPIFeaturesAdminAdminsRemoveRoleFromUserRemoveRoleFromUserEndpoint",
+				"operationId": "RemoveRoleFromUser",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -667,12 +669,78 @@
 				]
 			}
 		},
+		"/admins": {
+			"get": {
+				"tags": ["Admin"],
+				"summary": "Get list of admins",
+				"operationId": "GetAdmins",
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/AccountWithPermsDto"
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/admin/roles": {
+			"get": {
+				"tags": ["Admin"],
+				"summary": "Get list of roles",
+				"operationId": "GetRoles",
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"type": "string"
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
 		"/admin/cooldowns/player/{player}": {
 			"post": {
 				"tags": ["Admin"],
 				"summary": "Reset a player's cooldowns",
 				"description": "This enables a player's data from Hypixel to be refreshed on the next request.",
-				"operationId": "EliteAPIFeaturesAdminClearPlayerCooldownsClearPlayerCooldownsEndpoint",
+				"operationId": "ClearPlayerCooldowns",
 				"parameters": [
 					{
 						"name": "player",
@@ -716,7 +784,7 @@
 				"tags": ["Admin"],
 				"summary": "Delete all upcoming contests",
 				"description": "Delete all upcoming contests in case of wrong data",
-				"operationId": "EliteAPIFeaturesAdminDeleteUpcomingContestsDeleteUpcomingContestsEndpoint",
+				"operationId": "DeleteUpcomingContests",
 				"responses": {
 					"204": {
 						"description": "No Content"
@@ -739,7 +807,7 @@
 			"delete": {
 				"tags": ["Admin"],
 				"summary": "Delete Event",
-				"operationId": "EliteAPIFeaturesAdminEventsDeleteEventDeleteEventApprovalEndpoint",
+				"operationId": "DeleteEventApproval",
 				"parameters": [
 					{
 						"name": "eventId",
@@ -783,7 +851,7 @@
 			"get": {
 				"tags": ["Admin"],
 				"summary": "Get events pending approval",
-				"operationId": "EliteAPIFeaturesAdminEventsGetPendingEventsGetPendingEventsEndpoint",
+				"operationId": "GetPendingEvents",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -816,7 +884,7 @@
 			"post": {
 				"tags": ["Admin"],
 				"summary": "Set event approval",
-				"operationId": "EliteAPIFeaturesAdminEventsSetEventApprovalSetEventApprovalEndpoint",
+				"operationId": "SetEventApproval",
 				"parameters": [
 					{
 						"name": "eventId",
@@ -865,77 +933,11 @@
 				]
 			}
 		},
-		"/admins": {
-			"get": {
-				"tags": ["Admin"],
-				"summary": "Get list of admins",
-				"operationId": "EliteAPIFeaturesAdminGetAdminsGetAdminsEndpoint",
-				"responses": {
-					"200": {
-						"description": "Success",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "array",
-									"items": {
-										"$ref": "#/components/schemas/AccountWithPermsDto"
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized"
-					},
-					"403": {
-						"description": "Forbidden"
-					}
-				},
-				"security": [
-					{
-						"JWTBearerAuth": []
-					}
-				]
-			}
-		},
-		"/admin/roles": {
-			"get": {
-				"tags": ["Admin"],
-				"summary": "Get list of roles",
-				"operationId": "EliteAPIFeaturesAdminGetRolesGetRolesEndpoint",
-				"responses": {
-					"200": {
-						"description": "Success",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "array",
-									"items": {
-										"type": "string"
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized"
-					},
-					"403": {
-						"description": "Forbidden"
-					}
-				},
-				"security": [
-					{
-						"JWTBearerAuth": []
-					}
-				]
-			}
-		},
 		"/admin/link-account": {
 			"post": {
 				"tags": ["Admin"],
 				"summary": "Link an Account",
-				"operationId": "EliteAPIFeaturesAdminLinkAccountLinkAccountEndpoint",
+				"operationId": "LinkUserAccount",
 				"requestBody": {
 					"x-name": "AdminLinkAccountRequest",
 					"description": "",
@@ -976,7 +978,7 @@
 				"tags": ["Admin"],
 				"summary": "Refresh a guild",
 				"description": "This fetches the latest data from Discord for the specified guild",
-				"operationId": "EliteAPIFeaturesAdminRefreshDiscordGuildRefreshDiscordGuildEndpoint",
+				"operationId": "RefreshDiscordGuild",
 				"parameters": [
 					{
 						"name": "guildId",
@@ -1020,7 +1022,7 @@
 			"post": {
 				"tags": ["Admin"],
 				"summary": "Unlink an Account",
-				"operationId": "EliteAPIFeaturesAdminUnlinkAccountUnlinkAccountEndpoint",
+				"operationId": "UnlinkUserAccount",
 				"requestBody": {
 					"x-name": "AdminUnlinkAccountRequest",
 					"description": "",
@@ -1061,12 +1063,12 @@
 				"tags": ["Announcements"],
 				"summary": "Create an announcement",
 				"description": "Creates a new announcement that will be displayed to users",
-				"operationId": "EliteAPIFeaturesAnnouncementsCreateAnnouncementEndpoint",
+				"operationId": "CreateAnnouncement",
 				"requestBody": {
 					"x-name": "CreateAnnouncementDto",
 					"description": "",
 					"content": {
-						"*/*": {
+						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/CreateAnnouncementDto"
 							}
@@ -1098,7 +1100,7 @@
 				"tags": ["Announcements"],
 				"summary": "Dismiss an announcement",
 				"description": "Mark an announcement as dismissed for the current user",
-				"operationId": "EliteAPIFeaturesAnnouncementsDismissAnnouncementEndpoint",
+				"operationId": "DismissAnnouncement",
 				"parameters": [
 					{
 						"name": "announcementId",
@@ -1137,7 +1139,7 @@
 				"tags": ["Announcements"],
 				"summary": "Get announcements",
 				"description": "Gets all announcements that should be shown to users",
-				"operationId": "EliteAPIFeaturesAnnouncementsGetAnnouncementEndpoint",
+				"operationId": "GetAnnouncement",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -1160,7 +1162,7 @@
 				"tags": ["Auth"],
 				"summary": "Get logged in account",
 				"description": "Get the account of the currently logged in user",
-				"operationId": "EliteAPIFeaturesAuthGetSelfGetSelfEndpoint",
+				"operationId": "GetSession",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -1188,7 +1190,7 @@
 				"tags": ["Auth"],
 				"summary": "Log in",
 				"description": "Log in with discord credentials",
-				"operationId": "EliteAPIFeaturesAuthLoginLoginEndpoint",
+				"operationId": "Login",
 				"requestBody": {
 					"x-name": "DiscordLoginDto",
 					"description": "",
@@ -1221,7 +1223,7 @@
 				"tags": ["Auth"],
 				"summary": "Refresh Auth Token",
 				"description": "Refresh the auth token using the refresh token",
-				"operationId": "EliteAPIFeaturesAuthRefreshRefreshEndpoint",
+				"operationId": "RefreshAuth",
 				"requestBody": {
 					"x-name": "AuthRefreshDto",
 					"description": "",
@@ -1253,7 +1255,7 @@
 			"post": {
 				"tags": ["Badge"],
 				"summary": "Add a badge to a user",
-				"operationId": "EliteAPIFeaturesBadgesAddBadgeToUserAddBadgeToUserBadgeEndpoint",
+				"operationId": "AddBadgeToUserBadge",
 				"parameters": [
 					{
 						"name": "player",
@@ -1305,7 +1307,7 @@
 			"delete": {
 				"tags": ["Badge"],
 				"summary": "Remove a badge from a user",
-				"operationId": "EliteAPIFeaturesBadgesDeleteBadgeFromUserDeleteBadgeFromUserBadgeEndpoint",
+				"operationId": "DeleteBadgeFromUserBadge",
 				"parameters": [
 					{
 						"name": "player",
@@ -1357,7 +1359,7 @@
 			"post": {
 				"tags": ["Badge"],
 				"summary": "Create a badge",
-				"operationId": "EliteAPIFeaturesBadgesCreateBadgeCreateBadgeEndpoint",
+				"operationId": "CreateBadge",
 				"requestBody": {
 					"x-name": "badge",
 					"content": {
@@ -1399,7 +1401,7 @@
 			"get": {
 				"tags": ["Badge"],
 				"summary": "Get all badges",
-				"operationId": "EliteAPIFeaturesBadgesGetBadgesGetBadgesEndpoint",
+				"operationId": "GetBadges",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -1421,7 +1423,7 @@
 			"delete": {
 				"tags": ["Badge"],
 				"summary": "Delete a badge",
-				"operationId": "EliteAPIFeaturesBadgesDeleteBadgeDeleteBadgeEndpoint",
+				"operationId": "DeleteBadge",
 				"parameters": [
 					{
 						"name": "badgeId",
@@ -1464,7 +1466,7 @@
 			"patch": {
 				"tags": ["Badge"],
 				"summary": "Update a badge",
-				"operationId": "EliteAPIFeaturesBadgesUpdateBadgeUpdateBadgeEndpoint",
+				"operationId": "UpdateBadge",
 				"parameters": [
 					{
 						"name": "badgeId",
@@ -1520,7 +1522,7 @@
 			"post": {
 				"tags": ["Bot"],
 				"summary": "Link Account",
-				"operationId": "EliteAPIFeaturesBotAccountsLinkAccountLinkAccountEndpoint",
+				"operationId": "LinkAccountBot",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -1561,7 +1563,7 @@
 			"delete": {
 				"tags": ["Bot"],
 				"summary": "Unlink Account",
-				"operationId": "EliteAPIFeaturesBotAccountsUnlinkAccountUnlinkAccountEndpoint",
+				"operationId": "UnlinkAccountBot",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -1602,7 +1604,7 @@
 			"post": {
 				"tags": ["Bot"],
 				"summary": "Make Primary Account",
-				"operationId": "EliteAPIFeaturesBotAccountsMakePrimaryMakePrimaryAccountEndpoint",
+				"operationId": "MakePrimaryAccount",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -1643,7 +1645,7 @@
 			"post": {
 				"tags": ["Bot"],
 				"summary": "Refresh User Purchases",
-				"operationId": "EliteAPIFeaturesBotAccountsRefreshPurchasesUnlinkAccountEndpoint",
+				"operationId": "RefreshUserPurchases",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -1676,7 +1678,7 @@
 			"post": {
 				"tags": ["Bot"],
 				"summary": "Grant Badge",
-				"operationId": "EliteAPIFeaturesBotBadgesGrantBadgeGrantBadgeEndpoint",
+				"operationId": "GrantBadge",
 				"parameters": [
 					{
 						"name": "player",
@@ -1716,7 +1718,7 @@
 			"delete": {
 				"tags": ["Bot"],
 				"summary": "Remove Badge",
-				"operationId": "EliteAPIFeaturesBotBadgesRemoveBadgeRemoveBadgeEndpoint",
+				"operationId": "RemoveBadge",
 				"parameters": [
 					{
 						"name": "player",
@@ -1758,7 +1760,7 @@
 			"delete": {
 				"tags": ["Bot"],
 				"summary": "Disable contest pings for a guild",
-				"operationId": "EliteAPIFeaturesBotDisableContestPingsDisableContestPingsPingsEndpoint",
+				"operationId": "DisableContestPingsPings",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -1800,7 +1802,7 @@
 			"get": {
 				"tags": ["Bot"],
 				"summary": "Get list of guilds with contest pings enabled",
-				"operationId": "EliteAPIFeaturesBotGetContestPingsGetContestPingsEndpoint",
+				"operationId": "GetContestPings",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -1822,7 +1824,7 @@
 			"get": {
 				"tags": ["Bot"],
 				"summary": "Get guild",
-				"operationId": "EliteAPIFeaturesBotGetGuildGetBotGuildEndpoint",
+				"operationId": "GetBotGuild",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -1862,7 +1864,7 @@
 			"get": {
 				"tags": ["Bot"],
 				"summary": "Get guild jacob",
-				"operationId": "EliteAPIFeaturesBotGetJacobFeatureGetJacobFeatureEndpoint",
+				"operationId": "GetJacobFeature",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -1900,7 +1902,7 @@
 			"put": {
 				"tags": ["Bot"],
 				"summary": "Update guild jacob feature",
-				"operationId": "EliteAPIFeaturesBotUpdateJacobFeatureUpdateJacobFeatureEndpoint",
+				"operationId": "UpdateJacobFeature",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -1960,7 +1962,7 @@
 			"post": {
 				"tags": ["Bot"],
 				"summary": "Request Guild Update",
-				"operationId": "EliteAPIFeaturesBotGuildsRefreshGuildRefreshGuildEndpoint",
+				"operationId": "RefreshGuild",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -1991,7 +1993,7 @@
 			"patch": {
 				"tags": ["Bot"],
 				"summary": "Update Guild",
-				"operationId": "EliteAPIFeaturesBotGuildsUpdateGuildUpdateGuildEndpoint",
+				"operationId": "UpdateGuild",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -2043,7 +2045,7 @@
 			"post": {
 				"tags": ["Bot"],
 				"summary": "Update Guild Channel",
-				"operationId": "EliteAPIFeaturesBotGuildsUpdateGuildChannelUpdateGuildChannelEndpoint",
+				"operationId": "UpdateGuildChannel",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -2088,7 +2090,7 @@
 			"post": {
 				"tags": ["Bot"],
 				"summary": "Update Guild Member Roles",
-				"operationId": "EliteAPIFeaturesBotGuildsUpdateGuildMemberRolesUpdateGuildMemberRolesEndpoint",
+				"operationId": "UpdateGuildMemberRoles",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -2144,7 +2146,7 @@
 			"post": {
 				"tags": ["Bot"],
 				"summary": "Update Guild Role",
-				"operationId": "EliteAPIFeaturesBotGuildsUpdateGuildRoleUpdateGuildRoleEndpoint",
+				"operationId": "UpdateGuildRole",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -2189,7 +2191,7 @@
 			"patch": {
 				"tags": ["Bot"],
 				"summary": "Update user Discord account",
-				"operationId": "EliteAPIFeaturesBotUpdateDiscordAccountUpdateDiscordAccountEndpoint",
+				"operationId": "UpdateDiscordAccount",
 				"requestBody": {
 					"x-name": "IncomingAccountDto",
 					"description": "",
@@ -2221,7 +2223,7 @@
 			"get": {
 				"tags": ["Contests"],
 				"summary": "Get a contest from a contest key",
-				"operationId": "EliteAPIFeaturesContestsGetContestFromKeyGetContestFromKeyEndpoint",
+				"operationId": "GetContestFromKey",
 				"parameters": [
 					{
 						"name": "contestKey",
@@ -2252,7 +2254,7 @@
 			"get": {
 				"tags": ["Contests"],
 				"summary": "Get the three contests that start at a specific timestamp",
-				"operationId": "EliteAPIFeaturesContestsGetContestsAtTimestampGetContestsAtTimestampEndpoint",
+				"operationId": "GetContestsAtTimestamp",
 				"parameters": [
 					{
 						"name": "timestamp",
@@ -2261,6 +2263,16 @@
 						"schema": {
 							"type": "integer",
 							"format": "int64"
+						}
+					},
+					{
+						"name": "limit",
+						"in": "query",
+						"required": true,
+						"description": "Limit the number of participations returned in each contest.",
+						"schema": {
+							"type": "integer",
+							"format": "int32"
 						}
 					}
 				],
@@ -2284,8 +2296,8 @@
 		"/contests/at/{year}/{month}/{day}": {
 			"get": {
 				"tags": ["Contests"],
-				"summary": "Get all contests in a SkyBlock year",
-				"operationId": "EliteAPIFeaturesContestsGetContestsInDayGetContestsInDayEndpoint",
+				"summary": "Get the three contests in a specific SkyBlock day",
+				"operationId": "GetContestsInDay",
 				"parameters": [
 					{
 						"name": "year",
@@ -2349,7 +2361,7 @@
 			"get": {
 				"tags": ["Contests"],
 				"summary": "Get all contests in a SkyBlock month",
-				"operationId": "EliteAPIFeaturesContestsGetContestsInMonthGetContestsInMonthEndpoint",
+				"operationId": "GetContestsInMonth",
 				"parameters": [
 					{
 						"name": "year",
@@ -2406,7 +2418,7 @@
 			"get": {
 				"tags": ["Contests"],
 				"summary": "Get all contests in a SkyBlock year",
-				"operationId": "EliteAPIFeaturesContestsGetContestsInYearGetContestsInYearEndpoint",
+				"operationId": "GetContestsInYear",
 				"parameters": [
 					{
 						"name": "year",
@@ -2448,7 +2460,7 @@
 				"tags": ["Contests"],
 				"summary": "Get upcoming contests for the current SkyBlock year",
 				"description": "Uses crowd-sourced data, which may not be accurate.\nData used and provided by <see href=\"https://github.com/hannibal002/SkyHanni/\">SkyHanni</see> to display upcoming contests in-game.",
-				"operationId": "EliteAPIFeaturesContestsGetCurrentContestsGetCurrentContestsEndpoint",
+				"operationId": "GetCurrentContests",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -2466,7 +2478,7 @@
 				"tags": ["Contests"],
 				"summary": "Upload upcoming contests for the current SkyBlock year",
 				"description": "Data used and provided by <see href=\"https://github.com/hannibal002/SkyHanni/\">SkyHanni</see> to display upcoming contests in-game.",
-				"operationId": "EliteAPIFeaturesContestsUploadCurrentContestsUploadCurrentContestsEndpoint",
+				"operationId": "UploadCurrentContests",
 				"requestBody": {
 					"x-name": "Dictionary`2",
 					"description": "",
@@ -2504,7 +2516,7 @@
 			"get": {
 				"tags": ["Contests"],
 				"summary": "Get all contests for a player",
-				"operationId": "EliteAPIFeaturesContestsGetPlayerParticipationsGetPlayerParticipationsEndpoint",
+				"operationId": "GetPlayerParticipations",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -2546,7 +2558,7 @@
 			"get": {
 				"tags": ["Contests"],
 				"summary": "Get all contests for a profile member",
-				"operationId": "EliteAPIFeaturesContestsGetProfileMemberParticipationsGetProfileMemberParticipationsEndpoint",
+				"operationId": "GetProfileMemberParticipations",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -2596,7 +2608,7 @@
 			"get": {
 				"tags": ["Contests"],
 				"summary": "Get contest records for a SkyBlock year",
-				"operationId": "EliteAPIFeaturesContestsGetRecordsInYearGetRecordsInYearEndpoint",
+				"operationId": "GetRecordsInYear",
 				"parameters": [
 					{
 						"name": "year",
@@ -2637,7 +2649,7 @@
 			"get": {
 				"tags": ["Contests"],
 				"summary": "Get contests for the player's selected profile member",
-				"operationId": "EliteAPIFeaturesContestsGetSelectedMemberParticipationsGetSelectedMemberParticipationsEndpoint",
+				"operationId": "GetSelectedMemberParticipations",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -2679,7 +2691,7 @@
 			"post": {
 				"tags": ["Guild"],
 				"summary": "Add an Event Member to a Team",
-				"operationId": "EliteAPIFeaturesEventsAdminAddTeamMemberAddTeamMemberEndpoint",
+				"operationId": "AddTeamMemberAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -2745,7 +2757,7 @@
 			"delete": {
 				"tags": ["Guild"],
 				"summary": "Kick an Event Team Member",
-				"operationId": "EliteAPIFeaturesEventsAdminKickTeamMemberKickTeamMemberEndpoint",
+				"operationId": "KickTeamMemberAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -2813,7 +2825,7 @@
 			"post": {
 				"tags": ["Guild"],
 				"summary": "Ban an Event Member",
-				"operationId": "EliteAPIFeaturesEventsAdminBanMemberBanMemberEndpoint",
+				"operationId": "BanMemberAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -2887,7 +2899,7 @@
 			"delete": {
 				"tags": ["Guild"],
 				"summary": "Unban an Event Member",
-				"operationId": "EliteAPIFeaturesEventsAdminUnbanMemberUnbanMemberEndpoint",
+				"operationId": "UnbanMemberAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -2945,7 +2957,7 @@
 			"post": {
 				"tags": ["Guild"],
 				"summary": "Create Event",
-				"operationId": "EliteAPIFeaturesEventsAdminCreateEventCreateWeightEventEndpoint",
+				"operationId": "CreateEventAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -3006,7 +3018,7 @@
 				"tags": ["Guild"],
 				"summary": "Create an Event Team",
 				"description": "This generally should only be used for events with a set amount of teams (when users are not allowed to create their own teams)",
-				"operationId": "EliteAPIFeaturesEventsAdminCreateTeamCreateTeamEndpoint",
+				"operationId": "CreateTeamAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -3077,7 +3089,7 @@
 				"tags": ["Guild"],
 				"summary": "Delete Event",
 				"description": "Delete an event and all associated data. Only available for unapproved events.",
-				"operationId": "EliteAPIFeaturesEventsAdminDeleteEventDeleteEventEndpoint",
+				"operationId": "DeleteEventAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -3126,7 +3138,7 @@
 			"patch": {
 				"tags": ["Guild"],
 				"summary": "Update Event",
-				"operationId": "EliteAPIFeaturesEventsAdminUpdateEventCreateWeightEventEndpoint",
+				"operationId": "UpdateEventAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -3195,7 +3207,7 @@
 			"delete": {
 				"tags": ["Guild"],
 				"summary": "Delete Custom Event Banner",
-				"operationId": "EliteAPIFeaturesEventsAdminDeleteEventBannerDeleteEventBannerEndpoint",
+				"operationId": "DeleteEventBannerAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -3244,7 +3256,7 @@
 			"post": {
 				"tags": ["Guild"],
 				"summary": "Set Custom Event Banner",
-				"operationId": "EliteAPIFeaturesEventsAdminSetEventBannerSetEventBannerEndpoint",
+				"operationId": "SetEventBannerAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -3306,7 +3318,7 @@
 			"delete": {
 				"tags": ["Guild"],
 				"summary": "Delete an Event Member",
-				"operationId": "EliteAPIFeaturesEventsAdminDeleteMemberDeleteMemberEndpoint",
+				"operationId": "DeleteMemberAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -3379,7 +3391,7 @@
 			"post": {
 				"tags": ["Guild"],
 				"summary": "Ban an Event Member",
-				"operationId": "EliteAPIFeaturesEventsAdminForceAddMemberForceAddMemberEndpoint",
+				"operationId": "ForceAddMemberAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -3445,7 +3457,7 @@
 			"delete": {
 				"tags": ["Guild"],
 				"summary": "Delete an Event Team",
-				"operationId": "EliteAPIFeaturesEventsAdminDeleteTeamDeleteTeamEndpoint",
+				"operationId": "DeleteTeamAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -3503,7 +3515,7 @@
 			"patch": {
 				"tags": ["Guild"],
 				"summary": "Update a team",
-				"operationId": "EliteAPIFeaturesEventsAdminUpdateTeamUpdateTeamEndpoint",
+				"operationId": "UpdateTeamAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -3574,7 +3586,7 @@
 			"get": {
 				"tags": ["Guild"],
 				"summary": "Get banned event members",
-				"operationId": "EliteAPIFeaturesEventsAdminGetBannedMembersGetBannedMembersEndpoint",
+				"operationId": "GetBannedMembersAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -3635,7 +3647,7 @@
 			"get": {
 				"tags": ["Guild"],
 				"summary": "Get event members",
-				"operationId": "EliteAPIFeaturesEventsAdminGetEventMembersGetEventMembersEndpoint",
+				"operationId": "GetGuildEventMembersAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -3696,7 +3708,7 @@
 			"get": {
 				"tags": ["Guild"],
 				"summary": "Get an event for a guild",
-				"operationId": "EliteAPIFeaturesEventsAdminGetGuildEventGetGuildEventEndpoint",
+				"operationId": "GetGuildEventAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -3754,7 +3766,7 @@
 			"get": {
 				"tags": ["Guild"],
 				"summary": "Get all events for a guild",
-				"operationId": "EliteAPIFeaturesEventsAdminGetGuildEventsGetGuildEventsEndpoint",
+				"operationId": "GetGuildEventsAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -3805,7 +3817,7 @@
 			"get": {
 				"tags": ["Guild"],
 				"summary": "Get event teams",
-				"operationId": "EliteAPIFeaturesEventsAdminGetTeamsGetTeamsEndpoint",
+				"operationId": "GetTeamsAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -3866,7 +3878,7 @@
 			"put": {
 				"tags": ["Guild"],
 				"summary": "Set player as team owner",
-				"operationId": "EliteAPIFeaturesEventsAdminSetTeamOwnerSetTeamOwnerEndpoint",
+				"operationId": "SetTeamOwnerAdmin",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -3928,7 +3940,7 @@
 			"get": {
 				"tags": ["Event"],
 				"summary": "Get an event",
-				"operationId": "EliteAPIFeaturesEventsPublicGetEventGetEventEndpoint",
+				"operationId": "GetEvent",
 				"parameters": [
 					{
 						"name": "eventId",
@@ -3959,7 +3971,7 @@
 				"tags": ["Event"],
 				"summary": "Get event default constants",
 				"description": "Default constants for event settings.",
-				"operationId": "EliteAPIFeaturesEventsPublicGetEventDefaultsGetEventDefaultsEndpoint",
+				"operationId": "GetEventDefaults",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -3978,7 +3990,7 @@
 			"get": {
 				"tags": ["Event"],
 				"summary": "Get an event member",
-				"operationId": "EliteAPIFeaturesEventsPublicGetEventMemberGetEventMembersEndpoint",
+				"operationId": "GetEventMember",
 				"parameters": [
 					{
 						"name": "eventId",
@@ -4026,7 +4038,7 @@
 			"get": {
 				"tags": ["Event"],
 				"summary": "Get event members",
-				"operationId": "EliteAPIFeaturesEventsPublicGetEventMembersGetEventMembersEndpoint",
+				"operationId": "GetEventMembers",
 				"parameters": [
 					{
 						"name": "eventId",
@@ -4059,7 +4071,7 @@
 			"get": {
 				"tags": ["Event"],
 				"summary": "Get an event team",
-				"operationId": "EliteAPIFeaturesEventsPublicGetEventTeamGetEventTeamEndpoint",
+				"operationId": "GetEventTeam",
 				"parameters": [
 					{
 						"name": "eventId",
@@ -4096,7 +4108,7 @@
 			"delete": {
 				"tags": ["Event"],
 				"summary": "Delete team",
-				"operationId": "EliteAPIFeaturesEventsUserDeleteTeamDeleteTeamEndpoint",
+				"operationId": "DeleteTeam",
 				"parameters": [
 					{
 						"name": "eventId",
@@ -4134,7 +4146,7 @@
 			"patch": {
 				"tags": ["Event"],
 				"summary": "Update a team",
-				"operationId": "EliteAPIFeaturesEventsUserUpdateTeamUpdateTeamEndpoint",
+				"operationId": "UpdateTeam",
 				"parameters": [
 					{
 						"name": "eventId",
@@ -4185,7 +4197,7 @@
 			"get": {
 				"tags": ["Event"],
 				"summary": "Get event teams",
-				"operationId": "EliteAPIFeaturesEventsPublicGetEventTeamsGetEventTeamsEndpoint",
+				"operationId": "GetEventTeams",
 				"parameters": [
 					{
 						"name": "eventId",
@@ -4216,7 +4228,7 @@
 			"post": {
 				"tags": ["Event"],
 				"summary": "Create a team",
-				"operationId": "EliteAPIFeaturesEventsUserCreateTeamCreateTeamEndpoint",
+				"operationId": "CreateTeam",
 				"parameters": [
 					{
 						"name": "eventId",
@@ -4231,7 +4243,7 @@
 				"requestBody": {
 					"x-name": "team",
 					"content": {
-						"*/*": {
+						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/CreateEventTeamDto"
 							}
@@ -4259,7 +4271,7 @@
 				"tags": ["Event"],
 				"summary": "Get event team word list constants",
 				"description": "Lists of whitelisted words for team name generation.",
-				"operationId": "EliteAPIFeaturesEventsPublicGetTeamWordListGetTeamWordListEndpoint",
+				"operationId": "GetTeamWordList",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -4278,7 +4290,7 @@
 			"get": {
 				"tags": ["Event"],
 				"summary": "Get upcoming events",
-				"operationId": "EliteAPIFeaturesEventsPublicGetUpcomingGetUpcomingEventsEndpoint",
+				"operationId": "GetUpcomingEvents",
 				"parameters": [
 					{
 						"name": "offset",
@@ -4313,7 +4325,7 @@
 			"post": {
 				"tags": ["Event"],
 				"summary": "Join an event",
-				"operationId": "EliteAPIFeaturesEventsUserJoinEventJoinEventEndpoint",
+				"operationId": "JoinEvent",
 				"parameters": [
 					{
 						"name": "eventId",
@@ -4370,7 +4382,7 @@
 			"post": {
 				"tags": ["Event"],
 				"summary": "Join a team",
-				"operationId": "EliteAPIFeaturesEventsUserJoinTeamJoinTeamEndpoint",
+				"operationId": "JoinTeam",
 				"parameters": [
 					{
 						"name": "eventId",
@@ -4423,7 +4435,7 @@
 				"tags": ["Event"],
 				"summary": "Kick a team member",
 				"description": "Kicked members can rejoin the team if they have the join code.",
-				"operationId": "EliteAPIFeaturesEventsUserKickTeamMemberKickTeamMemberEndpoint",
+				"operationId": "KickTeamMember",
 				"parameters": [
 					{
 						"name": "eventId",
@@ -4482,7 +4494,7 @@
 			"post": {
 				"tags": ["Event"],
 				"summary": "Join an event",
-				"operationId": "EliteAPIFeaturesEventsUserLeaveEventLeaveEventEndpoint",
+				"operationId": "LeaveEvent",
 				"parameters": [
 					{
 						"name": "eventId",
@@ -4513,7 +4525,7 @@
 			"post": {
 				"tags": ["Event"],
 				"summary": "Leave a team",
-				"operationId": "EliteAPIFeaturesEventsUserLeaveTeamLeaveTeamEndpoint",
+				"operationId": "LeaveTeam",
 				"parameters": [
 					{
 						"name": "eventId",
@@ -4553,7 +4565,7 @@
 			"put": {
 				"tags": ["Event"],
 				"summary": "Set player as team owner",
-				"operationId": "EliteAPIFeaturesEventsUserSetTeamOwnerSetTeamOwnerEndpoint",
+				"operationId": "SetTeamOwner",
 				"parameters": [
 					{
 						"name": "eventId",
@@ -4578,7 +4590,7 @@
 					"x-name": "ChangeTeamOwnerRequest",
 					"description": "",
 					"content": {
-						"*/*": {
+						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/ChangeTeamOwnerRequest"
 							}
@@ -4606,7 +4618,7 @@
 			"post": {
 				"tags": ["Event"],
 				"summary": "Generate new team join code",
-				"operationId": "EliteAPIFeaturesEventsUserUpdateTeamCodeUpdateTeamJoinCodeEndpoint",
+				"operationId": "UpdateTeamJoinCode",
 				"parameters": [
 					{
 						"name": "eventId",
@@ -4647,7 +4659,7 @@
 				"tags": ["Garden"],
 				"summary": "Get Garden data for a profile",
 				"description": "Get Garden data for a specific profile by UUID",
-				"operationId": "EliteAPIFeaturesGardenGetGardenGetGardenEndpoint",
+				"operationId": "GetGarden",
 				"parameters": [
 					{
 						"name": "profileUuid",
@@ -4691,7 +4703,7 @@
 				"tags": ["Garden"],
 				"summary": "Get selected Garden data for a player",
 				"description": "Get selected Garden data for a specific player by UUID",
-				"operationId": "EliteAPIFeaturesGardenGetSelectedGardenGetGardenEndpoint",
+				"operationId": "GetSelectedGarden",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -4734,7 +4746,7 @@
 			"get": {
 				"tags": ["Graph"],
 				"summary": "Get Admin Crop Collections",
-				"operationId": "EliteAPIFeaturesGraphsGetAdminCropGraphsGetAdminCropGraphsEndpoint",
+				"operationId": "GetAdminCropGraphs",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -4833,7 +4845,7 @@
 			"get": {
 				"tags": ["Graph"],
 				"summary": "Get Admin Skill XP",
-				"operationId": "EliteAPIFeaturesGraphsGetAdminSkillGraphsGetAdminSkillGraphsEndpoint",
+				"operationId": "GetAdminSkillGraphs",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -4929,7 +4941,7 @@
 			"get": {
 				"tags": ["Graph"],
 				"summary": "Get Crop Collections Over Time",
-				"operationId": "EliteAPIFeaturesGraphsGetCropGraphsGetCropGraphsEndpoint",
+				"operationId": "GetCropGraphs",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -5014,7 +5026,7 @@
 			"get": {
 				"tags": ["Graph"],
 				"summary": "Get Skill XP Over Time",
-				"operationId": "EliteAPIFeaturesGraphsGetSkillGraphsGetSkillGraphsEndpoint",
+				"operationId": "GetSkillGraphs",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -5099,7 +5111,7 @@
 			"get": {
 				"tags": ["Graph"],
 				"summary": "Get current average medal brackets",
-				"operationId": "EliteAPIFeaturesGraphsMedalsGetCurrentMedalBracketsGetCurrentMedalBracketsEndpoint",
+				"operationId": "GetCurrentMedalBrackets",
 				"parameters": [
 					{
 						"name": "months",
@@ -5131,7 +5143,7 @@
 			"get": {
 				"tags": ["Graph"],
 				"summary": "Get average medal brackets for a specific SkyBlock month",
-				"operationId": "EliteAPIFeaturesGraphsMedalsGetMedalBracketsGetMedalBracketsEndpoint",
+				"operationId": "GetMedalBrackets",
 				"parameters": [
 					{
 						"name": "year",
@@ -5193,7 +5205,7 @@
 			"get": {
 				"tags": ["Graph"],
 				"summary": "Get average medal brackets for multiple SkyBlock years",
-				"operationId": "EliteAPIFeaturesGraphsMedalsGetMedalBracketsGraphGetMedalBracketsGraphEndpoint",
+				"operationId": "GetMedalBracketsGraph",
 				"parameters": [
 					{
 						"name": "year",
@@ -5259,7 +5271,7 @@
 			"post": {
 				"tags": ["Guild"],
 				"summary": "Modify guild event permissions",
-				"operationId": "EliteAPIFeaturesGuildsAdminSetEventsSetEventFeatureEndpoint",
+				"operationId": "SetEventFeature",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -5320,8 +5332,8 @@
 			},
 			"get": {
 				"tags": ["Guild"],
-				"summary": "Get public guild",
-				"operationId": "EliteAPIFeaturesGuildsPublicGetGuildEventsGetPublicGuildEventsEndpoint",
+				"summary": "Get public guild events",
+				"operationId": "GetPublicGuildEvents",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -5364,7 +5376,7 @@
 			"post": {
 				"tags": ["Guild"],
 				"summary": "Modify guild jacob permissions",
-				"operationId": "EliteAPIFeaturesGuildsAdminSetJacobLeaderboardsSetJacobFeatureEndpoint",
+				"operationId": "SetJacobFeature",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -5428,7 +5440,7 @@
 			"post": {
 				"tags": ["Guild"],
 				"summary": "Lock or unlock a guild",
-				"operationId": "EliteAPIFeaturesGuildsAdminSetLockedSetGuildLockedEndpoint",
+				"operationId": "SetGuildLocked",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -5483,7 +5495,7 @@
 			"post": {
 				"tags": ["Guild"],
 				"summary": "Set a guild to public or private",
-				"operationId": "EliteAPIFeaturesGuildsAdminSetPublicSetGuildPublicEndpoint",
+				"operationId": "SetGuildPublic",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -5537,7 +5549,7 @@
 			"get": {
 				"tags": ["Guild"],
 				"summary": "Get public guild",
-				"operationId": "EliteAPIFeaturesGuildsPublicGetGuildGetPublicGuildEndpoint",
+				"operationId": "GetPublicGuild",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -5577,7 +5589,7 @@
 			"get": {
 				"tags": ["Guild"],
 				"summary": "Get public guilds",
-				"operationId": "EliteAPIFeaturesGuildsPublicGetGuildsGetPublicGuildsEndpoint",
+				"operationId": "GetPublicGuilds",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -5599,7 +5611,7 @@
 			"delete": {
 				"tags": ["User"],
 				"summary": "Delete contest pings for a guild",
-				"operationId": "EliteAPIFeaturesGuildsUserContestPingsDeleteContestPingsDeleteContestPingsEndpoint",
+				"operationId": "DeleteContestPings",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -5647,7 +5659,7 @@
 			"put": {
 				"tags": ["User"],
 				"summary": "Update contest pings for a guild",
-				"operationId": "EliteAPIFeaturesGuildsUserContestPingsUpdateContestPingsDeleteContestPingsEndpoint",
+				"operationId": "UpdateContestPings",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -5700,7 +5712,7 @@
 			"get": {
 				"tags": ["User"],
 				"summary": "Get guild memberships for the current user",
-				"operationId": "EliteAPIFeaturesGuildsUserGetGuildsGetUserGuildsEndpoint",
+				"operationId": "GetUserGuilds",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -5730,7 +5742,7 @@
 			"get": {
 				"tags": ["User"],
 				"summary": "Get a guild membership for the current user",
-				"operationId": "EliteAPIFeaturesGuildsUserGetMembershipGetUserGuildEndpoint",
+				"operationId": "GetUserGuild",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -5778,7 +5790,7 @@
 			"post": {
 				"tags": ["User"],
 				"summary": "Create a Jacob leaderboard",
-				"operationId": "EliteAPIFeaturesGuildsUserJacobCreateJacobLeaderboardUpdateGuildJacobFeatureEndpoint",
+				"operationId": "CreateGuildJacobLeaderboard",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -5831,7 +5843,7 @@
 			"delete": {
 				"tags": ["User"],
 				"summary": "Delete a Jacob leaderboard",
-				"operationId": "EliteAPIFeaturesGuildsUserJacobDeleteJacobLeaderboardDeleteGuildJacobFeatureEndpoint",
+				"operationId": "DeleteGuildJacobLeaderboard",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -5879,7 +5891,7 @@
 			"patch": {
 				"tags": ["User"],
 				"summary": "Update a Jacob leaderboard",
-				"operationId": "EliteAPIFeaturesGuildsUserJacobUpdateJacobLeaderboardUpdateGuildJacobFeatureEndpoint",
+				"operationId": "UpdateGuildJacobLeaderboard",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -5940,7 +5952,7 @@
 			"get": {
 				"tags": ["User"],
 				"summary": "Get Jacob leaderboards for a guild",
-				"operationId": "EliteAPIFeaturesGuildsUserJacobGetJacobGetGuildJacobEndpoint",
+				"operationId": "GetGuildJacob",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -5986,7 +5998,7 @@
 			"patch": {
 				"tags": ["User"],
 				"summary": "Update Jacob leaderboards for a guild",
-				"operationId": "EliteAPIFeaturesGuildsUserJacobUpdateJacobUpdateGuildJacobFeatureEndpoint",
+				"operationId": "UpdateGuildJacobFeature",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -6046,7 +6058,7 @@
 			"post": {
 				"tags": ["User"],
 				"summary": "Send a Jacob leaderboard to Discord",
-				"operationId": "EliteAPIFeaturesGuildsUserJacobSendJacobLeaderboardSendGuildJacobFeatureEndpoint",
+				"operationId": "SendGuildJacobFeature",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -6092,12 +6104,32 @@
 				]
 			}
 		},
+		"/user/refresh-guilds": {
+			"post": {
+				"tags": ["User"],
+				"summary": "Refresh guild memberships for the current user",
+				"operationId": "RefreshGuildMemberships",
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
 		"/user/guild/{discordId}/refresh": {
 			"post": {
 				"tags": ["User"],
 				"summary": "Request Guild Refresh",
 				"description": "This fetches the latest data from Discord for the specified guild",
-				"operationId": "EliteAPIFeaturesGuildsUserRequestRefreshRequestGuildRefreshEndpoint",
+				"operationId": "RequestGuildRefresh",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -6138,7 +6170,7 @@
 			"put": {
 				"tags": ["User"],
 				"summary": "Set an admin role for a guild",
-				"operationId": "EliteAPIFeaturesGuildsUserSetAdminRoleSetAdminRoleEndpoint",
+				"operationId": "SetAdminRole",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -6191,7 +6223,7 @@
 			"put": {
 				"tags": ["User"],
 				"summary": "Set invite code for a guild",
-				"operationId": "EliteAPIFeaturesGuildsUserSetInviteSetInviteEndpoint",
+				"operationId": "SetInvite",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -6244,7 +6276,7 @@
 			"post": {
 				"tags": ["User"],
 				"summary": "Refresh Guild Purchases",
-				"operationId": "EliteAPIFeaturesGuildsUserUpdatePurchasesUpdateGuildPurchasesEndpoint",
+				"operationId": "UpdateGuildPurchases",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -6285,7 +6317,7 @@
 			"get": {
 				"tags": ["Leaderboard"],
 				"summary": "Get Leaderboard",
-				"operationId": "EliteAPIFeaturesLeaderboardsEndpointsGetLeaderboardGetLeaderboardEndpoint",
+				"operationId": "GetLeaderboard",
 				"parameters": [
 					{
 						"name": "leaderboard",
@@ -6347,16 +6379,6 @@
 								}
 							]
 						}
-					},
-					{
-						"name": "new",
-						"in": "query",
-						"description": "Use new leaderboard backend (will be default in the future)",
-						"schema": {
-							"type": "boolean",
-							"default": true,
-							"nullable": true
-						}
 					}
 				],
 				"responses": {
@@ -6386,8 +6408,8 @@
 		"/leaderboards": {
 			"get": {
 				"tags": ["Leaderboard"],
-				"summary": "Get leaderboards",
-				"operationId": "EliteAPIFeaturesLeaderboardsEndpointsGetLeaderboardsGetLeaderboardsEndpoint",
+				"summary": "Get Leaderboards",
+				"operationId": "GetLeaderboards",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -6402,11 +6424,144 @@
 				}
 			}
 		},
+		"/leaderboards-multiple/{playerUuid}/{profileUuid}": {
+			"get": {
+				"tags": ["Leaderboard"],
+				"summary": "Get multiple leaderboard ranks for a player",
+				"operationId": "GetMultiplePlayerRanks",
+				"parameters": [
+					{
+						"name": "playerUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "profileUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "leaderboards",
+						"in": "query",
+						"required": true,
+						"description": "Ids of leaderboards (comma-separated)",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "includeUpcoming",
+						"in": "query",
+						"description": "Include upcoming players",
+						"schema": {
+							"type": "boolean",
+							"default": false,
+							"nullable": true
+						}
+					},
+					{
+						"name": "upcoming",
+						"in": "query",
+						"description": "Amount of upcoming players to include (max 10).",
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"default": 0,
+							"nullable": true
+						}
+					},
+					{
+						"name": "previous",
+						"in": "query",
+						"description": "Amount of passed players to include (max 3).",
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"default": 0,
+							"nullable": true
+						}
+					},
+					{
+						"name": "atRank",
+						"in": "query",
+						"description": "Start at a specified rank for upcoming players",
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"nullable": true
+						}
+					},
+					{
+						"name": "interval",
+						"in": "query",
+						"description": "Time interval key of a monthly leaderboard. Format: yyyy-MM",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "mode",
+						"in": "query",
+						"description": "Game mode to filter leaderboard by. Leave empty to get all modes.\nOptions: \"ironman\", \"island\", \"classic\"",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "removed",
+						"in": "query",
+						"description": "Removed filter to get leaderboard entries that have been removed from the leaderboard.\nDefault is profiles that have not been removed/wiped.\n0 = Not Removed\n1 = Removed\n2 = All",
+						"schema": {
+							"default": 0,
+							"nullable": true,
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/RemovedFilter"
+								}
+							]
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"additionalProperties": {
+										"$ref": "#/components/schemas/LeaderboardPositionDto"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/leaderboards/{playerUuid}/{profileUuid}": {
 			"get": {
 				"tags": ["Leaderboard"],
 				"summary": "Get a Player's Leaderboard Ranks",
-				"operationId": "EliteAPIFeaturesLeaderboardsEndpointsGetPlayerLeaderboardRanksGetPlayerLeaderboardRanksEndpoint",
+				"operationId": "GetPlayerLeaderboardRanks",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -6453,7 +6608,7 @@
 			"get": {
 				"tags": ["Leaderboard"],
 				"summary": "Get a Player's Leaderboard Rank",
-				"operationId": "EliteAPIFeaturesLeaderboardsEndpointsGetPlayerRankGetPlayerRankEndpoint1",
+				"operationId": "GetPlayerRank1",
 				"parameters": [
 					{
 						"name": "leaderboard",
@@ -6502,22 +6657,23 @@
 						}
 					},
 					{
+						"name": "previous",
+						"in": "query",
+						"description": "Amount of passed players to include (max 3).",
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"default": 0,
+							"nullable": true
+						}
+					},
+					{
 						"name": "atRank",
 						"in": "query",
 						"description": "Start at a specified rank for upcoming players",
 						"schema": {
 							"type": "integer",
 							"format": "int32",
-							"nullable": true
-						}
-					},
-					{
-						"name": "new",
-						"in": "query",
-						"description": "Use new leaderboard backend (will be removed in the future)",
-						"schema": {
-							"type": "boolean",
-							"default": true,
 							"nullable": true
 						}
 					},
@@ -6582,7 +6738,7 @@
 			"get": {
 				"tags": ["Leaderboard"],
 				"summary": "Get a Player's Leaderboard Rank",
-				"operationId": "EliteAPIFeaturesLeaderboardsEndpointsGetPlayerRankGetPlayerRankEndpoint2",
+				"operationId": "GetPlayerRank2",
 				"parameters": [
 					{
 						"name": "leaderboard",
@@ -6628,20 +6784,21 @@
 						}
 					},
 					{
+						"name": "previous",
+						"in": "query",
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"default": 0,
+							"nullable": true
+						}
+					},
+					{
 						"name": "atRank",
 						"in": "query",
 						"schema": {
 							"type": "integer",
 							"format": "int32",
-							"nullable": true
-						}
-					},
-					{
-						"name": "new",
-						"in": "query",
-						"schema": {
-							"type": "boolean",
-							"default": true,
 							"nullable": true
 						}
 					},
@@ -6703,7 +6860,7 @@
 			"get": {
 				"tags": ["Leaderboard"],
 				"summary": "Get a Player's Leaderboard Ranks",
-				"operationId": "EliteAPIFeaturesLeaderboardsEndpointsGetPlayerRanksGetPlayerRanksEndpoint",
+				"operationId": "GetPlayerRanks",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -6751,7 +6908,7 @@
 			"get": {
 				"tags": ["Leaderboard"],
 				"summary": "Get a Profiles's Leaderboard Rank",
-				"operationId": "EliteAPIFeaturesLeaderboardsEndpointsGetProfileRankGetProfileRankEndpoint1",
+				"operationId": "GetProfileRank1",
 				"parameters": [
 					{
 						"name": "leaderboard",
@@ -6783,7 +6940,18 @@
 					{
 						"name": "upcoming",
 						"in": "query",
-						"description": "Amount of upcoming players to include (max 100). Only works with new leaderboard backend",
+						"description": "Amount of upcoming players to include (max 100).",
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"default": 0,
+							"nullable": true
+						}
+					},
+					{
+						"name": "previous",
+						"in": "query",
+						"description": "Amount of passed players to include (max 3).",
 						"schema": {
 							"type": "integer",
 							"format": "int32",
@@ -6798,16 +6966,6 @@
 						"schema": {
 							"type": "integer",
 							"format": "int32",
-							"nullable": true
-						}
-					},
-					{
-						"name": "new",
-						"in": "query",
-						"description": "Use new leaderboard backend (will be default in the future)",
-						"schema": {
-							"type": "boolean",
-							"default": true,
 							"nullable": true
 						}
 					},
@@ -6872,7 +7030,7 @@
 			"get": {
 				"tags": ["Leaderboard"],
 				"summary": "Get a Profiles's Leaderboard Rank",
-				"operationId": "EliteAPIFeaturesLeaderboardsEndpointsGetProfileRankGetProfileRankEndpoint2",
+				"operationId": "GetProfileRank2",
 				"parameters": [
 					{
 						"name": "leaderboard",
@@ -6910,20 +7068,21 @@
 						}
 					},
 					{
+						"name": "previous",
+						"in": "query",
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"default": 0,
+							"nullable": true
+						}
+					},
+					{
 						"name": "atRank",
 						"in": "query",
 						"schema": {
 							"type": "integer",
 							"format": "int32",
-							"nullable": true
-						}
-					},
-					{
-						"name": "new",
-						"in": "query",
-						"schema": {
-							"type": "boolean",
-							"default": true,
 							"nullable": true
 						}
 					},
@@ -6985,7 +7144,7 @@
 			"get": {
 				"tags": ["Account"],
 				"summary": "Get all entitlements for a user or guild",
-				"operationId": "EliteAPIFeaturesMonetizationEndpointsGetEntitlementsGetEntitlementsEndpoint",
+				"operationId": "GetEntitlements",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -7053,7 +7212,7 @@
 				"tags": ["Account"],
 				"summary": "Grant a test entitlement to a user or guild",
 				"description": "This passes along a request to Discord to grant a test entitlement to a user or guild, which only works on subscription products.",
-				"operationId": "EliteAPIFeaturesMonetizationEndpointsGrantTestEntitlementGrantTestEntitlementEndpoint",
+				"operationId": "GrantTestEntitlement",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -7118,7 +7277,7 @@
 				"tags": ["Account"],
 				"summary": "Remove a test entitlement from a user or guild",
 				"description": "This passes along a request to Discord to remove a test entitlement from a user or guild.",
-				"operationId": "EliteAPIFeaturesMonetizationEndpointsRemoveTestEntitlementRemoveTestEntitlementEndpoint",
+				"operationId": "RemoveTestEntitlement",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -7183,7 +7342,7 @@
 			"get": {
 				"tags": ["Player"],
 				"summary": "Get Linked Accounts",
-				"operationId": "EliteAPIFeaturesPlayerGetLinkedAccountsGetLinkedAccountsEndpoint",
+				"operationId": "GetLinkedAccounts",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -7226,7 +7385,7 @@
 			"get": {
 				"tags": ["Player"],
 				"summary": "Get Player Data",
-				"operationId": "EliteAPIFeaturesPlayerGetPlayerDataGetPlayerDataEndpoint",
+				"operationId": "GetPlayerData",
 				"parameters": [
 					{
 						"name": "player",
@@ -7268,7 +7427,7 @@
 			"get": {
 				"tags": ["Profile"],
 				"summary": "Get All Profile Details",
-				"operationId": "EliteAPIFeaturesProfilesEndpointsGetAllProfileDetailsGetAllProfileDetailsEndpoint",
+				"operationId": "GetAllProfileDetails",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -7310,7 +7469,7 @@
 			"get": {
 				"tags": ["Profile"],
 				"summary": "Get Profile Member",
-				"operationId": "EliteAPIFeaturesProfilesEndpointsGetProfileGetProfileEndpoint",
+				"operationId": "GetProfile",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -7360,7 +7519,7 @@
 			"get": {
 				"tags": ["Profile"],
 				"summary": "Get Profile Details",
-				"operationId": "EliteAPIFeaturesProfilesEndpointsGetProfileDetailsGetProfileDetailsEndpoint",
+				"operationId": "GetProfileDetails",
 				"parameters": [
 					{
 						"name": "profileUuid",
@@ -7402,7 +7561,7 @@
 			"get": {
 				"tags": ["Profile"],
 				"summary": "Get names of a player's profiles",
-				"operationId": "EliteAPIFeaturesProfilesEndpointsGetProfileNamesGetProfileNamesEndpoint",
+				"operationId": "GetProfileNames",
 				"parameters": [
 					{
 						"name": "player",
@@ -7444,7 +7603,7 @@
 			"get": {
 				"tags": ["Profile"],
 				"summary": "Get Profile Member",
-				"operationId": "EliteAPIFeaturesProfilesEndpointsGetSelectedProfileGetSelectedProfileEndpoint",
+				"operationId": "GetSelectedProfile",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -7487,7 +7646,7 @@
 				"tags": ["Resources"],
 				"summary": "Get Auction House",
 				"description": "Get lowest auction house prices.",
-				"operationId": "EliteAPIFeaturesResourcesAuctionsEndpointsGetAuctionHouseProductsEndpoint",
+				"operationId": "GetAuctionHouseProducts",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -7507,7 +7666,7 @@
 				"tags": ["Resources"],
 				"summary": "Get Bazaar Product",
 				"description": "Get a specific bazaar product and it's npc price (if it exists)",
-				"operationId": "EliteAPIFeaturesResourcesBazaarEndpointsGetBazaarProductEndpoint",
+				"operationId": "GetBazaarProduct",
 				"parameters": [
 					{
 						"name": "itemId",
@@ -7537,7 +7696,7 @@
 				"tags": ["Resources"],
 				"summary": "Get Bazaar Products",
 				"description": "Get all bazaar products.",
-				"operationId": "EliteAPIFeaturesResourcesBazaarEndpointsGetBazaarProductsEndpoint",
+				"operationId": "GetBazaarProducts",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -7552,12 +7711,52 @@
 				}
 			}
 		},
+		"/resources/firesales/current": {
+			"get": {
+				"tags": ["Resources"],
+				"summary": "Get Current Skyblock Firesale",
+				"description": "Get the current/upcoming Skyblock firesales.",
+				"operationId": "SkyblockFiresale",
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SkyblockFiresalesResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/resources/gems": {
+			"get": {
+				"tags": ["Resources"],
+				"summary": "Get Skyblock Gem Shops",
+				"description": "Get the current/upcoming Skyblock firesales, Taylor's Collection, and Seasonal Bundles.",
+				"operationId": "SkyblockGemShop",
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SkyblockGemShopsResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/resources/item-parse": {
 			"post": {
 				"tags": ["Resources"],
 				"summary": "Parse Skyblock Item from Bytes",
 				"description": "Get an ItemDto from raw bytes from Hypixel",
-				"operationId": "EliteAPIFeaturesResourcesItemsEndpointsGetItemsFromBytesEndpoint",
+				"operationId": "GetItemsFromBytes",
 				"requestBody": {
 					"x-name": "GetItemsFromBytesRequest",
 					"description": "",
@@ -7590,7 +7789,7 @@
 				"tags": ["Resources"],
 				"summary": "Get Skyblock Items",
 				"description": "Get all items in the Hypixel resources endpoint",
-				"operationId": "EliteAPIFeaturesResourcesItemsEndpointsGetSkyblockItemsEndpoint",
+				"operationId": "GetSkyblockItems",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -7608,7 +7807,7 @@
 				"tags": ["Resources"],
 				"summary": "Get Specific Skyblock Items",
 				"description": "Get specific skyblock items from the Hypixel resources endpoint, along with bazaar data for each.",
-				"operationId": "EliteAPIFeaturesResourcesItemsEndpointsGetSpecifiedSkyblockItemsEndpoint",
+				"operationId": "GetSpecifiedSkyblockItems",
 				"requestBody": {
 					"x-name": "GetSpecifiedSkyblockItemsRequest",
 					"description": "",
@@ -7651,7 +7850,7 @@
 				"tags": ["Resources"],
 				"summary": "Get Skyblock Item",
 				"description": "Get the Hypixel provided data of a specific item, as well as a bazaar summary.",
-				"operationId": "EliteAPIFeaturesResourcesItemsEndpointsSkyblockProductEndpoint",
+				"operationId": "SkyblockProduct",
 				"parameters": [
 					{
 						"name": "itemId",
@@ -7680,7 +7879,7 @@
 			"post": {
 				"tags": ["Shop"],
 				"summary": "Add Product to Shop Category",
-				"operationId": "EliteAPIFeaturesShopCategoriesAddProductAddProductToCategoryEndpoint",
+				"operationId": "AddProductToCategory",
 				"parameters": [
 					{
 						"name": "categoryId",
@@ -7723,7 +7922,7 @@
 			"delete": {
 				"tags": ["Shop"],
 				"summary": "Remove Product from Shop Category",
-				"operationId": "EliteAPIFeaturesShopCategoriesRemoveProductRemoveProductToCategoryEndpoint",
+				"operationId": "RemoveProductToCategory",
 				"parameters": [
 					{
 						"name": "categoryId",
@@ -7768,7 +7967,7 @@
 			"post": {
 				"tags": ["Shop"],
 				"summary": "Create Shop Category",
-				"operationId": "EliteAPIFeaturesShopCategoriesCreateCategoryCreateCategoryEndpoint",
+				"operationId": "CreateCategory",
 				"requestBody": {
 					"x-name": "CreateCategoryDto",
 					"description": "",
@@ -7804,7 +8003,7 @@
 			"delete": {
 				"tags": ["Shop"],
 				"summary": "Delete Shop Category",
-				"operationId": "EliteAPIFeaturesShopCategoriesDeleteCategoryUpdateCategoryEndpoint",
+				"operationId": "DeleteCategory",
 				"parameters": [
 					{
 						"name": "categoryId",
@@ -7837,7 +8036,7 @@
 			"patch": {
 				"tags": ["Shop"],
 				"summary": "Update Shop Category",
-				"operationId": "EliteAPIFeaturesShopCategoriesUpdateCategoryUpdateCategoryEndpoint",
+				"operationId": "UpdateCategory",
 				"parameters": [
 					{
 						"name": "categoryId",
@@ -7883,7 +8082,7 @@
 			"get": {
 				"tags": ["Shop"],
 				"summary": "Get Shop Categories",
-				"operationId": "EliteAPIFeaturesShopCategoriesGetCategoriesGetCategoriesEndpoint",
+				"operationId": "GetCategories",
 				"parameters": [
 					{
 						"name": "includeProducts",
@@ -7916,7 +8115,7 @@
 			"get": {
 				"tags": ["Shop"],
 				"summary": "Get Shop Category",
-				"operationId": "EliteAPIFeaturesShopCategoriesGetCategoryGetCategoryEndpoint",
+				"operationId": "GetCategory",
 				"parameters": [
 					{
 						"name": "category",
@@ -7946,12 +8145,12 @@
 			"post": {
 				"tags": ["Shop"],
 				"summary": "Reorder Shop Categories",
-				"operationId": "EliteAPIFeaturesShopCategoriesReorderCategoriesReorderCategoriesEndpoint",
+				"operationId": "ReorderCategories",
 				"requestBody": {
 					"x-name": "ReorderIntRequest",
 					"description": "",
 					"content": {
-						"*/*": {
+						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/ReorderIntRequest"
 							}
@@ -7992,7 +8191,7 @@
 			"post": {
 				"tags": ["Shop"],
 				"summary": "Reorder Products in Shop Category",
-				"operationId": "EliteAPIFeaturesShopCategoriesReorderCategoryProductsReorderCategoryProductsEndpoint",
+				"operationId": "ReorderCategoryProducts",
 				"parameters": [
 					{
 						"name": "categoryId",
@@ -8009,7 +8208,7 @@
 					"x-name": "ReorderCategoryProductsRequest",
 					"description": "",
 					"content": {
-						"*/*": {
+						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/ReorderCategoryProductsRequest"
 							}
@@ -8050,7 +8249,7 @@
 			"post": {
 				"tags": ["Product"],
 				"summary": "Add Cosmetic to Product",
-				"operationId": "EliteAPIFeaturesShopProductsAdminAddCosmeticAddCosmeticToProductEndpoint",
+				"operationId": "AddCosmeticToProduct",
 				"parameters": [
 					{
 						"name": "productId",
@@ -8093,7 +8292,7 @@
 			"delete": {
 				"tags": ["Product"],
 				"summary": "Remove Cosmetic from Product",
-				"operationId": "EliteAPIFeaturesShopProductsAdminRemoveCosmeticRemoveCosmeticToProductEndpoint",
+				"operationId": "RemoveCosmeticToProduct",
 				"parameters": [
 					{
 						"name": "productId",
@@ -8138,7 +8337,7 @@
 			"post": {
 				"tags": ["Product"],
 				"summary": "Add Image To Product",
-				"operationId": "EliteAPIFeaturesShopProductsAdminAddProductImageAddProductImageEndpoint",
+				"operationId": "AddProductImage",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -8204,7 +8403,7 @@
 			"delete": {
 				"tags": ["Product"],
 				"summary": "Remove Image from Product",
-				"operationId": "EliteAPIFeaturesShopProductsAdminDeleteProductImageDeleteProductImageEndpoint",
+				"operationId": "DeleteProductImage",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -8257,7 +8456,7 @@
 			"get": {
 				"tags": ["Product"],
 				"summary": "Get Admin Shop Products",
-				"operationId": "EliteAPIFeaturesShopProductsAdminGetAllProductsGetAllProductsEndpoint",
+				"operationId": "GetAllProducts",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -8290,7 +8489,7 @@
 			"post": {
 				"tags": ["Product"],
 				"summary": "Refresh Shop Products",
-				"operationId": "EliteAPIFeaturesShopProductsAdminRefreshProductsRefreshProductsEndpoint",
+				"operationId": "RefreshProducts",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -8323,7 +8522,7 @@
 			"patch": {
 				"tags": ["Product"],
 				"summary": "Update Shop Product",
-				"operationId": "EliteAPIFeaturesShopProductsAdminUpdateProductUpdateProductEndpoint",
+				"operationId": "UpdateProduct",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -8377,7 +8576,7 @@
 			"get": {
 				"tags": ["Product"],
 				"summary": "Get Shop Product",
-				"operationId": "EliteAPIFeaturesShopProductsGetProductGetProductEndpoint",
+				"operationId": "GetProduct",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -8417,7 +8616,7 @@
 			"post": {
 				"tags": ["Product"],
 				"summary": "Claim Free Shop Product",
-				"operationId": "EliteAPIFeaturesShopProductsClaimProductClaimProductEndpoint",
+				"operationId": "ClaimProduct",
 				"parameters": [
 					{
 						"name": "discordId",
@@ -8458,7 +8657,7 @@
 			"get": {
 				"tags": ["Product"],
 				"summary": "Get Shop Products",
-				"operationId": "EliteAPIFeaturesShopProductsGetProductsGetProductsEndpoint",
+				"operationId": "GetProducts",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -8480,7 +8679,7 @@
 			"post": {
 				"tags": ["Product"],
 				"summary": "Add Image To Style",
-				"operationId": "EliteAPIFeaturesShopStylesAddStyleImageAddStyleImageEndpoint",
+				"operationId": "AddStyleImage",
 				"parameters": [
 					{
 						"name": "styleId",
@@ -8535,7 +8734,7 @@
 			"post": {
 				"tags": ["Product"],
 				"summary": "Create Shop Style",
-				"operationId": "EliteAPIFeaturesShopStylesCreateStyleCreateStyleEndpoint",
+				"operationId": "CreateStyle",
 				"requestBody": {
 					"x-name": "CreateStyleRequest",
 					"description": "",
@@ -8581,7 +8780,7 @@
 			"delete": {
 				"tags": ["Product"],
 				"summary": "Delete Shop Style",
-				"operationId": "EliteAPIFeaturesShopStylesDeleteStyleDeleteStyleEndpoint",
+				"operationId": "DeleteStyle",
 				"parameters": [
 					{
 						"name": "styleId",
@@ -8613,7 +8812,7 @@
 			"get": {
 				"tags": ["Product"],
 				"summary": "Get Shop Style",
-				"operationId": "EliteAPIFeaturesShopStylesGetStyleGetStyleEndpoint",
+				"operationId": "GetStyle",
 				"parameters": [
 					{
 						"name": "styleId",
@@ -8641,7 +8840,7 @@
 			"post": {
 				"tags": ["Product"],
 				"summary": "Update Shop Style",
-				"operationId": "EliteAPIFeaturesShopStylesUpdateStyleUpdateStyleEndpoint",
+				"operationId": "UpdateStyle",
 				"parameters": [
 					{
 						"name": "styleId",
@@ -8696,7 +8895,7 @@
 			"delete": {
 				"tags": ["Product"],
 				"summary": "Remove Image from Style",
-				"operationId": "EliteAPIFeaturesShopStylesDeleteStyleImageDeleteStyleImageEndpoint",
+				"operationId": "DeleteStyleImage",
 				"parameters": [
 					{
 						"name": "styleId",
@@ -8738,7 +8937,7 @@
 			"get": {
 				"tags": ["Product"],
 				"summary": "Get Shop Styles",
-				"operationId": "EliteAPIFeaturesShopStylesGetStylesGetStylesEndpoint",
+				"operationId": "GetStyles",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -8761,7 +8960,7 @@
 				"tags": ["Weight"],
 				"summary": "Get all weight constants",
 				"description": "Get all farming weight constants",
-				"operationId": "EliteAPIFeaturesWeightGetAllWeightsGetAllWeightsEndpoint",
+				"operationId": "GetAllWeights",
 				"responses": {
 					"200": {
 						"description": "Success",
@@ -8780,7 +8979,7 @@
 			"get": {
 				"tags": ["Weight"],
 				"summary": "Get farming weight for a profile member",
-				"operationId": "EliteAPIFeaturesWeightGetWeightForProfileGetWeightForProfileEndpoint",
+				"operationId": "GetWeightForProfile",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -8829,7 +9028,7 @@
 			"get": {
 				"tags": ["Weight"],
 				"summary": "Get farming weight for a player's selected profile",
-				"operationId": "EliteAPIFeaturesWeightGetWeightForSelectedGetWeightForSelectedEndpoint",
+				"operationId": "GetWeightForSelected",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -8871,7 +9070,7 @@
 				"tags": ["Weight"],
 				"summary": "Get farming weight for all profiles of a player",
 				"description": "Get farming weight for all profiles of a player",
-				"operationId": "EliteAPIFeaturesWeightGetWeightProfilesGetWeightForProfilesEndpoint",
+				"operationId": "GetWeightForProfiles",
 				"parameters": [
 					{
 						"name": "playerUuid",
@@ -9313,7 +9512,7 @@
 			"ImageAttachmentDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["url"],
+				"required": ["width", "height", "sources", "url"],
 				"properties": {
 					"title": {
 						"type": "string",
@@ -9333,9 +9532,42 @@
 						"format": "int32",
 						"nullable": true
 					},
+					"width": {
+						"type": "integer",
+						"description": "The original width of the image.",
+						"format": "int32"
+					},
+					"height": {
+						"type": "integer",
+						"description": "The original height of the image.",
+						"format": "int32"
+					},
+					"sources": {
+						"type": "object",
+						"description": "A dictionary of available image sources, keyed by a logical name (e.g., \"small\", \"medium\").",
+						"additionalProperties": {
+							"$ref": "#/components/schemas/ImageSourceDto"
+						}
+					},
 					"url": {
 						"type": "string",
-						"description": "Full image URL"
+						"description": "Lowest quality image URL"
+					}
+				}
+			},
+			"ImageSourceDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["url", "width"],
+				"properties": {
+					"url": {
+						"type": "string",
+						"description": "The fully-qualified public URL for this image variant."
+					},
+					"width": {
+						"type": "integer",
+						"description": "The width of this image variant in pixels.",
+						"format": "int32"
 					}
 				}
 			},
@@ -9465,24 +9697,20 @@
 			},
 			"ErrorResponse": {
 				"type": "object",
-				"description": "the dto used to send an error response to the client",
 				"additionalProperties": false,
 				"required": ["statusCode", "message", "errors"],
 				"properties": {
 					"statusCode": {
 						"type": "integer",
-						"description": "the http status code sent to the client. default is 400.",
 						"format": "int32",
 						"default": 400
 					},
 					"message": {
 						"type": "string",
-						"description": "the message for the error response",
 						"default": "One or more errors occurred!"
 					},
 					"errors": {
 						"type": "object",
-						"description": "the collection of errors for the current context",
 						"additionalProperties": {
 							"type": "array",
 							"items": {
@@ -9841,7 +10069,6 @@
 			},
 			"ProblemDetails": {
 				"type": "object",
-				"description": "RFC7807 compatible problem details/ error response class. this can be used by configuring startup like so:\napp.UseFastEndpoints(c => c.Errors.UseProblemDetails())",
 				"additionalProperties": false,
 				"required": ["type", "title", "status", "instance", "traceId", "errors"],
 				"properties": {
@@ -9868,7 +10095,6 @@
 					},
 					"detail": {
 						"type": "string",
-						"description": "the details of the error",
 						"nullable": true
 					},
 					"errors": {
@@ -9881,28 +10107,23 @@
 			},
 			"ProblemDetails_Error": {
 				"type": "object",
-				"description": "the error details object",
 				"additionalProperties": false,
 				"required": ["name", "reason"],
 				"properties": {
 					"name": {
 						"type": "string",
-						"description": "the name of the error or property of the dto that caused the error",
 						"default": "Error or field name"
 					},
 					"reason": {
 						"type": "string",
-						"description": "the reason for the error",
 						"default": "Error reason"
 					},
 					"code": {
 						"type": "string",
-						"description": "the code of the error",
 						"nullable": true
 					},
 					"severity": {
 						"type": "string",
-						"description": "the severity of the error",
 						"nullable": true
 					}
 				}
@@ -9977,6 +10198,36 @@
 			"UserRoleRequest": {
 				"type": "object",
 				"additionalProperties": false
+			},
+			"AccountWithPermsDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["id", "displayName", "username", "roles"],
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"displayName": {
+						"type": "string"
+					},
+					"username": {
+						"type": "string"
+					},
+					"roles": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"discriminator": {
+						"type": "string",
+						"nullable": true
+					},
+					"avatar": {
+						"type": "string",
+						"nullable": true
+					}
+				}
 			},
 			"EventIdRequest": {
 				"type": "object",
@@ -10098,36 +10349,6 @@
 			"SetEventApprovalRequest": {
 				"type": "object",
 				"additionalProperties": false
-			},
-			"AccountWithPermsDto": {
-				"type": "object",
-				"additionalProperties": false,
-				"required": ["id", "displayName", "username", "roles"],
-				"properties": {
-					"id": {
-						"type": "string"
-					},
-					"displayName": {
-						"type": "string"
-					},
-					"username": {
-						"type": "string"
-					},
-					"roles": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						}
-					},
-					"discriminator": {
-						"type": "string",
-						"nullable": true
-					},
-					"avatar": {
-						"type": "string",
-						"nullable": true
-					}
-				}
 			},
 			"AdminLinkAccountRequest": {
 				"type": "object",
@@ -10967,6 +11188,7 @@
 					},
 					"timestamp": {
 						"type": "integer",
+						"description": "Timestamp of the contest in seconds since unix epoch.",
 						"format": "int64"
 					},
 					"collected": {
@@ -11408,7 +11630,7 @@
 			"JacobContestDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["crop", "timestamp", "participants"],
+				"required": ["crop", "timestamp", "participants", "brackets"],
 				"properties": {
 					"crop": {
 						"type": "string"
@@ -11420,6 +11642,9 @@
 					"participants": {
 						"type": "integer",
 						"format": "int32"
+					},
+					"brackets": {
+						"$ref": "#/components/schemas/ContestBracketsDto"
 					}
 				}
 			},
@@ -13045,6 +13270,10 @@
 						"type": "string",
 						"nullable": true
 					},
+					"firstInterval": {
+						"type": "string",
+						"nullable": true
+					},
 					"limit": {
 						"type": "integer",
 						"format": "int32"
@@ -13286,6 +13515,58 @@
 				"x-enumNames": ["Double", "Long", "Decimal"],
 				"enum": [0, 1, 2]
 			},
+			"LeaderboardPositionDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["rank", "amount", "initialAmount", "minAmount", "upcomingRank"],
+				"properties": {
+					"rank": {
+						"type": "integer",
+						"description": "Current rank of the player (-1 if not on leaderboard)",
+						"format": "int32"
+					},
+					"amount": {
+						"type": "number",
+						"description": "Current score of the player (0 if not on leaderboard)",
+						"format": "double"
+					},
+					"initialAmount": {
+						"type": "number",
+						"description": "The starting amount of the leaderboard entry for interval based leaderboards",
+						"format": "double"
+					},
+					"minAmount": {
+						"type": "number",
+						"description": "The minimum amount required to be on the leaderboard. If this is a time based leaderboard,\nthis score is instead required on the normal leaderboard before the player can be on the\ntime based leaderboard",
+						"format": "double"
+					},
+					"upcomingRank": {
+						"type": "integer",
+						"description": "The starting rank of the returned upcoming players list",
+						"format": "int32"
+					},
+					"upcomingPlayers": {
+						"type": "array",
+						"description": "List of upcoming players",
+						"nullable": true,
+						"items": {
+							"$ref": "#/components/schemas/LeaderboardEntryDto"
+						}
+					},
+					"previous": {
+						"type": "array",
+						"description": "List of previous players",
+						"nullable": true,
+						"items": {
+							"$ref": "#/components/schemas/LeaderboardEntryDto"
+						}
+					}
+				}
+			},
+			"GetMultiplePlayerRanksRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
 			"LeaderboardRanksResponse": {
 				"type": "object",
 				"additionalProperties": false,
@@ -13342,46 +13623,6 @@
 			"LeaderboardRanksRequest": {
 				"type": "object",
 				"additionalProperties": false
-			},
-			"LeaderboardPositionDto": {
-				"type": "object",
-				"additionalProperties": false,
-				"required": ["rank", "amount", "initialAmount", "minAmount", "upcomingRank"],
-				"properties": {
-					"rank": {
-						"type": "integer",
-						"description": "Current rank of the player (-1 if not on leaderboard)",
-						"format": "int32"
-					},
-					"amount": {
-						"type": "number",
-						"description": "Current score of the player (0 if not on leaderboard)",
-						"format": "double"
-					},
-					"initialAmount": {
-						"type": "number",
-						"description": "The starting amount of the leaderboard entry for interval based leaderboards",
-						"format": "double"
-					},
-					"minAmount": {
-						"type": "number",
-						"description": "The minimum amount required to be on the leaderboard. If this is a time based leaderboard,\nthis score is instead required on the normal leaderboard before the player can be on the\ntime based leaderboard",
-						"format": "double"
-					},
-					"upcomingRank": {
-						"type": "integer",
-						"description": "The starting rank of the returned upcoming players list",
-						"format": "int32"
-					},
-					"upcomingPlayers": {
-						"type": "array",
-						"description": "List of upcoming players",
-						"nullable": true,
-						"items": {
-							"$ref": "#/components/schemas/LeaderboardEntryDto"
-						}
-					}
-				}
 			},
 			"GetPlayerRankRequest": {
 				"type": "object",
@@ -13467,6 +13708,7 @@
 					"profileName",
 					"api",
 					"skyblockXp",
+					"socialXp",
 					"purse",
 					"bankBalance",
 					"collections",
@@ -13499,6 +13741,10 @@
 					"skyblockXp": {
 						"type": "integer",
 						"format": "int32"
+					},
+					"socialXp": {
+						"type": "number",
+						"format": "double"
 					},
 					"purse": {
 						"type": "number",
@@ -13794,7 +14040,7 @@
 			"JacobPerksDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["doubleDrops", "levelCap"],
+				"required": ["doubleDrops", "levelCap", "personalBests"],
 				"properties": {
 					"doubleDrops": {
 						"type": "integer",
@@ -13803,6 +14049,9 @@
 					"levelCap": {
 						"type": "integer",
 						"format": "int32"
+					},
+					"personalBests": {
+						"type": "boolean"
 					}
 				}
 			},
@@ -14556,6 +14805,169 @@
 					}
 				}
 			},
+			"SkyblockFiresalesResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["firesales"],
+				"properties": {
+					"firesales": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/SkyblockFiresaleDto"
+						}
+					}
+				}
+			},
+			"SkyblockFiresaleDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["startsAt", "endsAt", "items"],
+				"properties": {
+					"startsAt": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"endsAt": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"items": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/SkyblockFiresaleItemDto"
+						}
+					}
+				}
+			},
+			"SkyblockFiresaleItemDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["itemId", "amount", "price", "startsAt", "endsAt"],
+				"properties": {
+					"itemId": {
+						"type": "string"
+					},
+					"amount": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"price": {
+						"type": "integer",
+						"description": "Price in Skyblock Gems",
+						"format": "int32"
+					},
+					"startsAt": {
+						"type": "integer",
+						"description": "Unix seconds",
+						"format": "int64"
+					},
+					"endsAt": {
+						"type": "integer",
+						"description": "Unix seconds",
+						"format": "int64"
+					}
+				}
+			},
+			"SkyblockGemShopsResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["firesales", "taylorCollection", "seasonalBundles"],
+				"properties": {
+					"firesales": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/SkyblockFiresaleDto"
+						}
+					},
+					"taylorCollection": {
+						"$ref": "#/components/schemas/TaylorCollection"
+					},
+					"seasonalBundles": {
+						"$ref": "#/components/schemas/TaylorCollection"
+					}
+				}
+			},
+			"TaylorCollection": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["items"],
+				"properties": {
+					"items": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/TaylorCollectionItem"
+						}
+					}
+				}
+			},
+			"TaylorCollectionItem": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["name", "output", "cost", "released"],
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"output": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/UpgradeCost"
+						}
+					},
+					"cost": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/UpgradeCost"
+						}
+					},
+					"released": {
+						"type": "string"
+					}
+				}
+			},
+			"UpgradeCost": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["type", "amount"],
+				"properties": {
+					"type": {
+						"$ref": "#/components/schemas/UpgradeCostType"
+					},
+					"essence_type": {
+						"type": "string",
+						"nullable": true
+					},
+					"item_id": {
+						"type": "string",
+						"nullable": true
+					},
+					"medal_type": {
+						"type": "string",
+						"nullable": true
+					},
+					"amount": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"UpgradeCostType": {
+				"type": "integer",
+				"description": "",
+				"x-enumNames": [
+					"Unknown",
+					"Item",
+					"Essence",
+					"Coins",
+					"Motes",
+					"Copper",
+					"Gems",
+					"Bits",
+					"JacobMedal",
+					"Pelts"
+				],
+				"enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+			},
 			"GetItemsFromBytesResponse": {
 				"type": "object",
 				"additionalProperties": false,
@@ -14755,23 +15167,25 @@
 			"ItemSkin": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["value", "signature"],
 				"properties": {
 					"value": {
-						"type": "string"
+						"type": "string",
+						"nullable": true
 					},
 					"signature": {
-						"type": "string"
+						"type": "string",
+						"nullable": true
 					}
 				}
 			},
 			"ItemGemstoneSlot": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["slot_type", "costs"],
+				"required": ["costs"],
 				"properties": {
 					"slot_type": {
-						"type": "string"
+						"type": "string",
+						"nullable": true
 					},
 					"costs": {
 						"type": "array",
@@ -14909,13 +15323,10 @@
 			},
 			"JsonDocument": {
 				"type": "object",
-				"description": "Provides a mechanism for examining the structural content of a JSON value without automatically instantiating data values.",
 				"additionalProperties": false,
 				"required": ["rootElement"],
 				"properties": {
-					"rootElement": {
-						"description": "Gets the root element of this JSON document."
-					}
+					"rootElement": {}
 				}
 			},
 			"GetSpecifiedSkyblockItemsResponse": {

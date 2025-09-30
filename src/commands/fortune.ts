@@ -91,6 +91,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		accessories: member.farmingWeight.inventory?.accessories ?? [],
 		pets: member.pets ?? [],
 		personalBests: member.jacob.stats?.personalBests,
+		personalBestsUnlocked: member.jacob.perks?.personalBests ?? false,
 		bestiaryKills: (member.unparsed?.bestiary as { kills?: Record<string, number> })?.kills,
 		anitaBonus: member.jacob.perks?.doubleDrops,
 		uniqueVisitors: member.garden?.uniqueVisitors,

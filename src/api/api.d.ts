@@ -11,13 +11,16 @@ export interface paths {
 			path?: never;
 			cookie?: never;
 		};
-		/** Get Minecraft Account */
-		get: operations['EliteAPIFeaturesAccountGetAccountGetAccountEndpoint'];
+		/**
+		 * Get Account
+		 * @description Retrieves the Minecraft account information for a given player, along with an overview of their profiles and player data.
+		 */
+		get: operations['GetAccount'];
 		put?: never;
 		/** Link Account */
-		post: operations['EliteAPIFeaturesAccountLinkAccountLinkAccountEndpoint'];
+		post: operations['LinkOwnAccount'];
 		/** Unlink Account */
-		delete: operations['EliteAPIFeaturesAccountUnlinkAccountUnlinkAccountEndpoint'];
+		delete: operations['UnlinkOwnAccount'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -34,7 +37,7 @@ export interface paths {
 		 * Get Minecraft Account Face Image
 		 * @description Returns an 8x8 or 72x72 face png image of the Minecraft account associated with the provided player name or UUID. 72x72 response includes the player's "hat" overlay. If not found, returns Steve's face.
 		 */
-		get: operations['EliteAPIFeaturesAccountGetAccountFaceGetAccountFaceEndpoint1'];
+		get: operations['GetAccountFace1'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -54,7 +57,7 @@ export interface paths {
 		 * Get Minecraft Account Face Image
 		 * @description Returns an 8x8 or 72x72 face png image of the Minecraft account associated with the provided player name or UUID. 72x72 response includes the player's "hat" overlay. If not found, returns Steve's face.
 		 */
-		get: operations['EliteAPIFeaturesAccountGetAccountFaceGetAccountFaceEndpoint2'];
+		get: operations['GetAccountFace2'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -71,7 +74,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Minecraft Account from Discord Id */
-		get: operations['EliteAPIFeaturesAccountGetAccountFromDiscordGetAccountFromDiscordEndpoint'];
+		get: operations['GetAccountFromDiscord'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -88,7 +91,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Account Settings */
-		get: operations['EliteAPIFeaturesAccountGetAccountSettingsGetAccountSettingsEndpoint'];
+		get: operations['GetAccountSettings'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -105,7 +108,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Logged-In Account */
-		get: operations['EliteAPIFeaturesAccountGetAuthAccountGetAuthAccountEndpoint'];
+		get: operations['GetAuthAccount'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -124,7 +127,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Refresh Purchases */
-		post: operations['EliteAPIFeaturesAccountRefreshPurchasesRefreshPurchasesEndpoint'];
+		post: operations['RefreshPurchases'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -139,7 +142,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Search for Minecraft Account */
-		get: operations['EliteAPIFeaturesAccountSearchAccountsSearchAccountsEndpoint'];
+		get: operations['SearchAccounts'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -158,7 +161,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Set Primary Account */
-		post: operations['EliteAPIFeaturesAccountSetPrimaryAccountSetPrimaryAccountEndpoint'];
+		post: operations['SetPrimaryAccount'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -175,7 +178,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Update Account Settings */
-		post: operations['EliteAPIFeaturesAccountUpdateBadgesUpdateBadgesEndpoint'];
+		post: operations['UpdateBadges'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -192,7 +195,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Update Fortune Settings for Account */
-		post: operations['EliteAPIFeaturesAccountUpdateFortuneSettingsUpdateFortuneSettingsEndpoint'];
+		post: operations['UpdateFortuneSettings'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -213,7 +216,7 @@ export interface paths {
 		options?: never;
 		head?: never;
 		/** Update Account Settings */
-		patch: operations['EliteAPIFeaturesAccountUpdateSettingsUpdateAccountEndpoint'];
+		patch: operations['UpdateAccount'];
 		trace?: never;
 	};
 	'/admin/user/{discordId}/roles/{role}': {
@@ -226,9 +229,43 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Add a role to a user */
-		post: operations['EliteAPIFeaturesAdminAdminsAddRoleToUserAddRoleToUserEndpoint'];
+		post: operations['AddRoleToUser'];
 		/** Remove a role from a user */
-		delete: operations['EliteAPIFeaturesAdminAdminsRemoveRoleFromUserRemoveRoleFromUserEndpoint'];
+		delete: operations['RemoveRoleFromUser'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admins': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get list of admins */
+		get: operations['GetAdmins'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/roles': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get list of roles */
+		get: operations['GetRoles'];
+		put?: never;
+		post?: never;
+		delete?: never;
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -247,7 +284,7 @@ export interface paths {
 		 * Reset a player's cooldowns
 		 * @description This enables a player's data from Hypixel to be refreshed on the next request.
 		 */
-		post: operations['EliteAPIFeaturesAdminClearPlayerCooldownsClearPlayerCooldownsEndpoint'];
+		post: operations['ClearPlayerCooldowns'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -268,7 +305,7 @@ export interface paths {
 		 * Delete all upcoming contests
 		 * @description Delete all upcoming contests in case of wrong data
 		 */
-		delete: operations['EliteAPIFeaturesAdminDeleteUpcomingContestsDeleteUpcomingContestsEndpoint'];
+		delete: operations['DeleteUpcomingContests'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -285,7 +322,7 @@ export interface paths {
 		put?: never;
 		post?: never;
 		/** Delete Event */
-		delete: operations['EliteAPIFeaturesAdminEventsDeleteEventDeleteEventApprovalEndpoint'];
+		delete: operations['DeleteEventApproval'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -299,7 +336,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get events pending approval */
-		get: operations['EliteAPIFeaturesAdminEventsGetPendingEventsGetPendingEventsEndpoint'];
+		get: operations['GetPendingEvents'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -318,41 +355,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Set event approval */
-		post: operations['EliteAPIFeaturesAdminEventsSetEventApprovalSetEventApprovalEndpoint'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/admins': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** Get list of admins */
-		get: operations['EliteAPIFeaturesAdminGetAdminsGetAdminsEndpoint'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/admin/roles': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** Get list of roles */
-		get: operations['EliteAPIFeaturesAdminGetRolesGetRolesEndpoint'];
-		put?: never;
-		post?: never;
+		post: operations['SetEventApproval'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -369,7 +372,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Link an Account */
-		post: operations['EliteAPIFeaturesAdminLinkAccountLinkAccountEndpoint'];
+		post: operations['LinkUserAccount'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -389,7 +392,7 @@ export interface paths {
 		 * Refresh a guild
 		 * @description This fetches the latest data from Discord for the specified guild
 		 */
-		post: operations['EliteAPIFeaturesAdminRefreshDiscordGuildRefreshDiscordGuildEndpoint'];
+		post: operations['RefreshDiscordGuild'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -406,7 +409,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Unlink an Account */
-		post: operations['EliteAPIFeaturesAdminUnlinkAccountUnlinkAccountEndpoint'];
+		post: operations['UnlinkUserAccount'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -426,7 +429,7 @@ export interface paths {
 		 * Create an announcement
 		 * @description Creates a new announcement that will be displayed to users
 		 */
-		post: operations['EliteAPIFeaturesAnnouncementsCreateAnnouncementEndpoint'];
+		post: operations['CreateAnnouncement'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -446,7 +449,7 @@ export interface paths {
 		 * Dismiss an announcement
 		 * @description Mark an announcement as dismissed for the current user
 		 */
-		post: operations['EliteAPIFeaturesAnnouncementsDismissAnnouncementEndpoint'];
+		post: operations['DismissAnnouncement'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -464,7 +467,7 @@ export interface paths {
 		 * Get announcements
 		 * @description Gets all announcements that should be shown to users
 		 */
-		get: operations['EliteAPIFeaturesAnnouncementsGetAnnouncementEndpoint'];
+		get: operations['GetAnnouncement'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -484,7 +487,7 @@ export interface paths {
 		 * Get logged in account
 		 * @description Get the account of the currently logged in user
 		 */
-		get: operations['EliteAPIFeaturesAuthGetSelfGetSelfEndpoint'];
+		get: operations['GetSession'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -506,7 +509,7 @@ export interface paths {
 		 * Log in
 		 * @description Log in with discord credentials
 		 */
-		post: operations['EliteAPIFeaturesAuthLoginLoginEndpoint'];
+		post: operations['Login'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -526,7 +529,7 @@ export interface paths {
 		 * Refresh Auth Token
 		 * @description Refresh the auth token using the refresh token
 		 */
-		post: operations['EliteAPIFeaturesAuthRefreshRefreshEndpoint'];
+		post: operations['RefreshAuth'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -543,9 +546,9 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Add a badge to a user */
-		post: operations['EliteAPIFeaturesBadgesAddBadgeToUserAddBadgeToUserBadgeEndpoint'];
+		post: operations['AddBadgeToUserBadge'];
 		/** Remove a badge from a user */
-		delete: operations['EliteAPIFeaturesBadgesDeleteBadgeFromUserDeleteBadgeFromUserBadgeEndpoint'];
+		delete: operations['DeleteBadgeFromUserBadge'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -559,10 +562,10 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get all badges */
-		get: operations['EliteAPIFeaturesBadgesGetBadgesGetBadgesEndpoint'];
+		get: operations['GetBadges'];
 		put?: never;
 		/** Create a badge */
-		post: operations['EliteAPIFeaturesBadgesCreateBadgeCreateBadgeEndpoint'];
+		post: operations['CreateBadge'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -580,11 +583,11 @@ export interface paths {
 		put?: never;
 		post?: never;
 		/** Delete a badge */
-		delete: operations['EliteAPIFeaturesBadgesDeleteBadgeDeleteBadgeEndpoint'];
+		delete: operations['DeleteBadge'];
 		options?: never;
 		head?: never;
 		/** Update a badge */
-		patch: operations['EliteAPIFeaturesBadgesUpdateBadgeUpdateBadgeEndpoint'];
+		patch: operations['UpdateBadge'];
 		trace?: never;
 	};
 	'/bot/account/{discordId}/{player}': {
@@ -597,9 +600,9 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Link Account */
-		post: operations['EliteAPIFeaturesBotAccountsLinkAccountLinkAccountEndpoint'];
+		post: operations['LinkAccountBot'];
 		/** Unlink Account */
-		delete: operations['EliteAPIFeaturesBotAccountsUnlinkAccountUnlinkAccountEndpoint'];
+		delete: operations['UnlinkAccountBot'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -615,7 +618,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Make Primary Account */
-		post: operations['EliteAPIFeaturesBotAccountsMakePrimaryMakePrimaryAccountEndpoint'];
+		post: operations['MakePrimaryAccount'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -632,7 +635,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Refresh User Purchases */
-		post: operations['EliteAPIFeaturesBotAccountsRefreshPurchasesUnlinkAccountEndpoint'];
+		post: operations['RefreshUserPurchases'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -649,9 +652,9 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Grant Badge */
-		post: operations['EliteAPIFeaturesBotBadgesGrantBadgeGrantBadgeEndpoint'];
+		post: operations['GrantBadge'];
 		/** Remove Badge */
-		delete: operations['EliteAPIFeaturesBotBadgesRemoveBadgeRemoveBadgeEndpoint'];
+		delete: operations['RemoveBadge'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -668,7 +671,7 @@ export interface paths {
 		put?: never;
 		post?: never;
 		/** Disable contest pings for a guild */
-		delete: operations['EliteAPIFeaturesBotDisableContestPingsDisableContestPingsPingsEndpoint'];
+		delete: operations['DisableContestPingsPings'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -682,7 +685,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get list of guilds with contest pings enabled */
-		get: operations['EliteAPIFeaturesBotGetContestPingsGetContestPingsEndpoint'];
+		get: operations['GetContestPings'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -699,7 +702,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get guild */
-		get: operations['EliteAPIFeaturesBotGetGuildGetBotGuildEndpoint'];
+		get: operations['GetBotGuild'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -716,9 +719,9 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get guild jacob */
-		get: operations['EliteAPIFeaturesBotGetJacobFeatureGetJacobFeatureEndpoint'];
+		get: operations['GetJacobFeature'];
 		/** Update guild jacob feature */
-		put: operations['EliteAPIFeaturesBotUpdateJacobFeatureUpdateJacobFeatureEndpoint'];
+		put: operations['UpdateJacobFeature'];
 		post?: never;
 		delete?: never;
 		options?: never;
@@ -736,12 +739,12 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Request Guild Update */
-		post: operations['EliteAPIFeaturesBotGuildsRefreshGuildRefreshGuildEndpoint'];
+		post: operations['RefreshGuild'];
 		delete?: never;
 		options?: never;
 		head?: never;
 		/** Update Guild */
-		patch: operations['EliteAPIFeaturesBotGuildsUpdateGuildUpdateGuildEndpoint'];
+		patch: operations['UpdateGuild'];
 		trace?: never;
 	};
 	'/bot/guild/{discordId}/channels': {
@@ -754,7 +757,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Update Guild Channel */
-		post: operations['EliteAPIFeaturesBotGuildsUpdateGuildChannelUpdateGuildChannelEndpoint'];
+		post: operations['UpdateGuildChannel'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -771,7 +774,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Update Guild Member Roles */
-		post: operations['EliteAPIFeaturesBotGuildsUpdateGuildMemberRolesUpdateGuildMemberRolesEndpoint'];
+		post: operations['UpdateGuildMemberRoles'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -788,7 +791,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Update Guild Role */
-		post: operations['EliteAPIFeaturesBotGuildsUpdateGuildRoleUpdateGuildRoleEndpoint'];
+		post: operations['UpdateGuildRole'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -809,7 +812,7 @@ export interface paths {
 		options?: never;
 		head?: never;
 		/** Update user Discord account */
-		patch: operations['EliteAPIFeaturesBotUpdateDiscordAccountUpdateDiscordAccountEndpoint'];
+		patch: operations['UpdateDiscordAccount'];
 		trace?: never;
 	};
 	'/contest/{contestKey}': {
@@ -820,7 +823,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get a contest from a contest key */
-		get: operations['EliteAPIFeaturesContestsGetContestFromKeyGetContestFromKeyEndpoint'];
+		get: operations['GetContestFromKey'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -837,7 +840,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get the three contests that start at a specific timestamp */
-		get: operations['EliteAPIFeaturesContestsGetContestsAtTimestampGetContestsAtTimestampEndpoint'];
+		get: operations['GetContestsAtTimestamp'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -853,8 +856,8 @@ export interface paths {
 			path?: never;
 			cookie?: never;
 		};
-		/** Get all contests in a SkyBlock year */
-		get: operations['EliteAPIFeaturesContestsGetContestsInDayGetContestsInDayEndpoint'];
+		/** Get the three contests in a specific SkyBlock day */
+		get: operations['GetContestsInDay'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -871,7 +874,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get all contests in a SkyBlock month */
-		get: operations['EliteAPIFeaturesContestsGetContestsInMonthGetContestsInMonthEndpoint'];
+		get: operations['GetContestsInMonth'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -888,7 +891,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get all contests in a SkyBlock year */
-		get: operations['EliteAPIFeaturesContestsGetContestsInYearGetContestsInYearEndpoint'];
+		get: operations['GetContestsInYear'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -909,13 +912,13 @@ export interface paths {
 		 * @description Uses crowd-sourced data, which may not be accurate.
 		 *     Data used and provided by <see href="https://github.com/hannibal002/SkyHanni/">SkyHanni</see> to display upcoming contests in-game.
 		 */
-		get: operations['EliteAPIFeaturesContestsGetCurrentContestsGetCurrentContestsEndpoint'];
+		get: operations['GetCurrentContests'];
 		put?: never;
 		/**
 		 * Upload upcoming contests for the current SkyBlock year
 		 * @description Data used and provided by <see href="https://github.com/hannibal002/SkyHanni/">SkyHanni</see> to display upcoming contests in-game.
 		 */
-		post: operations['EliteAPIFeaturesContestsUploadCurrentContestsUploadCurrentContestsEndpoint'];
+		post: operations['UploadCurrentContests'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -930,7 +933,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get all contests for a player */
-		get: operations['EliteAPIFeaturesContestsGetPlayerParticipationsGetPlayerParticipationsEndpoint'];
+		get: operations['GetPlayerParticipations'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -947,7 +950,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get all contests for a profile member */
-		get: operations['EliteAPIFeaturesContestsGetProfileMemberParticipationsGetProfileMemberParticipationsEndpoint'];
+		get: operations['GetProfileMemberParticipations'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -964,7 +967,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get contest records for a SkyBlock year */
-		get: operations['EliteAPIFeaturesContestsGetRecordsInYearGetRecordsInYearEndpoint'];
+		get: operations['GetRecordsInYear'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -981,7 +984,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get contests for the player's selected profile member */
-		get: operations['EliteAPIFeaturesContestsGetSelectedMemberParticipationsGetSelectedMemberParticipationsEndpoint'];
+		get: operations['GetSelectedMemberParticipations'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1000,9 +1003,9 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Add an Event Member to a Team */
-		post: operations['EliteAPIFeaturesEventsAdminAddTeamMemberAddTeamMemberEndpoint'];
+		post: operations['AddTeamMemberAdmin'];
 		/** Kick an Event Team Member */
-		delete: operations['EliteAPIFeaturesEventsAdminKickTeamMemberKickTeamMemberEndpoint'];
+		delete: operations['KickTeamMemberAdmin'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -1018,9 +1021,9 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Ban an Event Member */
-		post: operations['EliteAPIFeaturesEventsAdminBanMemberBanMemberEndpoint'];
+		post: operations['BanMemberAdmin'];
 		/** Unban an Event Member */
-		delete: operations['EliteAPIFeaturesEventsAdminUnbanMemberUnbanMemberEndpoint'];
+		delete: operations['UnbanMemberAdmin'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -1036,7 +1039,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Create Event */
-		post: operations['EliteAPIFeaturesEventsAdminCreateEventCreateWeightEventEndpoint'];
+		post: operations['CreateEventAdmin'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -1056,7 +1059,7 @@ export interface paths {
 		 * Create an Event Team
 		 * @description This generally should only be used for events with a set amount of teams (when users are not allowed to create their own teams)
 		 */
-		post: operations['EliteAPIFeaturesEventsAdminCreateTeamCreateTeamEndpoint'];
+		post: operations['CreateTeamAdmin'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -1077,11 +1080,11 @@ export interface paths {
 		 * Delete Event
 		 * @description Delete an event and all associated data. Only available for unapproved events.
 		 */
-		delete: operations['EliteAPIFeaturesEventsAdminDeleteEventDeleteEventEndpoint'];
+		delete: operations['DeleteEventAdmin'];
 		options?: never;
 		head?: never;
 		/** Update Event */
-		patch: operations['EliteAPIFeaturesEventsAdminUpdateEventCreateWeightEventEndpoint'];
+		patch: operations['UpdateEventAdmin'];
 		trace?: never;
 	};
 	'/guild/{discordId}/events/{eventId}/banner': {
@@ -1094,9 +1097,9 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Set Custom Event Banner */
-		post: operations['EliteAPIFeaturesEventsAdminSetEventBannerSetEventBannerEndpoint'];
+		post: operations['SetEventBannerAdmin'];
 		/** Delete Custom Event Banner */
-		delete: operations['EliteAPIFeaturesEventsAdminDeleteEventBannerDeleteEventBannerEndpoint'];
+		delete: operations['DeleteEventBannerAdmin'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -1112,9 +1115,9 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Ban an Event Member */
-		post: operations['EliteAPIFeaturesEventsAdminForceAddMemberForceAddMemberEndpoint'];
+		post: operations['ForceAddMemberAdmin'];
 		/** Delete an Event Member */
-		delete: operations['EliteAPIFeaturesEventsAdminDeleteMemberDeleteMemberEndpoint'];
+		delete: operations['DeleteMemberAdmin'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -1131,11 +1134,11 @@ export interface paths {
 		put?: never;
 		post?: never;
 		/** Delete an Event Team */
-		delete: operations['EliteAPIFeaturesEventsAdminDeleteTeamDeleteTeamEndpoint'];
+		delete: operations['DeleteTeamAdmin'];
 		options?: never;
 		head?: never;
 		/** Update a team */
-		patch: operations['EliteAPIFeaturesEventsAdminUpdateTeamUpdateTeamEndpoint'];
+		patch: operations['UpdateTeamAdmin'];
 		trace?: never;
 	};
 	'/guild/{discordId}/event/{eventId}/bans': {
@@ -1146,7 +1149,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get banned event members */
-		get: operations['EliteAPIFeaturesEventsAdminGetBannedMembersGetBannedMembersEndpoint'];
+		get: operations['GetBannedMembersAdmin'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1163,7 +1166,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get event members */
-		get: operations['EliteAPIFeaturesEventsAdminGetEventMembersGetEventMembersEndpoint'];
+		get: operations['GetGuildEventMembersAdmin'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1180,7 +1183,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get an event for a guild */
-		get: operations['EliteAPIFeaturesEventsAdminGetGuildEventGetGuildEventEndpoint'];
+		get: operations['GetGuildEventAdmin'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1197,7 +1200,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get all events for a guild */
-		get: operations['EliteAPIFeaturesEventsAdminGetGuildEventsGetGuildEventsEndpoint'];
+		get: operations['GetGuildEventsAdmin'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1214,7 +1217,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get event teams */
-		get: operations['EliteAPIFeaturesEventsAdminGetTeamsGetTeamsEndpoint'];
+		get: operations['GetTeamsAdmin'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1232,7 +1235,7 @@ export interface paths {
 		};
 		get?: never;
 		/** Set player as team owner */
-		put: operations['EliteAPIFeaturesEventsAdminSetTeamOwnerSetTeamOwnerEndpoint'];
+		put: operations['SetTeamOwnerAdmin'];
 		post?: never;
 		delete?: never;
 		options?: never;
@@ -1248,7 +1251,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get an event */
-		get: operations['EliteAPIFeaturesEventsPublicGetEventGetEventEndpoint'];
+		get: operations['GetEvent'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1268,7 +1271,7 @@ export interface paths {
 		 * Get event default constants
 		 * @description Default constants for event settings.
 		 */
-		get: operations['EliteAPIFeaturesEventsPublicGetEventDefaultsGetEventDefaultsEndpoint'];
+		get: operations['GetEventDefaults'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1285,7 +1288,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get an event member */
-		get: operations['EliteAPIFeaturesEventsPublicGetEventMemberGetEventMembersEndpoint'];
+		get: operations['GetEventMember'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1302,7 +1305,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get event members */
-		get: operations['EliteAPIFeaturesEventsPublicGetEventMembersGetEventMembersEndpoint'];
+		get: operations['GetEventMembers'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1319,15 +1322,15 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get an event team */
-		get: operations['EliteAPIFeaturesEventsPublicGetEventTeamGetEventTeamEndpoint'];
+		get: operations['GetEventTeam'];
 		put?: never;
 		post?: never;
 		/** Delete team */
-		delete: operations['EliteAPIFeaturesEventsUserDeleteTeamDeleteTeamEndpoint'];
+		delete: operations['DeleteTeam'];
 		options?: never;
 		head?: never;
 		/** Update a team */
-		patch: operations['EliteAPIFeaturesEventsUserUpdateTeamUpdateTeamEndpoint'];
+		patch: operations['UpdateTeam'];
 		trace?: never;
 	};
 	'/event/{eventId}/teams': {
@@ -1338,10 +1341,10 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get event teams */
-		get: operations['EliteAPIFeaturesEventsPublicGetEventTeamsGetEventTeamsEndpoint'];
+		get: operations['GetEventTeams'];
 		put?: never;
 		/** Create a team */
-		post: operations['EliteAPIFeaturesEventsUserCreateTeamCreateTeamEndpoint'];
+		post: operations['CreateTeam'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -1359,7 +1362,7 @@ export interface paths {
 		 * Get event team word list constants
 		 * @description Lists of whitelisted words for team name generation.
 		 */
-		get: operations['EliteAPIFeaturesEventsPublicGetTeamWordListGetTeamWordListEndpoint'];
+		get: operations['GetTeamWordList'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1376,7 +1379,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get upcoming events */
-		get: operations['EliteAPIFeaturesEventsPublicGetUpcomingGetUpcomingEventsEndpoint'];
+		get: operations['GetUpcomingEvents'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1395,7 +1398,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Join an event */
-		post: operations['EliteAPIFeaturesEventsUserJoinEventJoinEventEndpoint'];
+		post: operations['JoinEvent'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -1412,7 +1415,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Join a team */
-		post: operations['EliteAPIFeaturesEventsUserJoinTeamJoinTeamEndpoint'];
+		post: operations['JoinTeam'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -1433,7 +1436,7 @@ export interface paths {
 		 * Kick a team member
 		 * @description Kicked members can rejoin the team if they have the join code.
 		 */
-		delete: operations['EliteAPIFeaturesEventsUserKickTeamMemberKickTeamMemberEndpoint'];
+		delete: operations['KickTeamMember'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -1449,7 +1452,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Join an event */
-		post: operations['EliteAPIFeaturesEventsUserLeaveEventLeaveEventEndpoint'];
+		post: operations['LeaveEvent'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -1466,7 +1469,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Leave a team */
-		post: operations['EliteAPIFeaturesEventsUserLeaveTeamLeaveTeamEndpoint'];
+		post: operations['LeaveTeam'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -1482,7 +1485,7 @@ export interface paths {
 		};
 		get?: never;
 		/** Set player as team owner */
-		put: operations['EliteAPIFeaturesEventsUserSetTeamOwnerSetTeamOwnerEndpoint'];
+		put: operations['SetTeamOwner'];
 		post?: never;
 		delete?: never;
 		options?: never;
@@ -1500,7 +1503,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Generate new team join code */
-		post: operations['EliteAPIFeaturesEventsUserUpdateTeamCodeUpdateTeamJoinCodeEndpoint'];
+		post: operations['UpdateTeamJoinCode'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -1518,7 +1521,7 @@ export interface paths {
 		 * Get Garden data for a profile
 		 * @description Get Garden data for a specific profile by UUID
 		 */
-		get: operations['EliteAPIFeaturesGardenGetGardenGetGardenEndpoint'];
+		get: operations['GetGarden'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1538,7 +1541,7 @@ export interface paths {
 		 * Get selected Garden data for a player
 		 * @description Get selected Garden data for a specific player by UUID
 		 */
-		get: operations['EliteAPIFeaturesGardenGetSelectedGardenGetGardenEndpoint'];
+		get: operations['GetSelectedGarden'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1555,7 +1558,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Admin Crop Collections */
-		get: operations['EliteAPIFeaturesGraphsGetAdminCropGraphsGetAdminCropGraphsEndpoint'];
+		get: operations['GetAdminCropGraphs'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1572,7 +1575,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Admin Skill XP */
-		get: operations['EliteAPIFeaturesGraphsGetAdminSkillGraphsGetAdminSkillGraphsEndpoint'];
+		get: operations['GetAdminSkillGraphs'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1589,7 +1592,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Crop Collections Over Time */
-		get: operations['EliteAPIFeaturesGraphsGetCropGraphsGetCropGraphsEndpoint'];
+		get: operations['GetCropGraphs'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1606,7 +1609,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Skill XP Over Time */
-		get: operations['EliteAPIFeaturesGraphsGetSkillGraphsGetSkillGraphsEndpoint'];
+		get: operations['GetSkillGraphs'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1623,7 +1626,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get current average medal brackets */
-		get: operations['EliteAPIFeaturesGraphsMedalsGetCurrentMedalBracketsGetCurrentMedalBracketsEndpoint'];
+		get: operations['GetCurrentMedalBrackets'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1640,7 +1643,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get average medal brackets for a specific SkyBlock month */
-		get: operations['EliteAPIFeaturesGraphsMedalsGetMedalBracketsGetMedalBracketsEndpoint'];
+		get: operations['GetMedalBrackets'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1657,7 +1660,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get average medal brackets for multiple SkyBlock years */
-		get: operations['EliteAPIFeaturesGraphsMedalsGetMedalBracketsGraphGetMedalBracketsGraphEndpoint'];
+		get: operations['GetMedalBracketsGraph'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1673,11 +1676,11 @@ export interface paths {
 			path?: never;
 			cookie?: never;
 		};
-		/** Get public guild */
-		get: operations['EliteAPIFeaturesGuildsPublicGetGuildEventsGetPublicGuildEventsEndpoint'];
+		/** Get public guild events */
+		get: operations['GetPublicGuildEvents'];
 		put?: never;
 		/** Modify guild event permissions */
-		post: operations['EliteAPIFeaturesGuildsAdminSetEventsSetEventFeatureEndpoint'];
+		post: operations['SetEventFeature'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -1694,7 +1697,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Modify guild jacob permissions */
-		post: operations['EliteAPIFeaturesGuildsAdminSetJacobLeaderboardsSetJacobFeatureEndpoint'];
+		post: operations['SetJacobFeature'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -1711,7 +1714,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Lock or unlock a guild */
-		post: operations['EliteAPIFeaturesGuildsAdminSetLockedSetGuildLockedEndpoint'];
+		post: operations['SetGuildLocked'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -1728,7 +1731,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Set a guild to public or private */
-		post: operations['EliteAPIFeaturesGuildsAdminSetPublicSetGuildPublicEndpoint'];
+		post: operations['SetGuildPublic'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -1743,7 +1746,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get public guild */
-		get: operations['EliteAPIFeaturesGuildsPublicGetGuildGetPublicGuildEndpoint'];
+		get: operations['GetPublicGuild'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1760,7 +1763,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get public guilds */
-		get: operations['EliteAPIFeaturesGuildsPublicGetGuildsGetPublicGuildsEndpoint'];
+		get: operations['GetPublicGuilds'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1778,10 +1781,10 @@ export interface paths {
 		};
 		get?: never;
 		/** Update contest pings for a guild */
-		put: operations['EliteAPIFeaturesGuildsUserContestPingsUpdateContestPingsDeleteContestPingsEndpoint'];
+		put: operations['UpdateContestPings'];
 		post?: never;
 		/** Delete contest pings for a guild */
-		delete: operations['EliteAPIFeaturesGuildsUserContestPingsDeleteContestPingsDeleteContestPingsEndpoint'];
+		delete: operations['DeleteContestPings'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -1795,7 +1798,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get guild memberships for the current user */
-		get: operations['EliteAPIFeaturesGuildsUserGetGuildsGetUserGuildsEndpoint'];
+		get: operations['GetUserGuilds'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1812,7 +1815,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get a guild membership for the current user */
-		get: operations['EliteAPIFeaturesGuildsUserGetMembershipGetUserGuildEndpoint'];
+		get: operations['GetUserGuild'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1831,7 +1834,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Create a Jacob leaderboard */
-		post: operations['EliteAPIFeaturesGuildsUserJacobCreateJacobLeaderboardUpdateGuildJacobFeatureEndpoint'];
+		post: operations['CreateGuildJacobLeaderboard'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -1849,11 +1852,11 @@ export interface paths {
 		put?: never;
 		post?: never;
 		/** Delete a Jacob leaderboard */
-		delete: operations['EliteAPIFeaturesGuildsUserJacobDeleteJacobLeaderboardDeleteGuildJacobFeatureEndpoint'];
+		delete: operations['DeleteGuildJacobLeaderboard'];
 		options?: never;
 		head?: never;
 		/** Update a Jacob leaderboard */
-		patch: operations['EliteAPIFeaturesGuildsUserJacobUpdateJacobLeaderboardUpdateGuildJacobFeatureEndpoint'];
+		patch: operations['UpdateGuildJacobLeaderboard'];
 		trace?: never;
 	};
 	'/user/guild/{discordId}/jacob': {
@@ -1864,14 +1867,14 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Jacob leaderboards for a guild */
-		get: operations['EliteAPIFeaturesGuildsUserJacobGetJacobGetGuildJacobEndpoint'];
+		get: operations['GetGuildJacob'];
 		put?: never;
 		post?: never;
 		delete?: never;
 		options?: never;
 		head?: never;
 		/** Update Jacob leaderboards for a guild */
-		patch: operations['EliteAPIFeaturesGuildsUserJacobUpdateJacobUpdateGuildJacobFeatureEndpoint'];
+		patch: operations['UpdateGuildJacobFeature'];
 		trace?: never;
 	};
 	'/user/guild/{discordId}/jacob/{leaderboardId}/send': {
@@ -1884,7 +1887,24 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Send a Jacob leaderboard to Discord */
-		post: operations['EliteAPIFeaturesGuildsUserJacobSendJacobLeaderboardSendGuildJacobFeatureEndpoint'];
+		post: operations['SendGuildJacobFeature'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/user/refresh-guilds': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Refresh guild memberships for the current user */
+		post: operations['RefreshGuildMemberships'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -1904,7 +1924,7 @@ export interface paths {
 		 * Request Guild Refresh
 		 * @description This fetches the latest data from Discord for the specified guild
 		 */
-		post: operations['EliteAPIFeaturesGuildsUserRequestRefreshRequestGuildRefreshEndpoint'];
+		post: operations['RequestGuildRefresh'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -1920,7 +1940,7 @@ export interface paths {
 		};
 		get?: never;
 		/** Set an admin role for a guild */
-		put: operations['EliteAPIFeaturesGuildsUserSetAdminRoleSetAdminRoleEndpoint'];
+		put: operations['SetAdminRole'];
 		post?: never;
 		delete?: never;
 		options?: never;
@@ -1937,7 +1957,7 @@ export interface paths {
 		};
 		get?: never;
 		/** Set invite code for a guild */
-		put: operations['EliteAPIFeaturesGuildsUserSetInviteSetInviteEndpoint'];
+		put: operations['SetInvite'];
 		post?: never;
 		delete?: never;
 		options?: never;
@@ -1955,7 +1975,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Refresh Guild Purchases */
-		post: operations['EliteAPIFeaturesGuildsUserUpdatePurchasesUpdateGuildPurchasesEndpoint'];
+		post: operations['UpdateGuildPurchases'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -1970,7 +1990,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Leaderboard */
-		get: operations['EliteAPIFeaturesLeaderboardsEndpointsGetLeaderboardGetLeaderboardEndpoint'];
+		get: operations['GetLeaderboard'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -1986,8 +2006,25 @@ export interface paths {
 			path?: never;
 			cookie?: never;
 		};
-		/** Get leaderboards */
-		get: operations['EliteAPIFeaturesLeaderboardsEndpointsGetLeaderboardsGetLeaderboardsEndpoint'];
+		/** Get Leaderboards */
+		get: operations['GetLeaderboards'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/leaderboards-multiple/{playerUuid}/{profileUuid}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get multiple leaderboard ranks for a player */
+		get: operations['GetMultiplePlayerRanks'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2004,7 +2041,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get a Player's Leaderboard Ranks */
-		get: operations['EliteAPIFeaturesLeaderboardsEndpointsGetPlayerLeaderboardRanksGetPlayerLeaderboardRanksEndpoint'];
+		get: operations['GetPlayerLeaderboardRanks'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2021,7 +2058,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get a Player's Leaderboard Rank */
-		get: operations['EliteAPIFeaturesLeaderboardsEndpointsGetPlayerRankGetPlayerRankEndpoint1'];
+		get: operations['GetPlayerRank1'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2038,7 +2075,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get a Player's Leaderboard Rank */
-		get: operations['EliteAPIFeaturesLeaderboardsEndpointsGetPlayerRankGetPlayerRankEndpoint2'];
+		get: operations['GetPlayerRank2'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2058,7 +2095,7 @@ export interface paths {
 		 * Get a Player's Leaderboard Ranks
 		 * @deprecated
 		 */
-		get: operations['EliteAPIFeaturesLeaderboardsEndpointsGetPlayerRanksGetPlayerRanksEndpoint'];
+		get: operations['GetPlayerRanks'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2075,7 +2112,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get a Profiles's Leaderboard Rank */
-		get: operations['EliteAPIFeaturesLeaderboardsEndpointsGetProfileRankGetProfileRankEndpoint1'];
+		get: operations['GetProfileRank1'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2092,7 +2129,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get a Profiles's Leaderboard Rank */
-		get: operations['EliteAPIFeaturesLeaderboardsEndpointsGetProfileRankGetProfileRankEndpoint2'];
+		get: operations['GetProfileRank2'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2109,7 +2146,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get all entitlements for a user or guild */
-		get: operations['EliteAPIFeaturesMonetizationEndpointsGetEntitlementsGetEntitlementsEndpoint'];
+		get: operations['GetEntitlements'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2131,12 +2168,12 @@ export interface paths {
 		 * Grant a test entitlement to a user or guild
 		 * @description This passes along a request to Discord to grant a test entitlement to a user or guild, which only works on subscription products.
 		 */
-		post: operations['EliteAPIFeaturesMonetizationEndpointsGrantTestEntitlementGrantTestEntitlementEndpoint'];
+		post: operations['GrantTestEntitlement'];
 		/**
 		 * Remove a test entitlement from a user or guild
 		 * @description This passes along a request to Discord to remove a test entitlement from a user or guild.
 		 */
-		delete: operations['EliteAPIFeaturesMonetizationEndpointsRemoveTestEntitlementRemoveTestEntitlementEndpoint'];
+		delete: operations['RemoveTestEntitlement'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -2150,7 +2187,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Linked Accounts */
-		get: operations['EliteAPIFeaturesPlayerGetLinkedAccountsGetLinkedAccountsEndpoint'];
+		get: operations['GetLinkedAccounts'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2167,7 +2204,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Player Data */
-		get: operations['EliteAPIFeaturesPlayerGetPlayerDataGetPlayerDataEndpoint'];
+		get: operations['GetPlayerData'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2184,7 +2221,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get All Profile Details */
-		get: operations['EliteAPIFeaturesProfilesEndpointsGetAllProfileDetailsGetAllProfileDetailsEndpoint'];
+		get: operations['GetAllProfileDetails'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2201,7 +2238,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Profile Member */
-		get: operations['EliteAPIFeaturesProfilesEndpointsGetProfileGetProfileEndpoint'];
+		get: operations['GetProfile'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2218,7 +2255,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Profile Details */
-		get: operations['EliteAPIFeaturesProfilesEndpointsGetProfileDetailsGetProfileDetailsEndpoint'];
+		get: operations['GetProfileDetails'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2235,7 +2272,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get names of a player's profiles */
-		get: operations['EliteAPIFeaturesProfilesEndpointsGetProfileNamesGetProfileNamesEndpoint'];
+		get: operations['GetProfileNames'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2252,7 +2289,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Profile Member */
-		get: operations['EliteAPIFeaturesProfilesEndpointsGetSelectedProfileGetSelectedProfileEndpoint'];
+		get: operations['GetSelectedProfile'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2272,7 +2309,7 @@ export interface paths {
 		 * Get Auction House
 		 * @description Get lowest auction house prices.
 		 */
-		get: operations['EliteAPIFeaturesResourcesAuctionsEndpointsGetAuctionHouseProductsEndpoint'];
+		get: operations['GetAuctionHouseProducts'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2292,7 +2329,7 @@ export interface paths {
 		 * Get Bazaar Product
 		 * @description Get a specific bazaar product and it's npc price (if it exists)
 		 */
-		get: operations['EliteAPIFeaturesResourcesBazaarEndpointsGetBazaarProductEndpoint'];
+		get: operations['GetBazaarProduct'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2312,7 +2349,47 @@ export interface paths {
 		 * Get Bazaar Products
 		 * @description Get all bazaar products.
 		 */
-		get: operations['EliteAPIFeaturesResourcesBazaarEndpointsGetBazaarProductsEndpoint'];
+		get: operations['GetBazaarProducts'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/resources/firesales/current': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Current Skyblock Firesale
+		 * @description Get the current/upcoming Skyblock firesales.
+		 */
+		get: operations['SkyblockFiresale'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/resources/gems': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Skyblock Gem Shops
+		 * @description Get the current/upcoming Skyblock firesales, Taylor's Collection, and Seasonal Bundles.
+		 */
+		get: operations['SkyblockGemShop'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2334,7 +2411,7 @@ export interface paths {
 		 * Parse Skyblock Item from Bytes
 		 * @description Get an ItemDto from raw bytes from Hypixel
 		 */
-		post: operations['EliteAPIFeaturesResourcesItemsEndpointsGetItemsFromBytesEndpoint'];
+		post: operations['GetItemsFromBytes'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -2352,13 +2429,13 @@ export interface paths {
 		 * Get Skyblock Items
 		 * @description Get all items in the Hypixel resources endpoint
 		 */
-		get: operations['EliteAPIFeaturesResourcesItemsEndpointsGetSkyblockItemsEndpoint'];
+		get: operations['GetSkyblockItems'];
 		put?: never;
 		/**
 		 * Get Specific Skyblock Items
 		 * @description Get specific skyblock items from the Hypixel resources endpoint, along with bazaar data for each.
 		 */
-		post: operations['EliteAPIFeaturesResourcesItemsEndpointsGetSpecifiedSkyblockItemsEndpoint'];
+		post: operations['GetSpecifiedSkyblockItems'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -2376,7 +2453,7 @@ export interface paths {
 		 * Get Skyblock Item
 		 * @description Get the Hypixel provided data of a specific item, as well as a bazaar summary.
 		 */
-		get: operations['EliteAPIFeaturesResourcesItemsEndpointsSkyblockProductEndpoint'];
+		get: operations['SkyblockProduct'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2395,9 +2472,9 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Add Product to Shop Category */
-		post: operations['EliteAPIFeaturesShopCategoriesAddProductAddProductToCategoryEndpoint'];
+		post: operations['AddProductToCategory'];
 		/** Remove Product from Shop Category */
-		delete: operations['EliteAPIFeaturesShopCategoriesRemoveProductRemoveProductToCategoryEndpoint'];
+		delete: operations['RemoveProductToCategory'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -2413,7 +2490,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Create Shop Category */
-		post: operations['EliteAPIFeaturesShopCategoriesCreateCategoryCreateCategoryEndpoint'];
+		post: operations['CreateCategory'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -2431,11 +2508,11 @@ export interface paths {
 		put?: never;
 		post?: never;
 		/** Delete Shop Category */
-		delete: operations['EliteAPIFeaturesShopCategoriesDeleteCategoryUpdateCategoryEndpoint'];
+		delete: operations['DeleteCategory'];
 		options?: never;
 		head?: never;
 		/** Update Shop Category */
-		patch: operations['EliteAPIFeaturesShopCategoriesUpdateCategoryUpdateCategoryEndpoint'];
+		patch: operations['UpdateCategory'];
 		trace?: never;
 	};
 	'/shop/categories': {
@@ -2446,7 +2523,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Shop Categories */
-		get: operations['EliteAPIFeaturesShopCategoriesGetCategoriesGetCategoriesEndpoint'];
+		get: operations['GetCategories'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2463,7 +2540,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Shop Category */
-		get: operations['EliteAPIFeaturesShopCategoriesGetCategoryGetCategoryEndpoint'];
+		get: operations['GetCategory'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2482,7 +2559,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Reorder Shop Categories */
-		post: operations['EliteAPIFeaturesShopCategoriesReorderCategoriesReorderCategoriesEndpoint'];
+		post: operations['ReorderCategories'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -2499,7 +2576,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Reorder Products in Shop Category */
-		post: operations['EliteAPIFeaturesShopCategoriesReorderCategoryProductsReorderCategoryProductsEndpoint'];
+		post: operations['ReorderCategoryProducts'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -2516,9 +2593,9 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Add Cosmetic to Product */
-		post: operations['EliteAPIFeaturesShopProductsAdminAddCosmeticAddCosmeticToProductEndpoint'];
+		post: operations['AddCosmeticToProduct'];
 		/** Remove Cosmetic from Product */
-		delete: operations['EliteAPIFeaturesShopProductsAdminRemoveCosmeticRemoveCosmeticToProductEndpoint'];
+		delete: operations['RemoveCosmeticToProduct'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -2534,7 +2611,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Add Image To Product */
-		post: operations['EliteAPIFeaturesShopProductsAdminAddProductImageAddProductImageEndpoint'];
+		post: operations['AddProductImage'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -2552,7 +2629,7 @@ export interface paths {
 		put?: never;
 		post?: never;
 		/** Remove Image from Product */
-		delete: operations['EliteAPIFeaturesShopProductsAdminDeleteProductImageDeleteProductImageEndpoint'];
+		delete: operations['DeleteProductImage'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -2566,7 +2643,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Admin Shop Products */
-		get: operations['EliteAPIFeaturesShopProductsAdminGetAllProductsGetAllProductsEndpoint'];
+		get: operations['GetAllProducts'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2585,7 +2662,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Refresh Shop Products */
-		post: operations['EliteAPIFeaturesShopProductsAdminRefreshProductsRefreshProductsEndpoint'];
+		post: operations['RefreshProducts'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -2600,14 +2677,14 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Shop Product */
-		get: operations['EliteAPIFeaturesShopProductsGetProductGetProductEndpoint'];
+		get: operations['GetProduct'];
 		put?: never;
 		post?: never;
 		delete?: never;
 		options?: never;
 		head?: never;
 		/** Update Shop Product */
-		patch: operations['EliteAPIFeaturesShopProductsAdminUpdateProductUpdateProductEndpoint'];
+		patch: operations['UpdateProduct'];
 		trace?: never;
 	};
 	'/product/{discordId}/claim': {
@@ -2620,7 +2697,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Claim Free Shop Product */
-		post: operations['EliteAPIFeaturesShopProductsClaimProductClaimProductEndpoint'];
+		post: operations['ClaimProduct'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -2635,7 +2712,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Shop Products */
-		get: operations['EliteAPIFeaturesShopProductsGetProductsGetProductsEndpoint'];
+		get: operations['GetProducts'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2654,7 +2731,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Add Image To Style */
-		post: operations['EliteAPIFeaturesShopStylesAddStyleImageAddStyleImageEndpoint'];
+		post: operations['AddStyleImage'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -2671,7 +2748,7 @@ export interface paths {
 		get?: never;
 		put?: never;
 		/** Create Shop Style */
-		post: operations['EliteAPIFeaturesShopStylesCreateStyleCreateStyleEndpoint'];
+		post: operations['CreateStyle'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -2686,12 +2763,12 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Shop Style */
-		get: operations['EliteAPIFeaturesShopStylesGetStyleGetStyleEndpoint'];
+		get: operations['GetStyle'];
 		put?: never;
 		/** Update Shop Style */
-		post: operations['EliteAPIFeaturesShopStylesUpdateStyleUpdateStyleEndpoint'];
+		post: operations['UpdateStyle'];
 		/** Delete Shop Style */
-		delete: operations['EliteAPIFeaturesShopStylesDeleteStyleDeleteStyleEndpoint'];
+		delete: operations['DeleteStyle'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -2708,7 +2785,7 @@ export interface paths {
 		put?: never;
 		post?: never;
 		/** Remove Image from Style */
-		delete: operations['EliteAPIFeaturesShopStylesDeleteStyleImageDeleteStyleImageEndpoint'];
+		delete: operations['DeleteStyleImage'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -2722,7 +2799,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get Shop Styles */
-		get: operations['EliteAPIFeaturesShopStylesGetStylesGetStylesEndpoint'];
+		get: operations['GetStyles'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2742,7 +2819,7 @@ export interface paths {
 		 * Get all weight constants
 		 * @description Get all farming weight constants
 		 */
-		get: operations['EliteAPIFeaturesWeightGetAllWeightsGetAllWeightsEndpoint'];
+		get: operations['GetAllWeights'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2759,7 +2836,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get farming weight for a profile member */
-		get: operations['EliteAPIFeaturesWeightGetWeightForProfileGetWeightForProfileEndpoint'];
+		get: operations['GetWeightForProfile'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2776,7 +2853,7 @@ export interface paths {
 			cookie?: never;
 		};
 		/** Get farming weight for a player's selected profile */
-		get: operations['EliteAPIFeaturesWeightGetWeightForSelectedGetWeightForSelectedEndpoint'];
+		get: operations['GetWeightForSelected'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2796,7 +2873,7 @@ export interface paths {
 		 * Get farming weight for all profiles of a player
 		 * @description Get farming weight for all profiles of a player
 		 */
-		get: operations['EliteAPIFeaturesWeightGetWeightProfilesGetWeightForProfilesEndpoint'];
+		get: operations['GetWeightForProfiles'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2953,8 +3030,31 @@ export interface components {
 			 * @description Image ordering number
 			 */
 			order?: number | null;
-			/** @description Full image URL */
+			/**
+			 * Format: int32
+			 * @description The original width of the image.
+			 */
+			width: number;
+			/**
+			 * Format: int32
+			 * @description The original height of the image.
+			 */
+			height: number;
+			/** @description A dictionary of available image sources, keyed by a logical name (e.g., "small", "medium"). */
+			sources: {
+				[key: string]: components['schemas']['ImageSourceDto'];
+			};
+			/** @description Lowest quality image URL */
 			url: string;
+		};
+		ImageSourceDto: {
+			/** @description The fully-qualified public URL for this image variant. */
+			url: string;
+			/**
+			 * Format: int32
+			 * @description The width of this image variant in pixels.
+			 */
+			width: number;
 		};
 		PlayerDataDto: {
 			uuid: string;
@@ -2994,20 +3094,14 @@ export interface components {
 			youtube?: string | null;
 		};
 		PlayerRequest: Record<string, never>;
-		/** @description the dto used to send an error response to the client */
 		ErrorResponse: {
 			/**
 			 * Format: int32
-			 * @description the http status code sent to the client. default is 400.
 			 * @default 400
 			 */
 			statusCode: number;
-			/**
-			 * @description the message for the error response
-			 * @default One or more errors occurred!
-			 */
+			/** @default One or more errors occurred! */
 			message: string;
-			/** @description the collection of errors for the current context */
 			errors: {
 				[key: string]: string[];
 			};
@@ -3141,8 +3235,6 @@ export interface components {
 			badges: components['schemas']['UserBadgeDto'][];
 			skin: components['schemas']['MinecraftSkinDto'];
 		};
-		/** @description RFC7807 compatible problem details/ error response class. this can be used by configuring startup like so:
-		 *     app.UseFastEndpoints(c => c.Errors.UseProblemDetails()) */
 		ProblemDetails: {
 			/** @default https://www.rfc-editor.org/rfc/rfc7231#section-6.5.1 */
 			type: string;
@@ -3157,25 +3249,15 @@ export interface components {
 			instance: string;
 			/** @default 0HMPNHL0JHL76:00000001 */
 			traceId: string;
-			/** @description the details of the error */
 			detail?: string | null;
 			errors: components['schemas']['ProblemDetails_Error'][];
 		};
-		/** @description the error details object */
 		ProblemDetails_Error: {
-			/**
-			 * @description the name of the error or property of the dto that caused the error
-			 * @default Error or field name
-			 */
+			/** @default Error or field name */
 			name: string;
-			/**
-			 * @description the reason for the error
-			 * @default Error reason
-			 */
+			/** @default Error reason */
 			reason: string;
-			/** @description the code of the error */
 			code?: string | null;
-			/** @description the severity of the error */
 			severity?: string | null;
 		};
 		SearchRequest: Record<string, never>;
@@ -3210,6 +3292,14 @@ export interface components {
 			order?: number | null;
 		};
 		UserRoleRequest: Record<string, never>;
+		AccountWithPermsDto: {
+			id: string;
+			displayName: string;
+			username: string;
+			roles: string[];
+			discriminator?: string | null;
+			avatar?: string | null;
+		};
 		EventIdRequest: Record<string, never>;
 		EventDetailsDto: {
 			/** @description Event id as a string */
@@ -3262,14 +3352,6 @@ export interface components {
 		/** @enum {string} */
 		EventType: 'none' | 'farming-weight' | 'collection' | 'experience' | 'medals' | 'pests';
 		SetEventApprovalRequest: Record<string, never>;
-		AccountWithPermsDto: {
-			id: string;
-			displayName: string;
-			username: string;
-			roles: string[];
-			discriminator?: string | null;
-			avatar?: string | null;
-		};
 		AdminLinkAccountRequest: {
 			discordId: string;
 			player: string;
@@ -3525,7 +3607,10 @@ export interface components {
 		};
 		ContestParticipationDto: {
 			crop: string;
-			/** Format: int64 */
+			/**
+			 * Format: int64
+			 * @description Timestamp of the contest in seconds since unix epoch.
+			 */
 			timestamp: number;
 			/** Format: int32 */
 			collected: number;
@@ -3669,6 +3754,7 @@ export interface components {
 			timestamp: number;
 			/** Format: int32 */
 			participants: number;
+			brackets: components['schemas']['ContestBracketsDto'];
 		};
 		SkyBlockMonthRequest: Record<string, never>;
 		YearlyContestsDto: {
@@ -4164,6 +4250,7 @@ export interface components {
 			title: string;
 			shortTitle?: string | null;
 			interval?: string | null;
+			firstInterval?: string | null;
 			/** Format: int32 */
 			limit: number;
 			/** Format: int32 */
@@ -4261,26 +4348,6 @@ export interface components {
 		LeaderboardType: 0 | 1 | 2;
 		/** @enum {integer} */
 		LeaderboardScoreDataType: 0 | 1 | 2;
-		LeaderboardRanksResponse: {
-			ranks: {
-				[key: string]: components['schemas']['PlayerLeaderboardEntryWithRankDto'];
-			};
-		};
-		PlayerLeaderboardEntryWithRankDto: {
-			title: string;
-			short?: string | null;
-			slug: string;
-			profile?: boolean | null;
-			/** Format: int32 */
-			rank: number;
-			intervalIdentifier?: string | null;
-			/** Format: double */
-			amount: number;
-			/** Format: double */
-			initialAmount: number;
-			type: components['schemas']['LeaderboardScoreDataType'];
-		};
-		LeaderboardRanksRequest: Record<string, never>;
 		LeaderboardPositionDto: {
 			/**
 			 * Format: int32
@@ -4311,7 +4378,30 @@ export interface components {
 			upcomingRank: number;
 			/** @description List of upcoming players */
 			upcomingPlayers?: components['schemas']['LeaderboardEntryDto'][] | null;
+			/** @description List of previous players */
+			previous?: components['schemas']['LeaderboardEntryDto'][] | null;
 		};
+		GetMultiplePlayerRanksRequest: Record<string, never>;
+		LeaderboardRanksResponse: {
+			ranks: {
+				[key: string]: components['schemas']['PlayerLeaderboardEntryWithRankDto'];
+			};
+		};
+		PlayerLeaderboardEntryWithRankDto: {
+			title: string;
+			short?: string | null;
+			slug: string;
+			profile?: boolean | null;
+			/** Format: int32 */
+			rank: number;
+			intervalIdentifier?: string | null;
+			/** Format: double */
+			amount: number;
+			/** Format: double */
+			initialAmount: number;
+			type: components['schemas']['LeaderboardScoreDataType'];
+		};
+		LeaderboardRanksRequest: Record<string, never>;
 		GetPlayerRankRequest: Record<string, never>;
 		LeaderboardPositionsDto: {
 			misc: {
@@ -4344,6 +4434,8 @@ export interface components {
 			api: components['schemas']['ApiAccessDto'];
 			/** Format: int32 */
 			skyblockXp: number;
+			/** Format: double */
+			socialXp: number;
 			/** Format: double */
 			purse: number;
 			/** Format: double */
@@ -4451,6 +4543,7 @@ export interface components {
 			doubleDrops: number;
 			/** Format: int32 */
 			levelCap: number;
+			personalBests: boolean;
 		};
 		JacobStatsDto: {
 			brackets: {
@@ -4773,6 +4866,60 @@ export interface components {
 				[key: string]: components['schemas']['BazaarProductSummaryDto'];
 			};
 		};
+		SkyblockFiresalesResponse: {
+			firesales: components['schemas']['SkyblockFiresaleDto'][];
+		};
+		SkyblockFiresaleDto: {
+			/** Format: int64 */
+			startsAt: number;
+			/** Format: int64 */
+			endsAt: number;
+			items: components['schemas']['SkyblockFiresaleItemDto'][];
+		};
+		SkyblockFiresaleItemDto: {
+			itemId: string;
+			/** Format: int32 */
+			amount: number;
+			/**
+			 * Format: int32
+			 * @description Price in Skyblock Gems
+			 */
+			price: number;
+			/**
+			 * Format: int64
+			 * @description Unix seconds
+			 */
+			startsAt: number;
+			/**
+			 * Format: int64
+			 * @description Unix seconds
+			 */
+			endsAt: number;
+		};
+		SkyblockGemShopsResponse: {
+			firesales: components['schemas']['SkyblockFiresaleDto'][];
+			taylorCollection: components['schemas']['TaylorCollection'];
+			seasonalBundles: components['schemas']['TaylorCollection'];
+		};
+		TaylorCollection: {
+			items: components['schemas']['TaylorCollectionItem'][];
+		};
+		TaylorCollectionItem: {
+			name: string;
+			output: components['schemas']['UpgradeCost'][];
+			cost: components['schemas']['UpgradeCost'][];
+			released: string;
+		};
+		UpgradeCost: {
+			type: components['schemas']['UpgradeCostType'];
+			essence_type?: string | null;
+			item_id?: string | null;
+			medal_type?: string | null;
+			/** Format: int32 */
+			amount: number;
+		};
+		/** @enum {integer} */
+		UpgradeCostType: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 		GetItemsFromBytesResponse: {
 			items: (components['schemas']['ItemDto'] | null)[];
 		};
@@ -4820,11 +4967,11 @@ export interface components {
 			[key: string]: unknown;
 		};
 		ItemSkin: {
-			value: string;
-			signature: string;
+			value?: string | null;
+			signature?: string | null;
 		};
 		ItemGemstoneSlot: {
-			slot_type: string;
+			slot_type?: string | null;
 			costs: components['schemas']['ItemGemstoneSlotCosts'][];
 		};
 		ItemGemstoneSlotCosts: {
@@ -4881,9 +5028,7 @@ export interface components {
 		} & {
 			[key: string]: unknown;
 		};
-		/** @description Provides a mechanism for examining the structural content of a JSON value without automatically instantiating data values. */
 		JsonDocument: {
-			/** @description Gets the root element of this JSON document. */
 			rootElement: unknown;
 		};
 		GetSpecifiedSkyblockItemsResponse: {
@@ -5282,12 +5427,15 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-	EliteAPIFeaturesAccountGetAccountGetAccountEndpoint: {
+	GetAccount: {
 		parameters: {
 			query?: never;
 			header?: never;
 			path: {
-				/** @description Player uuid or ign */
+				/**
+				 * @description Player uuid or ign
+				 * @example Ke5o
+				 */
 				player: string;
 			};
 			cookie?: never;
@@ -5314,7 +5462,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAccountLinkAccountLinkAccountEndpoint: {
+	LinkOwnAccount: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -5343,7 +5491,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAccountUnlinkAccountUnlinkAccountEndpoint: {
+	UnlinkOwnAccount: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -5372,7 +5520,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAccountGetAccountFaceGetAccountFaceEndpoint1: {
+	GetAccountFace1: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -5401,7 +5549,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAccountGetAccountFaceGetAccountFaceEndpoint2: {
+	GetAccountFace2: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -5430,7 +5578,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAccountGetAccountFromDiscordGetAccountFromDiscordEndpoint: {
+	GetAccountFromDiscord: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -5462,7 +5610,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAccountGetAccountSettingsGetAccountSettingsEndpoint: {
+	GetAccountSettings: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -5493,7 +5641,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAccountGetAuthAccountGetAuthAccountEndpoint: {
+	GetAuthAccount: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -5520,7 +5668,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAccountRefreshPurchasesRefreshPurchasesEndpoint: {
+	RefreshPurchases: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -5545,7 +5693,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAccountSearchAccountsSearchAccountsEndpoint: {
+	SearchAccounts: {
 		parameters: {
 			query: {
 				/** @description Search query string */
@@ -5579,7 +5727,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAccountSetPrimaryAccountSetPrimaryAccountEndpoint: {
+	SetPrimaryAccount: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -5608,7 +5756,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAccountUpdateBadgesUpdateBadgesEndpoint: {
+	UpdateBadges: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -5648,7 +5796,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAccountUpdateFortuneSettingsUpdateFortuneSettingsEndpoint: {
+	UpdateFortuneSettings: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -5682,7 +5830,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAccountUpdateSettingsUpdateAccountEndpoint: {
+	UpdateAccount: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -5713,7 +5861,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAdminAdminsAddRoleToUserAddRoleToUserEndpoint: {
+	AddRoleToUser: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -5758,7 +5906,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAdminAdminsRemoveRoleFromUserRemoveRoleFromUserEndpoint: {
+	RemoveRoleFromUser: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -5802,7 +5950,75 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAdminClearPlayerCooldownsClearPlayerCooldownsEndpoint: {
+	GetAdmins: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AccountWithPermsDto'][];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetRoles: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': string[];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	ClearPlayerCooldowns: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -5845,7 +6061,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAdminDeleteUpcomingContestsDeleteUpcomingContestsEndpoint: {
+	DeleteUpcomingContests: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -5877,7 +6093,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAdminEventsDeleteEventDeleteEventApprovalEndpoint: {
+	DeleteEventApproval: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -5920,7 +6136,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAdminEventsGetPendingEventsGetPendingEventsEndpoint: {
+	GetPendingEvents: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -5954,7 +6170,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAdminEventsSetEventApprovalSetEventApprovalEndpoint: {
+	SetEventApproval: {
 		parameters: {
 			query?: {
 				approve?: boolean | null;
@@ -5999,75 +6215,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAdminGetAdminsGetAdminsEndpoint: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Success */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['AccountWithPermsDto'][];
-				};
-			};
-			/** @description Unauthorized */
-			401: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-			/** @description Forbidden */
-			403: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-		};
-	};
-	EliteAPIFeaturesAdminGetRolesGetRolesEndpoint: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Success */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': string[];
-				};
-			};
-			/** @description Unauthorized */
-			401: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-			/** @description Forbidden */
-			403: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-		};
-	};
-	EliteAPIFeaturesAdminLinkAccountLinkAccountEndpoint: {
+	LinkUserAccount: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6098,7 +6246,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAdminRefreshDiscordGuildRefreshDiscordGuildEndpoint: {
+	RefreshDiscordGuild: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6141,7 +6289,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAdminUnlinkAccountUnlinkAccountEndpoint: {
+	UnlinkUserAccount: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6172,7 +6320,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAnnouncementsCreateAnnouncementEndpoint: {
+	CreateAnnouncement: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6181,7 +6329,7 @@ export interface operations {
 		};
 		requestBody: {
 			content: {
-				'*/*': components['schemas']['CreateAnnouncementDto'];
+				'application/json': components['schemas']['CreateAnnouncementDto'];
 			};
 		};
 		responses: {
@@ -6208,7 +6356,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAnnouncementsDismissAnnouncementEndpoint: {
+	DismissAnnouncement: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6237,7 +6385,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAnnouncementsGetAnnouncementEndpoint: {
+	GetAnnouncement: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6257,7 +6405,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAuthGetSelfGetSelfEndpoint: {
+	GetSession: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6284,7 +6432,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAuthLoginLoginEndpoint: {
+	Login: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6308,7 +6456,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesAuthRefreshRefreshEndpoint: {
+	RefreshAuth: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6332,7 +6480,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBadgesAddBadgeToUserAddBadgeToUserBadgeEndpoint: {
+	AddBadgeToUserBadge: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6378,7 +6526,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBadgesDeleteBadgeFromUserDeleteBadgeFromUserBadgeEndpoint: {
+	DeleteBadgeFromUserBadge: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6422,7 +6570,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBadgesGetBadgesGetBadgesEndpoint: {
+	GetBadges: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6442,7 +6590,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBadgesCreateBadgeCreateBadgeEndpoint: {
+	CreateBadge: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6487,7 +6635,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBadgesDeleteBadgeDeleteBadgeEndpoint: {
+	DeleteBadge: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6531,7 +6679,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBadgesUpdateBadgeUpdateBadgeEndpoint: {
+	UpdateBadge: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6579,7 +6727,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBotAccountsLinkAccountLinkAccountEndpoint: {
+	LinkAccountBot: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6611,7 +6759,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBotAccountsUnlinkAccountUnlinkAccountEndpoint: {
+	UnlinkAccountBot: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6641,7 +6789,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBotAccountsMakePrimaryMakePrimaryAccountEndpoint: {
+	MakePrimaryAccount: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6671,7 +6819,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBotAccountsRefreshPurchasesUnlinkAccountEndpoint: {
+	RefreshUserPurchases: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6700,7 +6848,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBotBadgesGrantBadgeGrantBadgeEndpoint: {
+	GrantBadge: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6731,7 +6879,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBotBadgesRemoveBadgeRemoveBadgeEndpoint: {
+	RemoveBadge: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6762,7 +6910,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBotDisableContestPingsDisableContestPingsPingsEndpoint: {
+	DisableContestPingsPings: {
 		parameters: {
 			query?: {
 				reason?: string | null;
@@ -6794,7 +6942,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBotGetContestPingsGetContestPingsEndpoint: {
+	GetContestPings: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6814,7 +6962,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBotGetGuildGetBotGuildEndpoint: {
+	GetBotGuild: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6845,7 +6993,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBotGetJacobFeatureGetJacobFeatureEndpoint: {
+	GetJacobFeature: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6876,7 +7024,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBotUpdateJacobFeatureUpdateJacobFeatureEndpoint: {
+	UpdateJacobFeature: {
 		parameters: {
 			query?: {
 				reason?: string | null;
@@ -6914,7 +7062,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBotGuildsRefreshGuildRefreshGuildEndpoint: {
+	RefreshGuild: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6943,7 +7091,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBotGuildsUpdateGuildUpdateGuildEndpoint: {
+	UpdateGuild: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -6979,7 +7127,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBotGuildsUpdateGuildChannelUpdateGuildChannelEndpoint: {
+	UpdateGuildChannel: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7013,7 +7161,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBotGuildsUpdateGuildMemberRolesUpdateGuildMemberRolesEndpoint: {
+	UpdateGuildMemberRoles: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7048,7 +7196,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBotGuildsUpdateGuildRoleUpdateGuildRoleEndpoint: {
+	UpdateGuildRole: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7082,7 +7230,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesBotUpdateDiscordAccountUpdateDiscordAccountEndpoint: {
+	UpdateDiscordAccount: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7106,7 +7254,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesContestsGetContestFromKeyGetContestFromKeyEndpoint: {
+	GetContestFromKey: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7132,9 +7280,12 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesContestsGetContestsAtTimestampGetContestsAtTimestampEndpoint: {
+	GetContestsAtTimestamp: {
 		parameters: {
-			query?: never;
+			query: {
+				/** @description Limit the number of participations returned in each contest. */
+				limit: number;
+			};
 			header?: never;
 			path: {
 				timestamp: number;
@@ -7154,7 +7305,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesContestsGetContestsInDayGetContestsInDayEndpoint: {
+	GetContestsInDay: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7190,7 +7341,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesContestsGetContestsInMonthGetContestsInMonthEndpoint: {
+	GetContestsInMonth: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7226,7 +7377,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesContestsGetContestsInYearGetContestsInYearEndpoint: {
+	GetContestsInYear: {
 		parameters: {
 			query?: {
 				/** @description If the year being requested is the current year. Not required. */
@@ -7252,7 +7403,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesContestsGetCurrentContestsGetCurrentContestsEndpoint: {
+	GetCurrentContests: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7272,7 +7423,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesContestsUploadCurrentContestsUploadCurrentContestsEndpoint: {
+	UploadCurrentContests: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7296,7 +7447,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesContestsGetPlayerParticipationsGetPlayerParticipationsEndpoint: {
+	GetPlayerParticipations: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7327,7 +7478,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesContestsGetProfileMemberParticipationsGetProfileMemberParticipationsEndpoint: {
+	GetProfileMemberParticipations: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7359,7 +7510,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesContestsGetRecordsInYearGetRecordsInYearEndpoint: {
+	GetRecordsInYear: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7391,7 +7542,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesContestsGetSelectedMemberParticipationsGetSelectedMemberParticipationsEndpoint: {
+	GetSelectedMemberParticipations: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7422,7 +7573,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminAddTeamMemberAddTeamMemberEndpoint: {
+	AddTeamMemberAdmin: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7462,7 +7613,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminKickTeamMemberKickTeamMemberEndpoint: {
+	KickTeamMemberAdmin: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7502,7 +7653,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminBanMemberBanMemberEndpoint: {
+	BanMemberAdmin: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7546,7 +7697,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminUnbanMemberUnbanMemberEndpoint: {
+	UnbanMemberAdmin: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7584,7 +7735,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminCreateEventCreateWeightEventEndpoint: {
+	CreateEventAdmin: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7627,7 +7778,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminCreateTeamCreateTeamEndpoint: {
+	CreateTeamAdmin: {
 		parameters: {
 			query?: {
 				userId?: string | null;
@@ -7671,7 +7822,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminDeleteEventDeleteEventEndpoint: {
+	DeleteEventAdmin: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7709,7 +7860,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminUpdateEventCreateWeightEventEndpoint: {
+	UpdateEventAdmin: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7753,7 +7904,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminSetEventBannerSetEventBannerEndpoint: {
+	SetEventBannerAdmin: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7795,7 +7946,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminDeleteEventBannerDeleteEventBannerEndpoint: {
+	DeleteEventBannerAdmin: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7833,7 +7984,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminForceAddMemberForceAddMemberEndpoint: {
+	ForceAddMemberAdmin: {
 		parameters: {
 			query: {
 				profileUuid: string;
@@ -7873,7 +8024,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminDeleteMemberDeleteMemberEndpoint: {
+	DeleteMemberAdmin: {
 		parameters: {
 			query?: {
 				profileUuid?: string | null;
@@ -7914,7 +8065,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminDeleteTeamDeleteTeamEndpoint: {
+	DeleteTeamAdmin: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7953,7 +8104,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminUpdateTeamUpdateTeamEndpoint: {
+	UpdateTeamAdmin: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -7996,7 +8147,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminGetBannedMembersGetBannedMembersEndpoint: {
+	GetBannedMembersAdmin: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8036,7 +8187,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminGetEventMembersGetEventMembersEndpoint: {
+	GetGuildEventMembersAdmin: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8076,7 +8227,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminGetGuildEventGetGuildEventEndpoint: {
+	GetGuildEventAdmin: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8116,7 +8267,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminGetGuildEventsGetGuildEventsEndpoint: {
+	GetGuildEventsAdmin: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8154,7 +8305,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminGetTeamsGetTeamsEndpoint: {
+	GetTeamsAdmin: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8194,7 +8345,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsAdminSetTeamOwnerSetTeamOwnerEndpoint: {
+	SetTeamOwnerAdmin: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8227,7 +8378,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsPublicGetEventGetEventEndpoint: {
+	GetEvent: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8249,7 +8400,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsPublicGetEventDefaultsGetEventDefaultsEndpoint: {
+	GetEventDefaults: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8269,7 +8420,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsPublicGetEventMemberGetEventMembersEndpoint: {
+	GetEventMember: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8301,7 +8452,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsPublicGetEventMembersGetEventMembersEndpoint: {
+	GetEventMembers: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8323,7 +8474,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsPublicGetEventTeamGetEventTeamEndpoint: {
+	GetEventTeam: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8346,7 +8497,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsUserDeleteTeamDeleteTeamEndpoint: {
+	DeleteTeam: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8374,7 +8525,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsUserUpdateTeamUpdateTeamEndpoint: {
+	UpdateTeam: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8406,7 +8557,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsPublicGetEventTeamsGetEventTeamsEndpoint: {
+	GetEventTeams: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8428,7 +8579,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsUserCreateTeamCreateTeamEndpoint: {
+	CreateTeam: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8439,7 +8590,7 @@ export interface operations {
 		};
 		requestBody: {
 			content: {
-				'*/*': components['schemas']['CreateEventTeamDto'];
+				'application/json': components['schemas']['CreateEventTeamDto'];
 			};
 		};
 		responses: {
@@ -8459,7 +8610,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsPublicGetTeamWordListGetTeamWordListEndpoint: {
+	GetTeamWordList: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8479,7 +8630,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsPublicGetUpcomingGetUpcomingEventsEndpoint: {
+	GetUpcomingEvents: {
 		parameters: {
 			query?: {
 				/** @description Offset by an amount of days to also include recently ended events. */
@@ -8502,7 +8653,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsUserJoinEventJoinEventEndpoint: {
+	JoinEvent: {
 		parameters: {
 			query?: {
 				playerUuid?: string | null;
@@ -8541,7 +8692,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsUserJoinTeamJoinTeamEndpoint: {
+	JoinTeam: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8574,7 +8725,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsUserKickTeamMemberKickTeamMemberEndpoint: {
+	KickTeamMember: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8613,7 +8764,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsUserLeaveEventLeaveEventEndpoint: {
+	LeaveEvent: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8640,7 +8791,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsUserLeaveTeamLeaveTeamEndpoint: {
+	LeaveTeam: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8668,7 +8819,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsUserSetTeamOwnerSetTeamOwnerEndpoint: {
+	SetTeamOwner: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8680,7 +8831,7 @@ export interface operations {
 		};
 		requestBody: {
 			content: {
-				'*/*': components['schemas']['ChangeTeamOwnerRequest'];
+				'application/json': components['schemas']['ChangeTeamOwnerRequest'];
 			};
 		};
 		responses: {
@@ -8700,7 +8851,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesEventsUserUpdateTeamCodeUpdateTeamJoinCodeEndpoint: {
+	UpdateTeamJoinCode: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8728,7 +8879,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGardenGetGardenGetGardenEndpoint: {
+	GetGarden: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8767,7 +8918,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGardenGetSelectedGardenGetGardenEndpoint: {
+	GetSelectedGarden: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -8806,7 +8957,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGraphsGetAdminCropGraphsGetAdminCropGraphsEndpoint: {
+	GetAdminCropGraphs: {
 		parameters: {
 			query?: {
 				/**
@@ -8870,7 +9021,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGraphsGetAdminSkillGraphsGetAdminSkillGraphsEndpoint: {
+	GetAdminSkillGraphs: {
 		parameters: {
 			query?: {
 				/** @example 0 */
@@ -8925,7 +9076,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGraphsGetCropGraphsGetCropGraphsEndpoint: {
+	GetCropGraphs: {
 		parameters: {
 			query?: {
 				/** @example 0 */
@@ -8966,7 +9117,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGraphsGetSkillGraphsGetSkillGraphsEndpoint: {
+	GetSkillGraphs: {
 		parameters: {
 			query?: {
 				/** @example 0 */
@@ -9007,7 +9158,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGraphsMedalsGetCurrentMedalBracketsGetCurrentMedalBracketsEndpoint: {
+	GetCurrentMedalBrackets: {
 		parameters: {
 			query?: {
 				/** @description Amount of previous SkyBlock months to include in the average */
@@ -9030,7 +9181,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGraphsMedalsGetMedalBracketsGetMedalBracketsEndpoint: {
+	GetMedalBrackets: {
 		parameters: {
 			query?: {
 				/** @description Amount of previous SkyBlock months to include in the average */
@@ -9067,7 +9218,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGraphsMedalsGetMedalBracketsGraphGetMedalBracketsGraphEndpoint: {
+	GetMedalBracketsGraph: {
 		parameters: {
 			query?: {
 				/** @description Amount of previous SkyBlock years to include in the average */
@@ -9104,7 +9255,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsPublicGetGuildEventsGetPublicGuildEventsEndpoint: {
+	GetPublicGuildEvents: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9135,7 +9286,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsAdminSetEventsSetEventFeatureEndpoint: {
+	SetEventFeature: {
 		parameters: {
 			query?: {
 				enable?: boolean | null;
@@ -9182,7 +9333,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsAdminSetJacobLeaderboardsSetJacobFeatureEndpoint: {
+	SetJacobFeature: {
 		parameters: {
 			query?: {
 				enable?: boolean | null;
@@ -9229,7 +9380,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsAdminSetLockedSetGuildLockedEndpoint: {
+	SetGuildLocked: {
 		parameters: {
 			query?: {
 				/** @description If server subscriptions shouldn't override feature values */
@@ -9276,7 +9427,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsAdminSetPublicSetGuildPublicEndpoint: {
+	SetGuildPublic: {
 		parameters: {
 			query?: {
 				public?: boolean | null;
@@ -9322,7 +9473,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsPublicGetGuildGetPublicGuildEndpoint: {
+	GetPublicGuild: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9353,7 +9504,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsPublicGetGuildsGetPublicGuildsEndpoint: {
+	GetPublicGuilds: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9373,7 +9524,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsUserContestPingsUpdateContestPingsDeleteContestPingsEndpoint: {
+	UpdateContestPings: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9414,7 +9565,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsUserContestPingsDeleteContestPingsDeleteContestPingsEndpoint: {
+	DeleteContestPings: {
 		parameters: {
 			query?: {
 				reason?: string | null;
@@ -9453,7 +9604,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsUserGetGuildsGetUserGuildsEndpoint: {
+	GetUserGuilds: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9480,7 +9631,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsUserGetMembershipGetUserGuildEndpoint: {
+	GetUserGuild: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9518,7 +9669,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsUserJacobCreateJacobLeaderboardUpdateGuildJacobFeatureEndpoint: {
+	CreateGuildJacobLeaderboard: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9559,7 +9710,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsUserJacobDeleteJacobLeaderboardDeleteGuildJacobFeatureEndpoint: {
+	DeleteGuildJacobLeaderboard: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9597,7 +9748,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsUserJacobUpdateJacobLeaderboardUpdateGuildJacobFeatureEndpoint: {
+	UpdateGuildJacobLeaderboard: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9639,7 +9790,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsUserJacobGetJacobGetGuildJacobEndpoint: {
+	GetGuildJacob: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9677,7 +9828,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsUserJacobUpdateJacobUpdateGuildJacobFeatureEndpoint: {
+	UpdateGuildJacobFeature: {
 		parameters: {
 			query?: {
 				reason?: string | null;
@@ -9719,7 +9870,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsUserJacobSendJacobLeaderboardSendGuildJacobFeatureEndpoint: {
+	SendGuildJacobFeature: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9757,7 +9908,32 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsUserRequestRefreshRequestGuildRefreshEndpoint: {
+	RefreshGuildMemberships: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	RequestGuildRefresh: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9793,7 +9969,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsUserSetAdminRoleSetAdminRoleEndpoint: {
+	SetAdminRole: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9834,7 +10010,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsUserSetInviteSetInviteEndpoint: {
+	SetInvite: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9875,7 +10051,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesGuildsUserUpdatePurchasesUpdateGuildPurchasesEndpoint: {
+	UpdateGuildPurchases: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9911,7 +10087,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesLeaderboardsEndpointsGetLeaderboardGetLeaderboardEndpoint: {
+	GetLeaderboard: {
 		parameters: {
 			query?: {
 				offset?: number | null;
@@ -9927,8 +10103,6 @@ export interface operations {
 				 *     1 = Removed
 				 *     2 = All */
 				removed?: components['schemas']['RemovedFilter'] | null;
-				/** @description Use new leaderboard backend (will be default in the future) */
-				new?: boolean | null;
 			};
 			header?: never;
 			path: {
@@ -9959,7 +10133,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesLeaderboardsEndpointsGetLeaderboardsGetLeaderboardsEndpoint: {
+	GetLeaderboards: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -9979,7 +10153,63 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesLeaderboardsEndpointsGetPlayerLeaderboardRanksGetPlayerLeaderboardRanksEndpoint: {
+	GetMultiplePlayerRanks: {
+		parameters: {
+			query: {
+				/** @description Ids of leaderboards (comma-separated) */
+				leaderboards: string;
+				/** @description Include upcoming players */
+				includeUpcoming?: boolean | null;
+				/** @description Amount of upcoming players to include (max 10). */
+				upcoming?: number | null;
+				/** @description Amount of passed players to include (max 3). */
+				previous?: number | null;
+				/** @description Start at a specified rank for upcoming players */
+				atRank?: number | null;
+				/** @description Time interval key of a monthly leaderboard. Format: yyyy-MM */
+				interval?: string | null;
+				/** @description Game mode to filter leaderboard by. Leave empty to get all modes.
+				 *     Options: "ironman", "island", "classic" */
+				mode?: string | null;
+				/** @description Removed filter to get leaderboard entries that have been removed from the leaderboard.
+				 *     Default is profiles that have not been removed/wiped.
+				 *     0 = Not Removed
+				 *     1 = Removed
+				 *     2 = All */
+				removed?: components['schemas']['RemovedFilter'] | null;
+			};
+			header?: never;
+			path: {
+				playerUuid: string;
+				profileUuid: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': {
+						[key: string]: components['schemas']['LeaderboardPositionDto'];
+					};
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+		};
+	};
+	GetPlayerLeaderboardRanks: {
 		parameters: {
 			query?: {
 				/** @description Maximum rank number to return. Used if you don't want ranks higher than a certain number. */
@@ -10005,17 +10235,17 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesLeaderboardsEndpointsGetPlayerRankGetPlayerRankEndpoint1: {
+	GetPlayerRank1: {
 		parameters: {
 			query?: {
 				/** @description Include upcoming players */
 				includeUpcoming?: boolean | null;
 				/** @description Amount of upcoming players to include (max 100). Only works with new leaderboard backend */
 				upcoming?: number | null;
+				/** @description Amount of passed players to include (max 3). */
+				previous?: number | null;
 				/** @description Start at a specified rank for upcoming players */
 				atRank?: number | null;
-				/** @description Use new leaderboard backend (will be removed in the future) */
-				new?: boolean | null;
 				/** @description Time interval key of a monthly leaderboard. Format: yyyy-MM */
 				interval?: string | null;
 				/** @description Game mode to filter leaderboard by. Leave empty to get all modes.
@@ -10059,13 +10289,13 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesLeaderboardsEndpointsGetPlayerRankGetPlayerRankEndpoint2: {
+	GetPlayerRank2: {
 		parameters: {
 			query?: {
 				includeUpcoming?: boolean | null;
 				upcoming?: number | null;
+				previous?: number | null;
 				atRank?: number | null;
-				new?: boolean | null;
 				interval?: string | null;
 				mode?: string | null;
 				removed?: components['schemas']['RemovedFilter'] | null;
@@ -10100,7 +10330,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesLeaderboardsEndpointsGetPlayerRanksGetPlayerRanksEndpoint: {
+	GetPlayerRanks: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10132,17 +10362,17 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesLeaderboardsEndpointsGetProfileRankGetProfileRankEndpoint1: {
+	GetProfileRank1: {
 		parameters: {
 			query?: {
 				/** @description Include upcoming players */
 				includeUpcoming?: boolean | null;
-				/** @description Amount of upcoming players to include (max 100). Only works with new leaderboard backend */
+				/** @description Amount of upcoming players to include (max 100). */
 				upcoming?: number | null;
+				/** @description Amount of passed players to include (max 3). */
+				previous?: number | null;
 				/** @description Start at a specified rank for upcoming players */
 				atRank?: number | null;
-				/** @description Use new leaderboard backend (will be default in the future) */
-				new?: boolean | null;
 				/** @description Time interval key of a monthly leaderboard. Format: yyyy-MM */
 				interval?: string | null;
 				/** @description Game mode to filter leaderboard by. Leave empty to get all modes.
@@ -10185,13 +10415,13 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesLeaderboardsEndpointsGetProfileRankGetProfileRankEndpoint2: {
+	GetProfileRank2: {
 		parameters: {
 			query?: {
 				includeUpcoming?: boolean | null;
 				upcoming?: number | null;
+				previous?: number | null;
 				atRank?: number | null;
-				new?: boolean | null;
 				interval?: string | null;
 				mode?: string | null;
 				removed?: components['schemas']['RemovedFilter'] | null;
@@ -10225,7 +10455,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesMonetizationEndpointsGetEntitlementsGetEntitlementsEndpoint: {
+	GetEntitlements: {
 		parameters: {
 			query?: {
 				target?: components['schemas']['EntitlementTarget'] | null;
@@ -10273,7 +10503,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesMonetizationEndpointsGrantTestEntitlementGrantTestEntitlementEndpoint: {
+	GrantTestEntitlement: {
 		parameters: {
 			query?: {
 				target?: components['schemas']['EntitlementTarget'] | null;
@@ -10320,7 +10550,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesMonetizationEndpointsRemoveTestEntitlementRemoveTestEntitlementEndpoint: {
+	RemoveTestEntitlement: {
 		parameters: {
 			query?: {
 				target?: components['schemas']['EntitlementTarget'] | null;
@@ -10366,7 +10596,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesPlayerGetLinkedAccountsGetLinkedAccountsEndpoint: {
+	GetLinkedAccounts: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10404,7 +10634,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesPlayerGetPlayerDataGetPlayerDataEndpoint: {
+	GetPlayerData: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10442,7 +10672,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesProfilesEndpointsGetAllProfileDetailsGetAllProfileDetailsEndpoint: {
+	GetAllProfileDetails: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10473,7 +10703,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesProfilesEndpointsGetProfileGetProfileEndpoint: {
+	GetProfile: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10512,7 +10742,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesProfilesEndpointsGetProfileDetailsGetProfileDetailsEndpoint: {
+	GetProfileDetails: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10550,7 +10780,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesProfilesEndpointsGetProfileNamesGetProfileNamesEndpoint: {
+	GetProfileNames: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10581,7 +10811,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesProfilesEndpointsGetSelectedProfileGetSelectedProfileEndpoint: {
+	GetSelectedProfile: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10619,7 +10849,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesResourcesAuctionsEndpointsGetAuctionHouseProductsEndpoint: {
+	GetAuctionHouseProducts: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10639,7 +10869,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesResourcesBazaarEndpointsGetBazaarProductEndpoint: {
+	GetBazaarProduct: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10661,7 +10891,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesResourcesBazaarEndpointsGetBazaarProductsEndpoint: {
+	GetBazaarProducts: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10681,7 +10911,47 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesResourcesItemsEndpointsGetItemsFromBytesEndpoint: {
+	SkyblockFiresale: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['SkyblockFiresalesResponse'];
+				};
+			};
+		};
+	};
+	SkyblockGemShop: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['SkyblockGemShopsResponse'];
+				};
+			};
+		};
+	};
+	GetItemsFromBytes: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10705,7 +10975,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesResourcesItemsEndpointsGetSkyblockItemsEndpoint: {
+	GetSkyblockItems: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10725,7 +10995,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesResourcesItemsEndpointsGetSpecifiedSkyblockItemsEndpoint: {
+	GetSpecifiedSkyblockItems: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10758,7 +11028,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesResourcesItemsEndpointsSkyblockProductEndpoint: {
+	SkyblockProduct: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10780,7 +11050,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopCategoriesAddProductAddProductToCategoryEndpoint: {
+	AddProductToCategory: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10817,7 +11087,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopCategoriesRemoveProductRemoveProductToCategoryEndpoint: {
+	RemoveProductToCategory: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10854,7 +11124,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopCategoriesCreateCategoryCreateCategoryEndpoint: {
+	CreateCategory: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10890,7 +11160,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopCategoriesDeleteCategoryUpdateCategoryEndpoint: {
+	DeleteCategory: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10925,7 +11195,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopCategoriesUpdateCategoryUpdateCategoryEndpoint: {
+	UpdateCategory: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -10964,7 +11234,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopCategoriesGetCategoriesGetCategoriesEndpoint: {
+	GetCategories: {
 		parameters: {
 			query?: {
 				/** @description Include products in response */
@@ -10987,7 +11257,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopCategoriesGetCategoryGetCategoryEndpoint: {
+	GetCategory: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11010,7 +11280,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopCategoriesReorderCategoriesReorderCategoriesEndpoint: {
+	ReorderCategories: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11019,7 +11289,7 @@ export interface operations {
 		};
 		requestBody: {
 			content: {
-				'*/*': components['schemas']['ReorderIntRequest'];
+				'application/json': components['schemas']['ReorderIntRequest'];
 			};
 		};
 		responses: {
@@ -11055,7 +11325,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopCategoriesReorderCategoryProductsReorderCategoryProductsEndpoint: {
+	ReorderCategoryProducts: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11067,7 +11337,7 @@ export interface operations {
 		};
 		requestBody: {
 			content: {
-				'*/*': components['schemas']['ReorderCategoryProductsRequest'];
+				'application/json': components['schemas']['ReorderCategoryProductsRequest'];
 			};
 		};
 		responses: {
@@ -11103,7 +11373,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopProductsAdminAddCosmeticAddCosmeticToProductEndpoint: {
+	AddCosmeticToProduct: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11140,7 +11410,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopProductsAdminRemoveCosmeticRemoveCosmeticToProductEndpoint: {
+	RemoveCosmeticToProduct: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11177,7 +11447,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopProductsAdminAddProductImageAddProductImageEndpoint: {
+	AddProductImage: {
 		parameters: {
 			query?: {
 				/** @description Use this to set the image as the product's thumbnail */
@@ -11228,7 +11498,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopProductsAdminDeleteProductImageDeleteProductImageEndpoint: {
+	DeleteProductImage: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11273,7 +11543,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopProductsAdminGetAllProductsGetAllProductsEndpoint: {
+	GetAllProducts: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11307,7 +11577,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopProductsAdminRefreshProductsRefreshProductsEndpoint: {
+	RefreshProducts: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11341,7 +11611,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopProductsGetProductGetProductEndpoint: {
+	GetProduct: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11372,7 +11642,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopProductsAdminUpdateProductUpdateProductEndpoint: {
+	UpdateProduct: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11420,7 +11690,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopProductsClaimProductClaimProductEndpoint: {
+	ClaimProduct: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11456,7 +11726,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopProductsGetProductsGetProductsEndpoint: {
+	GetProducts: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11476,7 +11746,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopStylesAddStyleImageAddStyleImageEndpoint: {
+	AddStyleImage: {
 		parameters: {
 			query?: {
 				/** @description Use this to set the image as the product's thumbnail */
@@ -11517,7 +11787,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopStylesCreateStyleCreateStyleEndpoint: {
+	CreateStyle: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11562,7 +11832,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopStylesGetStyleGetStyleEndpoint: {
+	GetStyle: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11584,7 +11854,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopStylesUpdateStyleUpdateStyleEndpoint: {
+	UpdateStyle: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11631,7 +11901,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopStylesDeleteStyleDeleteStyleEndpoint: {
+	DeleteStyle: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11665,7 +11935,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopStylesDeleteStyleImageDeleteStyleImageEndpoint: {
+	DeleteStyleImage: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11700,7 +11970,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesShopStylesGetStylesGetStylesEndpoint: {
+	GetStyles: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11720,7 +11990,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesWeightGetAllWeightsGetAllWeightsEndpoint: {
+	GetAllWeights: {
 		parameters: {
 			query?: never;
 			header?: never;
@@ -11740,7 +12010,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesWeightGetWeightForProfileGetWeightForProfileEndpoint: {
+	GetWeightForProfile: {
 		parameters: {
 			query?: {
 				collections?: boolean | null;
@@ -11772,7 +12042,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesWeightGetWeightForSelectedGetWeightForSelectedEndpoint: {
+	GetWeightForSelected: {
 		parameters: {
 			query?: {
 				collections?: boolean | null;
@@ -11803,7 +12073,7 @@ export interface operations {
 			};
 		};
 	};
-	EliteAPIFeaturesWeightGetWeightProfilesGetWeightForProfilesEndpoint: {
+	GetWeightForProfiles: {
 		parameters: {
 			query?: {
 				collections?: boolean | null;
