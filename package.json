@@ -3,7 +3,7 @@
 	"engines": {
 		"node": ">=24.0.0"
 	},
-	"packageManager": "pnpm@10.17.0",
+	"packageManager": "pnpm@10.18.2",
 	"scripts": {
 		"start": "pnpm tsx src/index.ts",
 		"lint": "pnpm biome check --write",
@@ -16,7 +16,7 @@
 		"sentry:sourcemaps": "sentry-cli sourcemaps inject --org kaeso --project bot ./dist && sentry-cli sourcemaps upload --org kaeso --project bot ./dist"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.2.4",
+		"@biomejs/biome": "2.2.5",
 		"@types/amqplib": "^0.10.7",
 		"@types/node": "^24.5.2",
 		"dotenv": "^17.2.2",
