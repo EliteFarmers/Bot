@@ -1,5 +1,5 @@
 import { utc } from '@date-fns/utc';
-import { fromUnixTime, getUnixTime, startOfDay } from 'date-fns';
+import { addHours, fromUnixTime, getUnixTime, startOfDay } from 'date-fns';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction } from 'discord.js';
 import { FetchCollectionGraphs, UserSettings } from '../api/elite.js';
 import { elitePlayerOption } from '../autocomplete/player.js';
@@ -80,7 +80,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const dataPoints = collections.sort((a, b) => +(a.timestamp ?? 0) - +(b.timestamp ?? 0));
 
 	type dayProgress = {
-		start: number;
+		date: number;
 		crops: Record<string, number>;
 		weight: number;
 	};
@@ -98,7 +98,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		}, {});
 
 		days.push({
-			start: getUnixTime(startOfDay(fromUnixTime(lastPoint.timestamp, { in: utc }), { in: utc })),
+			date: getUnixTime(addHours(startOfDay(fromUnixTime(lastPoint.timestamp, { in: utc }), { in: utc }), 12)),
 			crops: cropGains,
 			weight: +(lastPoint.cropWeight ?? 0) - +(point.cropWeight ?? 0),
 		});
@@ -129,7 +129,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		if (crops.length <= 0) {
 			fields.push({
-				name: `<t:${day.start}:d>`,
+				name: `<t:${day.date}:d>`,
 				value: 'None!',
 				inline: true,
 			});
@@ -137,7 +137,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		}
 
 		fields.push({
-			name: `<t:${day.start}:d>`,
+			name: `<t:${day.date}:d>`,
 			value:
 				`**Weight:** ${day.weight.toFixed(2)}\n` +
 				crops

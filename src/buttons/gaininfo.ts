@@ -33,7 +33,7 @@ async function execute(interaction: ButtonInteraction, settings: UserSettings) {
 		{
 			name: 'What are the timestamps?',
 			value:
-				"These timestamps represent the start of the day in UTC. A player's first and last data point of that day is what is used to calculate the collection increase.",
+				"These timestamps represent noon UTC for the given day (so that the localized date is correct for the most users). A player's first and last data point of that day is what is used to calculate the collection increase.",
 		},
 		{
 			name: 'Where can I see older data?',

@@ -86,7 +86,7 @@ export const FetchWeightLeaderboardRank = (playerUuid: string, profileUuid: stri
 				leaderboard: 'farmingweight',
 				playerUuid,
 				profileUuid,
-			}
+			},
 		},
 	});
 
