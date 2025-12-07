@@ -174,6 +174,9 @@ async function sendMessages(
 				roles = crops
 					.map((crop) => pings.cropPingRoles?.[cropKeys[crop] as keyof typeof pings.cropPingRoles] ?? undefined)
 					.filter((role) => role && isFinite(+role)) as string[];
+
+				// Make distinct
+				roles = Array.from(new Set(...roles));
 			}
 
 			// Make sure alwaysPingRole at least seems valid
@@ -187,9 +190,8 @@ async function sendMessages(
 				},
 			} as MessageCreateOptions;
 
-			channel.send(msg).catch(() => {
-				console.log(`Failed to send message to ${channel.id} (${channel.guild.id})`);
-				// DisableGuildContestPings(pings.guildId ?? '', 'Failed to send message');
+			channel.send(msg).catch((e) => {
+				console.log(`Failed to send message to ${channel.id} (${channel.guild.id})`, e);
 			});
 		} catch (e) {
 			console.log(e);
