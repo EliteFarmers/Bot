@@ -176,7 +176,7 @@ async function sendMessages(
 					.filter((role) => role && isFinite(+role)) as string[];
 
 				// Make distinct
-				roles = Array.from(new Set(...roles));
+				roles = [...new Set(roles)];
 			}
 
 			// Make sure alwaysPingRole at least seems valid
