@@ -43,7 +43,7 @@ const command = new EliteCommand({
 
 export default command;
 
-const fortuneEmoji = '<:fortune:1313282552060055635>';
+const fortuneEmoji = '<:ff:1450022749631287330>';
 
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	const useDicers = interaction.options.getBoolean('dicer', false) ?? true;
@@ -283,7 +283,7 @@ function makeField(
 	useDicers = true,
 	useMooshroom = true,
 ) {
-	const reqs = Object.entries(data?.brackets ?? {})
+	const requirements = Object.entries(data?.brackets ?? {})
 		.map(([cropName, medals = {}]) => {
 			return {
 				cropName,
@@ -292,7 +292,7 @@ function makeField(
 		})
 		.sort((a, b) => a.cropName.localeCompare(b.cropName));
 
-	const cropNames = reqs
+	const cropNames = requirements
 		.map(({ cropName, collection }) => {
 			const crop = getCropFromName(cropName);
 			if (!crop) return '';

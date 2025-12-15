@@ -1,5 +1,5 @@
 {
-	"x-generator": "NSwag v14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))",
+	"x-generator": "NSwag v14.6.1.0 (NJsonSchema v11.5.1.0 (Newtonsoft.Json v13.0.0.0))",
 	"openapi": "3.0.0",
 	"info": {
 		"title": "Elite API",
@@ -137,7 +137,7 @@
 			"get": {
 				"tags": ["Account"],
 				"summary": "Get Minecraft Account Face Image",
-				"description": "Returns an 8x8 or 72x72 face png image of the Minecraft account associated with the provided player name or UUID. 72x72 response includes the player's \"hat\" overlay. If not found, returns Steve's face.",
+				"description": "Returns a 72x72 face png image of the Minecraft account associated with the provided player name or UUID. 72x72 response includes the player's \"hat\" overlay. If not found, returns Steve's face.",
 				"operationId": "GetAccountFace1",
 				"parameters": [
 					{
@@ -170,7 +170,7 @@
 			"get": {
 				"tags": ["Account"],
 				"summary": "Get Minecraft Account Face Image",
-				"description": "Returns an 8x8 or 72x72 face png image of the Minecraft account associated with the provided player name or UUID. 72x72 response includes the player's \"hat\" overlay. If not found, returns Steve's face.",
+				"description": "Returns a 72x72 face png image of the Minecraft account associated with the provided player name or UUID. 72x72 response includes the player's \"hat\" overlay. If not found, returns Steve's face.",
 				"operationId": "GetAccountFace2",
 				"parameters": [
 					{
@@ -377,6 +377,37 @@
 						}
 					}
 				}
+			}
+		},
+		"/account/discord-search": {
+			"get": {
+				"tags": ["Account"],
+				"summary": "Search for Minecraft Account From Discord",
+				"description": "Authenticated endpoint that returns a list of accounts that have a specific discord username linked.",
+				"operationId": "SearchAccountsWithDiscord",
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/AccountSearchResultDto"
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
 			}
 		},
 		"/account/primary/{player}": {
@@ -1018,6 +1049,40 @@
 				]
 			}
 		},
+		"/admin/hguilds/{guildId}/refresh": {
+			"post": {
+				"tags": ["Admin"],
+				"summary": "Refresh a Hypixel Guild",
+				"description": "This fetches the latest data from Hypixel for the specified guild",
+				"operationId": "RefreshHypixelGuild",
+				"parameters": [
+					{
+						"name": "guildId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
 		"/admin/unlink-account": {
 			"post": {
 				"tags": ["Admin"],
@@ -1150,6 +1215,76 @@
 									"items": {
 										"$ref": "#/components/schemas/AnnouncementDto"
 									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/confirmations/{id}/accept": {
+			"post": {
+				"tags": ["Auth"],
+				"summary": "Accept a confirmation",
+				"description": "Accepts a login confirmation that users will need to accept to proceed.",
+				"operationId": "AcceptConfirmation",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ConfirmationDto"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/auth/confirmations/{id}": {
+			"get": {
+				"tags": ["Auth"],
+				"summary": "Get a confirmation",
+				"description": "Gets a confirmation that users will need to accept.",
+				"operationId": "GetConfirmation",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ConfirmationDto"
 								}
 							}
 						}
@@ -2217,6 +2352,176 @@
 						}
 					}
 				}
+			}
+		},
+		"/admin/confirmations": {
+			"post": {
+				"tags": ["Admin"],
+				"summary": "Create a new confirmation",
+				"description": "Creates a new confirmation that users will need to accept.",
+				"operationId": "CreateConfirmation",
+				"requestBody": {
+					"x-name": "CreateConfirmationDto",
+					"description": "",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateConfirmationDto"
+							}
+						}
+					},
+					"required": true,
+					"x-position": 1
+				},
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ConfirmationDto"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			},
+			"get": {
+				"tags": ["Admin"],
+				"summary": "Get a confirmation",
+				"description": "Gets a confirmation that users will need to accept.",
+				"operationId": "GetAllConfirmations",
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/ConfirmationDto"
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/admin/confirmations/{id}": {
+			"delete": {
+				"tags": ["Admin"],
+				"summary": "Delete a login confirmation",
+				"operationId": "DeleteConfirmation",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ConfirmationDto"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			},
+			"put": {
+				"tags": ["Admin"],
+				"summary": "Update a confirmation",
+				"description": "Updates a confirmation that users will need to accept.",
+				"operationId": "UpdateConfirmation",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "UpdateConfirmationRequest",
+					"description": "",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateConfirmationRequest"
+							}
+						}
+					},
+					"required": true,
+					"x-position": 1
+				},
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ConfirmationDto"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
 			}
 		},
 		"/contest/{contestKey}": {
@@ -6313,6 +6618,308 @@
 				]
 			}
 		},
+		"/hguilds/{guildId}": {
+			"get": {
+				"tags": ["Hypixel Guilds"],
+				"summary": "Get Hypixel Guild",
+				"operationId": "GetHypixelGuild",
+				"parameters": [
+					{
+						"name": "guildId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetHypixelGuildResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/hguilds/{guildId}/leaderboards/{leaderboard}": {
+			"get": {
+				"tags": ["Hypixel Guilds"],
+				"summary": "Get Hypixel Guild Members Leaderboard",
+				"operationId": "GetHypixelGuildMembersLeaderboard",
+				"parameters": [
+					{
+						"name": "guildId",
+						"in": "path",
+						"required": true,
+						"description": "Guild id to fetch members for (discord/hypixel guild id)",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "leaderboard",
+						"in": "path",
+						"required": true,
+						"description": "Id of leaderboard",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "interval",
+						"in": "query",
+						"description": "Time interval key of a monthly leaderboard. Format: yyyy-MM",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "mode",
+						"in": "query",
+						"description": "Game mode to filter leaderboard by. Leave empty to get all modes.\nOptions: \"ironman\", \"island\", \"classic\"",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "removed",
+						"in": "query",
+						"description": "Removed filter to get leaderboard entries that have been removed from the leaderboard.\nDefault is profiles that have not been removed/wiped.\n0 = Not Removed\n1 = Removed\n2 = All",
+						"schema": {
+							"default": 0,
+							"nullable": true,
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/RemovedFilter"
+								}
+							]
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GuildMembersLeaderboardDto"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/hguilds/{guildId}/rank": {
+			"get": {
+				"tags": ["Hypixel Guilds"],
+				"summary": "Get Hypixel Guild Rank",
+				"description": "Get the rank of a Hypixel guild on a specific leaderboard",
+				"operationId": "GetHypixelGuildRank",
+				"parameters": [
+					{
+						"name": "guildId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "sortBy",
+						"in": "query",
+						"schema": {
+							"nullable": true,
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/SortHypixelGuildsBy"
+								}
+							]
+						}
+					},
+					{
+						"name": "collection",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "skill",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetHypixelGuildRankResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/hguilds": {
+			"get": {
+				"tags": ["Hypixel Guilds"],
+				"summary": "Get Hypixel Guilds",
+				"operationId": "GetHypixelGuilds",
+				"parameters": [
+					{
+						"name": "sortBy",
+						"in": "query",
+						"schema": {
+							"nullable": true,
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/SortHypixelGuildsBy"
+								}
+							]
+						}
+					},
+					{
+						"name": "collection",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "skill",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "descending",
+						"in": "query",
+						"schema": {
+							"type": "boolean",
+							"nullable": true
+						}
+					},
+					{
+						"name": "page",
+						"in": "query",
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"nullable": true
+						}
+					},
+					{
+						"name": "pageSize",
+						"in": "query",
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"nullable": true
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetHypixelGuildsResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/hguilds/search": {
+			"get": {
+				"tags": ["Hypixel Guilds"],
+				"summary": "Search Hypixel Guilds",
+				"description": "Fuzzy search across Hypixel guild names",
+				"operationId": "SearchHypixelGuilds",
+				"parameters": [
+					{
+						"name": "query",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "limit",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SearchHypixelGuildsResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/leaderboard/{leaderboard}": {
 			"get": {
 				"tags": ["Leaderboard"],
@@ -7515,6 +8122,53 @@
 				}
 			}
 		},
+		"/profile/{playerUuid}/{profileUuid}/auctions": {
+			"get": {
+				"tags": ["Profile"],
+				"summary": "Get Specific Profile Member Auctions",
+				"operationId": "GetProfileAuctions",
+				"parameters": [
+					{
+						"name": "playerUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "profileUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetProfileAuctionsResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/profile/{profileUuid}": {
 			"get": {
 				"tags": ["Profile"],
@@ -7557,6 +8211,63 @@
 				}
 			}
 		},
+		"/profile/{playerUuid}/{profileUuid}/inventories/{inventory}": {
+			"get": {
+				"tags": ["Profile"],
+				"summary": "Get Specific Profile Member Inventory",
+				"operationId": "GetProfileInventory",
+				"parameters": [
+					{
+						"name": "playerUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "profileUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "inventory",
+						"in": "path",
+						"required": true,
+						"description": "Inventory ID",
+						"schema": {
+							"type": "string",
+							"format": "guid"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HypixelInventoryDto"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/profiles/{player}/names": {
 			"get": {
 				"tags": ["Profile"],
@@ -7582,6 +8293,53 @@
 									"items": {
 										"$ref": "#/components/schemas/ProfileNamesDto"
 									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/profile/{playerUuid}/{profileUuid}/networth": {
+			"get": {
+				"tags": ["Profile"],
+				"summary": "Get Member Networth",
+				"operationId": "GetProfileNetworth",
+				"parameters": [
+					{
+						"name": "playerUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "profileUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NetworthBreakdown"
 								}
 							}
 						}
@@ -7641,6 +8399,183 @@
 				}
 			}
 		},
+		"/recap/{year}/player/{playerUuid}/{profileUuid}": {
+			"get": {
+				"tags": ["Recap"],
+				"summary": "Get Player Recap",
+				"description": "Retrieves the yearly recap for a player. Requires authentication if the recap is not public.",
+				"operationId": "GetPlayerRecap",
+				"parameters": [
+					{
+						"name": "year",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					},
+					{
+						"name": "playerUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "profileUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/YearlyRecapDto"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/recap/{year}/player/{playerUuid}/{profileUuid}/visibility": {
+			"post": {
+				"tags": ["Recap"],
+				"summary": "Toggle Recap Visibility",
+				"description": "Toggles the public visibility of a player's yearly recap.",
+				"operationId": "ToggleRecapVisibility",
+				"parameters": [
+					{
+						"name": "year",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					},
+					{
+						"name": "playerUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "profileUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "body",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ToggleRecapVisibilityRequestBody"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/resources/auctions/{auctionId}": {
+			"get": {
+				"tags": ["Resources"],
+				"summary": "Get Auction",
+				"description": "Get a specific auction by id. Will not fetch auction from Hypixel, only returns auctions that exist locally.",
+				"operationId": "GetAuction",
+				"parameters": [
+					{
+						"name": "auctionId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "guid"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetAuctionResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/resources/auctions-overview": {
+			"get": {
+				"tags": ["Resources"],
+				"summary": "Get Auction House Overview",
+				"description": "Get overview of auction house.",
+				"operationId": "GetAuctionHouseOverview",
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuctionOverviewResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/resources/auctions": {
 			"get": {
 				"tags": ["Resources"],
@@ -7654,6 +8589,238 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/AuctionHouseDto"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/resources/auctions/{skyblockId}/{variantKey}": {
+			"get": {
+				"tags": ["Resources"],
+				"summary": "Get Auction History For Item",
+				"operationId": "GetAuctionPriceHistory",
+				"parameters": [
+					{
+						"name": "skyblockId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "variantKey",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "timespan",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetAuctionPriceHistoryResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/resources/auctions/{skyblockId}/variants": {
+			"get": {
+				"tags": ["Resources"],
+				"summary": "List Auction Variants",
+				"description": "Retrieve aggregated BIN statistics for each tracked variant of a SkyBlock item.",
+				"operationId": "GetAuctionVariants",
+				"parameters": [
+					{
+						"name": "skyblockId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetAuctionVariantsResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/resources/auctions/{skyblockId}/ended": {
+			"get": {
+				"tags": ["Resources"],
+				"summary": "Get Recently Ended Auctions for Item",
+				"description": "Get recently ended auctions for a specific item and optional variant. Supports bundle: format for pets and runes.",
+				"operationId": "GetItemEndedAuctions",
+				"parameters": [
+					{
+						"name": "skyblockId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "variant",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "limit",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/AuctionDto"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/resources/auctions/popular": {
+			"get": {
+				"tags": ["Resources"],
+				"summary": "List Popular Auction Items",
+				"description": "Returns a paginated list of auction items ranked by recent trading volume.",
+				"operationId": "GetPopularAuctions",
+				"parameters": [
+					{
+						"name": "timespan",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "page",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					},
+					{
+						"name": "pageSize",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetPopularAuctionsResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/resources/auctions/search": {
+			"get": {
+				"tags": ["Resources"],
+				"summary": "Search Auction Items",
+				"description": "Fuzzy search across known auctionable items by SkyBlock ID or display name.",
+				"operationId": "SearchAuctionItems",
+				"parameters": [
+					{
+						"name": "query",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "limit",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SearchAuctionItemsResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/resources/bazaar/overview": {
+			"get": {
+				"tags": ["Resources"],
+				"summary": "Get Bazaar Overview",
+				"description": "Get overview of bazaar with top movers and most traded items.",
+				"operationId": "GetBazaarOverview",
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BazaarOverviewResponse"
 								}
 							}
 						}
@@ -7691,6 +8858,44 @@
 				}
 			}
 		},
+		"/resources/bazaar/{itemId}/history": {
+			"get": {
+				"tags": ["Resources"],
+				"summary": "Get Bazaar Product History",
+				"description": "Get a specific bazaar product's history",
+				"operationId": "GetBazaarProductHistory",
+				"parameters": [
+					{
+						"name": "itemId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "timespan",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetBazaarProductHistoryResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/resources/bazaar": {
 			"get": {
 				"tags": ["Resources"],
@@ -7704,6 +8909,53 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/GetBazaarProductsResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/resources/bazaar/search": {
+			"get": {
+				"tags": ["Resources"],
+				"summary": "Search Bazaar Products",
+				"description": "Search bazaar products by name or category. Returns all products if no filters provided.",
+				"operationId": "SearchBazaarProducts",
+				"parameters": [
+					{
+						"name": "query",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "category",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "limit",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SearchBazaarProductsResponse"
 								}
 							}
 						}
@@ -7744,6 +8996,36 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/SkyblockGemShopsResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/resources/items/{skyblockId}/related": {
+			"get": {
+				"tags": ["Resources"],
+				"summary": "Get Related Items and Trends",
+				"description": "Get similar items and trend data for a specific item.",
+				"operationId": "GetItemRelated",
+				"parameters": [
+					{
+						"name": "skyblockId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ItemRelatedResponse"
 								}
 							}
 						}
@@ -8955,6 +10237,192 @@
 				}
 			}
 		},
+		"/textures/{inventoryUuid}/{slotId}/meta": {
+			"get": {
+				"tags": ["Textures"],
+				"summary": "Get Inventory Item Texture Metadata",
+				"operationId": "GetInventoryItemMeta",
+				"parameters": [
+					{
+						"name": "inventoryUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "guid"
+						}
+					},
+					{
+						"name": "slotId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "packs",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "sub",
+						"in": "query",
+						"description": "Sub slot if nested inventory",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/InventoryItemMetaResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/textures/{inventoryUuid}/{slotId}": {
+			"get": {
+				"tags": ["Textures"],
+				"summary": "Get Inventory Item Texture",
+				"operationId": "GetInventoryItemTexture",
+				"parameters": [
+					{
+						"name": "inventoryUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "guid"
+						}
+					},
+					{
+						"name": "slotId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "packs",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "sub",
+						"in": "query",
+						"description": "Sub slot if nested inventory",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					}
+				}
+			}
+		},
+		"/textures/items/{itemId}": {
+			"get": {
+				"tags": ["Textures"],
+				"summary": "Get Skyblock Item Texture",
+				"operationId": "GetItemTexture",
+				"parameters": [
+					{
+						"name": "itemId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "packs",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					}
+				}
+			}
+		},
+		"/textures/pets/{petId}": {
+			"get": {
+				"tags": ["Textures"],
+				"summary": "Get Skyblock Pet Texture",
+				"operationId": "GetPetTexture",
+				"parameters": [
+					{
+						"name": "petId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "packs",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					}
+				}
+			}
+		},
+		"/texturepacks/{packId}/icon": {
+			"get": {
+				"tags": ["Textures"],
+				"summary": "Get Registered Texture Pack Icon",
+				"description": "Retrieves the icon image for a registered texture pack by its ID.",
+				"operationId": "GetTexturePackIcon",
+				"parameters": [
+					{
+						"name": "packId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					}
+				}
+			}
+		},
 		"/weights/all": {
 			"get": {
 				"tags": ["Weight"],
@@ -9615,6 +11083,14 @@
 						"type": "number",
 						"format": "double"
 					},
+					"guildMember": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/HypixelGuildMemberDetailsDto"
+							}
+						]
+					},
 					"rewardHighScore": {
 						"type": "integer",
 						"format": "int32"
@@ -9640,6 +11116,10 @@
 						"nullable": true
 					},
 					"rank": {
+						"type": "string",
+						"nullable": true
+					},
+					"packageRank": {
 						"type": "string",
 						"nullable": true
 					},
@@ -9670,6 +11150,150 @@
 								"$ref": "#/components/schemas/SocialMediaLinksDto"
 							}
 						]
+					}
+				}
+			},
+			"HypixelGuildMemberDetailsDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["joinedAt", "questParticipation", "active", "expHistory"],
+				"properties": {
+					"guild": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/HypixelGuildDetailsDto"
+							}
+						]
+					},
+					"rank": {
+						"type": "string",
+						"nullable": true
+					},
+					"joinedAt": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"questParticipation": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"active": {
+						"type": "boolean"
+					},
+					"expHistory": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				}
+			},
+			"HypixelGuildDetailsDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["id", "name", "createdAt", "memberCount", "lastUpdated", "amount"],
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"createdAt": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"tag": {
+						"type": "string",
+						"nullable": true
+					},
+					"tagColor": {
+						"type": "string",
+						"nullable": true
+					},
+					"memberCount": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"lastUpdated": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"stats": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/HypixelGuildStatsDto"
+							}
+						]
+					},
+					"amount": {
+						"type": "number",
+						"description": "Populated when sorting guilds by a specific collection or skill",
+						"format": "double"
+					}
+				}
+			},
+			"HypixelGuildStatsDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"recordedAt",
+					"memberCount",
+					"hypixelLevel",
+					"skyblockExperience",
+					"skillLevel",
+					"slayerExperience",
+					"catacombsExperience",
+					"farmingWeight",
+					"networth"
+				],
+				"properties": {
+					"recordedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"memberCount": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"hypixelLevel": {
+						"$ref": "#/components/schemas/HypixelGuildStat"
+					},
+					"skyblockExperience": {
+						"$ref": "#/components/schemas/HypixelGuildStat"
+					},
+					"skillLevel": {
+						"$ref": "#/components/schemas/HypixelGuildStat"
+					},
+					"slayerExperience": {
+						"$ref": "#/components/schemas/HypixelGuildStat"
+					},
+					"catacombsExperience": {
+						"$ref": "#/components/schemas/HypixelGuildStat"
+					},
+					"farmingWeight": {
+						"$ref": "#/components/schemas/HypixelGuildStat"
+					},
+					"networth": {
+						"$ref": "#/components/schemas/HypixelGuildStat"
+					}
+				}
+			},
+			"HypixelGuildStat": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["total", "average"],
+				"properties": {
+					"total": {
+						"type": "number",
+						"format": "double"
+					},
+					"average": {
+						"type": "number",
+						"format": "double"
 					}
 				}
 			},
@@ -10039,6 +11663,14 @@
 						"description": "Maximum number of jacob leaderboard that can be active at once. (For guilds)",
 						"format": "int32",
 						"nullable": true
+					},
+					"flags": {
+						"type": "array",
+						"description": "Unlocked product flags",
+						"nullable": true,
+						"items": {
+							"type": "string"
+						}
 					}
 				}
 			},
@@ -10131,6 +11763,23 @@
 			"SearchRequest": {
 				"type": "object",
 				"additionalProperties": false
+			},
+			"AccountSearchResultDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["ign", "uuid"],
+				"properties": {
+					"ign": {
+						"type": "string"
+					},
+					"uuid": {
+						"type": "string"
+					},
+					"discordId": {
+						"type": "string",
+						"nullable": true
+					}
+				}
 			},
 			"UpdateUserSettingsDto": {
 				"type": "object",
@@ -10344,7 +11993,7 @@
 			"EventType": {
 				"type": "string",
 				"description": "",
-				"enum": ["none", "farming-weight", "collection", "experience", "medals", "pests"]
+				"enum": ["none", "farmingWeight", "collection", "experience", "medals", "pests"]
 			},
 			"SetEventApprovalRequest": {
 				"type": "object",
@@ -10364,6 +12013,10 @@
 				}
 			},
 			"GuildIdRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"HypixelGuildRefreshRequest": {
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -10503,10 +12156,44 @@
 					}
 				}
 			},
+			"ConfirmationDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["id", "isActive", "createdAt"],
+				"properties": {
+					"id": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"title": {
+						"type": "string",
+						"nullable": true
+					},
+					"content": {
+						"type": "string",
+						"nullable": true
+					},
+					"isActive": {
+						"type": "boolean"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					}
+				}
+			},
+			"AcceptConfirmationRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetConfirmationDto": {
+				"type": "object",
+				"additionalProperties": false
+			},
 			"AuthSessionDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["id", "username", "avatar", "ign", "uuid", "roles"],
+				"required": ["id", "username", "avatar", "ign", "uuid", "roles", "flags"],
 				"properties": {
 					"id": {
 						"type": "string",
@@ -10539,13 +12226,29 @@
 						"items": {
 							"type": "string"
 						}
+					},
+					"flags": {
+						"type": "array",
+						"description": "List of account flags",
+						"items": {
+							"type": "string"
+						}
+					},
+					"pending_confirmation": {
+						"description": "The pending confirmation for the user, if any",
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/ConfirmationDto"
+							}
+						]
 					}
 				}
 			},
 			"AuthResponseDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["access_token", "refresh_token"],
+				"required": ["access_token", "refresh_token", "first_login"],
 				"properties": {
 					"access_token": {
 						"type": "string",
@@ -10559,6 +12262,19 @@
 					"refresh_token": {
 						"type": "string",
 						"description": "Refresh token for the user"
+					},
+					"pending_confirmation": {
+						"description": "The pending confirmation for the user, if any",
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/ConfirmationDto"
+							}
+						]
+					},
+					"first_login": {
+						"type": "boolean",
+						"description": "If this is the user's first login"
 					}
 				}
 			},
@@ -10782,6 +12498,18 @@
 						"nullable": true
 					},
 					"netherWart": {
+						"type": "string",
+						"nullable": true
+					},
+					"sunflower": {
+						"type": "string",
+						"nullable": true
+					},
+					"moonflower": {
+						"type": "string",
+						"nullable": true
+					},
+					"wildRose": {
 						"type": "string",
 						"nullable": true
 					}
@@ -11094,7 +12822,10 @@
 					"mushroom",
 					"cocoaBeans",
 					"sugarCane",
-					"netherWart"
+					"netherWart",
+					"sunflower",
+					"moonflower",
+					"wildRose"
 				],
 				"properties": {
 					"cactus": {
@@ -11152,6 +12883,24 @@
 						}
 					},
 					"netherWart": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/GuildJacobLeaderboardEntry"
+						}
+					},
+					"sunflower": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/GuildJacobLeaderboardEntry"
+						}
+					},
+					"moonflower": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/GuildJacobLeaderboardEntry"
+						}
+					},
+					"wildRose": {
 						"type": "array",
 						"items": {
 							"$ref": "#/components/schemas/GuildJacobLeaderboardEntry"
@@ -11473,30 +13222,19 @@
 					}
 				}
 			},
-			"JacobContestWithParticipationsDto": {
+			"CreateConfirmationDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["crop", "timestamp", "participants", "brackets", "participations"],
+				"required": ["title", "content", "isActive"],
 				"properties": {
-					"crop": {
+					"title": {
 						"type": "string"
 					},
-					"timestamp": {
-						"type": "integer",
-						"format": "int64"
+					"content": {
+						"type": "string"
 					},
-					"participants": {
-						"type": "integer",
-						"format": "int32"
-					},
-					"brackets": {
-						"$ref": "#/components/schemas/ContestBracketsDto"
-					},
-					"participations": {
-						"type": "array",
-						"items": {
-							"$ref": "#/components/schemas/StrippedContestParticipationDto"
-						}
+					"isActive": {
+						"type": "boolean"
 					}
 				}
 			},
@@ -11553,6 +13291,55 @@
 						"description": "Leaderboards for the guild's Jacob Leaderboards",
 						"items": {
 							"$ref": "#/components/schemas/GuildJacobLeaderboard"
+						}
+					}
+				}
+			},
+			"DeleteConfirmationDto": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdateConfirmationRequest": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["isActive"],
+				"properties": {
+					"title": {
+						"type": "string",
+						"nullable": true
+					},
+					"content": {
+						"type": "string",
+						"nullable": true
+					},
+					"isActive": {
+						"type": "boolean"
+					}
+				}
+			},
+			"JacobContestWithParticipationsDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["crop", "timestamp", "participants", "brackets", "participations"],
+				"properties": {
+					"crop": {
+						"type": "string"
+					},
+					"timestamp": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"participants": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"brackets": {
+						"$ref": "#/components/schemas/ContestBracketsDto"
+					},
+					"participations": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/StrippedContestParticipationDto"
 						}
 					}
 				}
@@ -12245,9 +14032,12 @@
 					"Pumpkin",
 					"SugarCane",
 					"Wheat",
-					"Seeds"
+					"Seeds",
+					"Sunflower",
+					"Moonflower",
+					"WildRose"
 				],
-				"enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+				"enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
 			},
 			"MedalEventData": {
 				"type": "object",
@@ -12269,8 +14059,8 @@
 			"ContestMedal": {
 				"type": "integer",
 				"description": "",
-				"x-enumNames": ["None", "Bronze", "Silver", "Gold", "Platinum", "Diamond"],
-				"enum": [0, 1, 2, 3, 4, 5]
+				"x-enumNames": ["None", "Bronze", "Silver", "Gold", "Platinum", "Diamond", "Unclaimable"],
+				"enum": [0, 1, 2, 3, 4, 5, -1]
 			},
 			"PestEventData": {
 				"type": "object",
@@ -12303,9 +14093,12 @@
 					"Rat",
 					"Mosquito",
 					"Fly",
-					"Mouse"
+					"Mouse",
+					"Dragonfly",
+					"Firefly",
+					"Mantis"
 				],
-				"enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+				"enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
 			},
 			"CollectionEventData": {
 				"type": "object",
@@ -12626,7 +14419,10 @@
 					"mushroom",
 					"cocoaBeans",
 					"sugarCane",
-					"netherWart"
+					"netherWart",
+					"sunflower",
+					"moonflower",
+					"wildRose"
 				],
 				"properties": {
 					"cactus": {
@@ -12666,6 +14462,18 @@
 						"format": "int32"
 					},
 					"netherWart": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"sunflower": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"moonflower": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"wildRose": {
 						"type": "integer",
 						"format": "int32"
 					}
@@ -13240,73 +15048,13 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"LeaderboardDto": {
+			"GetHypixelGuildResponse": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": [
-					"id",
-					"title",
-					"limit",
-					"offset",
-					"maxEntries",
-					"minimumScore",
-					"startsAt",
-					"endsAt",
-					"profile",
-					"entries"
-				],
+				"required": ["guild"],
 				"properties": {
-					"id": {
-						"type": "string"
-					},
-					"title": {
-						"type": "string"
-					},
-					"shortTitle": {
-						"type": "string",
-						"nullable": true
-					},
-					"interval": {
-						"type": "string",
-						"nullable": true
-					},
-					"firstInterval": {
-						"type": "string",
-						"nullable": true
-					},
-					"limit": {
-						"type": "integer",
-						"format": "int32"
-					},
-					"offset": {
-						"type": "integer",
-						"format": "int32"
-					},
-					"maxEntries": {
-						"type": "integer",
-						"format": "int32"
-					},
-					"minimumScore": {
-						"type": "number",
-						"description": "The minimum score required to be on the leaderboard",
-						"format": "decimal"
-					},
-					"startsAt": {
-						"type": "integer",
-						"format": "int64"
-					},
-					"endsAt": {
-						"type": "integer",
-						"format": "int64"
-					},
-					"profile": {
-						"type": "boolean"
-					},
-					"entries": {
-						"type": "array",
-						"items": {
-							"$ref": "#/components/schemas/LeaderboardEntryDto"
-						}
+					"guild": {
+						"$ref": "#/components/schemas/HypixelGuildDto"
 					}
 				}
 			},
@@ -13356,6 +15104,306 @@
 					"pingForSmallImprovements": {
 						"type": "boolean",
 						"nullable": true
+					}
+				}
+			},
+			"HypixelGuildDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"id",
+					"name",
+					"createdAt",
+					"description",
+					"publiclyListed",
+					"public",
+					"exp",
+					"gameExp",
+					"ranks",
+					"members",
+					"memberCount",
+					"lastUpdated",
+					"stats"
+				],
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"createdAt": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"description": {
+						"type": "string"
+					},
+					"preferredGames": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"type": "string"
+						}
+					},
+					"publiclyListed": {
+						"type": "boolean"
+					},
+					"public": {
+						"type": "boolean"
+					},
+					"exp": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"tag": {
+						"type": "string",
+						"nullable": true
+					},
+					"tagColor": {
+						"type": "string",
+						"nullable": true
+					},
+					"gameExp": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					"ranks": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/RawHypixelGuildRank"
+						}
+					},
+					"members": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/HypixelGuildMemberDto"
+						}
+					},
+					"memberCount": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"lastUpdated": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"stats": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/HypixelGuildStatsFullDto"
+						}
+					}
+				}
+			},
+			"RawHypixelGuildRank": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["name", "default", "created", "priority"],
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"tag": {
+						"type": "string",
+						"nullable": true
+					},
+					"default": {
+						"type": "boolean"
+					},
+					"created": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"priority": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"HypixelGuildMemberDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["playerUuid", "name", "formattedName", "joinedAt", "questParticipation", "active", "expHistory"],
+				"properties": {
+					"playerUuid": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"formattedName": {
+						"type": "string"
+					},
+					"rank": {
+						"type": "string",
+						"nullable": true
+					},
+					"joinedAt": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"questParticipation": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"active": {
+						"type": "boolean"
+					},
+					"expHistory": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				}
+			},
+			"HypixelGuildStatsFullDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"recordedAt",
+					"memberCount",
+					"hypixelLevel",
+					"skyblockExperience",
+					"skillLevel",
+					"slayerExperience",
+					"catacombsExperience",
+					"farmingWeight",
+					"networth",
+					"collections",
+					"skills"
+				],
+				"properties": {
+					"recordedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"memberCount": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"hypixelLevel": {
+						"$ref": "#/components/schemas/HypixelGuildStat"
+					},
+					"skyblockExperience": {
+						"$ref": "#/components/schemas/HypixelGuildStat"
+					},
+					"skillLevel": {
+						"$ref": "#/components/schemas/HypixelGuildStat"
+					},
+					"slayerExperience": {
+						"$ref": "#/components/schemas/HypixelGuildStat"
+					},
+					"catacombsExperience": {
+						"$ref": "#/components/schemas/HypixelGuildStat"
+					},
+					"farmingWeight": {
+						"$ref": "#/components/schemas/HypixelGuildStat"
+					},
+					"networth": {
+						"$ref": "#/components/schemas/HypixelGuildStat"
+					},
+					"collections": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					"skills": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				}
+			},
+			"GetHypixelGuildRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GuildMembersLeaderboardDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"id",
+					"title",
+					"limit",
+					"offset",
+					"maxEntries",
+					"minimumScore",
+					"startsAt",
+					"endsAt",
+					"profile",
+					"entries",
+					"guildId"
+				],
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"title": {
+						"type": "string"
+					},
+					"shortTitle": {
+						"type": "string",
+						"nullable": true
+					},
+					"itemId": {
+						"type": "string",
+						"description": "Item Id if this is a collection leaderboard",
+						"nullable": true
+					},
+					"interval": {
+						"type": "string",
+						"nullable": true
+					},
+					"firstInterval": {
+						"type": "string",
+						"nullable": true
+					},
+					"limit": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"offset": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"maxEntries": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"minimumScore": {
+						"type": "number",
+						"description": "The minimum score required to be on the leaderboard",
+						"format": "decimal"
+					},
+					"startsAt": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"endsAt": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"profile": {
+						"type": "boolean"
+					},
+					"entries": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/LeaderboardEntryDto"
+						}
+					},
+					"guildId": {
+						"type": "string"
 					}
 				}
 			},
@@ -13435,7 +15483,7 @@
 					}
 				}
 			},
-			"LeaderboardSliceRequest": {
+			"GetHypixelGuildMembersLeaderboardRequest": {
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -13444,6 +15492,190 @@
 				"description": "",
 				"x-enumNames": ["NotRemoved", "Removed", "All"],
 				"enum": [0, 1, 2]
+			},
+			"GetHypixelGuildRankResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["guildId", "guildName", "rank", "amount"],
+				"properties": {
+					"guildId": {
+						"type": "string"
+					},
+					"guildName": {
+						"type": "string"
+					},
+					"rank": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					}
+				}
+			},
+			"GetHypixelGuildRankRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SortHypixelGuildsBy": {
+				"type": "string",
+				"description": "",
+				"enum": [
+					"memberCount",
+					"skyblockExperience",
+					"skyblockExperienceAverage",
+					"skillLevel",
+					"skillLevelAverage",
+					"hypixelLevelAverage",
+					"slayerExperience",
+					"catacombsExperience",
+					"farmingWeight",
+					"networth",
+					"networthAverage"
+				]
+			},
+			"GetHypixelGuildsResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["totalGuilds", "guilds"],
+				"properties": {
+					"totalGuilds": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"guilds": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/HypixelGuildDetailsDto"
+						}
+					}
+				}
+			},
+			"GetHypixelGuildsRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SearchHypixelGuildsResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["results"],
+				"properties": {
+					"results": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/HypixelGuildSearchResultDto"
+						}
+					}
+				}
+			},
+			"HypixelGuildSearchResultDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["id", "name", "memberCount"],
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"memberCount": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"tag": {
+						"type": "string",
+						"nullable": true
+					},
+					"tagColor": {
+						"type": "string",
+						"nullable": true
+					}
+				}
+			},
+			"SearchHypixelGuildsRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"LeaderboardDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"id",
+					"title",
+					"limit",
+					"offset",
+					"maxEntries",
+					"minimumScore",
+					"startsAt",
+					"endsAt",
+					"profile",
+					"entries"
+				],
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"title": {
+						"type": "string"
+					},
+					"shortTitle": {
+						"type": "string",
+						"nullable": true
+					},
+					"itemId": {
+						"type": "string",
+						"description": "Item Id if this is a collection leaderboard",
+						"nullable": true
+					},
+					"interval": {
+						"type": "string",
+						"nullable": true
+					},
+					"firstInterval": {
+						"type": "string",
+						"nullable": true
+					},
+					"limit": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"offset": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"maxEntries": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"minimumScore": {
+						"type": "number",
+						"description": "The minimum score required to be on the leaderboard",
+						"format": "decimal"
+					},
+					"startsAt": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"endsAt": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"profile": {
+						"type": "boolean"
+					},
+					"entries": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/LeaderboardEntryDto"
+						}
+					}
+				}
+			},
+			"LeaderboardSliceRequest": {
+				"type": "object",
+				"additionalProperties": false
 			},
 			"LeaderboardsResponse": {
 				"type": "object",
@@ -13470,6 +15702,11 @@
 					"short": {
 						"type": "string",
 						"description": "Leaderboard short title",
+						"nullable": true
+					},
+					"itemId": {
+						"type": "string",
+						"description": "Item Id if a collection based leaderboard",
 						"nullable": true
 					},
 					"category": {
@@ -13711,9 +15948,12 @@
 					"socialXp",
 					"purse",
 					"bankBalance",
+					"personalBank",
+					"networth",
 					"collections",
 					"collectionTiers",
 					"craftedMinions",
+					"sacks",
 					"pets",
 					"unparsed",
 					"jacob",
@@ -13721,6 +15961,7 @@
 					"skills",
 					"chocolateFactory",
 					"events",
+					"inventories",
 					"isSelected",
 					"wasRemoved",
 					"lastUpdated"
@@ -13754,6 +15995,13 @@
 						"type": "number",
 						"format": "double"
 					},
+					"personalBank": {
+						"type": "number",
+						"format": "double"
+					},
+					"networth": {
+						"$ref": "#/components/schemas/ProfileMemberNetworthDto"
+					},
 					"meta": {
 						"nullable": true,
 						"oneOf": [
@@ -13781,6 +16029,13 @@
 						"additionalProperties": {
 							"type": "integer",
 							"format": "int32"
+						}
+					},
+					"sacks": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int64"
 						}
 					},
 					"pets": {
@@ -13818,6 +16073,12 @@
 							"$ref": "#/components/schemas/ProfileEventMemberDto"
 						}
 					},
+					"inventories": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/HypixelInventoryOverviewDto"
+						}
+					},
 					"isSelected": {
 						"type": "boolean"
 					},
@@ -13833,7 +16094,7 @@
 			"ApiAccessDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["inventories", "collections", "skills", "vault"],
+				"required": ["inventories", "collections", "skills", "vault", "museum"],
 				"properties": {
 					"inventories": {
 						"type": "boolean"
@@ -13846,6 +16107,32 @@
 					},
 					"vault": {
 						"type": "boolean"
+					},
+					"museum": {
+						"type": "boolean"
+					}
+				}
+			},
+			"ProfileMemberNetworthDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["normal", "liquid", "functional", "liquidFunctional"],
+				"properties": {
+					"normal": {
+						"type": "number",
+						"format": "double"
+					},
+					"liquid": {
+						"type": "number",
+						"format": "double"
+					},
+					"functional": {
+						"type": "number",
+						"format": "double"
+					},
+					"liquidFunctional": {
+						"type": "number",
+						"format": "double"
 					}
 				}
 			},
@@ -13932,6 +16219,14 @@
 					},
 					"bestiary": {
 						"nullable": true
+					},
+					"dungeons": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/RawDungeonsResponse"
+							}
+						]
 					}
 				}
 			},
@@ -13955,6 +16250,217 @@
 					"expire_at": {
 						"type": "integer",
 						"format": "int64"
+					}
+				}
+			},
+			"RawDungeonsResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["secrets"],
+				"properties": {
+					"dungeon_types": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/DungeonTypes"
+							}
+						]
+					},
+					"player_classes": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/DungeonPlayerClasses"
+							}
+						]
+					},
+					"secrets": {
+						"type": "integer",
+						"format": "int64"
+					}
+				}
+			},
+			"DungeonTypes": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["catacombs", "master_catacombs"],
+				"properties": {
+					"catacombs": {
+						"$ref": "#/components/schemas/DungeonData"
+					},
+					"master_catacombs": {
+						"$ref": "#/components/schemas/DungeonData"
+					}
+				}
+			},
+			"DungeonData": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"experience",
+					"highest_tier_completed",
+					"tier_completions",
+					"times_played",
+					"best_score",
+					"mobs_killed",
+					"most_mobs_killed",
+					"watcher_kills",
+					"most_healing",
+					"fastest_time",
+					"fastest_time_s",
+					"fastest_time_s_plus",
+					"most_damage_tank",
+					"most_damage_mage",
+					"most_damage_healer",
+					"most_damage_archer",
+					"milestone_completions"
+				],
+				"properties": {
+					"experience": {
+						"type": "number",
+						"format": "double"
+					},
+					"highest_tier_completed": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"tier_completions": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"times_played": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"best_score": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"mobs_killed": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"most_mobs_killed": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"watcher_kills": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"most_healing": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"fastest_time": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"fastest_time_s": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"fastest_time_s_plus": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"most_damage_tank": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"most_damage_mage": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"most_damage_healer": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"most_damage_archer": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"milestone_completions": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					}
+				}
+			},
+			"DungeonPlayerClasses": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["healer", "mage", "berserk", "archer", "tank"],
+				"properties": {
+					"healer": {
+						"$ref": "#/components/schemas/DungeonClassData"
+					},
+					"mage": {
+						"$ref": "#/components/schemas/DungeonClassData"
+					},
+					"berserk": {
+						"$ref": "#/components/schemas/DungeonClassData"
+					},
+					"archer": {
+						"$ref": "#/components/schemas/DungeonClassData"
+					},
+					"tank": {
+						"$ref": "#/components/schemas/DungeonClassData"
+					}
+				}
+			},
+			"DungeonClassData": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["experience"],
+				"properties": {
+					"experience": {
+						"type": "number",
+						"format": "double"
 					}
 				}
 			},
@@ -14254,7 +16760,7 @@
 			"ItemDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["id", "count"],
+				"required": ["id", "count", "damage"],
 				"properties": {
 					"id": {
 						"type": "integer",
@@ -14265,6 +16771,10 @@
 						"type": "integer",
 						"description": "Minecraft stack count of the item",
 						"format": "byte"
+					},
+					"damage": {
+						"type": "integer",
+						"description": "Minecraft damage value of the item"
 					},
 					"skyblockId": {
 						"type": "string",
@@ -14299,12 +16809,13 @@
 						}
 					},
 					"attributes": {
-						"type": "object",
 						"description": "ExtraAttributes not included elsewhere",
 						"nullable": true,
-						"additionalProperties": {
-							"type": "string"
-						}
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/ItemAttributes"
+							}
+						]
 					},
 					"itemAttributes": {
 						"type": "object",
@@ -14331,6 +16842,143 @@
 								"$ref": "#/components/schemas/ItemPetInfoDto"
 							}
 						]
+					},
+					"imageUrl": {
+						"type": "string",
+						"description": "Image url for the item",
+						"nullable": true
+					},
+					"textureId": {
+						"type": "string",
+						"description": "Texture id for the item, used to look up the image in our image service",
+						"nullable": true
+					},
+					"slot": {
+						"type": "string",
+						"description": "Slot identifier where the item was located, if applicable",
+						"nullable": true
+					}
+				}
+			},
+			"ItemAttributes": {
+				"type": "object",
+				"additionalProperties": {},
+				"properties": {
+					"runes": {
+						"type": "object",
+						"nullable": true,
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int32"
+						}
+					},
+					"effects": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"$ref": "#/components/schemas/ItemEffectAttribute"
+						}
+					},
+					"necromancer_souls": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"$ref": "#/components/schemas/ItemSoulAttribute"
+						}
+					},
+					"hook": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/ItemRodPartAttribute"
+							}
+						]
+					},
+					"line": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/ItemRodPartAttribute"
+							}
+						]
+					},
+					"sinker": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/ItemRodPartAttribute"
+							}
+						]
+					},
+					"ability_scroll": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"type": "string"
+						}
+					},
+					"inventory_data": {
+						"type": "object",
+						"nullable": true,
+						"additionalProperties": {
+							"nullable": true,
+							"oneOf": [
+								{
+									"$ref": "#/components/schemas/ItemDto"
+								}
+							]
+						}
+					}
+				}
+			},
+			"ItemEffectAttribute": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["level", "duration_ticks"],
+				"properties": {
+					"level": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"effect": {
+						"type": "string",
+						"nullable": true
+					},
+					"duration_ticks": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"ItemSoulAttribute": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"mob_id": {
+						"type": "string",
+						"nullable": true
+					},
+					"dropped_instance_id": {
+						"type": "string",
+						"nullable": true
+					},
+					"dropped_mode_id": {
+						"type": "string",
+						"nullable": true
+					}
+				}
+			},
+			"ItemRodPartAttribute": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["donated_museum"],
+				"properties": {
+					"part": {
+						"type": "string",
+						"nullable": true
+					},
+					"donated_museum": {
+						"type": "boolean"
 					}
 				}
 			},
@@ -14361,6 +17009,10 @@
 						"format": "int32"
 					},
 					"heldItem": {
+						"type": "string",
+						"nullable": true
+					},
+					"skin": {
 						"type": "string",
 						"nullable": true
 					}
@@ -14553,6 +17205,212 @@
 					}
 				}
 			},
+			"HypixelInventoryOverviewDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["id", "name"],
+				"properties": {
+					"id": {
+						"type": "string",
+						"format": "guid"
+					},
+					"name": {
+						"type": "string",
+						"maxLength": 64
+					},
+					"metadata": {
+						"type": "object",
+						"nullable": true,
+						"additionalProperties": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"GetProfileAuctionsResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["ended"],
+				"properties": {
+					"ended": {
+						"type": "array",
+						"description": "Ended auctions",
+						"items": {
+							"$ref": "#/components/schemas/AuctionDto"
+						}
+					}
+				}
+			},
+			"AuctionDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"auctionId",
+					"sellerUuid",
+					"sellerProfileUuid",
+					"start",
+					"end",
+					"soldAt",
+					"price",
+					"count",
+					"bin",
+					"variantKey",
+					"lastUpdatedAt",
+					"startingBid"
+				],
+				"properties": {
+					"auctionId": {
+						"type": "string",
+						"format": "guid"
+					},
+					"sellerUuid": {
+						"type": "string",
+						"format": "guid"
+					},
+					"sellerProfileUuid": {
+						"type": "string",
+						"format": "guid"
+					},
+					"seller": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/AccountMetaDto"
+							}
+						]
+					},
+					"buyerUuid": {
+						"type": "string",
+						"format": "guid",
+						"nullable": true
+					},
+					"buyerProfileUuid": {
+						"type": "string",
+						"format": "guid",
+						"nullable": true
+					},
+					"buyer": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/AccountMetaDto"
+							}
+						]
+					},
+					"start": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"end": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"soldAt": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"price": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"count": {
+						"type": "integer"
+					},
+					"bin": {
+						"type": "boolean"
+					},
+					"skyblockId": {
+						"type": "string",
+						"nullable": true
+					},
+					"variantKey": {
+						"type": "string"
+					},
+					"itemUuid": {
+						"type": "string",
+						"nullable": true
+					},
+					"item": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/ItemDto"
+							}
+						]
+					},
+					"lastUpdatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"startingBid": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"highestBid": {
+						"type": "integer",
+						"format": "int64",
+						"nullable": true
+					}
+				}
+			},
+			"AccountMetaDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["id", "name", "formattedName"],
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"formattedName": {
+						"type": "string"
+					}
+				}
+			},
+			"GetProfileAuctionsRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"HypixelInventoryDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["id", "name", "items"],
+				"properties": {
+					"id": {
+						"type": "string",
+						"format": "guid"
+					},
+					"name": {
+						"type": "string",
+						"maxLength": 64
+					},
+					"items": {
+						"type": "object",
+						"description": "Dictionary of slot to item mapping, null if the slot is empty",
+						"additionalProperties": {
+							"nullable": true,
+							"oneOf": [
+								{
+									"$ref": "#/components/schemas/ItemDto"
+								}
+							]
+						}
+					},
+					"metadata": {
+						"type": "object",
+						"nullable": true,
+						"additionalProperties": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"GetProfileInventoryRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
 			"ProfileNamesDto": {
 				"type": "object",
 				"additionalProperties": false,
@@ -14566,6 +17424,830 @@
 					},
 					"selected": {
 						"type": "boolean"
+					}
+				}
+			},
+			"NetworthBreakdown": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"networth",
+					"liquidNetworth",
+					"functionalNetworth",
+					"liquidFunctionalNetworth",
+					"purse",
+					"bank",
+					"personalBank",
+					"categories"
+				],
+				"properties": {
+					"networth": {
+						"type": "number",
+						"format": "double"
+					},
+					"liquidNetworth": {
+						"type": "number",
+						"format": "double"
+					},
+					"functionalNetworth": {
+						"type": "number",
+						"format": "double"
+					},
+					"liquidFunctionalNetworth": {
+						"type": "number",
+						"format": "double"
+					},
+					"purse": {
+						"type": "number",
+						"format": "double"
+					},
+					"bank": {
+						"type": "number",
+						"format": "double"
+					},
+					"personalBank": {
+						"type": "number",
+						"format": "double"
+					},
+					"categories": {
+						"type": "object",
+						"additionalProperties": {
+							"$ref": "#/components/schemas/NetworthCategory"
+						}
+					}
+				}
+			},
+			"NetworthCategory": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["total", "liquidTotal", "functionalTotal", "liquidFunctionalTotal", "items"],
+				"properties": {
+					"total": {
+						"type": "number",
+						"format": "double"
+					},
+					"liquidTotal": {
+						"type": "number",
+						"format": "double"
+					},
+					"functionalTotal": {
+						"type": "number",
+						"format": "double"
+					},
+					"liquidFunctionalTotal": {
+						"type": "number",
+						"format": "double"
+					},
+					"items": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/NetworthResult"
+						}
+					}
+				}
+			},
+			"NetworthResult": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"basePrice",
+					"price",
+					"networth",
+					"soulbound",
+					"cosmetic",
+					"liquidNetworth",
+					"functionalNetworth",
+					"liquidFunctionalNetworth",
+					"cosmeticValue",
+					"illiquidValue"
+				],
+				"properties": {
+					"item": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/NetworthItemSimple"
+							}
+						]
+					},
+					"basePrice": {
+						"type": "number",
+						"format": "double"
+					},
+					"price": {
+						"type": "number",
+						"format": "double"
+					},
+					"networth": {
+						"type": "number",
+						"format": "double"
+					},
+					"calculation": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"$ref": "#/components/schemas/NetworthCalculation"
+						}
+					},
+					"soulbound": {
+						"type": "boolean"
+					},
+					"cosmetic": {
+						"type": "boolean"
+					},
+					"liquidNetworth": {
+						"type": "number",
+						"format": "double"
+					},
+					"functionalNetworth": {
+						"type": "number",
+						"format": "double"
+					},
+					"liquidFunctionalNetworth": {
+						"type": "number",
+						"format": "double"
+					},
+					"cosmeticValue": {
+						"type": "number",
+						"format": "double"
+					},
+					"illiquidValue": {
+						"type": "number",
+						"format": "double"
+					}
+				}
+			},
+			"NetworthItemSimple": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["count", "damage"],
+				"properties": {
+					"skyblockId": {
+						"type": "string",
+						"nullable": true
+					},
+					"name": {
+						"type": "string",
+						"nullable": true
+					},
+					"slot": {
+						"type": "string",
+						"nullable": true
+					},
+					"count": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"damage": {
+						"type": "integer"
+					},
+					"uuid": {
+						"type": "string",
+						"nullable": true
+					}
+				}
+			},
+			"NetworthCalculation": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["id", "type", "value", "count"],
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string"
+					},
+					"value": {
+						"type": "number",
+						"format": "double"
+					},
+					"count": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"YearlyRecapDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["playerUuid", "year", "public", "data", "global", "discord"],
+				"properties": {
+					"playerUuid": {
+						"type": "string"
+					},
+					"year": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"public": {
+						"type": "boolean"
+					},
+					"data": {
+						"$ref": "#/components/schemas/YearlyRecapData"
+					},
+					"global": {
+						"$ref": "#/components/schemas/GlobalRecap"
+					},
+					"discord": {
+						"$ref": "#/components/schemas/DiscordRecapInfoDto"
+					}
+				}
+			},
+			"YearlyRecapData": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"player",
+					"profiles",
+					"allProfilesSummary",
+					"contests",
+					"events",
+					"shop",
+					"collections",
+					"pests",
+					"skills",
+					"streak",
+					"leaderboards",
+					"year",
+					"currentProfile"
+				],
+				"properties": {
+					"player": {
+						"$ref": "#/components/schemas/PlayerRecapInfo"
+					},
+					"profiles": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/ProfileRecapInfo"
+						}
+					},
+					"allProfilesSummary": {
+						"$ref": "#/components/schemas/AllProfilesSummaryRecap"
+					},
+					"contests": {
+						"$ref": "#/components/schemas/ContestRecap"
+					},
+					"events": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/EventRecap"
+						}
+					},
+					"shop": {
+						"$ref": "#/components/schemas/ShopRecap"
+					},
+					"collections": {
+						"$ref": "#/components/schemas/CollectionRecap"
+					},
+					"pests": {
+						"$ref": "#/components/schemas/PestRecap"
+					},
+					"skills": {
+						"$ref": "#/components/schemas/SkillRecap"
+					},
+					"streak": {
+						"$ref": "#/components/schemas/StreakRecap"
+					},
+					"leaderboards": {
+						"$ref": "#/components/schemas/LeaderboardRecap"
+					},
+					"year": {
+						"type": "string"
+					},
+					"currentProfile": {
+						"type": "string"
+					}
+				}
+			},
+			"PlayerRecapInfo": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"ign",
+					"uuid",
+					"firstDataPoint",
+					"lastDataPoint",
+					"daysActive",
+					"mostActiveMonth",
+					"farmingWeight"
+				],
+				"properties": {
+					"ign": {
+						"type": "string"
+					},
+					"uuid": {
+						"type": "string"
+					},
+					"firstDataPoint": {
+						"type": "string"
+					},
+					"lastDataPoint": {
+						"type": "string"
+					},
+					"daysActive": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"mostActiveMonth": {
+						"type": "string"
+					},
+					"farmingWeight": {
+						"$ref": "#/components/schemas/FarmingWeightRecap"
+					}
+				}
+			},
+			"FarmingWeightRecap": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["gained", "total", "averageComparison"],
+				"properties": {
+					"gained": {
+						"type": "number",
+						"format": "double"
+					},
+					"total": {
+						"type": "number",
+						"format": "double"
+					},
+					"averageComparison": {
+						"type": "number",
+						"format": "double"
+					}
+				}
+			},
+			"ProfileRecapInfo": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["name", "cuteName", "isMain"],
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"cuteName": {
+						"type": "string"
+					},
+					"isMain": {
+						"type": "boolean"
+					},
+					"wiped": {
+						"type": "boolean",
+						"nullable": true
+					}
+				}
+			},
+			"AllProfilesSummaryRecap": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["totalWeightGained", "totalCoinsGained", "wipedProfiles"],
+				"properties": {
+					"totalWeightGained": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalCoinsGained": {
+						"type": "number",
+						"format": "double"
+					},
+					"wipedProfiles": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"ContestRecap": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["total", "perCrop", "highestPlacements"],
+				"properties": {
+					"total": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"perCrop": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int32"
+						}
+					},
+					"highestPlacements": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/ContestPlacementRecap"
+						}
+					}
+				}
+			},
+			"ContestPlacementRecap": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["crop", "rank", "medal"],
+				"properties": {
+					"crop": {
+						"type": "string"
+					},
+					"rank": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"medal": {
+						"type": "string"
+					}
+				}
+			},
+			"EventRecap": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["name", "type", "participated"],
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string"
+					},
+					"participated": {
+						"type": "boolean"
+					},
+					"rank": {
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					},
+					"score": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"banner": {
+						"type": "string",
+						"nullable": true
+					},
+					"typeLabel": {
+						"type": "string",
+						"nullable": true
+					}
+				}
+			},
+			"ShopRecap": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["hasPurchased"],
+				"properties": {
+					"hasPurchased": {
+						"type": "boolean"
+					}
+				}
+			},
+			"CollectionRecap": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["increases", "globalTotals", "averageComparison", "monthly"],
+				"properties": {
+					"increases": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					"globalTotals": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					"averageComparison": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"monthly": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/MonthlyStatRecap"
+						}
+					}
+				}
+			},
+			"MonthlyStatRecap": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["month", "amount"],
+				"properties": {
+					"month": {
+						"type": "string"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					}
+				}
+			},
+			"PestRecap": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["kills", "breakdown", "globalTotal", "averageComparison", "monthly"],
+				"properties": {
+					"kills": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"breakdown": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int32"
+						}
+					},
+					"globalTotal": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"averageComparison": {
+						"type": "number",
+						"format": "double"
+					},
+					"monthly": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/MonthlyStatRecap"
+						}
+					}
+				}
+			},
+			"SkillRecap": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["farmingXp", "breakdown", "globalTotal", "averageComparison"],
+				"properties": {
+					"farmingXp": {
+						"type": "number",
+						"format": "double"
+					},
+					"breakdown": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"globalTotal": {
+						"type": "number",
+						"format": "double"
+					},
+					"averageComparison": {
+						"type": "number",
+						"format": "double"
+					}
+				}
+			},
+			"StreakRecap": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["longestStreakHours", "start", "end", "averageDailyDowntime", "sparkline"],
+				"properties": {
+					"longestStreakHours": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"start": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"end": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"averageDailyDowntime": {
+						"type": "number",
+						"format": "double"
+					},
+					"sparkline": {
+						"type": "array",
+						"items": {
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				}
+			},
+			"LeaderboardRecap": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["top1000", "monthlyHighs"],
+				"properties": {
+					"top1000": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/LeaderboardPlacementRecap"
+						}
+					},
+					"monthlyHighs": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/MonthlyLeaderboardRecap"
+						}
+					}
+				}
+			},
+			"LeaderboardPlacementRecap": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["title", "slug", "rank", "amount"],
+				"properties": {
+					"title": {
+						"type": "string"
+					},
+					"slug": {
+						"type": "string"
+					},
+					"rank": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					},
+					"shortTitle": {
+						"type": "string",
+						"nullable": true
+					}
+				}
+			},
+			"MonthlyLeaderboardRecap": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["month", "name", "rank"],
+				"properties": {
+					"month": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"rank": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"GlobalRecap": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"totalCrops",
+					"totalXp",
+					"totalPests",
+					"totalFarmingWeight",
+					"trackedPlayers",
+					"bannedWiped",
+					"ironmanToNormal",
+					"crops",
+					"totalCropsBreakdown",
+					"skills",
+					"totalSkillsBreakdown",
+					"pests",
+					"totalPestsBreakdown"
+				],
+				"properties": {
+					"totalCrops": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"totalXp": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalPests": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"totalFarmingWeight": {
+						"type": "number",
+						"format": "double"
+					},
+					"trackedPlayers": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"bannedWiped": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"ironmanToNormal": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"crops": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					"totalCropsBreakdown": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					"skills": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"totalSkillsBreakdown": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "number",
+							"format": "double"
+						}
+					},
+					"pests": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					"totalPestsBreakdown": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				}
+			},
+			"DiscordRecapInfoDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["username", "id", "avatar"],
+				"properties": {
+					"username": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					},
+					"avatar": {
+						"type": "string"
+					}
+				}
+			},
+			"RecapRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetAuctionResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["auction"],
+				"properties": {
+					"auction": {
+						"$ref": "#/components/schemas/AuctionDto"
+					}
+				}
+			},
+			"ToggleRecapVisibilityRequestBody": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["public"],
+				"properties": {
+					"public": {
+						"type": "boolean"
+					}
+				}
+			},
+			"GetAuctionRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AuctionOverviewResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["new", "ended"],
+				"properties": {
+					"new": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/AuctionDto"
+						}
+					},
+					"ended": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/AuctionDto"
+						}
 					}
 				}
 			},
@@ -14708,15 +18390,253 @@
 					}
 				}
 			},
-			"GetBazaarProductResponse": {
+			"GetAuctionPriceHistoryResponse": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["productId", "product"],
+				"required": ["history"],
 				"properties": {
-					"productId": {
+					"history": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/PriceHistoryDataPoint"
+						}
+					}
+				}
+			},
+			"PriceHistoryDataPoint": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["timestamp", "binListings", "saleAuctions", "itemsSold"],
+				"properties": {
+					"timestamp": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"lowestBinPrice": {
+						"type": "number",
+						"format": "decimal",
+						"nullable": true
+					},
+					"averageBinPrice": {
+						"type": "number",
+						"format": "decimal",
+						"nullable": true
+					},
+					"binListings": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"lowestSalePrice": {
+						"type": "number",
+						"format": "decimal",
+						"nullable": true
+					},
+					"averageSalePrice": {
+						"type": "number",
+						"format": "decimal",
+						"nullable": true
+					},
+					"saleAuctions": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"itemsSold": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"GetAuctionPriceHistoryRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetAuctionVariantsResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["variants"],
+				"properties": {
+					"variants": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/AuctionItemDto"
+						}
+					}
+				}
+			},
+			"GetAuctionVariantsRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ItemEndedAuctionsRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetPopularAuctionsResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["page", "pageSize", "totalCount", "totalPages", "items"],
+				"properties": {
+					"page": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"pageSize": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"totalCount": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"totalPages": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"items": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/PopularAuctionItemDto"
+						}
+					}
+				}
+			},
+			"PopularAuctionItemDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["skyblockId", "itemsSold", "saleAuctions", "binListings"],
+				"properties": {
+					"skyblockId": {
 						"type": "string"
 					},
-					"product": {
+					"name": {
+						"type": "string",
+						"nullable": true
+					},
+					"itemsSold": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"saleAuctions": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"binListings": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"averageSalePrice": {
+						"type": "number",
+						"format": "decimal",
+						"nullable": true
+					},
+					"averageBinPrice": {
+						"type": "number",
+						"format": "decimal",
+						"nullable": true
+					},
+					"lowestSalePrice": {
+						"type": "number",
+						"format": "decimal",
+						"nullable": true
+					},
+					"lowestBinPrice": {
+						"type": "number",
+						"format": "decimal",
+						"nullable": true
+					}
+				}
+			},
+			"GetPopularAuctionsRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SearchAuctionItemsResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["results"],
+				"properties": {
+					"results": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/AuctionItemSearchResult"
+						}
+					}
+				}
+			},
+			"AuctionItemSearchResult": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["skyblockId", "hasVariants", "variantCount", "recentVolume"],
+				"properties": {
+					"skyblockId": {
+						"type": "string"
+					},
+					"variantKey": {
+						"type": "string",
+						"nullable": true
+					},
+					"name": {
+						"type": "string",
+						"nullable": true
+					},
+					"hasVariants": {
+						"type": "boolean"
+					},
+					"variantCount": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"recentLowestPrice": {
+						"type": "number",
+						"format": "decimal",
+						"nullable": true
+					},
+					"recentVolume": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"SearchAuctionItemsRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"BazaarOverviewResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["topMovers", "mostTraded"],
+				"properties": {
+					"topMovers": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/BazaarOverviewItemDto"
+						}
+					},
+					"mostTraded": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/BazaarOverviewItemDto"
+						}
+					}
+				}
+			},
+			"BazaarOverviewItemDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["itemId", "summary"],
+				"properties": {
+					"itemId": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string",
+						"nullable": true
+					},
+					"category": {
+						"type": "string",
+						"nullable": true
+					},
+					"summary": {
 						"$ref": "#/components/schemas/BazaarProductSummaryDto"
 					}
 				}
@@ -14785,10 +18705,121 @@
 						"type": "number",
 						"description": "Calculated average Buy Order price that should be more resistant to price fluctuations",
 						"format": "double"
+					},
+					"orders": {
+						"description": "Current orders in the bazaar for this item if they exist.",
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/BazaarOrders"
+							}
+						]
+					}
+				}
+			},
+			"BazaarOrders": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"sellSummary": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"$ref": "#/components/schemas/BazaarOrder"
+						}
+					},
+					"buySummary": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"$ref": "#/components/schemas/BazaarOrder"
+						}
+					}
+				}
+			},
+			"BazaarOrder": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["amount", "pricePerUnit", "orders"],
+				"properties": {
+					"amount": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"pricePerUnit": {
+						"type": "number",
+						"format": "double"
+					},
+					"orders": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"GetBazaarProductResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["productId", "product"],
+				"properties": {
+					"productId": {
+						"type": "string"
+					},
+					"product": {
+						"$ref": "#/components/schemas/BazaarProductSummaryDto"
 					}
 				}
 			},
 			"GetBazaarProductRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetBazaarProductHistoryResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["productId", "product", "history"],
+				"properties": {
+					"productId": {
+						"type": "string"
+					},
+					"product": {
+						"$ref": "#/components/schemas/BazaarProductSummaryDto"
+					},
+					"history": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/BazaarHistoryDataPoint"
+						}
+					}
+				}
+			},
+			"BazaarHistoryDataPoint": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["timestamp", "instaSellPrice", "instaBuyPrice", "buyOrderPrice", "sellOrderPrice"],
+				"properties": {
+					"timestamp": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"instaSellPrice": {
+						"type": "number",
+						"format": "double"
+					},
+					"instaBuyPrice": {
+						"type": "number",
+						"format": "double"
+					},
+					"buyOrderPrice": {
+						"type": "number",
+						"format": "double"
+					},
+					"sellOrderPrice": {
+						"type": "number",
+						"format": "double"
+					}
+				}
+			},
+			"GetBazaarProductHistoryRequest": {
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -14804,6 +18835,44 @@
 						}
 					}
 				}
+			},
+			"SearchBazaarProductsResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["products"],
+				"properties": {
+					"products": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/BazaarSearchResultDto"
+						}
+					}
+				}
+			},
+			"BazaarSearchResultDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["itemId", "summary"],
+				"properties": {
+					"itemId": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string",
+						"nullable": true
+					},
+					"category": {
+						"type": "string",
+						"nullable": true
+					},
+					"summary": {
+						"$ref": "#/components/schemas/BazaarProductSummaryDto"
+					}
+				}
+			},
+			"SearchBazaarProductsRequest": {
+				"type": "object",
+				"additionalProperties": false
 			},
 			"SkyblockFiresalesResponse": {
 				"type": "object",
@@ -14842,10 +18911,14 @@
 			"SkyblockFiresaleItemDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["itemId", "amount", "price", "startsAt", "endsAt"],
+				"required": ["itemId", "slotId", "amount", "price", "startsAt", "endsAt"],
 				"properties": {
 					"itemId": {
 						"type": "string"
+					},
+					"slotId": {
+						"type": "integer",
+						"format": "int32"
 					},
 					"amount": {
 						"type": "integer",
@@ -14968,49 +19041,24 @@
 				],
 				"enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 			},
-			"GetItemsFromBytesResponse": {
+			"ItemRelatedResponse": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["items"],
+				"required": ["similar"],
 				"properties": {
-					"items": {
+					"similar": {
 						"type": "array",
 						"items": {
-							"nullable": true,
-							"oneOf": [
-								{
-									"$ref": "#/components/schemas/ItemDto"
-								}
-							]
+							"$ref": "#/components/schemas/ItemResponse"
 						}
-					}
-				}
-			},
-			"GetItemsFromBytesRequest": {
-				"type": "object",
-				"additionalProperties": false,
-				"required": ["bytes"],
-				"properties": {
-					"bytes": {
-						"type": "string"
-					}
-				}
-			},
-			"GetSkyblockItemsResponse": {
-				"type": "object",
-				"additionalProperties": false,
-				"required": ["items"],
-				"properties": {
-					"items": {
-						"type": "object",
-						"additionalProperties": {
-							"nullable": true,
-							"oneOf": [
-								{
-									"$ref": "#/components/schemas/ItemResponse"
-								}
-							]
-						}
+					},
+					"trends": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/ItemTrendDto"
+							}
+						]
 					}
 				}
 			},
@@ -15327,6 +19375,71 @@
 				"required": ["rootElement"],
 				"properties": {
 					"rootElement": {}
+				}
+			},
+			"ItemTrendDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["priceChangePercentage", "volumeChangePercentage"],
+				"properties": {
+					"priceChangePercentage": {
+						"type": "number",
+						"format": "double"
+					},
+					"volumeChangePercentage": {
+						"type": "number",
+						"format": "double"
+					}
+				}
+			},
+			"ItemRelatedRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetItemsFromBytesResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["items"],
+				"properties": {
+					"items": {
+						"type": "array",
+						"items": {
+							"nullable": true,
+							"oneOf": [
+								{
+									"$ref": "#/components/schemas/ItemDto"
+								}
+							]
+						}
+					}
+				}
+			},
+			"GetItemsFromBytesRequest": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["bytes"],
+				"properties": {
+					"bytes": {
+						"type": "string"
+					}
+				}
+			},
+			"GetSkyblockItemsResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["items"],
+				"properties": {
+					"items": {
+						"type": "object",
+						"additionalProperties": {
+							"nullable": true,
+							"oneOf": [
+								{
+									"$ref": "#/components/schemas/ItemResponse"
+								}
+							]
+						}
+					}
 				}
 			},
 			"GetSpecifiedSkyblockItemsResponse": {
@@ -16581,6 +20694,51 @@
 				}
 			},
 			"GetStyleRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"InventoryItemMetaResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"packId": {
+						"type": "string",
+						"description": "Texture Pack ID where the item texture is located",
+						"nullable": true
+					},
+					"variantKey": {
+						"type": "string",
+						"description": "Variant key for price lookups",
+						"nullable": true
+					},
+					"networth": {
+						"description": "Networth calculation result for this item",
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/NetworthResult"
+							}
+						]
+					}
+				}
+			},
+			"GetInventoryItemMetaRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetInventoryItemTextureRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetItemTextureRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetPetTextureRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetTexturePackIcon": {
 				"type": "object",
 				"additionalProperties": false
 			},

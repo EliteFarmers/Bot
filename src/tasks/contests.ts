@@ -30,9 +30,12 @@ const cropKeys: Record<string, string> = {
 	Pumpkin: 'pumpkin',
 	'Sugar Cane': 'sugarCane',
 	Wheat: 'wheat',
+	Sunflower: 'sunflower',
+	Moonflower: 'moonflower',
+	'Wild Rose': 'wildRose',
 };
 
-const fortuneEmoji = '<:fortune:1313282552060055635>';
+const fortuneEmoji = '<:ff:1450022749631287330>';
 
 async function execute(client: Client) {
 	console.log('Running contest ping task. Shard: ' + client.shard?.ids[0]);

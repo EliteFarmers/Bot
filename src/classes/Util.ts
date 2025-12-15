@@ -116,12 +116,14 @@ export function GetCropURL(crop: string) {
 		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978817150009355/sugar_cane.png';
 	if (crop === 'Wheat')
 		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978823630209024/wheat.png';
+	if (crop === 'Sunflower')
+		return 'https://media.discordapp.net/attachments/1115349089782087731/1450021025503772692/sunflower.png';
+	if (crop === 'Moonflower')
+		return 'https://media.discordapp.net/attachments/1115349089782087731/1450021025025884230/moonflower.png';
+	if (crop === 'Wild Rose')
+		return 'https://media.discordapp.net/attachments/1115349089782087731/1450021025948635340/wildrose.png';
 
 	return undefined;
-}
-
-export function GetCropPath(crop: string) {
-	return `./src/assets/crops/${crop.toLowerCase().replace(' ', '_')}.png`;
 }
 
 export function GetCropColor(crop: string) {
@@ -135,6 +137,9 @@ export function GetCropColor(crop: string) {
 	if (crop === 'Nether Wart') return '#5c151a';
 	if (crop === 'Mushroom') return '#725643';
 	if (crop === 'Cocoa Beans') return '#61381d';
+	if (crop === 'Sunflower') return '#fec938';
+	if (crop === 'Moonflower') return '#a3a3c2';
+	if (crop === 'Wild Rose') return '#d95382';
 
 	// Default green
 	return '#03fc7b';
@@ -160,6 +165,9 @@ const simpleCropNames = {
 	pumpkin: 'Pumpkin',
 	cane: 'Sugar Cane',
 	wheat: 'Wheat',
+	sunflower: 'Sunflower',
+	moonflower: 'Moonflower',
+	wildrose: 'Wild Rose',
 };
 
 export const CROP_ARRAY = [
@@ -173,6 +181,9 @@ export const CROP_ARRAY = [
 	Crop.Pumpkin,
 	Crop.SugarCane,
 	Crop.Wheat,
+	Crop.Sunflower,
+	Crop.Moonflower,
+	Crop.WildRose,
 ];
 export const GEAR_ARRAY = [
 	GearSlot.Helmet,
@@ -284,6 +295,18 @@ const CropEmojis = {
 		id: '1263608553797849119',
 		name: 'wheat',
 	},
+	Sunflower: {
+		id: '1450016131086684251',
+		name: 'sunflower',
+	},
+	Moonflower: {
+		id: '1450016129455099935',
+		name: 'moonflower',
+	},
+	'Wild Rose': {
+		id: '1450016132454027264',
+		name: 'wild_rose',
+	},
 };
 
 export const EliteCropEmojis = {
@@ -297,6 +320,9 @@ export const EliteCropEmojis = {
 	[Crop.Pumpkin]: CropEmojis.Pumpkin,
 	[Crop.SugarCane]: CropEmojis['Sugar Cane'],
 	[Crop.Wheat]: CropEmojis.Wheat,
+	[Crop.Sunflower]: CropEmojis.Sunflower,
+	[Crop.Moonflower]: CropEmojis.Moonflower,
+	[Crop.WildRose]: CropEmojis['Wild Rose'],
 };
 
 export async function GetPurchaseUpdateChannel(client: Client) {

@@ -34,7 +34,7 @@
 		"cron": "^3.5.0",
 		"date-fns": "^4.1.0",
 		"discord.js": "^14.24.0",
-		"farming-weight": "^0.10.8",
+		"farming-weight": "^0.11.0",
 		"openapi-fetch": "^0.14.1",
 		"redis": "^5.9.0",
 		"utf-8-validate": "^6.0.5",

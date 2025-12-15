@@ -192,7 +192,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	function moreInfoEmbed() {
 		const crops = Object.entries(profileWeight?.cropWeight ?? {})
-			.filter(([, a]) => a && a >= 0.001)
+			.filter(([, a]) => (a && a >= 0.001) || true)
 			.sort(([, a], [, b]) => (b ?? 0) - (a ?? 0));
 
 		const embed = EliteEmbed(settings);
@@ -256,7 +256,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 			return (
 				`${GetCropEmoji(key)} **${(+(value?.toFixed(2) ?? 0))?.toLocaleString() ?? 0}** ⠀${percent > 2 ? `${percent}%` : ''}` +
-				`${collection ? `\n-# ${rankString}${collection.toLocaleString()} ${key}` : ''}`
+				`\n-# ${rankString}${(collection ?? 0).toLocaleString()} ${key}`
 			);
 		});
 
@@ -264,16 +264,16 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			{
 				inline: true,
 				name: `Crop Weight • ${cropWeight.toLocaleString()}`,
-				value: formattedCrops.slice(0, 5).join('\n') || 'No crop weight!',
+				value: formattedCrops.slice(0, 7).join('\n') || 'No crop weight!',
 			},
 			EmptyField(),
 		);
 
-		if (formattedCrops.length > 5) {
+		if (formattedCrops.length > 7) {
 			embed.addFields({
 				inline: true,
 				name: EmptyString,
-				value: formattedCrops.slice(5).join('\n'),
+				value: formattedCrops.slice(7).join('\n'),
 			});
 		}
 

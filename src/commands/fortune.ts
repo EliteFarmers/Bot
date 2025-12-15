@@ -48,7 +48,7 @@ const command = new EliteCommand({
 	execute: execute,
 });
 
-const fortuneEmoji = '<:fortune:1313282552060055635>';
+const fortuneEmoji = '<:ff:1450022749631287330>';
 
 export default command;
 
@@ -85,10 +85,10 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		collection: member.collections,
 		farmingXp: member.skills?.farming ?? 0,
 		farmingLevel: farmingLevel.level,
-		tools: member.farmingWeight.inventory?.tools ?? [],
-		armor: member.farmingWeight.inventory?.armor ?? [],
-		equipment: member.farmingWeight.inventory?.equipment ?? [],
-		accessories: member.farmingWeight.inventory?.accessories ?? [],
+		tools: (member.farmingWeight.inventory?.tools ?? []) as PlayerOptions['tools'],
+		armor: (member.farmingWeight.inventory?.armor ?? []) as PlayerOptions['armor'],
+		equipment: (member.farmingWeight.inventory?.equipment ?? []) as PlayerOptions['equipment'],
+		accessories: (member.farmingWeight.inventory?.accessories ?? []) as PlayerOptions['accessories'],
 		pets: member.pets ?? [],
 		personalBests: member.jacob.stats?.personalBests,
 		personalBestsUnlocked: member.jacob.perks?.personalBests ?? false,
@@ -189,9 +189,11 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			`### Crop Specific Fortune\n` +
 				`${cropOverview(Crop.Cactus)}  ${cropOverview(Crop.Carrot)}\n` +
 				`${cropOverview(Crop.CocoaBeans)}  ${cropOverview(Crop.Melon)}\n` +
-				`${cropOverview(Crop.Mushroom)}  ${cropOverview(Crop.NetherWart)}\n` +
-				`${cropOverview(Crop.Potato)}  ${cropOverview(Crop.Pumpkin)}\n` +
-				`${cropOverview(Crop.SugarCane)}  ${cropOverview(Crop.Wheat)}`,
+				`${cropOverview(Crop.Moonflower)}  ${cropOverview(Crop.Mushroom)}\n` +
+				`${cropOverview(Crop.NetherWart)}  ${cropOverview(Crop.Potato)}\n` +
+				`${cropOverview(Crop.Pumpkin)}  ${cropOverview(Crop.SugarCane)}\n` +
+				`${cropOverview(Crop.Sunflower)}  ${cropOverview(Crop.Wheat)}\n` +
+				`${cropOverview(Crop.WildRose)}`,
 		)
 		.addActionRowComponents(row)
 		.addFooter();

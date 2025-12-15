@@ -1,10 +1,4 @@
-import {
-	ButtonBuilder,
-	ButtonStyle,
-	ChatInputCommandInteraction,
-	MessageFlags,
-	StringSelectMenuInteraction,
-} from 'discord.js';
+import { ChatInputCommandInteraction, MessageFlags, StringSelectMenuInteraction } from 'discord.js';
 import {
 	CROP_INFO,
 	Crop,
@@ -136,7 +130,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			return {
 				crop: crop as Crop,
 				emoji: GetCropEmoji(cropName),
-				bz: bz,
+				bz: bz.length ? bz : [{ name: 'N/A', items: 0, cost: 0, per: 0, profit: 0, total: 0 }],
 				details,
 				profit,
 			};
@@ -154,11 +148,6 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const row = CropSelectRow('crop-select-rates', 'Select a crop to view its rates!');
 
-	const container = new EliteContainer(settings)
-		.addTitle('## Farming Rates Calculator', false)
-		.addDescription(description)
-		.addSeparator();
-
 	const compactContainer = new EliteContainer(settings)
 		.addTitle('## Farming Rates Calculator', false)
 		.addDescription(description)
@@ -166,20 +155,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const cropList = Object.keys(EliteCropEmojis) as Crop[];
 
-	for (const { emoji, profit, bz, crop } of formatted) {
-		const values = `:coin: \`${profit.toLocaleString().padStart(profitLength, ' ')}\` **BZ** \`${bz[0].total.toLocaleString().padStart(bzLength, ' ')}\``;
-		const text = `-# ${emoji} **${getCropDisplayName(crop)}**\n${values}`;
-		container.addSectionComponents((s) =>
-			s
-				.addTextDisplayComponents((t) => t.setContent(text))
-				.setButtonAccessory(
-					new ButtonBuilder()
-						.setCustomId(`crop-select-rates-${cropList.indexOf(crop)}`)
-						.setEmoji(emoji)
-						.setLabel('>')
-						.setStyle(ButtonStyle.Secondary),
-				),
-		);
+	for (const { emoji, profit, bz } of formatted) {
+		const values = `:coin: \`${profit.toLocaleString().padStart(profitLength, ' ')}\` **BZ** \`${(bz[0]?.total ?? 0).toLocaleString().padStart(bzLength, ' ')}\``;
 
 		compactContainer.addText(`${emoji} ${values}`);
 	}
@@ -193,16 +170,12 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			'\n\n**Custom Fortune Warning**\n-# The amount of fortune available varies depending on the crop. For the best results, only look at the crop your entered fortune is for.';
 	}
 
-	container.addSeparator();
-	container.addText("**What's my fortune?**\n-# " + details);
-	container.addFooter();
-
 	compactContainer.addSeparator();
 	compactContainer.addText("**What's my fortune?**\n-# " + details);
 	compactContainer.addFooter();
 
 	const reply = await interaction.editReply({
-		components: [container, row],
+		components: [compactContainer, row],
 		flags: [MessageFlags.IsComponentsV2],
 	});
 
@@ -225,7 +198,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		if (inter.customId == 'back') {
 			await inter.update({
-				components: [container, row],
+				components: [compactContainer, row],
 				flags: [MessageFlags.IsComponentsV2],
 			});
 			cropContainer = undefined;

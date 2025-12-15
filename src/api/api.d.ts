@@ -35,7 +35,7 @@ export interface paths {
 		};
 		/**
 		 * Get Minecraft Account Face Image
-		 * @description Returns an 8x8 or 72x72 face png image of the Minecraft account associated with the provided player name or UUID. 72x72 response includes the player's "hat" overlay. If not found, returns Steve's face.
+		 * @description Returns a 72x72 face png image of the Minecraft account associated with the provided player name or UUID. 72x72 response includes the player's "hat" overlay. If not found, returns Steve's face.
 		 */
 		get: operations['GetAccountFace1'];
 		put?: never;
@@ -55,7 +55,7 @@ export interface paths {
 		};
 		/**
 		 * Get Minecraft Account Face Image
-		 * @description Returns an 8x8 or 72x72 face png image of the Minecraft account associated with the provided player name or UUID. 72x72 response includes the player's "hat" overlay. If not found, returns Steve's face.
+		 * @description Returns a 72x72 face png image of the Minecraft account associated with the provided player name or UUID. 72x72 response includes the player's "hat" overlay. If not found, returns Steve's face.
 		 */
 		get: operations['GetAccountFace2'];
 		put?: never;
@@ -143,6 +143,26 @@ export interface paths {
 		};
 		/** Search for Minecraft Account */
 		get: operations['SearchAccounts'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/account/discord-search': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Search for Minecraft Account From Discord
+		 * @description Authenticated endpoint that returns a list of accounts that have a specific discord username linked.
+		 */
+		get: operations['SearchAccountsWithDiscord'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -399,6 +419,26 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/admin/hguilds/{guildId}/refresh': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Refresh a Hypixel Guild
+		 * @description This fetches the latest data from Hypixel for the specified guild
+		 */
+		post: operations['RefreshHypixelGuild'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/admin/unlink-account': {
 		parameters: {
 			query?: never;
@@ -468,6 +508,46 @@ export interface paths {
 		 * @description Gets all announcements that should be shown to users
 		 */
 		get: operations['GetAnnouncement'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/auth/confirmations/{id}/accept': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Accept a confirmation
+		 * @description Accepts a login confirmation that users will need to accept to proceed.
+		 */
+		post: operations['AcceptConfirmation'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/auth/confirmations/{id}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get a confirmation
+		 * @description Gets a confirmation that users will need to accept.
+		 */
+		get: operations['GetConfirmation'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -813,6 +893,51 @@ export interface paths {
 		head?: never;
 		/** Update user Discord account */
 		patch: operations['UpdateDiscordAccount'];
+		trace?: never;
+	};
+	'/admin/confirmations': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get a confirmation
+		 * @description Gets a confirmation that users will need to accept.
+		 */
+		get: operations['GetAllConfirmations'];
+		put?: never;
+		/**
+		 * Create a new confirmation
+		 * @description Creates a new confirmation that users will need to accept.
+		 */
+		post: operations['CreateConfirmation'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/confirmations/{id}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		/**
+		 * Update a confirmation
+		 * @description Updates a confirmation that users will need to accept.
+		 */
+		put: operations['UpdateConfirmation'];
+		post?: never;
+		/** Delete a login confirmation */
+		delete: operations['DeleteConfirmation'];
+		options?: never;
+		head?: never;
+		patch?: never;
 		trace?: never;
 	};
 	'/contest/{contestKey}': {
@@ -1982,6 +2107,97 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/hguilds/{guildId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Hypixel Guild */
+		get: operations['GetHypixelGuild'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/hguilds/{guildId}/leaderboards/{leaderboard}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Hypixel Guild Members Leaderboard */
+		get: operations['GetHypixelGuildMembersLeaderboard'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/hguilds/{guildId}/rank': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Hypixel Guild Rank
+		 * @description Get the rank of a Hypixel guild on a specific leaderboard
+		 */
+		get: operations['GetHypixelGuildRank'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/hguilds': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Hypixel Guilds */
+		get: operations['GetHypixelGuilds'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/hguilds/search': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Search Hypixel Guilds
+		 * @description Fuzzy search across Hypixel guild names
+		 */
+		get: operations['SearchHypixelGuilds'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/leaderboard/{leaderboard}': {
 		parameters: {
 			query?: never;
@@ -2247,6 +2463,23 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/profile/{playerUuid}/{profileUuid}/auctions': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Specific Profile Member Auctions */
+		get: operations['GetProfileAuctions'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/profile/{profileUuid}': {
 		parameters: {
 			query?: never;
@@ -2256,6 +2489,23 @@ export interface paths {
 		};
 		/** Get Profile Details */
 		get: operations['GetProfileDetails'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/profile/{playerUuid}/{profileUuid}/inventories/{inventory}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Specific Profile Member Inventory */
+		get: operations['GetProfileInventory'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2281,6 +2531,23 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/profile/{playerUuid}/{profileUuid}/networth': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Member Networth */
+		get: operations['GetProfileNetworth'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/profile/{playerUuid}/selected': {
 		parameters: {
 			query?: never;
@@ -2290,6 +2557,86 @@ export interface paths {
 		};
 		/** Get Profile Member */
 		get: operations['GetSelectedProfile'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/recap/{year}/player/{playerUuid}/{profileUuid}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Player Recap
+		 * @description Retrieves the yearly recap for a player. Requires authentication if the recap is not public.
+		 */
+		get: operations['GetPlayerRecap'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/recap/{year}/player/{playerUuid}/{profileUuid}/visibility': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Toggle Recap Visibility
+		 * @description Toggles the public visibility of a player's yearly recap.
+		 */
+		post: operations['ToggleRecapVisibility'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/resources/auctions/{auctionId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Auction
+		 * @description Get a specific auction by id. Will not fetch auction from Hypixel, only returns auctions that exist locally.
+		 */
+		get: operations['GetAuction'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/resources/auctions-overview': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Auction House Overview
+		 * @description Get overview of auction house.
+		 */
+		get: operations['GetAuctionHouseOverview'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2318,6 +2665,123 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/resources/auctions/{skyblockId}/{variantKey}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Auction History For Item */
+		get: operations['GetAuctionPriceHistory'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/resources/auctions/{skyblockId}/variants': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * List Auction Variants
+		 * @description Retrieve aggregated BIN statistics for each tracked variant of a SkyBlock item.
+		 */
+		get: operations['GetAuctionVariants'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/resources/auctions/{skyblockId}/ended': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Recently Ended Auctions for Item
+		 * @description Get recently ended auctions for a specific item and optional variant. Supports bundle: format for pets and runes.
+		 */
+		get: operations['GetItemEndedAuctions'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/resources/auctions/popular': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * List Popular Auction Items
+		 * @description Returns a paginated list of auction items ranked by recent trading volume.
+		 */
+		get: operations['GetPopularAuctions'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/resources/auctions/search': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Search Auction Items
+		 * @description Fuzzy search across known auctionable items by SkyBlock ID or display name.
+		 */
+		get: operations['SearchAuctionItems'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/resources/bazaar/overview': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Bazaar Overview
+		 * @description Get overview of bazaar with top movers and most traded items.
+		 */
+		get: operations['GetBazaarOverview'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/resources/bazaar/{itemId}': {
 		parameters: {
 			query?: never;
@@ -2338,6 +2802,26 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/resources/bazaar/{itemId}/history': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Bazaar Product History
+		 * @description Get a specific bazaar product's history
+		 */
+		get: operations['GetBazaarProductHistory'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/resources/bazaar': {
 		parameters: {
 			query?: never;
@@ -2350,6 +2834,26 @@ export interface paths {
 		 * @description Get all bazaar products.
 		 */
 		get: operations['GetBazaarProducts'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/resources/bazaar/search': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Search Bazaar Products
+		 * @description Search bazaar products by name or category. Returns all products if no filters provided.
+		 */
+		get: operations['SearchBazaarProducts'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2390,6 +2894,26 @@ export interface paths {
 		 * @description Get the current/upcoming Skyblock firesales, Taylor's Collection, and Seasonal Bundles.
 		 */
 		get: operations['SkyblockGemShop'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/resources/items/{skyblockId}/related': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Related Items and Trends
+		 * @description Get similar items and trend data for a specific item.
+		 */
+		get: operations['GetItemRelated'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -2808,6 +3332,94 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/textures/{inventoryUuid}/{slotId}/meta': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Inventory Item Texture Metadata */
+		get: operations['GetInventoryItemMeta'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/textures/{inventoryUuid}/{slotId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Inventory Item Texture */
+		get: operations['GetInventoryItemTexture'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/textures/items/{itemId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Skyblock Item Texture */
+		get: operations['GetItemTexture'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/textures/pets/{petId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Skyblock Pet Texture */
+		get: operations['GetPetTexture'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/texturepacks/{packId}/icon': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Registered Texture Pack Icon
+		 * @description Retrieves the icon image for a registered texture pack by its ID.
+		 */
+		get: operations['GetTexturePackIcon'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/weights/all': {
 		parameters: {
 			query?: never;
@@ -3069,6 +3681,7 @@ export interface components {
 			karma: number;
 			/** Format: double */
 			networkExp: number;
+			guildMember?: components['schemas']['HypixelGuildMemberDetailsDto'] | null;
 			/** Format: int32 */
 			rewardHighScore: number;
 			/** Format: int32 */
@@ -3081,12 +3694,62 @@ export interface components {
 			totalRewards: number;
 			prefix?: string | null;
 			rank?: string | null;
+			packageRank?: string | null;
 			newPackageRank?: string | null;
 			rankPlusColor?: string | null;
 			monthlyPackageRank?: string | null;
 			mostRecentMonthlyPackageRank?: string | null;
 			monthlyRankColor?: string | null;
 			socialMedia?: components['schemas']['SocialMediaLinksDto'] | null;
+		};
+		HypixelGuildMemberDetailsDto: {
+			guild?: components['schemas']['HypixelGuildDetailsDto'] | null;
+			rank?: string | null;
+			/** Format: int64 */
+			joinedAt: number;
+			/** Format: int32 */
+			questParticipation: number;
+			active: boolean;
+			expHistory: {
+				[key: string]: number;
+			};
+		};
+		HypixelGuildDetailsDto: {
+			id: string;
+			name: string;
+			/** Format: int64 */
+			createdAt: number;
+			tag?: string | null;
+			tagColor?: string | null;
+			/** Format: int32 */
+			memberCount: number;
+			/** Format: int64 */
+			lastUpdated: number;
+			stats?: components['schemas']['HypixelGuildStatsDto'] | null;
+			/**
+			 * Format: double
+			 * @description Populated when sorting guilds by a specific collection or skill
+			 */
+			amount: number;
+		};
+		HypixelGuildStatsDto: {
+			/** Format: date-time */
+			recordedAt: string;
+			/** Format: int32 */
+			memberCount: number;
+			hypixelLevel: components['schemas']['HypixelGuildStat'];
+			skyblockExperience: components['schemas']['HypixelGuildStat'];
+			skillLevel: components['schemas']['HypixelGuildStat'];
+			slayerExperience: components['schemas']['HypixelGuildStat'];
+			catacombsExperience: components['schemas']['HypixelGuildStat'];
+			farmingWeight: components['schemas']['HypixelGuildStat'];
+			networth: components['schemas']['HypixelGuildStat'];
+		};
+		HypixelGuildStat: {
+			/** Format: double */
+			total: number;
+			/** Format: double */
+			average: number;
 		};
 		SocialMediaLinksDto: {
 			discord?: string | null;
@@ -3135,10 +3798,12 @@ export interface components {
 			id: string;
 			/** @description Type of entitlement */
 			type: components['schemas']['EntitlementType'];
-			/** @description Target of entitlement.
+			/**
+			 * @description Target of entitlement.
 			 *     0 = None
 			 *     1 = User
-			 *     2 = Guild */
+			 *     2 = Guild
+			 */
 			target: components['schemas']['EntitlementTarget'];
 			/** @description SKU ID of the product */
 			productId: string;
@@ -3227,6 +3892,8 @@ export interface components {
 			 * @description Maximum number of jacob leaderboard that can be active at once. (For guilds)
 			 */
 			maxJacobLeaderboards?: number | null;
+			/** @description Unlocked product flags */
+			flags?: string[] | null;
 		};
 		MinecraftAccountDetailsDto: {
 			id: string;
@@ -3261,6 +3928,11 @@ export interface components {
 			severity?: string | null;
 		};
 		SearchRequest: Record<string, never>;
+		AccountSearchResultDto: {
+			ign: string;
+			uuid: string;
+			discordId?: string | null;
+		};
 		UpdateUserSettingsDto: {
 			/** @description Custom name prefix */
 			prefix?: string | null;
@@ -3350,13 +4022,14 @@ export interface components {
 			data?: unknown;
 		};
 		/** @enum {string} */
-		EventType: 'none' | 'farming-weight' | 'collection' | 'experience' | 'medals' | 'pests';
+		EventType: 'none' | 'farmingWeight' | 'collection' | 'experience' | 'medals' | 'pests';
 		SetEventApprovalRequest: Record<string, never>;
 		AdminLinkAccountRequest: {
 			discordId: string;
 			player: string;
 		};
 		GuildIdRequest: Record<string, never>;
+		HypixelGuildRefreshRequest: Record<string, never>;
 		AdminUnlinkAccountRequest: {
 			discordId: string;
 			player: string;
@@ -3430,6 +4103,17 @@ export interface components {
 			/** @description Announcement id */
 			id: string;
 		};
+		ConfirmationDto: {
+			/** Format: int32 */
+			id: number;
+			title?: string | null;
+			content?: string | null;
+			isActive: boolean;
+			/** Format: date-time */
+			createdAt: string;
+		};
+		AcceptConfirmationRequest: Record<string, never>;
+		GetConfirmationDto: Record<string, never>;
 		AuthSessionDto: {
 			/** @description Discord user ID */
 			id: string;
@@ -3445,6 +4129,10 @@ export interface components {
 			uuid: string;
 			/** @description List of user roles */
 			roles: string[];
+			/** @description List of account flags */
+			flags: string[];
+			/** @description The pending confirmation for the user, if any */
+			pending_confirmation?: components['schemas']['ConfirmationDto'] | null;
 		};
 		AuthResponseDto: {
 			/** @description Access token for the user */
@@ -3453,6 +4141,10 @@ export interface components {
 			expires_in?: string | null;
 			/** @description Refresh token for the user */
 			refresh_token: string;
+			/** @description The pending confirmation for the user, if any */
+			pending_confirmation?: components['schemas']['ConfirmationDto'] | null;
+			/** @description If this is the user's first login */
+			first_login: boolean;
 		};
 		DiscordLoginDto: {
 			/** @description Discord login code from OAuth2 */
@@ -3516,6 +4208,9 @@ export interface components {
 			cocoaBeans?: string | null;
 			sugarCane?: string | null;
 			netherWart?: string | null;
+			sunflower?: string | null;
+			moonflower?: string | null;
+			wildRose?: string | null;
 		};
 		PrivateGuildDto: {
 			id: string;
@@ -3598,6 +4293,9 @@ export interface components {
 			cocoaBeans: components['schemas']['GuildJacobLeaderboardEntry'][];
 			sugarCane: components['schemas']['GuildJacobLeaderboardEntry'][];
 			netherWart: components['schemas']['GuildJacobLeaderboardEntry'][];
+			sunflower: components['schemas']['GuildJacobLeaderboardEntry'][];
+			moonflower: components['schemas']['GuildJacobLeaderboardEntry'][];
+			wildRose: components['schemas']['GuildJacobLeaderboardEntry'][];
 		};
 		GuildJacobLeaderboardEntry: {
 			uuid: string;
@@ -3699,14 +4397,10 @@ export interface components {
 			/** Format: int32 */
 			position: number;
 		};
-		JacobContestWithParticipationsDto: {
-			crop: string;
-			/** Format: int64 */
-			timestamp: number;
-			/** Format: int32 */
-			participants: number;
-			brackets: components['schemas']['ContestBracketsDto'];
-			participations: components['schemas']['StrippedContestParticipationDto'][];
+		CreateConfirmationDto: {
+			title: string;
+			content: string;
+			isActive: boolean;
 		};
 		UpdateJacobFeatureRequest_UpdateJacobFeature: {
 			/** @description Blocked roles from participating in the guild's Jacob Leaderboards */
@@ -3721,6 +4415,21 @@ export interface components {
 			excludedTimespans: components['schemas']['ExcludedTimespan'][];
 			/** @description Leaderboards for the guild's Jacob Leaderboards */
 			leaderboards: components['schemas']['GuildJacobLeaderboard'][];
+		};
+		DeleteConfirmationDto: Record<string, never>;
+		UpdateConfirmationRequest: {
+			title?: string | null;
+			content?: string | null;
+			isActive: boolean;
+		};
+		JacobContestWithParticipationsDto: {
+			crop: string;
+			/** Format: int64 */
+			timestamp: number;
+			/** Format: int32 */
+			participants: number;
+			brackets: components['schemas']['ContestBracketsDto'];
+			participations: components['schemas']['StrippedContestParticipationDto'][];
 		};
 		ContestBracketsDto: {
 			/** Format: int32 */
@@ -3940,21 +4649,21 @@ export interface components {
 			};
 		};
 		/** @enum {integer} */
-		Crop: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+		Crop: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
 		MedalEventData: {
 			medalWeights: {
 				[key: string]: number;
 			};
 		};
 		/** @enum {integer} */
-		ContestMedal: 0 | 1 | 2 | 3 | 4 | 5;
+		ContestMedal: 0 | 1 | 2 | 3 | 4 | 5 | -1;
 		PestEventData: {
 			pestWeights: {
 				[key: string]: number;
 			};
 		};
 		/** @enum {integer} */
-		Pest: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+		Pest: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
 		CollectionEventData: {
 			collectionWeights: {
 				[key: string]: components['schemas']['CollectionWeight'];
@@ -4071,6 +4780,12 @@ export interface components {
 			sugarCane: number;
 			/** Format: int32 */
 			netherWart: number;
+			/** Format: int32 */
+			sunflower: number;
+			/** Format: int32 */
+			moonflower: number;
+			/** Format: int32 */
+			wildRose: number;
 		};
 		ComposterDto: {
 			/** Format: double */
@@ -4245,10 +4960,96 @@ export interface components {
 			pingForSmallImprovements?: boolean | null;
 		};
 		SendJacobLeaderboardRequest: Record<string, never>;
-		LeaderboardDto: {
+		GetHypixelGuildResponse: {
+			guild: components['schemas']['HypixelGuildDto'];
+		};
+		UpdateJacobLeaderboardRequest_UpdateJacobLeaderboard: {
+			title?: string | null;
+			channelId?: string | null;
+			/** Format: int64 */
+			startCutoff?: number | null;
+			/** Format: int64 */
+			endCutoff?: number | null;
+			active?: boolean | null;
+			requiredRole?: string | null;
+			blockedRole?: string | null;
+			updateChannelId?: string | null;
+			updateRoleId?: string | null;
+			pingForSmallImprovements?: boolean | null;
+		};
+		HypixelGuildDto: {
+			id: string;
+			name: string;
+			/** Format: int64 */
+			createdAt: number;
+			description: string;
+			preferredGames?: string[] | null;
+			publiclyListed: boolean;
+			public: boolean;
+			/** Format: int64 */
+			exp: number;
+			tag?: string | null;
+			tagColor?: string | null;
+			gameExp: {
+				[key: string]: number;
+			};
+			ranks: components['schemas']['RawHypixelGuildRank'][];
+			members: components['schemas']['HypixelGuildMemberDto'][];
+			/** Format: int32 */
+			memberCount: number;
+			/** Format: int64 */
+			lastUpdated: number;
+			stats: components['schemas']['HypixelGuildStatsFullDto'][];
+		};
+		RawHypixelGuildRank: {
+			name: string;
+			tag?: string | null;
+			default: boolean;
+			/** Format: int64 */
+			created: number;
+			/** Format: int32 */
+			priority: number;
+		};
+		HypixelGuildMemberDto: {
+			playerUuid: string;
+			name: string;
+			formattedName: string;
+			rank?: string | null;
+			/** Format: int64 */
+			joinedAt: number;
+			/** Format: int32 */
+			questParticipation: number;
+			active: boolean;
+			expHistory: {
+				[key: string]: number;
+			};
+		};
+		HypixelGuildStatsFullDto: {
+			/** Format: date-time */
+			recordedAt: string;
+			/** Format: int32 */
+			memberCount: number;
+			hypixelLevel: components['schemas']['HypixelGuildStat'];
+			skyblockExperience: components['schemas']['HypixelGuildStat'];
+			skillLevel: components['schemas']['HypixelGuildStat'];
+			slayerExperience: components['schemas']['HypixelGuildStat'];
+			catacombsExperience: components['schemas']['HypixelGuildStat'];
+			farmingWeight: components['schemas']['HypixelGuildStat'];
+			networth: components['schemas']['HypixelGuildStat'];
+			collections: {
+				[key: string]: number;
+			};
+			skills: {
+				[key: string]: number;
+			};
+		};
+		GetHypixelGuildRequest: Record<string, never>;
+		GuildMembersLeaderboardDto: {
 			id: string;
 			title: string;
 			shortTitle?: string | null;
+			/** @description Item Id if this is a collection leaderboard */
+			itemId?: string | null;
 			interval?: string | null;
 			firstInterval?: string | null;
 			/** Format: int32 */
@@ -4268,20 +5069,7 @@ export interface components {
 			endsAt: number;
 			profile: boolean;
 			entries: components['schemas']['LeaderboardEntryDto'][];
-		};
-		UpdateJacobLeaderboardRequest_UpdateJacobLeaderboard: {
-			title?: string | null;
-			channelId?: string | null;
-			/** Format: int64 */
-			startCutoff?: number | null;
-			/** Format: int64 */
-			endCutoff?: number | null;
-			active?: boolean | null;
-			requiredRole?: string | null;
-			blockedRole?: string | null;
-			updateChannelId?: string | null;
-			updateRoleId?: string | null;
-			pingForSmallImprovements?: boolean | null;
+			guildId: string;
 		};
 		LeaderboardEntryDto: {
 			/** @description Player's IGN if player leaderboard */
@@ -4317,9 +5105,76 @@ export interface components {
 			xp: number;
 			removed: boolean;
 		};
-		LeaderboardSliceRequest: Record<string, never>;
+		GetHypixelGuildMembersLeaderboardRequest: Record<string, never>;
 		/** @enum {integer} */
 		RemovedFilter: 0 | 1 | 2;
+		GetHypixelGuildRankResponse: {
+			guildId: string;
+			guildName: string;
+			/** Format: int32 */
+			rank: number;
+			/** Format: double */
+			amount: number;
+		};
+		GetHypixelGuildRankRequest: Record<string, never>;
+		/** @enum {string} */
+		SortHypixelGuildsBy:
+			| 'memberCount'
+			| 'skyblockExperience'
+			| 'skyblockExperienceAverage'
+			| 'skillLevel'
+			| 'skillLevelAverage'
+			| 'hypixelLevelAverage'
+			| 'slayerExperience'
+			| 'catacombsExperience'
+			| 'farmingWeight'
+			| 'networth'
+			| 'networthAverage';
+		GetHypixelGuildsResponse: {
+			/** Format: int32 */
+			totalGuilds: number;
+			guilds: components['schemas']['HypixelGuildDetailsDto'][];
+		};
+		GetHypixelGuildsRequest: Record<string, never>;
+		SearchHypixelGuildsResponse: {
+			results: components['schemas']['HypixelGuildSearchResultDto'][];
+		};
+		HypixelGuildSearchResultDto: {
+			id: string;
+			name: string;
+			/** Format: int32 */
+			memberCount: number;
+			tag?: string | null;
+			tagColor?: string | null;
+		};
+		SearchHypixelGuildsRequest: Record<string, never>;
+		LeaderboardDto: {
+			id: string;
+			title: string;
+			shortTitle?: string | null;
+			/** @description Item Id if this is a collection leaderboard */
+			itemId?: string | null;
+			interval?: string | null;
+			firstInterval?: string | null;
+			/** Format: int32 */
+			limit: number;
+			/** Format: int32 */
+			offset: number;
+			/** Format: int32 */
+			maxEntries: number;
+			/**
+			 * Format: decimal
+			 * @description The minimum score required to be on the leaderboard
+			 */
+			minimumScore: number;
+			/** Format: int64 */
+			startsAt: number;
+			/** Format: int64 */
+			endsAt: number;
+			profile: boolean;
+			entries: components['schemas']['LeaderboardEntryDto'][];
+		};
+		LeaderboardSliceRequest: Record<string, never>;
 		LeaderboardsResponse: {
 			leaderboards: {
 				[key: string]: components['schemas']['LeaderboardInfoDto'];
@@ -4330,6 +5185,8 @@ export interface components {
 			title: string;
 			/** @description Leaderboard short title */
 			short?: string | null;
+			/** @description Item Id if a collection based leaderboard */
+			itemId?: string | null;
 			/** @description Leaderboard category */
 			category: string;
 			/** @description If true, the leaderboard is profile based */
@@ -4440,6 +5297,9 @@ export interface components {
 			purse: number;
 			/** Format: double */
 			bankBalance: number;
+			/** Format: double */
+			personalBank: number;
+			networth: components['schemas']['ProfileMemberNetworthDto'];
 			meta?: components['schemas']['MemberCosmeticsDto'] | null;
 			collections: {
 				[key: string]: number;
@@ -4450,6 +5310,9 @@ export interface components {
 			craftedMinions: {
 				[key: string]: number;
 			};
+			sacks: {
+				[key: string]: number;
+			};
 			pets: components['schemas']['PetDto'][];
 			unparsed: components['schemas']['UnparsedApiDataDto'];
 			jacob: components['schemas']['JacobDataDto'];
@@ -4458,6 +5321,7 @@ export interface components {
 			skills: components['schemas']['SkillsDto'];
 			chocolateFactory: components['schemas']['ChocolateFactoryDto'];
 			events: components['schemas']['ProfileEventMemberDto'][];
+			inventories: components['schemas']['HypixelInventoryOverviewDto'][];
 			isSelected: boolean;
 			wasRemoved: boolean;
 			/** Format: int64 */
@@ -4468,6 +5332,17 @@ export interface components {
 			collections: boolean;
 			skills: boolean;
 			vault: boolean;
+			museum: boolean;
+		};
+		ProfileMemberNetworthDto: {
+			/** Format: double */
+			normal: number;
+			/** Format: double */
+			liquid: number;
+			/** Format: double */
+			functional: number;
+			/** Format: double */
+			liquidFunctional: number;
 		};
 		PetDto: {
 			uuid?: string | null;
@@ -4497,6 +5372,7 @@ export interface components {
 			tempStatBuffs?: components['schemas']['TempStatBuffResponse'][] | null;
 			accessoryBagSettings?: unknown;
 			bestiary?: unknown;
+			dungeons?: components['schemas']['RawDungeonsResponse'] | null;
 		};
 		TempStatBuffResponse: {
 			/** Format: int32 */
@@ -4506,6 +5382,78 @@ export interface components {
 			amount: number;
 			/** Format: int64 */
 			expire_at: number;
+		};
+		RawDungeonsResponse: {
+			dungeon_types?: components['schemas']['DungeonTypes'] | null;
+			player_classes?: components['schemas']['DungeonPlayerClasses'] | null;
+			/** Format: int64 */
+			secrets: number;
+		};
+		DungeonTypes: {
+			catacombs: components['schemas']['DungeonData'];
+			master_catacombs: components['schemas']['DungeonData'];
+		};
+		DungeonData: {
+			/** Format: double */
+			experience: number;
+			/** Format: int32 */
+			highest_tier_completed: number;
+			tier_completions: {
+				[key: string]: number;
+			};
+			times_played: {
+				[key: string]: number;
+			};
+			best_score: {
+				[key: string]: number;
+			};
+			mobs_killed: {
+				[key: string]: number;
+			};
+			most_mobs_killed: {
+				[key: string]: number;
+			};
+			watcher_kills: {
+				[key: string]: number;
+			};
+			most_healing: {
+				[key: string]: number;
+			};
+			fastest_time: {
+				[key: string]: number;
+			};
+			fastest_time_s: {
+				[key: string]: number;
+			};
+			fastest_time_s_plus: {
+				[key: string]: number;
+			};
+			most_damage_tank: {
+				[key: string]: number;
+			};
+			most_damage_mage: {
+				[key: string]: number;
+			};
+			most_damage_healer: {
+				[key: string]: number;
+			};
+			most_damage_archer: {
+				[key: string]: number;
+			};
+			milestone_completions: {
+				[key: string]: number;
+			};
+		};
+		DungeonPlayerClasses: {
+			healer: components['schemas']['DungeonClassData'];
+			mage: components['schemas']['DungeonClassData'];
+			berserk: components['schemas']['DungeonClassData'];
+			archer: components['schemas']['DungeonClassData'];
+			tank: components['schemas']['DungeonClassData'];
+		};
+		DungeonClassData: {
+			/** Format: double */
+			experience: number;
 		};
 		JacobDataDto: {
 			medals: components['schemas']['MedalInventoryDto'];
@@ -4626,6 +5574,8 @@ export interface components {
 			 * @description Minecraft stack count of the item
 			 */
 			count: number;
+			/** @description Minecraft damage value of the item */
+			damage: number;
 			/** @description Skyblock ID of the item */
 			skyblockId?: string | null;
 			/** @description Item UUID to uniquely identify a specific instance of this item */
@@ -4639,9 +5589,7 @@ export interface components {
 				[key: string]: number;
 			} | null;
 			/** @description ExtraAttributes not included elsewhere */
-			attributes?: {
-				[key: string]: string;
-			} | null;
+			attributes?: components['schemas']['ItemAttributes'] | null;
 			/** @description ExtraAtrributes.Attributes for attribute shards */
 			itemAttributes?: {
 				[key: string]: string;
@@ -4652,6 +5600,44 @@ export interface components {
 			} | null;
 			/** @description Pet info if item is a pet */
 			petInfo?: components['schemas']['ItemPetInfoDto'] | null;
+			/** @description Image url for the item */
+			imageUrl?: string | null;
+			/** @description Texture id for the item, used to look up the image in our image service */
+			textureId?: string | null;
+			/** @description Slot identifier where the item was located, if applicable */
+			slot?: string | null;
+		};
+		ItemAttributes: {
+			runes?: {
+				[key: string]: number;
+			} | null;
+			effects?: components['schemas']['ItemEffectAttribute'][] | null;
+			necromancer_souls?: components['schemas']['ItemSoulAttribute'][] | null;
+			hook?: components['schemas']['ItemRodPartAttribute'] | null;
+			line?: components['schemas']['ItemRodPartAttribute'] | null;
+			sinker?: components['schemas']['ItemRodPartAttribute'] | null;
+			ability_scroll?: string[] | null;
+			inventory_data?: {
+				[key: string]: components['schemas']['ItemDto'] | null;
+			} | null;
+		} & {
+			[key: string]: unknown;
+		};
+		ItemEffectAttribute: {
+			/** Format: int32 */
+			level: number;
+			effect?: string | null;
+			/** Format: int32 */
+			duration_ticks: number;
+		};
+		ItemSoulAttribute: {
+			mob_id?: string | null;
+			dropped_instance_id?: string | null;
+			dropped_mode_id?: string | null;
+		};
+		ItemRodPartAttribute: {
+			part?: string | null;
+			donated_museum: boolean;
 		};
 		ItemPetInfoDto: {
 			type: string;
@@ -4664,6 +5650,7 @@ export interface components {
 			/** Format: int32 */
 			candyUsed: number;
 			heldItem?: string | null;
+			skin?: string | null;
 		} & {
 			[key: string]: unknown;
 		};
@@ -4740,10 +5727,349 @@ export interface components {
 			rank: number;
 			score?: string | null;
 		};
+		HypixelInventoryOverviewDto: {
+			/** Format: guid */
+			id: string;
+			name: string;
+			metadata?: {
+				[key: string]: string;
+			} | null;
+		};
+		GetProfileAuctionsResponse: {
+			/** @description Ended auctions */
+			ended: components['schemas']['AuctionDto'][];
+		};
+		AuctionDto: {
+			/** Format: guid */
+			auctionId: string;
+			/** Format: guid */
+			sellerUuid: string;
+			/** Format: guid */
+			sellerProfileUuid: string;
+			seller?: components['schemas']['AccountMetaDto'] | null;
+			/** Format: guid */
+			buyerUuid?: string | null;
+			/** Format: guid */
+			buyerProfileUuid?: string | null;
+			buyer?: components['schemas']['AccountMetaDto'] | null;
+			/** Format: int64 */
+			start: number;
+			/** Format: int64 */
+			end: number;
+			/** Format: int64 */
+			soldAt: number;
+			/** Format: int64 */
+			price: number;
+			count: number;
+			bin: boolean;
+			skyblockId?: string | null;
+			variantKey: string;
+			itemUuid?: string | null;
+			item?: components['schemas']['ItemDto'] | null;
+			/** Format: date-time */
+			lastUpdatedAt: string;
+			/** Format: int64 */
+			startingBid: number;
+			/** Format: int64 */
+			highestBid?: number | null;
+		};
+		AccountMetaDto: {
+			id: string;
+			name: string;
+			formattedName: string;
+		};
+		GetProfileAuctionsRequest: Record<string, never>;
+		HypixelInventoryDto: {
+			/** Format: guid */
+			id: string;
+			name: string;
+			/** @description Dictionary of slot to item mapping, null if the slot is empty */
+			items: {
+				[key: string]: components['schemas']['ItemDto'] | null;
+			};
+			metadata?: {
+				[key: string]: string;
+			} | null;
+		};
+		GetProfileInventoryRequest: Record<string, never>;
 		ProfileNamesDto: {
 			id: string;
 			name: string;
 			selected: boolean;
+		};
+		NetworthBreakdown: {
+			/** Format: double */
+			networth: number;
+			/** Format: double */
+			liquidNetworth: number;
+			/** Format: double */
+			functionalNetworth: number;
+			/** Format: double */
+			liquidFunctionalNetworth: number;
+			/** Format: double */
+			purse: number;
+			/** Format: double */
+			bank: number;
+			/** Format: double */
+			personalBank: number;
+			categories: {
+				[key: string]: components['schemas']['NetworthCategory'];
+			};
+		};
+		NetworthCategory: {
+			/** Format: double */
+			total: number;
+			/** Format: double */
+			liquidTotal: number;
+			/** Format: double */
+			functionalTotal: number;
+			/** Format: double */
+			liquidFunctionalTotal: number;
+			items: components['schemas']['NetworthResult'][];
+		};
+		NetworthResult: {
+			item?: components['schemas']['NetworthItemSimple'] | null;
+			/** Format: double */
+			basePrice: number;
+			/** Format: double */
+			price: number;
+			/** Format: double */
+			networth: number;
+			calculation?: components['schemas']['NetworthCalculation'][] | null;
+			soulbound: boolean;
+			cosmetic: boolean;
+			/** Format: double */
+			liquidNetworth: number;
+			/** Format: double */
+			functionalNetworth: number;
+			/** Format: double */
+			liquidFunctionalNetworth: number;
+			/** Format: double */
+			cosmeticValue: number;
+			/** Format: double */
+			illiquidValue: number;
+		};
+		NetworthItemSimple: {
+			skyblockId?: string | null;
+			name?: string | null;
+			slot?: string | null;
+			/** Format: int32 */
+			count: number;
+			damage: number;
+			uuid?: string | null;
+		};
+		NetworthCalculation: {
+			id: string;
+			type: string;
+			/** Format: double */
+			value: number;
+			/** Format: int32 */
+			count: number;
+		};
+		YearlyRecapDto: {
+			playerUuid: string;
+			/** Format: int32 */
+			year: number;
+			public: boolean;
+			data: components['schemas']['YearlyRecapData'];
+			global: components['schemas']['GlobalRecap'];
+			discord: components['schemas']['DiscordRecapInfoDto'];
+		};
+		YearlyRecapData: {
+			player: components['schemas']['PlayerRecapInfo'];
+			profiles: components['schemas']['ProfileRecapInfo'][];
+			allProfilesSummary: components['schemas']['AllProfilesSummaryRecap'];
+			contests: components['schemas']['ContestRecap'];
+			events: components['schemas']['EventRecap'][];
+			shop: components['schemas']['ShopRecap'];
+			collections: components['schemas']['CollectionRecap'];
+			pests: components['schemas']['PestRecap'];
+			skills: components['schemas']['SkillRecap'];
+			streak: components['schemas']['StreakRecap'];
+			leaderboards: components['schemas']['LeaderboardRecap'];
+			year: string;
+			currentProfile: string;
+		};
+		PlayerRecapInfo: {
+			ign: string;
+			uuid: string;
+			firstDataPoint: string;
+			lastDataPoint: string;
+			/** Format: int32 */
+			daysActive: number;
+			mostActiveMonth: string;
+			farmingWeight: components['schemas']['FarmingWeightRecap'];
+		};
+		FarmingWeightRecap: {
+			/** Format: double */
+			gained: number;
+			/** Format: double */
+			total: number;
+			/** Format: double */
+			averageComparison: number;
+		};
+		ProfileRecapInfo: {
+			name: string;
+			cuteName: string;
+			isMain: boolean;
+			wiped?: boolean | null;
+		};
+		AllProfilesSummaryRecap: {
+			/** Format: double */
+			totalWeightGained: number;
+			/** Format: double */
+			totalCoinsGained: number;
+			/** Format: int32 */
+			wipedProfiles: number;
+		};
+		ContestRecap: {
+			/** Format: int32 */
+			total: number;
+			perCrop: {
+				[key: string]: number;
+			};
+			highestPlacements: components['schemas']['ContestPlacementRecap'][];
+		};
+		ContestPlacementRecap: {
+			crop: string;
+			/** Format: int32 */
+			rank: number;
+			medal: string;
+		};
+		EventRecap: {
+			name: string;
+			type: string;
+			participated: boolean;
+			/** Format: int32 */
+			rank?: number | null;
+			/** Format: double */
+			score?: number | null;
+			banner?: string | null;
+			typeLabel?: string | null;
+		};
+		ShopRecap: {
+			hasPurchased: boolean;
+		};
+		CollectionRecap: {
+			increases: {
+				[key: string]: number;
+			};
+			globalTotals: {
+				[key: string]: number;
+			};
+			averageComparison: {
+				[key: string]: number;
+			};
+			monthly: components['schemas']['MonthlyStatRecap'][];
+		};
+		MonthlyStatRecap: {
+			month: string;
+			/** Format: double */
+			amount: number;
+		};
+		PestRecap: {
+			/** Format: int32 */
+			kills: number;
+			breakdown: {
+				[key: string]: number;
+			};
+			/** Format: int64 */
+			globalTotal: number;
+			/** Format: double */
+			averageComparison: number;
+			monthly: components['schemas']['MonthlyStatRecap'][];
+		};
+		SkillRecap: {
+			/** Format: double */
+			farmingXp: number;
+			breakdown: {
+				[key: string]: number;
+			};
+			/** Format: double */
+			globalTotal: number;
+			/** Format: double */
+			averageComparison: number;
+		};
+		StreakRecap: {
+			/** Format: int32 */
+			longestStreakHours: number;
+			/** Format: int64 */
+			start: number;
+			/** Format: int64 */
+			end: number;
+			/** Format: double */
+			averageDailyDowntime: number;
+			sparkline: number[];
+		};
+		LeaderboardRecap: {
+			top1000: components['schemas']['LeaderboardPlacementRecap'][];
+			monthlyHighs: components['schemas']['MonthlyLeaderboardRecap'][];
+		};
+		LeaderboardPlacementRecap: {
+			title: string;
+			slug: string;
+			/** Format: int32 */
+			rank: number;
+			/** Format: double */
+			amount: number;
+			shortTitle?: string | null;
+		};
+		MonthlyLeaderboardRecap: {
+			month: string;
+			name: string;
+			/** Format: int32 */
+			rank: number;
+		};
+		GlobalRecap: {
+			/** Format: int64 */
+			totalCrops: number;
+			/** Format: double */
+			totalXp: number;
+			/** Format: int64 */
+			totalPests: number;
+			/** Format: double */
+			totalFarmingWeight: number;
+			/** Format: int32 */
+			trackedPlayers: number;
+			/** Format: int32 */
+			bannedWiped: number;
+			/** Format: int32 */
+			ironmanToNormal: number;
+			crops: {
+				[key: string]: number;
+			};
+			totalCropsBreakdown: {
+				[key: string]: number;
+			};
+			skills: {
+				[key: string]: number;
+			};
+			totalSkillsBreakdown: {
+				[key: string]: number;
+			};
+			pests: {
+				[key: string]: number;
+			};
+			totalPestsBreakdown: {
+				[key: string]: number;
+			};
+		};
+		DiscordRecapInfoDto: {
+			username: string;
+			id: string;
+			avatar: string;
+		};
+		RecapRequest: Record<string, never>;
+		GetAuctionResponse: {
+			auction: components['schemas']['AuctionDto'];
+		};
+		ToggleRecapVisibilityRequestBody: {
+			public: boolean;
+		};
+		GetAuctionRequest: Record<string, never>;
+		AuctionOverviewResponse: {
+			new: components['schemas']['AuctionDto'][];
+			ended: components['schemas']['AuctionDto'][];
 		};
 		AuctionHouseDto: {
 			items: {
@@ -4807,9 +6133,88 @@ export interface components {
 			/** Format: int32 */
 			max: number;
 		};
-		GetBazaarProductResponse: {
-			productId: string;
-			product: components['schemas']['BazaarProductSummaryDto'];
+		GetAuctionPriceHistoryResponse: {
+			history: components['schemas']['PriceHistoryDataPoint'][];
+		};
+		PriceHistoryDataPoint: {
+			/** Format: date-time */
+			timestamp: string;
+			/** Format: decimal */
+			lowestBinPrice?: number | null;
+			/** Format: decimal */
+			averageBinPrice?: number | null;
+			/** Format: int32 */
+			binListings: number;
+			/** Format: decimal */
+			lowestSalePrice?: number | null;
+			/** Format: decimal */
+			averageSalePrice?: number | null;
+			/** Format: int32 */
+			saleAuctions: number;
+			/** Format: int32 */
+			itemsSold: number;
+		};
+		GetAuctionPriceHistoryRequest: Record<string, never>;
+		GetAuctionVariantsResponse: {
+			variants: components['schemas']['AuctionItemDto'][];
+		};
+		GetAuctionVariantsRequest: Record<string, never>;
+		ItemEndedAuctionsRequest: Record<string, never>;
+		GetPopularAuctionsResponse: {
+			/** Format: int32 */
+			page: number;
+			/** Format: int32 */
+			pageSize: number;
+			/** Format: int64 */
+			totalCount: number;
+			/** Format: int32 */
+			totalPages: number;
+			items: components['schemas']['PopularAuctionItemDto'][];
+		};
+		PopularAuctionItemDto: {
+			skyblockId: string;
+			name?: string | null;
+			/** Format: int32 */
+			itemsSold: number;
+			/** Format: int32 */
+			saleAuctions: number;
+			/** Format: int32 */
+			binListings: number;
+			/** Format: decimal */
+			averageSalePrice?: number | null;
+			/** Format: decimal */
+			averageBinPrice?: number | null;
+			/** Format: decimal */
+			lowestSalePrice?: number | null;
+			/** Format: decimal */
+			lowestBinPrice?: number | null;
+		};
+		GetPopularAuctionsRequest: Record<string, never>;
+		SearchAuctionItemsResponse: {
+			results: components['schemas']['AuctionItemSearchResult'][];
+		};
+		AuctionItemSearchResult: {
+			skyblockId: string;
+			variantKey?: string | null;
+			name?: string | null;
+			hasVariants: boolean;
+			/** Format: int32 */
+			variantCount: number;
+			/** Format: decimal */
+			recentLowestPrice?: number | null;
+			/** Format: int32 */
+			recentVolume: number;
+		};
+		SearchAuctionItemsRequest: Record<string, never>;
+		BazaarOverviewResponse: {
+			topMovers: components['schemas']['BazaarOverviewItemDto'][];
+			mostTraded: components['schemas']['BazaarOverviewItemDto'][];
+		};
+		BazaarOverviewItemDto: {
+			itemId: string;
+			name?: string | null;
+			category?: string | null;
+			summary: components['schemas']['BazaarProductSummaryDto'];
 		};
 		BazaarProductSummaryDto: {
 			/** @description Name of the item if it exists. */
@@ -4859,13 +6264,59 @@ export interface components {
 			 * @description Calculated average Buy Order price that should be more resistant to price fluctuations
 			 */
 			averageBuyOrder: number;
+			/** @description Current orders in the bazaar for this item if they exist. */
+			orders?: components['schemas']['BazaarOrders'] | null;
+		};
+		BazaarOrders: {
+			sellSummary?: components['schemas']['BazaarOrder'][] | null;
+			buySummary?: components['schemas']['BazaarOrder'][] | null;
+		};
+		BazaarOrder: {
+			/** Format: int32 */
+			amount: number;
+			/** Format: double */
+			pricePerUnit: number;
+			/** Format: int32 */
+			orders: number;
+		};
+		GetBazaarProductResponse: {
+			productId: string;
+			product: components['schemas']['BazaarProductSummaryDto'];
 		};
 		GetBazaarProductRequest: Record<string, never>;
+		GetBazaarProductHistoryResponse: {
+			productId: string;
+			product: components['schemas']['BazaarProductSummaryDto'];
+			history: components['schemas']['BazaarHistoryDataPoint'][];
+		};
+		BazaarHistoryDataPoint: {
+			/** Format: date-time */
+			timestamp: string;
+			/** Format: double */
+			instaSellPrice: number;
+			/** Format: double */
+			instaBuyPrice: number;
+			/** Format: double */
+			buyOrderPrice: number;
+			/** Format: double */
+			sellOrderPrice: number;
+		};
+		GetBazaarProductHistoryRequest: Record<string, never>;
 		GetBazaarProductsResponse: {
 			products: {
 				[key: string]: components['schemas']['BazaarProductSummaryDto'];
 			};
 		};
+		SearchBazaarProductsResponse: {
+			products: components['schemas']['BazaarSearchResultDto'][];
+		};
+		BazaarSearchResultDto: {
+			itemId: string;
+			name?: string | null;
+			category?: string | null;
+			summary: components['schemas']['BazaarProductSummaryDto'];
+		};
+		SearchBazaarProductsRequest: Record<string, never>;
 		SkyblockFiresalesResponse: {
 			firesales: components['schemas']['SkyblockFiresaleDto'][];
 		};
@@ -4878,6 +6329,8 @@ export interface components {
 		};
 		SkyblockFiresaleItemDto: {
 			itemId: string;
+			/** Format: int32 */
+			slotId: number;
 			/** Format: int32 */
 			amount: number;
 			/**
@@ -4920,16 +6373,9 @@ export interface components {
 		};
 		/** @enum {integer} */
 		UpgradeCostType: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-		GetItemsFromBytesResponse: {
-			items: (components['schemas']['ItemDto'] | null)[];
-		};
-		GetItemsFromBytesRequest: {
-			bytes: string;
-		};
-		GetSkyblockItemsResponse: {
-			items: {
-				[key: string]: components['schemas']['ItemResponse'] | null;
-			};
+		ItemRelatedResponse: {
+			similar: components['schemas']['ItemResponse'][];
+			trends?: components['schemas']['ItemTrendDto'] | null;
 		};
 		ItemResponse: {
 			id?: string | null;
@@ -5031,6 +6477,24 @@ export interface components {
 		JsonDocument: {
 			rootElement: unknown;
 		};
+		ItemTrendDto: {
+			/** Format: double */
+			priceChangePercentage: number;
+			/** Format: double */
+			volumeChangePercentage: number;
+		};
+		ItemRelatedRequest: Record<string, never>;
+		GetItemsFromBytesResponse: {
+			items: (components['schemas']['ItemDto'] | null)[];
+		};
+		GetItemsFromBytesRequest: {
+			bytes: string;
+		};
+		GetSkyblockItemsResponse: {
+			items: {
+				[key: string]: components['schemas']['ItemResponse'] | null;
+			};
+		};
 		GetSpecifiedSkyblockItemsResponse: {
 			items: {
 				[key: string]: components['schemas']['SkyblockItemResponse'];
@@ -5044,19 +6508,23 @@ export interface components {
 			bazaar?: components['schemas']['BazaarProductSummaryDto'] | null;
 			auctions?: components['schemas']['AuctionItemDto'][] | null;
 		};
-		/** @example {
+		/**
+		 * @example {
 		 *       "items": [
 		 *         "NETHER_STALK",
 		 *         "ENCHANTED_NETHER_STALK",
 		 *         "MUTANT_NETHER_STALK"
 		 *       ]
-		 *     } */
+		 *     }
+		 */
 		GetSpecifiedSkyblockItemsRequest: {
-			/** @example [
+			/**
+			 * @example [
 			 *       "NETHER_STALK",
 			 *       "ENCHANTED_NETHER_STALK",
 			 *       "MUTANT_NETHER_STALK"
-			 *     ] */
+			 *     ]
+			 */
 			items: string[];
 		};
 		SkyblockProductRequest: Record<string, never>;
@@ -5374,6 +6842,19 @@ export interface components {
 			fontWeight?: number | null;
 		};
 		GetStyleRequest: Record<string, never>;
+		InventoryItemMetaResponse: {
+			/** @description Texture Pack ID where the item texture is located */
+			packId?: string | null;
+			/** @description Variant key for price lookups */
+			variantKey?: string | null;
+			/** @description Networth calculation result for this item */
+			networth?: components['schemas']['NetworthResult'] | null;
+		};
+		GetInventoryItemMetaRequest: Record<string, never>;
+		GetInventoryItemTextureRequest: Record<string, never>;
+		GetItemTextureRequest: Record<string, never>;
+		GetPetTextureRequest: Record<string, never>;
+		GetTexturePackIcon: Record<string, never>;
 		WeightsDto: {
 			crops: {
 				[key: string]: number;
@@ -5724,6 +7205,33 @@ export interface operations {
 				content: {
 					'application/problem+json': components['schemas']['ErrorResponse'];
 				};
+			};
+		};
+	};
+	SearchAccountsWithDiscord: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AccountSearchResultDto'][];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
 			};
 		};
 	};
@@ -6289,6 +7797,40 @@ export interface operations {
 			};
 		};
 	};
+	RefreshHypixelGuild: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				guildId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
 	UnlinkUserAccount: {
 		parameters: {
 			query?: never;
@@ -6401,6 +7943,57 @@ export interface operations {
 				};
 				content: {
 					'application/json': components['schemas']['AnnouncementDto'][];
+				};
+			};
+		};
+	};
+	AcceptConfirmation: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				id: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ConfirmationDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetConfirmation: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				id: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ConfirmationDto'];
 				};
 			};
 		};
@@ -7251,6 +8844,154 @@ export interface operations {
 				content: {
 					'application/json': components['schemas']['AuthorizedAccountDto'];
 				};
+			};
+		};
+	};
+	GetAllConfirmations: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ConfirmationDto'][];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	CreateConfirmation: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['CreateConfirmationDto'];
+			};
+		};
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ConfirmationDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	UpdateConfirmation: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				id: number;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['UpdateConfirmationRequest'];
+			};
+		};
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ConfirmationDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	DeleteConfirmation: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				id: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ConfirmationDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
 			};
 		};
 	};
@@ -10087,6 +11828,172 @@ export interface operations {
 			};
 		};
 	};
+	GetHypixelGuild: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				guildId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetHypixelGuildResponse'];
+				};
+			};
+		};
+	};
+	GetHypixelGuildMembersLeaderboard: {
+		parameters: {
+			query?: {
+				/** @description Time interval key of a monthly leaderboard. Format: yyyy-MM */
+				interval?: string | null;
+				/**
+				 * @description Game mode to filter leaderboard by. Leave empty to get all modes.
+				 *     Options: "ironman", "island", "classic"
+				 */
+				mode?: string | null;
+				/**
+				 * @description Removed filter to get leaderboard entries that have been removed from the leaderboard.
+				 *     Default is profiles that have not been removed/wiped.
+				 *     0 = Not Removed
+				 *     1 = Removed
+				 *     2 = All
+				 */
+				removed?: components['schemas']['RemovedFilter'] | null;
+			};
+			header?: never;
+			path: {
+				/** @description Guild id to fetch members for (discord/hypixel guild id) */
+				guildId: string;
+				/** @description Id of leaderboard */
+				leaderboard: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GuildMembersLeaderboardDto'];
+				};
+			};
+		};
+	};
+	GetHypixelGuildRank: {
+		parameters: {
+			query?: {
+				sortBy?: components['schemas']['SortHypixelGuildsBy'] | null;
+				collection?: string | null;
+				skill?: string | null;
+			};
+			header?: never;
+			path: {
+				guildId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetHypixelGuildRankResponse'];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+		};
+	};
+	GetHypixelGuilds: {
+		parameters: {
+			query?: {
+				sortBy?: components['schemas']['SortHypixelGuildsBy'] | null;
+				collection?: string | null;
+				skill?: string | null;
+				descending?: boolean | null;
+				page?: number | null;
+				pageSize?: number | null;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetHypixelGuildsResponse'];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+		};
+	};
+	SearchHypixelGuilds: {
+		parameters: {
+			query: {
+				query: string;
+				limit: number;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['SearchHypixelGuildsResponse'];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+		};
+	};
 	GetLeaderboard: {
 		parameters: {
 			query?: {
@@ -10094,14 +12001,18 @@ export interface operations {
 				limit?: number | null;
 				/** @description Time interval key of a monthly leaderboard. Format: yyyy-MM */
 				interval?: string | null;
-				/** @description Game mode to filter leaderboard by. Leave empty to get all modes.
-				 *     Options: "ironman", "island", "classic" */
+				/**
+				 * @description Game mode to filter leaderboard by. Leave empty to get all modes.
+				 *     Options: "ironman", "island", "classic"
+				 */
 				mode?: string | null;
-				/** @description Removed filter to get leaderboard entries that have been removed from the leaderboard.
+				/**
+				 * @description Removed filter to get leaderboard entries that have been removed from the leaderboard.
 				 *     Default is profiles that have not been removed/wiped.
 				 *     0 = Not Removed
 				 *     1 = Removed
-				 *     2 = All */
+				 *     2 = All
+				 */
 				removed?: components['schemas']['RemovedFilter'] | null;
 			};
 			header?: never;
@@ -10168,14 +12079,18 @@ export interface operations {
 				atRank?: number | null;
 				/** @description Time interval key of a monthly leaderboard. Format: yyyy-MM */
 				interval?: string | null;
-				/** @description Game mode to filter leaderboard by. Leave empty to get all modes.
-				 *     Options: "ironman", "island", "classic" */
+				/**
+				 * @description Game mode to filter leaderboard by. Leave empty to get all modes.
+				 *     Options: "ironman", "island", "classic"
+				 */
 				mode?: string | null;
-				/** @description Removed filter to get leaderboard entries that have been removed from the leaderboard.
+				/**
+				 * @description Removed filter to get leaderboard entries that have been removed from the leaderboard.
 				 *     Default is profiles that have not been removed/wiped.
 				 *     0 = Not Removed
 				 *     1 = Removed
-				 *     2 = All */
+				 *     2 = All
+				 */
 				removed?: components['schemas']['RemovedFilter'] | null;
 			};
 			header?: never;
@@ -10248,14 +12163,18 @@ export interface operations {
 				atRank?: number | null;
 				/** @description Time interval key of a monthly leaderboard. Format: yyyy-MM */
 				interval?: string | null;
-				/** @description Game mode to filter leaderboard by. Leave empty to get all modes.
-				 *     Options: "ironman", "island", "classic" */
+				/**
+				 * @description Game mode to filter leaderboard by. Leave empty to get all modes.
+				 *     Options: "ironman", "island", "classic"
+				 */
 				mode?: string | null;
-				/** @description Removed filter to get leaderboard entries that have been removed from the leaderboard.
+				/**
+				 * @description Removed filter to get leaderboard entries that have been removed from the leaderboard.
 				 *     Default is profiles that have not been removed/wiped.
 				 *     0 = Not Removed
 				 *     1 = Removed
-				 *     2 = All */
+				 *     2 = All
+				 */
 				removed?: components['schemas']['RemovedFilter'] | null;
 			};
 			header?: never;
@@ -10375,14 +12294,18 @@ export interface operations {
 				atRank?: number | null;
 				/** @description Time interval key of a monthly leaderboard. Format: yyyy-MM */
 				interval?: string | null;
-				/** @description Game mode to filter leaderboard by. Leave empty to get all modes.
-				 *     Options: "ironman", "island", "classic" */
+				/**
+				 * @description Game mode to filter leaderboard by. Leave empty to get all modes.
+				 *     Options: "ironman", "island", "classic"
+				 */
 				mode?: string | null;
-				/** @description Removed filter to get leaderboard entries that have been removed from the leaderboard.
+				/**
+				 * @description Removed filter to get leaderboard entries that have been removed from the leaderboard.
 				 *     Default is profiles that have not been removed/wiped.
 				 *     0 = Not Removed
 				 *     1 = Removed
-				 *     2 = All */
+				 *     2 = All
+				 */
 				removed?: components['schemas']['RemovedFilter'] | null;
 			};
 			header?: never;
@@ -10742,6 +12665,38 @@ export interface operations {
 			};
 		};
 	};
+	GetProfileAuctions: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				playerUuid: string;
+				profileUuid: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetProfileAuctionsResponse'];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+		};
+	};
 	GetProfileDetails: {
 		parameters: {
 			query?: never;
@@ -10780,6 +12735,40 @@ export interface operations {
 			};
 		};
 	};
+	GetProfileInventory: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				playerUuid: string;
+				profileUuid: string;
+				/** @description Inventory ID */
+				inventory: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HypixelInventoryDto'];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+		};
+	};
 	GetProfileNames: {
 		parameters: {
 			query?: never;
@@ -10798,6 +12787,38 @@ export interface operations {
 				};
 				content: {
 					'application/json': components['schemas']['ProfileNamesDto'][];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+		};
+	};
+	GetProfileNetworth: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				playerUuid: string;
+				profileUuid: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['NetworthBreakdown'];
 				};
 			};
 			/** @description Bad Request */
@@ -10849,6 +12870,123 @@ export interface operations {
 			};
 		};
 	};
+	GetPlayerRecap: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				year: number;
+				playerUuid: string;
+				profileUuid: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['YearlyRecapDto'];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+		};
+	};
+	ToggleRecapVisibility: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				year: number;
+				playerUuid: string;
+				profileUuid: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['ToggleRecapVisibilityRequestBody'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetAuction: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				auctionId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetAuctionResponse'];
+				};
+			};
+		};
+	};
+	GetAuctionHouseOverview: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AuctionOverviewResponse'];
+				};
+			};
+		};
+	};
 	GetAuctionHouseProducts: {
 		parameters: {
 			query?: never;
@@ -10865,6 +13003,145 @@ export interface operations {
 				};
 				content: {
 					'application/json': components['schemas']['AuctionHouseDto'];
+				};
+			};
+		};
+	};
+	GetAuctionPriceHistory: {
+		parameters: {
+			query?: {
+				timespan?: string | null;
+			};
+			header?: never;
+			path: {
+				skyblockId: string;
+				variantKey: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetAuctionPriceHistoryResponse'];
+				};
+			};
+		};
+	};
+	GetAuctionVariants: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				skyblockId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetAuctionVariantsResponse'];
+				};
+			};
+		};
+	};
+	GetItemEndedAuctions: {
+		parameters: {
+			query: {
+				variant?: string | null;
+				limit: number;
+			};
+			header?: never;
+			path: {
+				skyblockId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AuctionDto'][];
+				};
+			};
+		};
+	};
+	GetPopularAuctions: {
+		parameters: {
+			query: {
+				timespan?: string | null;
+				page: number;
+				pageSize: number;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetPopularAuctionsResponse'];
+				};
+			};
+		};
+	};
+	SearchAuctionItems: {
+		parameters: {
+			query: {
+				query: string;
+				limit: number;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['SearchAuctionItemsResponse'];
+				};
+			};
+		};
+	};
+	GetBazaarOverview: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['BazaarOverviewResponse'];
 				};
 			};
 		};
@@ -10891,6 +13168,30 @@ export interface operations {
 			};
 		};
 	};
+	GetBazaarProductHistory: {
+		parameters: {
+			query?: {
+				timespan?: string | null;
+			};
+			header?: never;
+			path: {
+				itemId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetBazaarProductHistoryResponse'];
+				};
+			};
+		};
+	};
 	GetBazaarProducts: {
 		parameters: {
 			query?: never;
@@ -10907,6 +13208,30 @@ export interface operations {
 				};
 				content: {
 					'application/json': components['schemas']['GetBazaarProductsResponse'];
+				};
+			};
+		};
+	};
+	SearchBazaarProducts: {
+		parameters: {
+			query: {
+				query?: string | null;
+				category?: string | null;
+				limit: number;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['SearchBazaarProductsResponse'];
 				};
 			};
 		};
@@ -10947,6 +13272,28 @@ export interface operations {
 				};
 				content: {
 					'application/json': components['schemas']['SkyblockGemShopsResponse'];
+				};
+			};
+		};
+	};
+	GetItemRelated: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				skyblockId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ItemRelatedResponse'];
 				};
 			};
 		};
@@ -11987,6 +14334,122 @@ export interface operations {
 				content: {
 					'application/json': components['schemas']['WeightStyleWithDataDto'][];
 				};
+			};
+		};
+	};
+	GetInventoryItemMeta: {
+		parameters: {
+			query?: {
+				packs?: string | null;
+				/** @description Sub slot if nested inventory */
+				sub?: string | null;
+			};
+			header?: never;
+			path: {
+				inventoryUuid: string;
+				slotId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['InventoryItemMetaResponse'];
+				};
+			};
+		};
+	};
+	GetInventoryItemTexture: {
+		parameters: {
+			query?: {
+				packs?: string | null;
+				/** @description Sub slot if nested inventory */
+				sub?: string | null;
+			};
+			header?: never;
+			path: {
+				inventoryUuid: string;
+				slotId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetItemTexture: {
+		parameters: {
+			query?: {
+				packs?: string | null;
+			};
+			header?: never;
+			path: {
+				itemId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetPetTexture: {
+		parameters: {
+			query?: {
+				packs?: string | null;
+			};
+			header?: never;
+			path: {
+				petId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetTexturePackIcon: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				packId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
 			};
 		};
 	};

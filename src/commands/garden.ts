@@ -245,7 +245,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		embed.addFields({
 			name: 'Crop Milestones',
-			value: cropText.slice(0, 5).join('\n') || 'No crop milestone progress yet!',
+			value: cropText.slice(0, 7).join('\n') || 'No crop milestone progress yet!',
 			inline: true,
 		});
 
@@ -254,10 +254,10 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const milestonesValues = Object.values(milestones);
 		const milestoneAvg = Object.values(milestones).reduce((acc, v) => acc + v.level, 0) / milestonesValues.length;
 
-		if (cropText.length > 5) {
+		if (cropText.length > 7) {
 			embed.addFields({
 				name: `Average • ${(+milestoneAvg.toFixed(1)).toLocaleString()}`,
-				value: cropText.slice(5).join('\n'),
+				value: cropText.slice(7).join('\n'),
 				inline: true,
 			});
 		}

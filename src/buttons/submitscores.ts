@@ -236,6 +236,9 @@ async function execute(interaction: ButtonInteraction) {
 		'melon',
 		'netherWart',
 		'mushroom',
+		'sunflower',
+		'moonflower',
+		'wildRose',
 	];
 	for (const key of Object.keys(leaderboard.crops)) {
 		if (!cropKeys.includes(key)) {
@@ -253,6 +256,9 @@ async function execute(interaction: ButtonInteraction) {
 	leaderboard.crops.melon ??= [];
 	leaderboard.crops.netherWart ??= [];
 	leaderboard.crops.mushroom ??= [];
+	leaderboard.crops.sunflower ??= [];
+	leaderboard.crops.moonflower ??= [];
+	leaderboard.crops.wildRose ??= [];
 
 	const currentScores = {
 		Cactus: leaderboard.crops.cactus,
@@ -265,6 +271,9 @@ async function execute(interaction: ButtonInteraction) {
 		Melon: leaderboard.crops.melon,
 		'Nether Wart': leaderboard.crops.netherWart,
 		Mushroom: leaderboard.crops.mushroom,
+		Sunflower: leaderboard.crops.sunflower,
+		Moonflower: leaderboard.crops.moonflower,
+		'Wild Rose': leaderboard.crops.wildRose,
 	};
 
 	const cropEmbeds = new Map<
@@ -480,7 +489,21 @@ async function execute(interaction: ButtonInteraction) {
 }
 
 export function getLeaderboardComponents(lb: components['schemas']['GuildJacobLeaderboard'], guildId?: string) {
-	const { cactus, carrot, cocoaBeans, melon, mushroom, netherWart, potato, pumpkin, sugarCane, wheat } = lb.crops ?? {};
+	const {
+		cactus,
+		carrot,
+		cocoaBeans,
+		melon,
+		mushroom,
+		netherWart,
+		potato,
+		pumpkin,
+		sugarCane,
+		wheat,
+		sunflower,
+		moonflower,
+		wildRose,
+	} = lb.crops ?? {};
 
 	const headerContainer = new ContainerBuilder();
 
@@ -506,6 +529,9 @@ export function getLeaderboardComponents(lb: components['schemas']['GuildJacobLe
 		new TextDisplayBuilder().setContent(getField('Pumpkin', pumpkin)),
 		new TextDisplayBuilder().setContent(getField('Sugar Cane', sugarCane)),
 		new TextDisplayBuilder().setContent(getField('Wheat', wheat)),
+		new TextDisplayBuilder().setContent(getField('Sunflower', sunflower)),
+		new TextDisplayBuilder().setContent(getField('Moonflower', moonflower)),
+		new TextDisplayBuilder().setContent(getField('Wild Rose', wildRose)),
 	);
 
 	let footerText = '-# Scores are valid starting ';
