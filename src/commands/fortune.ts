@@ -125,27 +125,28 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		if (tool) player.selectTool(tool);
 
 		const progress = player.getCropProgress(crop);
-		const total = progress.reduce((acc, curr) => acc + curr.fortune, 0);
-		const max = progress.reduce((acc, curr) => acc + curr.maxFortune, 0);
+		const total = progress.reduce((acc, curr) => acc + curr.current, 0);
+		const max = progress.reduce((acc, curr) => acc + curr.max, 0);
 
 		return `${GetCropEmoji(crop)} ${progressBar(Math.min(total / max, 1))}`;
 	};
 
 	const sourceProgress = (source: FortuneSourceProgress) => {
-		const total = source.fortune;
-		const max = source.maxFortune;
+		const total = source.current;
+		const max = source.max;
 		const missing =
 			source.api === false && !total
 				? ':warning:'
 				: (source.api === false ? ':warning: **' : '** ') + total.toLocaleString() + '**';
 
 		const name = source.wiki ? `${source.name} [⧉](${source.wiki})` : source.name;
+		const emoji = source.alwaysInclude ? ' ' + fortuneEmoji : '';
 
 		return (
 			`**${name}** \n` +
 			(source.api === false && !total
-				? `-# Configure [on elitebot.dev!](${url})  ${missing} **/ ${max.toLocaleString()}** ${fortuneEmoji}`
-				: `${progressBar(Math.min(total / max, 1), 10)}  ${missing} / ${max.toLocaleString()} ${fortuneEmoji}`)
+				? `-# Configure [on elitebot.dev!](${url})  ${missing} **/ ${max.toLocaleString()}**${emoji}`
+				: `${progressBar(Math.min(total / max, 1), 10)}  ${missing} / ${max.toLocaleString()}${emoji}`)
 		);
 	};
 
@@ -154,8 +155,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		let max = 0;
 
 		for (const source of sources) {
-			total += source.fortune;
-			max += source.maxFortune;
+			total += source.current;
+			max += source.max;
 		}
 
 		return (
@@ -292,7 +293,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const container = new EliteContainer(settings)
 			.addTitle(`## ${GetCropEmoji(crop)} Fortune ${containerTitleSuffix}`, false)
 			.addDescription(
-				`${getCropDisplayName(crop)} Fortune • **${cropFortune.fortune.toLocaleString()}** / ${progress.reduce((acc, curr) => acc + curr.maxFortune, 0).toLocaleString()}`,
+				`${getCropDisplayName(crop)} Fortune • **${cropFortune.fortune.toLocaleString()}** / ${progress.reduce((acc, curr) => acc + curr.max, 0).toLocaleString()}`,
 			)
 			.addSeparator();
 
@@ -402,8 +403,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	function getGeneralFortuneProgress() {
 		const total = player.getProgress();
-		const current = total.reduce((acc, curr) => acc + curr.fortune, 0);
-		const max = total.reduce((acc, curr) => acc + curr.maxFortune, 0);
+		const current = total.reduce((acc, curr) => acc + curr.current, 0);
+		const max = total.reduce((acc, curr) => acc + curr.max, 0);
 
 		const container = new EliteContainer(settings)
 			.addTitle(`## ${fortuneEmoji} General Fortune ` + containerTitleSuffix, false)
@@ -431,7 +432,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	function getGearFortuneProgress() {
 		const total = player.armorSet.getProgress();
 		const current = player.armorSet.fortune;
-		const max = total.reduce((acc, curr) => acc + curr.maxFortune, 0);
+		const max = total.reduce((acc, curr) => acc + curr.max, 0);
 
 		const container = new EliteContainer(settings)
 			.addTitle(`## ${fortuneEmoji} Armor & Equipment Fortune ` + containerTitleSuffix, false)
