@@ -107,7 +107,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		milestones: getCropMilestoneLevels(member.garden?.crops ?? {}),
 		refinedTruffles: member.chocolateFactory?.refinedTrufflesConsumed,
 		cocoaFortuneUpgrade: member.chocolateFactory?.cocoaFortuneUpgrades,
-		exportableCrops: saved?.exported ?? {},
+		exportableCrops: member.unparsed.exportedCrops ?? {},
+		chips: saved?.chips ?? {},
 		attributes: saved?.attributes ?? {},
 		communityCenter: saved?.communityCenter ?? 0,
 	};
@@ -140,7 +141,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				: (source.api === false ? ':warning: **' : '** ') + total.toLocaleString() + '**';
 
 		const name = source.wiki ? `${source.name} [⧉](${source.wiki})` : source.name;
-		const emoji = source.alwaysInclude ? ' ' + fortuneEmoji : '';
+		const emoji = source.stats === undefined ? ' ' + fortuneEmoji : '';
 
 		return (
 			`**${name}** \n` +

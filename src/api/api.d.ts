@@ -3573,9 +3573,9 @@ export interface components {
 			attributes: {
 				[key: string]: number;
 			};
-			/** @description Exported crops */
-			exported: {
-				[key: string]: boolean;
+			/** @description Garden chips */
+			chips: {
+				[key: string]: number;
 			};
 		};
 		MinecraftSkinDto: {
@@ -5363,6 +5363,9 @@ export interface components {
 			consumed: {
 				[key: string]: number;
 			};
+			exportedCrops?: {
+				[key: string]: boolean;
+			} | null;
 			levelCaps: {
 				[key: string]: number;
 			};
@@ -5555,7 +5558,13 @@ export interface components {
 			/** Format: int32 */
 			earthworm: number;
 			/** Format: int32 */
-			mouse?: number | null;
+			mouse: number;
+			/** Format: int32 */
+			dragonfly: number;
+			/** Format: int32 */
+			firefly: number;
+			/** Format: int32 */
+			mantis: number;
 		};
 		FarmingInventoryDto: {
 			armor: components['schemas']['ItemDto'][];
@@ -6419,6 +6428,7 @@ export interface components {
 		ItemGemstoneSlot: {
 			slot_type?: string | null;
 			costs: components['schemas']['ItemGemstoneSlotCosts'][];
+			requirements: components['schemas']['ItemRequirement'][];
 		};
 		ItemGemstoneSlotCosts: {
 			type: string;
@@ -6431,6 +6441,9 @@ export interface components {
 		ItemRequirement: {
 			type: string;
 			skill?: string | null;
+			data_key?: string | null;
+			value?: string | null;
+			operator?: string | null;
 			/** Format: int32 */
 			level: number;
 		} & {

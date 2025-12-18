@@ -10771,7 +10771,7 @@
 			"MemberFortuneSettingsDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["strength", "communityCenter", "attributes", "exported"],
+				"required": ["strength", "communityCenter", "attributes", "chips"],
 				"properties": {
 					"strength": {
 						"type": "integer",
@@ -10791,11 +10791,12 @@
 							"format": "int32"
 						}
 					},
-					"exported": {
+					"chips": {
 						"type": "object",
-						"description": "Exported crops",
+						"description": "Garden chips",
 						"additionalProperties": {
-							"type": "boolean"
+							"type": "integer",
+							"format": "int32"
 						}
 					}
 				}
@@ -16192,6 +16193,13 @@
 							"format": "int32"
 						}
 					},
+					"exportedCrops": {
+						"type": "object",
+						"nullable": true,
+						"additionalProperties": {
+							"type": "boolean"
+						}
+					},
 					"levelCaps": {
 						"type": "object",
 						"additionalProperties": {
@@ -16677,7 +16685,22 @@
 			"PestsDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["beetle", "cricket", "fly", "locust", "mite", "mosquito", "moth", "rat", "slug", "earthworm"],
+				"required": [
+					"beetle",
+					"cricket",
+					"fly",
+					"locust",
+					"mite",
+					"mosquito",
+					"moth",
+					"rat",
+					"slug",
+					"earthworm",
+					"mouse",
+					"dragonfly",
+					"firefly",
+					"mantis"
+				],
 				"properties": {
 					"beetle": {
 						"type": "integer",
@@ -16721,8 +16744,19 @@
 					},
 					"mouse": {
 						"type": "integer",
-						"format": "int32",
-						"nullable": true
+						"format": "int32"
+					},
+					"dragonfly": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"firefly": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"mantis": {
+						"type": "integer",
+						"format": "int32"
 					}
 				}
 			},
@@ -19229,7 +19263,7 @@
 			"ItemGemstoneSlot": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["costs"],
+				"required": ["costs", "requirements"],
 				"properties": {
 					"slot_type": {
 						"type": "string",
@@ -19239,6 +19273,12 @@
 						"type": "array",
 						"items": {
 							"$ref": "#/components/schemas/ItemGemstoneSlotCosts"
+						}
+					},
+					"requirements": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/ItemRequirement"
 						}
 					}
 				}
@@ -19270,6 +19310,18 @@
 						"type": "string"
 					},
 					"skill": {
+						"type": "string",
+						"nullable": true
+					},
+					"data_key": {
+						"type": "string",
+						"nullable": true
+					},
+					"value": {
+						"type": "string",
+						"nullable": true
+					},
+					"operator": {
 						"type": "string",
 						"nullable": true
 					},
