@@ -302,7 +302,6 @@ function makeField(
 					crop,
 					collection,
 					blocksBroken,
-					useDicers,
 					useMooshroom,
 				}),
 				0,

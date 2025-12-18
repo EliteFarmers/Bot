@@ -52,6 +52,12 @@ const command = new EliteCommand({
 			builder: (b) =>
 				b.addChoices({ name: 'Mooshroom Cow', value: 'mooshroom' }, { name: 'Elephant', value: 'elephant' }),
 		},
+		'max-tool': {
+			name: 'max-tool',
+			description: 'Whether to use a level 50 farming tool! (default: false)',
+			type: SlashCommandOptionType.Boolean,
+			builder: (b) => b.setRequired(false),
+		},
 		bps: {
 			name: 'bps',
 			description: 'Your blocks broken per second! (10-20)',
@@ -71,6 +77,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const reforge = interaction.options.getString('reforge', false) ?? 'bountiful';
 	const pet = interaction.options.getString('pet', false) ?? 'mooshroom';
 	const bps = interaction.options.getNumber('bps', false) ?? 20;
+	const useLevel50Tool = interaction.options.getBoolean('max-tool', false) ?? false;
 	const timeName = TIME_OPTIONS[blocks as keyof typeof TIME_OPTIONS];
 	const blocksBroken = Math.round(blocks * (bps / 20));
 
@@ -79,6 +86,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		blocksBroken: blocksBroken,
 		bountiful: reforge === 'bountiful',
 		mooshroom: pet === 'mooshroom',
+		maxTool: useLevel50Tool,
 	}) as Partial<ReturnType<typeof calculateDetailedAverageDrops>>;
 
 	delete expectedDrops[Crop.Seeds];
