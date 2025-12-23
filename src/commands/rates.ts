@@ -91,9 +91,13 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	delete expectedDrops[Crop.Seeds];
 
-	const allIds = Object.values(CROP_INFO)
+	const craftIds = Object.values(CROP_INFO)
 		.map((info) => info.crafts.map((c) => c.item))
 		.flat();
+	const dropIds = Object.values(expectedDrops)
+		.flatMap((details) => Object.keys(details.items ?? {}))
+		.filter((id) => id !== Crop.Seeds);
+	const allIds = [...new Set([...craftIds, ...dropIds])];
 	const { data: bazaar } = await FetchProducts(allIds);
 
 	let amountLength = 0;
@@ -104,7 +108,43 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		.map(([crop, details]) => {
 			const cropName = getCropDisplayName(crop as Crop);
 			const profit = details.npcCoins ?? 0;
-			const otherCoins = details.npcCoins - (details.items[crop] ?? 0) * details.npcPrice;
+			const cropItems = details.items?.[crop] ?? 0;
+			const otherCoinsNpc = (details.npcCoins ?? 0) - cropItems * details.npcPrice;
+
+			const sellToBazaar: { itemId: string; name: string; items: number; npc: number; per: number; gain: number }[] =
+				[];
+			let sellToBazaarCoins = 0;
+			let sellToBazaarDelta = 0;
+
+			for (const [itemId, items] of Object.entries(details.items ?? {})) {
+				if (itemId === crop) continue;
+				if (!items || items <= 0) continue;
+
+				const itemData = bazaar?.items?.[itemId];
+				const bzData = itemData?.bazaar;
+				if (!bzData) continue;
+
+				const npc = bzData.npc ?? 0;
+				const per = bzData.averageSellOrder ?? 0;
+				if (per <= npc || per <= 0) continue;
+
+				const gain = items * (per - npc);
+				sellToBazaarDelta += gain;
+				sellToBazaarCoins += items * per;
+				sellToBazaar.push({
+					itemId,
+					name: itemData?.name ?? itemId,
+					items,
+					npc,
+					per,
+					gain,
+				});
+			}
+
+			sellToBazaar.sort((a, b) => b.gain - a.gain);
+
+			const otherCoinsTotal = otherCoinsNpc + sellToBazaarDelta;
+			const otherCoinsNpcRemaining = Math.max(0, otherCoinsTotal - sellToBazaarCoins);
 
 			const crafts = getPossibleResultsFromCrops(crop as Crop, details.items[crop] ?? details.collection);
 			const bz = [];
@@ -122,7 +162,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 					cost: craft.fractionalCost,
 					per: bzData.bazaar.averageSellOrder,
 					profit: Math.floor(profit),
-					total: Math.floor(profit + otherCoins),
+					total: Math.floor(profit + otherCoinsTotal),
 				});
 			}
 
@@ -139,6 +179,12 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				crop: crop as Crop,
 				emoji: GetCropEmoji(cropName),
 				bz: bz.length ? bz : [{ name: 'N/A', items: 0, cost: 0, per: 0, profit: 0, total: 0 }],
+				other: {
+					total: Math.floor(otherCoinsTotal),
+					npc: Math.floor(otherCoinsNpcRemaining),
+					bazaar: Math.floor(sellToBazaarCoins),
+					sellToBazaar: sellToBazaar.map((x) => ({ ...x, items: x.items })),
+				},
 				details,
 				profit,
 			};
@@ -264,10 +310,20 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 					text:
 						cropInfo.bz
 							.map(({ name, items, profit, total, per }, i) => {
-								return `${i === 0 ? ':star: ' : ''}**${name}:** ${total.toLocaleString()} \n-# **${Math.floor(items).toLocaleString()}** items at **${per.toLocaleString()}** coins each for **${profit.toLocaleString()}** coins plus other items`;
+								return `${i === 0 ? ':star: ' : ''}**${name}:** ${total.toLocaleString()} :coin:\n-# **${Math.floor(items).toLocaleString()}** items at **${per.toLocaleString()}** coins each for **${profit.toLocaleString()}** coins plus other items`;
 							})
 							.join('\n') +
-						`\n\n-# Other items: **${Math.floor(cropInfo.bz[0].total - cropInfo.bz[0].profit).toLocaleString()}** coins to NPC` +
+						(cropInfo.other.sellToBazaar.length
+							? `\n\n**Sell these other drops to BZ:**\n` +
+								cropInfo.other.sellToBazaar
+									.map((x) => {
+										const itemsText = x.items % 1 === 0 ? Math.floor(x.items).toLocaleString() : x.items.toFixed(2);
+										const bzCoins = Math.floor(x.items * x.per);
+										return `**${x.name}:** ${bzCoins.toLocaleString()} :coin:\n-# **${itemsText}** items at **${x.per.toLocaleString()}** coins each instead of **${x.npc.toLocaleString()}** to NPC (+**${Math.floor(x.gain).toLocaleString()}**)`;
+									})
+									.join('\n')
+							: '') +
+						`\n\n-# Included in totals: Other items = **${cropInfo.other.total.toLocaleString()}** coins (**${cropInfo.other.npc.toLocaleString()}** to NPC, **${cropInfo.other.bazaar.toLocaleString()}** to BZ)` +
 						`\n-# Prices used are averaged sell order prices, not insta-sell prices.`,
 				},
 			})
