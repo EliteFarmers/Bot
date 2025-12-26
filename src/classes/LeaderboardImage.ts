@@ -39,14 +39,14 @@ export async function GenerateLeaderboardImage(guildName: string, lb: components
 		'Carrot',
 		'Cocoa Beans',
 		'Melon',
+		'Moonflower',
 		'Mushroom',
 		'Nether Wart',
 		'Potato',
 		'Pumpkin',
 		'Sugar Cane',
-		'Wheat',
 		'Sunflower',
-		'Moonflower',
+		'Wheat',
 		'Wild Rose',
 	];
 

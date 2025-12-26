@@ -20,7 +20,7 @@ import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/in
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 import { GenerateLeaderboardImage } from '../classes/LeaderboardImage.js';
 import { GetReadableDate } from '../classes/SkyblockDate.js';
-import { CropSelectRow, escapeIgn, GetCropEmoji, GetCropTuple, GetCropURL } from '../classes/Util.js';
+import { CropSelectRow, escapeIgn, GetCropEmoji, GetCropTuple } from '../classes/Util.js';
 
 const command = new EliteCommand({
 	name: 'LBSUBMIT',
@@ -321,10 +321,13 @@ async function execute(interaction: ButtonInteraction) {
 		if (!updateContainer) {
 			updateContainer = {
 				container: new ContainerBuilder().setAccentColor(GetCropTuple(crop)),
-				section: new SectionBuilder()
-					.addTextDisplayComponents((b) =>
-						b.setContent(oldIndex === 0 ? `## ${GetCropEmoji(crop)} New High Score for ${crop}!` : `## ${GetCropEmoji(crop)} New Score for ${crop}!`),
-					)
+				section: new SectionBuilder().addTextDisplayComponents((b) =>
+					b.setContent(
+						oldIndex === 0
+							? `## ${GetCropEmoji(crop)} New High Score for ${crop}!`
+							: `## ${GetCropEmoji(crop)} New Score for ${crop}!`,
+					),
+				),
 			};
 
 			updateContainer.container.addSectionComponents(updateContainer.section);
@@ -343,8 +346,9 @@ async function execute(interaction: ButtonInteraction) {
 					account.name,
 				)})** has beaten <@${old.discordId}> (${escapeIgn(old.ign)}) by **${(
 					collected - old.record.collected
-				).toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0
-					})`;
+				).toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${
+					contest.timestamp ?? 0
+				})`;
 
 				// Check if this knocked someone out of the top 3
 				if (scores.length > 2 && !scores.some((s) => s.discordId === interaction.user.id)) {
@@ -360,8 +364,9 @@ async function execute(interaction: ButtonInteraction) {
 
 				message += `\n<@${interaction.user.id}> **(${escapeIgn(
 					account.name,
-				)})** improved their score by **${improvement.toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0
-					})`;
+				)})** improved their score by **${improvement.toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${
+					contest.timestamp ?? 0
+				})`;
 			}
 
 			updateContainer.section.addTextDisplayComponents((b) => b.setContent(`${message}`));
@@ -373,7 +378,8 @@ async function execute(interaction: ButtonInteraction) {
 				b.setContent(
 					`\n${prefix}<@${interaction.user.id}> **(${escapeIgn(
 						account.name,
-					)})** has set a new score of **${collected.toLocaleString()}** collection! [⧉](https://elitebot.dev/contest/${contest.timestamp ?? 0
+					)})** has set a new score of **${collected.toLocaleString()}** collection! [⧉](https://elitebot.dev/contest/${
+						contest.timestamp ?? 0
 					})`,
 				),
 			);
