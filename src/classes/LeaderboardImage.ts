@@ -118,9 +118,17 @@ export async function GenerateLeaderboardImage(guildName: string, lb: components
 				if (index === 0) ctx.font = 'bold 26px "Open Sans"';
 				else ctx.font = '24px "Open Sans"';
 
-				ctx.fillText(`${rank}. ${score}`, x + 20, scoreY);
+				// Rank
+				const originalFill = ctx.fillStyle;
+				ctx.fillStyle = '#80848E';
+				ctx.fillText(`${rank}.`, x + 20, scoreY);
+				const rankWidth = ctx.measureText(`${rank}.`).width;
 
-				// Right align name
+				// Score
+				ctx.fillStyle = originalFill;
+				ctx.fillText(score, x + 20 + rankWidth + 8, scoreY);
+
+				// Name
 				ctx.textAlign = 'right';
 				ctx.fillText(displayName, x + colWidth - 20, scoreY);
 				ctx.textAlign = 'left';
