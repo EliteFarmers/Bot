@@ -1,11 +1,13 @@
 import {
 	APIContainerComponent,
 	APITextDisplayComponent,
+	AttachmentBuilder,
 	ButtonBuilder,
 	ButtonInteraction,
 	ButtonStyle,
 	ChannelType,
 	ContainerBuilder,
+	MediaGalleryBuilder,
 	MessageFlags,
 	PermissionFlagsBits,
 	SectionBuilder,
@@ -16,15 +18,9 @@ import { FetchAccount, FetchContests, FetchGuildJacob, FetchSelectedProfile, Upd
 import { commandReferences } from '../bot.js';
 import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
+import { GenerateLeaderboardImage } from '../classes/LeaderboardImage.js';
 import { GetReadableDate } from '../classes/SkyblockDate.js';
-import {
-	escapeIgn,
-	GetCropEmoji,
-	GetCropTuple,
-	GetCropURL,
-	GetEmbeddedTimestamp,
-	UserHyperLink,
-} from '../classes/Util.js';
+import { CropSelectRow, escapeIgn, GetCropTuple, GetCropURL } from '../classes/Util.js';
 
 const command = new EliteCommand({
 	name: 'LBSUBMIT',
@@ -93,9 +89,10 @@ async function execute(interaction: ButtonInteraction) {
 
 	if (!interaction.message.flags.has(MessageFlags.IsComponentsV2)) {
 		await interaction.message.delete().catch(() => undefined);
+		const payload = await getLeaderboardPayload(leaderboard, interaction.guildId, interaction.guild.name);
 		await interaction.channel
 			?.send({
-				components: getLeaderboardComponents(leaderboard, interaction.guildId),
+				...payload,
 				allowedMentions: { parse: [] },
 				flags: [MessageFlags.IsComponentsV2, MessageFlags.SuppressNotifications],
 			})
@@ -103,9 +100,10 @@ async function execute(interaction: ButtonInteraction) {
 	}
 
 	if (isAdmin) {
+		const payload = await getLeaderboardPayload(leaderboard, interaction.guildId, interaction.guild.name);
 		await interaction.message
 			.edit({
-				components: getLeaderboardComponents(leaderboard, interaction.guildId),
+				...payload,
 				allowedMentions: { parse: [] },
 			})
 			.catch(() => undefined);
@@ -478,32 +476,23 @@ async function execute(interaction: ButtonInteraction) {
 		interaction.editReply({ embeds: [embed] });
 	}
 
-	const components = getLeaderboardComponents(leaderboard, interaction.guildId);
+	const payload = await getLeaderboardPayload(leaderboard, interaction.guildId, interaction.guild.name);
 
 	interaction.message
 		.edit({
-			components,
+			...payload,
 			allowedMentions: { parse: [] },
 		})
 		.catch(() => undefined);
 }
 
-export function getLeaderboardComponents(lb: components['schemas']['GuildJacobLeaderboard'], guildId?: string) {
-	const {
-		cactus,
-		carrot,
-		cocoaBeans,
-		melon,
-		mushroom,
-		netherWart,
-		potato,
-		pumpkin,
-		sugarCane,
-		wheat,
-		sunflower,
-		moonflower,
-		wildRose,
-	} = lb.crops ?? {};
+export async function getLeaderboardPayload(
+	lb: components['schemas']['GuildJacobLeaderboard'],
+	guildId?: string,
+	guildName = "Jacob's Contest",
+) {
+	const buffer = await GenerateLeaderboardImage(guildName, lb);
+	const attachment = new AttachmentBuilder(buffer, { name: 'leaderboard.png' });
 
 	const headerContainer = new ContainerBuilder();
 
@@ -515,24 +504,6 @@ export function getLeaderboardComponents(lb: components['schemas']['GuildJacobLe
 	);
 
 	headerContainer.addTextDisplayComponents(headerText);
-
-	const container = new ContainerBuilder();
-
-	container.addTextDisplayComponents(
-		new TextDisplayBuilder().setContent(getField('Cactus', cactus)),
-		new TextDisplayBuilder().setContent(getField('Carrot', carrot)),
-		new TextDisplayBuilder().setContent(getField('Cocoa Beans', cocoaBeans)),
-		new TextDisplayBuilder().setContent(getField('Melon', melon)),
-		new TextDisplayBuilder().setContent(getField('Mushroom', mushroom)),
-		new TextDisplayBuilder().setContent(getField('Nether Wart', netherWart)),
-		new TextDisplayBuilder().setContent(getField('Potato', potato)),
-		new TextDisplayBuilder().setContent(getField('Pumpkin', pumpkin)),
-		new TextDisplayBuilder().setContent(getField('Sugar Cane', sugarCane)),
-		new TextDisplayBuilder().setContent(getField('Wheat', wheat)),
-		new TextDisplayBuilder().setContent(getField('Sunflower', sunflower)),
-		new TextDisplayBuilder().setContent(getField('Moonflower', moonflower)),
-		new TextDisplayBuilder().setContent(getField('Wild Rose', wildRose)),
-	);
 
 	let footerText = '-# Scores are valid starting ';
 	if (!lb.startCutoff || lb.startCutoff === -1) {
@@ -552,6 +523,8 @@ export function getLeaderboardComponents(lb: components['schemas']['GuildJacobLe
 
 	footerContainer.addTextDisplayComponents(footerTextComponent);
 
+	footerContainer.addActionRowComponents(CropSelectRow(`LB_DETAILS|${lb.id}`, 'Select a crop to view detailed stats!'));
+
 	footerContainer.addActionRowComponents((row) =>
 		row.addComponents(
 			new ButtonBuilder().setCustomId(`LBSUBMIT|${lb.id}`).setLabel('Submit Scores').setStyle(ButtonStyle.Primary),
@@ -562,32 +535,10 @@ export function getLeaderboardComponents(lb: components['schemas']['GuildJacobLe
 		),
 	);
 
-	return [headerContainer, container, footerContainer];
+	const mediaGallery = new MediaGalleryBuilder().addItems((b) => b.setURL('attachment://leaderboard.png'));
+
+	return {
+		components: [headerContainer, mediaGallery, footerContainer],
+		files: [attachment],
+	};
 }
-
-function getField(crop: string, scores?: components['schemas']['GuildJacobLeaderboardEntry'][]) {
-	if (!scores || scores.length === 0) {
-		return `### ${GetCropEmoji(crop)} ${crop} \nNo Scores Set Yet!`;
-	}
-
-	const first = scores[0];
-	const otherScores = scores
-		.slice(1)
-		.map((s, i) => {
-			return `${i + 2}. ${scoreFormat(s.record?.collected)}  ${UserHyperLink(s.discordId)}  ${GetEmbeddedTimestamp(
-				s.record?.timestamp ?? 0,
-			)} [⧉](https://elitebot.dev/contest/${s.record?.timestamp ?? 0})`;
-		})
-		.join('\n');
-
-	const value =
-		`1. **${scoreFormat(first.record?.collected)}**  ${UserHyperLink(first.discordId)}  ${GetEmbeddedTimestamp(
-			first.record?.timestamp ?? 0,
-		)} [⧉](https://elitebot.dev/contest/${first.record?.timestamp ?? 0})\n` + otherScores.trim();
-
-	return `### ${GetCropEmoji(crop)} ${crop} - ${first.ign}\n${value.trim()}`;
-}
-
-const scoreFormat = (collected = 0) => {
-	return `\`${collected.toLocaleString().padStart(9, ' ')}\``;
-};

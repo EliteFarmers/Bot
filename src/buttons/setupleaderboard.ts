@@ -2,7 +2,7 @@ import { ButtonInteraction, MessageFlags, PermissionFlagsBits } from 'discord.js
 import { FetchGuildJacob } from '../api/elite.js';
 import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed } from '../classes/embeds.js';
-import { getLeaderboardComponents } from './submitscores.js';
+import { getLeaderboardPayload } from './submitscores.js';
 
 const command = new EliteCommand({
 	name: 'LBSETUP',
@@ -30,8 +30,6 @@ async function execute(interaction: ButtonInteraction) {
 		.then((data) => data.data)
 		.catch(() => undefined);
 
-	console.log(guild);
-
 	if (!guild) {
 		const embed = ErrorEmbed('Jacob Leaderboards not available!').setDescription(
 			'This server does not have Jacob Leaderboards enabled.\nIf you were expecting this to work, please contact "kaeso.dev" on Discord.\nThis feature is being remade currently, and will likely be a paid feature. Sorry for the inconvenience.',
@@ -54,12 +52,12 @@ async function execute(interaction: ButtonInteraction) {
 	const embed = EliteEmbed().setTitle('Leaderboard Setup').setDescription('Setup!');
 	interaction.editReply({ embeds: [embed] });
 
-	const components = getLeaderboardComponents(leaderboard, interaction.guildId);
+	const payload = await getLeaderboardPayload(leaderboard, interaction.guildId, interaction.guild.name);
 
 	interaction.message.delete().catch(() => undefined);
 	interaction.channel
 		?.send({
-			components,
+			...payload,
 			allowedMentions: { parse: [] },
 			flags: [MessageFlags.IsComponentsV2, MessageFlags.SuppressNotifications],
 		})

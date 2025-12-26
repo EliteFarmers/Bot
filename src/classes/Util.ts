@@ -96,32 +96,19 @@ export function GetEmbeddedTimestamp(unixSeconds: number, format = 'R') {
 }
 
 export function GetCropURL(crop: string) {
-	if (crop === 'Cactus')
-		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978759197294602/cactus.png';
-	if (crop === 'Carrot')
-		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978766868697168/carrot.png';
-	if (crop === 'Cocoa Beans')
-		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978774053535804/cocoa_beans.png';
-	if (crop === 'Melon')
-		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978782832214100/melon.png';
-	if (crop === 'Mushroom')
-		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978789526306846/mushroom.png';
-	if (crop === 'Nether Wart')
-		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978796912492564/nether_wart.png';
-	if (crop === 'Potato')
-		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978803854061638/potato.png';
-	if (crop === 'Pumpkin')
-		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978810653024256/pumpkin.png';
-	if (crop === 'Sugar Cane')
-		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978817150009355/sugar_cane.png';
-	if (crop === 'Wheat')
-		return 'https://media.discordapp.net/attachments/1115349089782087731/1191978823630209024/wheat.png';
-	if (crop === 'Sunflower')
-		return 'https://media.discordapp.net/attachments/1115349089782087731/1450021025503772692/sunflower.png';
-	if (crop === 'Moonflower')
-		return 'https://media.discordapp.net/attachments/1115349089782087731/1450021025025884230/moonflower.png';
-	if (crop === 'Wild Rose')
-		return 'https://media.discordapp.net/attachments/1115349089782087731/1450021025948635340/wildrose.png';
+	if (crop === 'Cactus') return 'https://elitebot.dev/images/crops/cactus.png';
+	if (crop === 'Carrot') return 'https://elitebot.dev/images/crops/carrot.png';
+	if (crop === 'Cocoa Beans') return 'https://elitebot.dev/images/crops/cocoa.png';
+	if (crop === 'Melon') return 'https://elitebot.dev/images/crops/melon.png';
+	if (crop === 'Mushroom') return 'https://elitebot.dev/images/crops/mushroom.png';
+	if (crop === 'Nether Wart') return 'https://elitebot.dev/images/crops/netherwart.png';
+	if (crop === 'Potato') return 'https://elitebot.dev/images/crops/potato.png';
+	if (crop === 'Pumpkin') return 'https://elitebot.dev/images/crops/pumpkin.png';
+	if (crop === 'Sugar Cane') return 'https://elitebot.dev/images/crops/sugarcane.png';
+	if (crop === 'Wheat') return 'https://elitebot.dev/images/crops/wheat.png';
+	if (crop === 'Sunflower') return 'https://elitebot.dev/images/crops/sunflower.png';
+	if (crop === 'Moonflower') return 'https://elitebot.dev/images/crops/moonflower.png';
+	if (crop === 'Wild Rose') return 'https://elitebot.dev/images/crops/wildrose.png';
 
 	return undefined;
 }
