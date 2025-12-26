@@ -10,7 +10,6 @@ import {
 	MediaGalleryBuilder,
 	MessageFlags,
 	PermissionFlagsBits,
-	SectionBuilder,
 	TextDisplayBuilder,
 } from 'discord.js';
 import { components } from '../api/api.js';
@@ -274,13 +273,7 @@ async function execute(interaction: ButtonInteraction) {
 		'Wild Rose': leaderboard.crops.wildRose,
 	};
 
-	const cropEmbeds = new Map<
-		string,
-		{
-			container: ContainerBuilder;
-			section: SectionBuilder;
-		}
-	>();
+	const cropEmbeds = new Map<string, ContainerBuilder>();
 
 	validContests.sort((a, b) => (b.collected ?? 0) - (a.collected ?? 0));
 	let sendPing = false;
@@ -319,18 +312,15 @@ async function execute(interaction: ButtonInteraction) {
 		let updateContainer = cropEmbeds.get(crop);
 
 		if (!updateContainer) {
-			updateContainer = {
-				container: new ContainerBuilder().setAccentColor(GetCropTuple(crop)),
-				section: new SectionBuilder().addTextDisplayComponents((b) =>
+			updateContainer = new ContainerBuilder()
+				.setAccentColor(GetCropTuple(crop))
+				.addTextDisplayComponents((b) =>
 					b.setContent(
 						oldIndex === 0
 							? `## ${GetCropEmoji(crop)} New High Score for ${crop}!`
 							: `## ${GetCropEmoji(crop)} New Score for ${crop}!`,
 					),
-				),
-			};
-
-			updateContainer.container.addSectionComponents(updateContainer.section);
+				);
 		}
 
 		if (old?.record?.collected) {
@@ -369,12 +359,12 @@ async function execute(interaction: ButtonInteraction) {
 				})`;
 			}
 
-			updateContainer.section.addTextDisplayComponents((b) => b.setContent(`${message}`));
+			updateContainer.addTextDisplayComponents((b) => b.setContent(`${message}`));
 		} else {
 			sendPing = true;
 			const prefix =
 				scores.length === 0 ? '' : scores.length === 1 ? '**New 2nd Place Score!**\n' : '**New 3rd Place Score!**\n';
-			updateContainer.section.addTextDisplayComponents((b) =>
+			updateContainer.addTextDisplayComponents((b) =>
 				b.setContent(
 					`\n${prefix}<@${interaction.user.id}> **(${escapeIgn(
 						account.name,
@@ -423,7 +413,7 @@ async function execute(interaction: ButtonInteraction) {
 		return;
 	}
 
-	const componentsToSend = Array.from(cropEmbeds.values()).map((c) => c.container);
+	const componentsToSend = Array.from(cropEmbeds.values());
 	const newRecords = componentsToSend.length > 0;
 
 	if (leaderboard.updateChannelId && newRecords) {
