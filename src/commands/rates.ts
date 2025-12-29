@@ -195,7 +195,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const description =
 		`Expected rates for **${fortuneInput?.toLocaleString() ?? 'MAX'}** Farming Fortune in **${timeName}**! ` +
 		`\nUsing **${reforge === 'bountiful' ? 'Bountiful' : 'Blessed'}**, ` +
-		`**${pet === 'mooshroom' ? 'Mooshroom Cow' : 'Elephant'}**, and **4/4ths Fermento Armor**!\n` +
+		`**${pet === 'mooshroom' ? 'Mooshroom Cow' : 'Elephant'}**, and **4/4ths Helianthus Armor**!\n` +
 		bpsText;
 
 	await interaction.deferReply();
@@ -272,7 +272,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const cropDetails =
 			`\nUsing **${reforge === 'bountiful' ? 'Bountiful' : 'Blessed'}**, ` +
 			`**${pet === 'mooshroom' ? 'Mooshroom Cow' : 'Elephant'}**, ` +
-			`and **4/4ths Fermento Armor**!`;
+			`and **4/4ths Helianthus Armor**!`;
 
 		const threeFourths = calculateAverageSpecialCrops(blocksBroken, crop as Crop, 3);
 		const fromSpecial = cropInfo.details.coinSources[threeFourths.type] ?? 0;
@@ -297,7 +297,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 								return `- **${source}:** ${amount?.toLocaleString()}`;
 							})
 							.join('\n') +
-						`\n### 3/4ths Fermento Armor\n:coin: ${threeFourthsTotal?.toLocaleString() ?? '0'} ⠀ ${(specialDifference).toLocaleString()} less coins (~${threeFourths.amount.toLocaleString()} ${threeFourths.type})`,
+						`\n### 3/4ths Helianthus Armor\n:coin: ${threeFourthsTotal?.toLocaleString() ?? '0'} ⠀ ${(specialDifference).toLocaleString()} less coins (~${threeFourths.amount.toLocaleString()} ${threeFourths.type})`,
 				},
 			})
 			.addSeparator()
