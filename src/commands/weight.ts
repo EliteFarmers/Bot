@@ -209,14 +209,14 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		const weightRankText =
 			weightRank > -1
-				? `[#${weightRank}](https://elitebot.dev/leaderboard/farmingweight/${account?.id}-${profile?.profileId}) • `
+				? `[#${weightRank}](https://elitebot.dev/leaderboard/farmingweight/${account.name}-${profile.profileName}?fallback=${weightRank}) • `
 				: '';
 
 		const farmingRank = rankings?.farming?.rank ?? -1;
 		const farmingLevel = getLevel(member?.skills?.farming ?? 0, LEVELING_XP, 50 + (member?.jacob.perks?.levelCap ?? 0));
 		const farmingRankText =
 			farmingRank > -1
-				? `[#${farmingRank}](https://elitebot.dev/leaderboard/farming/${account?.id}-${profile?.profileId}) • `
+				? `[#${farmingRank}](https://elitebot.dev/leaderboard/farming/${account.name}-${profile.profileName}?fallback=${farmingRank}) • `
 				: '';
 
 		embed.addFields(
@@ -252,7 +252,9 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 			const { rank = -1, key: lb } = cropRanks.find((c) => c.crop === crop) ?? {};
 			const rankString =
-				rank > -1 ? `[#${rank}](https://elitebot.dev/leaderboard/${lb}/${account?.id}-${profile?.profileId}) • ` : '';
+				rank > -1
+					? `[#${rank}](https://elitebot.dev/leaderboard/${lb}/${account.name}-${profile.profileName}?fallback=${rank}) • `
+					: '';
 
 			return (
 				`${GetCropEmoji(key)} **${(+(value?.toFixed(2) ?? 0))?.toLocaleString() ?? 0}** ⠀${percent > 2 ? `${percent}%` : ''}` +

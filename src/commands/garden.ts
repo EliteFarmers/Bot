@@ -149,7 +149,15 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		}
 
 		if (button.customId === 'uncommon') {
-			await button.update(getVisitorsPayload(true));
+			await button.update(getVisitorsPayload('uncommon'));
+		}
+
+		if (button.customId === 'uncommon-2') {
+			await button.update(getVisitorsPayload('uncommon-2'));
+		}
+
+		if (button.customId === 'rare') {
+			await button.update(getVisitorsPayload('rare'));
 		}
 
 		if (button.customId === 'overflow') {
@@ -162,7 +170,15 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		}
 
 		if (button.customId === 'missing-uncommon') {
-			await button.update(getMissingVisitors(true));
+			await button.update(getMissingVisitors('uncommon'));
+		}
+
+		if (button.customId === 'missing-uncommon-2') {
+			await button.update(getMissingVisitors('uncommon-2'));
+		}
+
+		if (button.customId === 'missing-rare') {
+			await button.update(getMissingVisitors('rare'));
 		}
 	});
 
@@ -189,7 +205,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		levelText += `\n-# ${(garden?.experience ?? 0).toLocaleString()} Total XP`;
 
 		levelText += `\n**Visitors**`;
-		levelText += `\nUnique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**/84`;
+		levelText += `\nUnique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**/137`;
 		levelText += `\nAccepted • **${(garden?.completedVisitors ?? 0).toLocaleString()}**`;
 		levelText += `\nRejected • **${(rejectedVisitors ?? 0).toLocaleString()}**`;
 
@@ -286,22 +302,40 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		return { embeds: [embed], components: [linkRow] };
 	}
 
-	function getVisitorsPayload(uncommon = false) {
+	function getVisitorsPayload(page: 'main' | 'uncommon' | 'uncommon-2' | 'rare' = 'main') {
 		const visitorsByRarity = groupGardenVisitors(
 			(garden?.visitors ?? {}) as Record<string, { visits: number; accepted: number }>,
 		);
+
+		const uncommonVisitors = visitorsByRarity[Rarity.Uncommon] ?? [];
+		const rareVisitors = visitorsByRarity[Rarity.Rare] ?? [];
+		const uncommonHalfLength = Math.ceil(uncommonVisitors.length / 2);
 
 		let fieldCount = 0;
 		const visitorsList = Object.entries(visitorsByRarity)
 			.sort(([a], [b]) => compareRarity(b as Rarity, a as Rarity))
 			.map(([rarity, visitors]) => {
-				if (uncommon && rarity !== Rarity.Uncommon) return undefined;
+				const isUncommon = rarity === Rarity.Uncommon;
+				const isRare = rarity === Rarity.Rare;
+
+				if (page === 'uncommon' && !isUncommon) return undefined;
+				if (page === 'uncommon-2' && !isUncommon) return undefined;
+				if (page === 'rare' && !isRare) return undefined;
 
 				const accepted = visitors.reduce((acc, v) => acc + v.accepted, 0);
 				const visits = visitors.reduce((acc, v) => acc + v.visits, 0);
 
-				const skipText = rarity === Rarity.Uncommon && !uncommon;
-				const splitBy = visitors.length > 5 ? Math.ceil(visitors.length / 3) : 5;
+				const skipUncommon = isUncommon && page === 'main';
+				const skipRare = isRare && page === 'main';
+
+				let displayVisitors = visitors;
+				if (page === 'uncommon') {
+					displayVisitors = visitors.slice(0, uncommonHalfLength);
+				} else if (page === 'uncommon-2') {
+					displayVisitors = visitors.slice(uncommonHalfLength);
+				}
+
+				const splitBy = displayVisitors.length > 5 ? Math.ceil(displayVisitors.length / 3) : 5;
 				const result = [];
 
 				if (rarity !== Rarity.Special && rarity !== Rarity.Mythic) {
@@ -311,19 +345,31 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 					}
 				}
 
-				for (let i = 0; i < visitors.length; i += splitBy) {
-					const chunk = visitors.slice(i, i + splitBy);
-
+				if (skipUncommon || skipRare) {
 					fieldCount++;
 					result.push({
-						name: i === 0 ? `**${rarity}** • **${accepted.toLocaleString()}**/${visits.toLocaleString()}` : EmptyString,
-						value: skipText
-							? '-# Click "Uncommon" to see these!'
-							: chunk.map((v) => `-# ${v.short ?? v.name} • **${v.accepted}**/${v.visits}`).join('\n'),
+						name: `**${rarity}** • **${accepted.toLocaleString()}**/${visits.toLocaleString()}`,
+						value: `-# Click "${rarity}" to see these!`,
 						inline: true,
 					});
+					return result;
+				}
 
-					if (skipText) break;
+				for (let i = 0; i < displayVisitors.length; i += splitBy) {
+					const chunk = displayVisitors.slice(i, i + splitBy);
+
+					fieldCount++;
+					const headerName =
+						page === 'uncommon-2' && i === 0
+							? `**${rarity}** (cont.)`
+							: i === 0
+								? `**${rarity}** • **${accepted.toLocaleString()}**/${visits.toLocaleString()}`
+								: EmptyString;
+					result.push({
+						name: headerName,
+						value: chunk.map((v) => `-# ${v.short ?? v.name} • **${v.accepted}**/${v.visits}`).join('\n'),
+						inline: true,
+					});
 				}
 
 				return result;
@@ -334,10 +380,16 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const acceptanceRate =
 			((garden?.completedVisitors ?? 0) / ((garden?.completedVisitors ?? 0) + rejectedVisitors)) * 100;
 		const acceptanceRateText = isNaN(acceptanceRate) ? '0.00' : `${acceptanceRate.toFixed(2)}`;
+
+		let titleSuffix = '';
+		if (page === 'uncommon') titleSuffix = ' - Uncommon (1/2)';
+		else if (page === 'uncommon-2') titleSuffix = ' - Uncommon (2/2)';
+		else if (page === 'rare') titleSuffix = ' - Rare';
+
 		const embed = EliteEmbed(settings)
-			.setTitle(`Visitors for ${escapeIgn(playerName)} (${profile?.profileName})`)
+			.setTitle(`Visitors for ${escapeIgn(playerName)} (${profile?.profileName})${titleSuffix}`)
 			.setDescription(
-				`Unique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**/84 ${EmptyString} • ${EmptyString} Accepted • **${(garden?.completedVisitors ?? 0).toLocaleString()}** ${EmptyString} • ${EmptyString} Rejected • **${(rejectedVisitors ?? 0).toLocaleString()}**` +
+				`Unique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**/137 ${EmptyString} • ${EmptyString} Accepted • **${(garden?.completedVisitors ?? 0).toLocaleString()}** ${EmptyString} • ${EmptyString} Rejected • **${(rejectedVisitors ?? 0).toLocaleString()}**` +
 					'\nAcceptance Rate • **' +
 					acceptanceRateText +
 					'%**',
@@ -357,11 +409,32 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			);
 		}
 
+		if (page === 'main') {
+			if (rareVisitors.length > 0) {
+				linkRow.addComponents(new ButtonBuilder().setLabel('Rare').setCustomId('rare').setStyle(ButtonStyle.Secondary));
+			}
+			if (uncommonVisitors.length > 0) {
+				linkRow.addComponents(
+					new ButtonBuilder().setLabel('Uncommon').setCustomId('uncommon').setStyle(ButtonStyle.Secondary),
+				);
+			}
+		} else if (page === 'rare') {
+			linkRow.addComponents(
+				new ButtonBuilder().setLabel('Back').setCustomId('visitors').setStyle(ButtonStyle.Secondary),
+			);
+		} else if (page === 'uncommon') {
+			linkRow.addComponents(
+				new ButtonBuilder().setLabel('Back').setCustomId('visitors').setStyle(ButtonStyle.Secondary),
+				new ButtonBuilder().setLabel('Page 2').setCustomId('uncommon-2').setStyle(ButtonStyle.Secondary),
+			);
+		} else if (page === 'uncommon-2') {
+			linkRow.addComponents(
+				new ButtonBuilder().setLabel('Page 1').setCustomId('uncommon').setStyle(ButtonStyle.Secondary),
+				new ButtonBuilder().setLabel('Back').setCustomId('visitors').setStyle(ButtonStyle.Secondary),
+			);
+		}
+
 		linkRow.addComponents(
-			new ButtonBuilder()
-				.setLabel(uncommon ? 'Back' : 'Uncommon')
-				.setCustomId(uncommon ? 'visitors' : 'uncommon')
-				.setStyle(ButtonStyle.Secondary),
 			new ButtonBuilder()
 				.setLabel(`@${account?.name}/${profile?.profileName}`)
 				.setURL(`https://elitebot.dev/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')}`)
@@ -371,7 +444,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		return { embeds: [embed], components: [linkRow] };
 	}
 
-	function getMissingVisitors(uncommon = false) {
+	function getMissingVisitors(page: 'main' | 'uncommon' | 'uncommon-2' | 'rare' = 'main') {
 		const visitedVisitors = (garden?.visitors ?? {}) as Record<
 			string,
 			{ visits: number; accepted: number } | undefined
@@ -390,16 +463,34 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			{},
 		);
 
-		let fieldCount = 0;
-		const skipUncommon = !uncommon && (missingVisitors[Rarity.Uncommon]?.length ?? 0) > 15;
+		const missingUncommon = missingVisitors[Rarity.Uncommon] ?? [];
+		const missingRare = missingVisitors[Rarity.Rare] ?? [];
+		const uncommonHalfLength = Math.ceil(missingUncommon.length / 2);
 
+		const skipUncommon = page === 'main' && missingUncommon.length > 15;
+		const skipRare = page === 'main' && missingRare.length > 10;
+
+		let fieldCount = 0;
 		const visitorsList = Object.entries(missingVisitors)
 			.sort(([a], [b]) => compareRarity(b as Rarity, a as Rarity))
 			.map(([rarity, visitors]) => {
-				if (uncommon && rarity !== Rarity.Uncommon) return undefined;
+				const isUncommon = rarity === Rarity.Uncommon;
+				const isRare = rarity === Rarity.Rare;
 
-				const skipText = rarity === Rarity.Uncommon && skipUncommon;
-				const splitBy = visitors.length > 5 ? Math.ceil(visitors.length / 3) : 5;
+				if (page === 'uncommon' && !isUncommon) return undefined;
+				if (page === 'uncommon-2' && !isUncommon) return undefined;
+				if (page === 'rare' && !isRare) return undefined;
+
+				const shouldSkip = (isUncommon && skipUncommon) || (isRare && skipRare);
+
+				let displayVisitors = visitors;
+				if (page === 'uncommon') {
+					displayVisitors = visitors.slice(0, uncommonHalfLength);
+				} else if (page === 'uncommon-2') {
+					displayVisitors = visitors.slice(uncommonHalfLength);
+				}
+
+				const splitBy = displayVisitors.length > 5 ? Math.ceil(displayVisitors.length / 3) : 5;
 				const result = [];
 
 				if (rarity !== Rarity.Special && rarity !== Rarity.Mythic) {
@@ -409,19 +500,31 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 					}
 				}
 
-				for (let i = 0; i < visitors.length; i += splitBy) {
-					const chunk = visitors.slice(i, i + splitBy);
-
+				if (shouldSkip) {
 					fieldCount++;
 					result.push({
-						name: i === 0 ? `**${rarity}** • **${visitors.length} Missing**` : EmptyString,
-						value: skipText
-							? '-# Click "Missing Uncommon" to see these!'
-							: chunk.map((v) => `-# ${v.short ?? v.name} [⧉](${v.wiki})`).join('\n'),
+						name: `**${rarity}** • **${visitors.length} Missing**`,
+						value: `-# Click "Missing ${rarity}" to see these!`,
 						inline: true,
 					});
+					return result;
+				}
 
-					if (skipText) break;
+				for (let i = 0; i < displayVisitors.length; i += splitBy) {
+					const chunk = displayVisitors.slice(i, i + splitBy);
+
+					fieldCount++;
+					const headerName =
+						page === 'uncommon-2' && i === 0
+							? `**${rarity}** (cont.) • **${visitors.length} Missing**`
+							: i === 0
+								? `**${rarity}** • **${visitors.length} Missing**`
+								: EmptyString;
+					result.push({
+						name: headerName,
+						value: chunk.map((v) => `-# ${v.short ?? v.name} [⧉](${v.wiki})`).join('\n'),
+						inline: true,
+					});
 				}
 
 				return result;
@@ -432,10 +535,16 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const acceptanceRate =
 			((garden?.completedVisitors ?? 0) / ((garden?.completedVisitors ?? 0) + rejectedVisitors)) * 100;
 		const acceptanceRateText = isNaN(acceptanceRate) ? '0.00' : `${acceptanceRate.toFixed(2)}`;
+
+		let titleSuffix = '';
+		if (page === 'uncommon') titleSuffix = ' - Uncommon (1/2)';
+		else if (page === 'uncommon-2') titleSuffix = ' - Uncommon (2/2)';
+		else if (page === 'rare') titleSuffix = ' - Rare';
+
 		const embed = EliteEmbed(settings)
-			.setTitle(`Missing Visitors for ${escapeIgn(playerName)} (${profile?.profileName})`)
+			.setTitle(`Missing Visitors for ${escapeIgn(playerName)} (${profile?.profileName})${titleSuffix}`)
 			.setDescription(
-				`Unique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**/84 ${EmptyString} • ${EmptyString} Accepted • **${(garden?.completedVisitors ?? 0).toLocaleString()}** ${EmptyString} • ${EmptyString} Rejected • **${(rejectedVisitors ?? 0).toLocaleString()}**` +
+				`Unique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**/137 ${EmptyString} • ${EmptyString} Accepted • **${(garden?.completedVisitors ?? 0).toLocaleString()}** ${EmptyString} • ${EmptyString} Rejected • **${(rejectedVisitors ?? 0).toLocaleString()}**` +
 					'\nAcceptance Rate • **' +
 					acceptanceRateText +
 					'%**',
@@ -447,12 +556,33 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			new ButtonBuilder().setLabel('Visitor Stats').setCustomId('visitors').setStyle(ButtonStyle.Success),
 		);
 
-		if (skipUncommon || uncommon) {
+		if (page === 'main') {
+			if (skipRare) {
+				linkRow.addComponents(
+					new ButtonBuilder().setLabel('Missing Rare').setCustomId('missing-rare').setStyle(ButtonStyle.Secondary),
+				);
+			}
+			if (skipUncommon) {
+				linkRow.addComponents(
+					new ButtonBuilder()
+						.setLabel('Missing Uncommon')
+						.setCustomId('missing-uncommon')
+						.setStyle(ButtonStyle.Secondary),
+				);
+			}
+		} else if (page === 'rare') {
 			linkRow.addComponents(
-				new ButtonBuilder()
-					.setLabel(uncommon ? 'Back' : 'Missing Uncommon')
-					.setCustomId(uncommon ? 'missing' : 'missing-uncommon')
-					.setStyle(ButtonStyle.Secondary),
+				new ButtonBuilder().setLabel('Back').setCustomId('missing').setStyle(ButtonStyle.Secondary),
+			);
+		} else if (page === 'uncommon') {
+			linkRow.addComponents(
+				new ButtonBuilder().setLabel('Back').setCustomId('missing').setStyle(ButtonStyle.Secondary),
+				new ButtonBuilder().setLabel('Page 2').setCustomId('missing-uncommon-2').setStyle(ButtonStyle.Secondary),
+			);
+		} else if (page === 'uncommon-2') {
+			linkRow.addComponents(
+				new ButtonBuilder().setLabel('Page 1').setCustomId('missing-uncommon').setStyle(ButtonStyle.Secondary),
+				new ButtonBuilder().setLabel('Back').setCustomId('missing').setStyle(ButtonStyle.Secondary),
 			);
 		}
 
