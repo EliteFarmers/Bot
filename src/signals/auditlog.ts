@@ -1,6 +1,6 @@
-import { FetchGuide } from 'api/elite.js';
-import { EliteContainer } from 'classes/components.js';
 import { ButtonBuilder, ButtonStyle, ChannelType, Client, MessageFlags, WebhookClient } from 'discord.js';
+import { FetchGuide } from '../api/elite.js';
+import { EliteContainer } from '../classes/components.js';
 import { Signal, SignalReceiverOptions } from '../classes/Signal.js';
 
 const settings: SignalReceiverOptions = {
