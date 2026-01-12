@@ -1,6 +1,6 @@
 import { createClient, RedisClientOptions, RedisFunctions, RedisModules, RedisScripts } from 'redis';
 import { client, client as discordClient, signals } from '../bot.js';
-import { Signal, SignalRecieverOptions } from '../classes/Signal.js';
+import { Signal, SignalReceiverOptions } from '../classes/Signal.js';
 
 // Channel name needs to match the one used in the EliteAPI
 const REDIS_CHANNEL_NAME = 'eliteapi_messages';
@@ -98,7 +98,7 @@ async function handleMessage(message: string) {
 		return;
 	}
 
-	const info = signals.get(signal.name) as SignalRecieverOptions | undefined; // Ensure type safety
+	const info = signals.get(signal.name) as SignalReceiverOptions | undefined; // Ensure type safety
 	if (!info) {
 		console.warn(`No signal handler found for signal name: ${signal.name}`);
 		return;

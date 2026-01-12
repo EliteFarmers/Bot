@@ -76,7 +76,7 @@ export class Signal<T = unknown> {
 	}
 }
 
-export interface SignalRecieverOptions {
+export interface SignalReceiverOptions {
 	name: string;
 	permissions?: bigint;
 	execute: (signal: Signal, client?: Client) => void;

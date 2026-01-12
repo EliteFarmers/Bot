@@ -8,7 +8,7 @@ import path from 'path';
 import { ConnectToRedis } from './api/redis.js';
 import { CommandGroup, CommandReferences, CronTask, EliteCommand } from './classes/commands/index.js';
 import { registerCommandGroups, registerFiles } from './classes/register.js';
-import { SignalRecieverOptions } from './classes/Signal.js';
+import { SignalReceiverOptions } from './classes/Signal.js';
 import { LoadWeightStyles } from './weight/custom.js';
 
 dotenv.config();
@@ -18,7 +18,7 @@ export const client = new Client({
 });
 
 export const commands = new Collection<string, CommandGroup | EliteCommand>();
-export const signals = new Collection<string, SignalRecieverOptions>();
+export const signals = new Collection<string, SignalReceiverOptions>();
 export const commandReferences = new CommandReferences();
 
 const deploying = process.argv.some((arg) => arg.includes('deploy'));
@@ -61,7 +61,7 @@ const deploying = process.argv.some((arg) => arg.includes('deploy'));
 		client.on(event.event, event.execute);
 	});
 
-	registerFiles<SignalRecieverOptions>('signals', filter, (signal) => {
+	registerFiles<SignalReceiverOptions>('signals', filter, (signal) => {
 		signals.set(signal.name, signal);
 	});
 

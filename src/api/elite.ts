@@ -325,6 +325,18 @@ export const FetchContest = (timestamp: number) =>
 		},
 	});
 
+export const FetchGuide = (guideId: string) =>
+	GET('/guides/{slug}', {
+		params: {
+			path: {
+				slug: guideId,
+			},
+			query: {
+				draft: false,
+			},
+		},
+	});
+
 export const FetchWeightStyles = () => GET('/product/styles', {});
 
 export const FetchProduct = (skuId: string) =>

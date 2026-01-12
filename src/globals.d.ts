@@ -12,5 +12,7 @@ namespace NodeJS {
 
 		ELITE_DISCORD_ID: string;
 		ELITE_FARMER_ROLE: string;
+
+		GUIDES_WEBHOOK: string;
 	}
 }

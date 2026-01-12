@@ -516,6 +516,46 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/admin/audit-logs/filters': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get available audit log filters
+		 * @description Returns distinct actions and target types for filter dropdowns.
+		 */
+		get: operations['GetAuditLogFilters'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/audit-logs': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get admin audit logs
+		 * @description Retrieve paginated and filterable audit logs for administrative actions.
+		 */
+		get: operations['GetAuditLogs'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/auth/confirmations/{id}/accept': {
 		parameters: {
 			query?: never;
@@ -1794,6 +1834,462 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/admin/guides/pending': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get pending guides
+		 * @description Retrieves a list of guides waiting for approval.
+		 */
+		get: operations['AdminPendingGuides'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/comments/{commentId}/approve': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Approve a comment
+		 * @description Approves a pending comment, making it visible to all users.
+		 */
+		post: operations['ApproveComment'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/guides/{guideId}/approve': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Approve and publish a guide
+		 * @description Approve a pending guide and publish it.
+		 */
+		post: operations['ApproveGuide'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/guides/{guideId}/bookmark': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Bookmark a guide
+		 * @description Add a guide to user's bookmarks/favorites.
+		 */
+		post: operations['BookmarkGuide'];
+		/**
+		 * Remove bookmark
+		 * @description Remove a guide from user's bookmarks.
+		 */
+		delete: operations['UnbookmarkGuide'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/guides/{guideId}/comments': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Post a comment
+		 * @description Create a new comment on a guide.
+		 */
+		post: operations['CreateComment'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/guides': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * List guides
+		 * @description Search and list published guides with optional filtering and sorting.
+		 */
+		get: operations['ListGuides'];
+		put?: never;
+		/**
+		 * Create a new guide draft
+		 * @description Initializes a new empty guide draft for the user.
+		 */
+		post: operations['CreateGuide'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/tags': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Create a tag
+		 * @description Create a new guide tag. Moderator only.
+		 */
+		post: operations['CreateTag'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/comments/{commentId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		post?: never;
+		/**
+		 * Delete a comment
+		 * @description Deletes a comment.
+		 */
+		delete: operations['DeleteComment'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/guides/{id}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		/**
+		 * Update a guide draft
+		 * @description Update the draft version of a guide. Only the author can update their own guide.
+		 */
+		put: operations['UpdateGuide'];
+		post?: never;
+		/**
+		 * Delete a guide
+		 * @description Soft delete a guide. Only the author or an admin can delete.
+		 */
+		delete: operations['DeleteGuide'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/tags/{id}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		/**
+		 * Update a tag
+		 * @description Update an existing guide tag. Moderator only.
+		 */
+		put: operations['UpdateTag'];
+		post?: never;
+		/**
+		 * Delete a tag
+		 * @description Delete a guide tag. Moderator only.
+		 */
+		delete: operations['DeleteTag'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/comments/{commentId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		/**
+		 * Edit a comment
+		 * @description Edit comment content. Authors can edit their own comments, admins can edit any.
+		 */
+		put: operations['EditComment'];
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/guides/{slug}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get a guide
+		 * @description Retrieve a guide by its slug. Use ?draft=true to view draft version (requires author/mod permission).
+		 */
+		get: operations['GetGuide'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/users/{accountId}/bookmarks': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get user's bookmarked guides
+		 * @description Returns all guides bookmarked by the user. Only the owner can see their bookmarks.
+		 */
+		get: operations['GetUserBookmarks'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/users/{accountId}/guides': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get guides by user
+		 * @description Returns all guides by a specific user. Shows only published guides for anonymous users. Author sees all their own guides.
+		 */
+		get: operations['GetUserGuides'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/guides/{slug}/comments': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * List comments for a guide
+		 * @description Returns all comments for a specific guide.
+		 */
+		get: operations['ListComments'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/comments/pending': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * List all pending comments
+		 * @description Returns a list of all comments pending approval.
+		 */
+		get: operations['ListPendingComments'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/tags': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * List all tags
+		 * @description Returns all available guide tags.
+		 */
+		get: operations['ListTags'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/guides/{guideId}/reject': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Reject a guide
+		 * @description Reject a pending guide submission with an optional reason.
+		 */
+		post: operations['RejectGuide'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/guides/{guideId}/submit': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Submit guide for approval
+		 * @description Submit a draft guide for admin review.
+		 */
+		post: operations['SubmitGuideForApproval'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/guides/{guideId}/unpublish': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Unpublish a guide
+		 * @description Revert a published guide back to draft status. Only author or admin can unpublish.
+		 */
+		post: operations['UnpublishGuide'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/comments/{commentId}/vote': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Vote on a comment
+		 * @description Cast an upvote (+1) or downvote (-1) on a comment.
+		 */
+		post: operations['VoteComment'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/guides/{guideId}/vote': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Vote on a guide
+		 * @description Cast an upvote (+1) or downvote (-1) on a guide.
+		 */
+		post: operations['VoteGuide'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/guild/{discordId}/events': {
 		parameters: {
 			query?: never;
@@ -2390,6 +2886,77 @@ export interface paths {
 		 * @description This passes along a request to Discord to remove a test entitlement from a user or guild.
 		 */
 		delete: operations['RemoveTestEntitlement'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/notifications/{Id}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		post?: never;
+		/** Delete a notification */
+		delete: operations['DeleteNotification'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/notifications': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get user notifications
+		 * @description Retrieve paginated notifications for the authenticated user.
+		 */
+		get: operations['GetNotifications'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/notifications/read-all': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Mark all notifications as read */
+		post: operations['MarkAllNotificationsRead'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/notifications/{Id}/read': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Mark notification as read */
+		post: operations['MarkNotificationRead'];
+		delete?: never;
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -3332,6 +3899,23 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/textures/blocks/{blockId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Minecraft Block Texture */
+		get: operations['GetBlockTexture'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/textures/{inventoryUuid}/{slotId}/meta': {
 		parameters: {
 			query?: never;
@@ -3569,6 +4153,11 @@ export interface components {
 			 * @description Community center farming fortune level
 			 */
 			communityCenter: number;
+			/**
+			 * Format: int32
+			 * @description Consumed Filled Rosewater Flasks
+			 */
+			rosewaterFlasks: number;
 			/** @description Attribute shards */
 			attributes: {
 				[key: string]: number;
@@ -3757,14 +4346,20 @@ export interface components {
 			youtube?: string | null;
 		};
 		PlayerRequest: Record<string, never>;
+		/** @description the dto used to send an error response to the client */
 		ErrorResponse: {
 			/**
 			 * Format: int32
+			 * @description the http status code sent to the client. default is 400.
 			 * @default 400
 			 */
 			statusCode: number;
-			/** @default One or more errors occurred! */
+			/**
+			 * @description the message for the error response
+			 * @default One or more errors occurred!
+			 */
 			message: string;
+			/** @description the collection of errors for the current context */
 			errors: {
 				[key: string]: string[];
 			};
@@ -3902,6 +4497,10 @@ export interface components {
 			badges: components['schemas']['UserBadgeDto'][];
 			skin: components['schemas']['MinecraftSkinDto'];
 		};
+		/**
+		 * @description RFC7807 compatible problem details/ error response class. this can be used by configuring startup like so:
+		 *     app.UseFastEndpoints(c => c.Errors.UseProblemDetails())
+		 */
 		ProblemDetails: {
 			/** @default https://www.rfc-editor.org/rfc/rfc7231#section-6.5.1 */
 			type: string;
@@ -3916,15 +4515,25 @@ export interface components {
 			instance: string;
 			/** @default 0HMPNHL0JHL76:00000001 */
 			traceId: string;
+			/** @description the details of the error */
 			detail?: string | null;
 			errors: components['schemas']['ProblemDetails_Error'][];
 		};
+		/** @description the error details object */
 		ProblemDetails_Error: {
-			/** @default Error or field name */
+			/**
+			 * @description the name of the error or property of the dto that caused the error
+			 * @default Error or field name
+			 */
 			name: string;
-			/** @default Error reason */
+			/**
+			 * @description the reason for the error
+			 * @default Error reason
+			 */
 			reason: string;
+			/** @description the code of the error */
 			code?: string | null;
+			/** @description the severity of the error */
 			severity?: string | null;
 		};
 		SearchRequest: Record<string, never>;
@@ -4103,6 +4712,31 @@ export interface components {
 			/** @description Announcement id */
 			id: string;
 		};
+		AuditLogFiltersResponse: {
+			actions: string[];
+			targetTypes: string[];
+		};
+		GetAuditLogsResponse: {
+			logs: components['schemas']['AuditLogDto'][];
+			/** Format: int32 */
+			totalCount: number;
+		};
+		AuditLogDto: {
+			/** Format: int64 */
+			id: number;
+			adminUserId: string;
+			adminUserName: string;
+			action: string;
+			targetType: string;
+			targetId?: string | null;
+			details?: string | null;
+			/** Format: date-time */
+			createdAt: string;
+			data?: {
+				[key: string]: unknown;
+			} | null;
+		};
+		GetAuditLogsRequest: Record<string, never>;
 		ConfirmationDto: {
 			/** Format: int32 */
 			id: number;
@@ -4855,6 +5489,170 @@ export interface components {
 		GetCurrentMedalBracketsRequest: Record<string, never>;
 		GetMedalBracketsRequest: Record<string, never>;
 		GetMedalBracketsGraphRequest: Record<string, never>;
+		GuideDto: {
+			/** Format: int32 */
+			id: number;
+			slug: string;
+			title: string;
+			status: string;
+			iconSkyblockId?: string | null;
+			author: components['schemas']['AuthorDto'];
+			/** Format: int32 */
+			score: number;
+			/** Format: int32 */
+			views: number;
+			/** Format: date-time */
+			createdAt: string;
+			description: string;
+			tags: string[];
+		};
+		AuthorDto: {
+			id: string;
+			name: string;
+			avatar?: string | null;
+			uuid?: string | null;
+		};
+		ApproveCommentRequest: Record<string, never>;
+		ApproveGuideRequest: Record<string, never>;
+		BookmarkRequest: Record<string, never>;
+		CommentDto: {
+			/** Format: int32 */
+			id: number;
+			sqid: string;
+			/** Format: int32 */
+			parentId?: number | null;
+			content: string;
+			draftContent?: string | null;
+			author: components['schemas']['AuthorDto'];
+			/** Format: date-time */
+			createdAt: string;
+			/** Format: date-time */
+			editedAt?: string | null;
+			/** Format: int32 */
+			score: number;
+			liftedElementId?: string | null;
+			/** Format: int32 */
+			userVote?: number | null;
+			isPending: boolean;
+			isDeleted: boolean;
+			isEdited: boolean;
+			isEditedByAdmin: boolean;
+			hasPendingEdit: boolean;
+		};
+		CreateCommentRequest: {
+			/** Format: int32 */
+			parentId?: number | null;
+			content: string;
+			liftedElementId?: string | null;
+		};
+		CreateGuideRequest: {
+			type: components['schemas']['GuideType'];
+		};
+		/** @enum {integer} */
+		GuideType: 0 | 1 | 2 | 3;
+		TagResponse: {
+			/** Format: int32 */
+			id: number;
+			name: string;
+			category: string;
+			hexColor: string;
+		};
+		CreateTagRequest: {
+			name: string;
+			category: string;
+			hexColor?: string | null;
+		};
+		DeleteCommentRequest: Record<string, never>;
+		DeleteGuideRequest: Record<string, never>;
+		DeleteTagRequest: Record<string, never>;
+		EditCommentRequest: {
+			content: string;
+		};
+		FullGuideDto: {
+			/** Format: int32 */
+			id: number;
+			slug: string;
+			title: string;
+			iconSkyblockId?: string | null;
+			description: string;
+			content: string;
+			author: components['schemas']['AuthorDto'];
+			/** Format: date-time */
+			createdAt: string;
+			/** Format: int32 */
+			score: number;
+			/** Format: int32 */
+			viewCount: number;
+			tags: string[];
+			isDraft: boolean;
+			status: string;
+			userVote?: number | null;
+			isBookmarked?: boolean | null;
+			rejectionReason?: string | null;
+		};
+		GetGuideRequest: Record<string, never>;
+		UserGuideDto: {
+			/** Format: int32 */
+			id: number;
+			slug: string;
+			title: string;
+			description: string;
+			type: string;
+			status: string;
+			/** Format: int32 */
+			score: number;
+			/** Format: int32 */
+			viewCount: number;
+			/** Format: date-time */
+			createdAt: string;
+			/** Format: date-time */
+			updatedAt?: string | null;
+		};
+		GetUserBookmarksRequest: Record<string, never>;
+		GetUserGuidesRequest: Record<string, never>;
+		ListCommentsRequest: Record<string, never>;
+		ListGuidesRequest: Record<string, never>;
+		/** @enum {string} */
+		GuideSort: 'newest' | 'topRated' | 'trending';
+		RejectGuideRequest: {
+			/** @description Optional reason for rejection to provide feedback to the author. */
+			reason?: string | null;
+		};
+		SubmitGuideRequest: Record<string, never>;
+		UnpublishGuideRequest: Record<string, never>;
+		UpdateGuideRequest: {
+			title: string;
+			iconSkyblockId?: string | null;
+			description: string;
+			markdownContent: string;
+			tags?: string[] | null;
+			richBlocks?: components['schemas']['GuideRichData'] | null;
+		};
+		GuideRichData: {
+			greenhouseLayout?: components['schemas']['GreenhouseLayout'] | null;
+		};
+		GreenhouseLayout: {
+			/** Format: int32 */
+			layoutId: number;
+			slots: components['schemas']['GreenhouseSlot'][];
+		};
+		GreenhouseSlot: {
+			/** Format: int32 */
+			index: number;
+			itemId: string;
+			backgroundTexture?: string | null;
+		};
+		UpdateTagRequest: {
+			name?: string | null;
+			category?: string | null;
+			hexColor?: string | null;
+		};
+		VoteCommentRequest: {
+			value: number;
+		};
+		VoteGuideRequest: {
+			value: number;
+		};
 		SetEventFeatureRequest: Record<string, never>;
 		SetJacobFeatureRequest: Record<string, never>;
 		SetGuildLockedRequest: Record<string, never>;
@@ -5201,10 +5999,10 @@ export interface components {
 			/** @description Score data type of the leaderboard */
 			scoreDataType: components['schemas']['LeaderboardScoreDataType'];
 		};
-		/** @enum {integer} */
-		LeaderboardType: 0 | 1 | 2;
-		/** @enum {integer} */
-		LeaderboardScoreDataType: 0 | 1 | 2;
+		/** @enum {string} */
+		LeaderboardType: 'Current' | 'Weekly' | 'Monthly';
+		/** @enum {string} */
+		LeaderboardScoreDataType: 'Double' | 'Long' | 'Decimal';
 		LeaderboardPositionDto: {
 			/**
 			 * Format: int32
@@ -5280,6 +6078,39 @@ export interface components {
 		GetProfileRankRequest: Record<string, never>;
 		GetEntitlementsRequest: Record<string, never>;
 		UserEntitlementRequest: Record<string, never>;
+		GetNotificationsResponse: {
+			notifications: components['schemas']['NotificationDto'][];
+			/** Format: int32 */
+			unreadCount: number;
+		};
+		NotificationDto: {
+			/** Format: int64 */
+			id: number;
+			type: components['schemas']['NotificationType'];
+			title: string;
+			message?: string | null;
+			link?: string | null;
+			isRead: boolean;
+			/** Format: date-time */
+			createdAt: string;
+			data?: {
+				[key: string]: unknown;
+			} | null;
+		};
+		/** @enum {string} */
+		NotificationType:
+			| 'system'
+			| 'guideApproved'
+			| 'guideEditApproved'
+			| 'guideRejected'
+			| 'guideDeleted'
+			| 'commentApproved'
+			| 'commentEditApproved'
+			| 'commentRejected'
+			| 'newComment'
+			| 'newReply'
+			| 'shopPurchase';
+		GetNotificationsRequest: Record<string, never>;
 		LinkedAccountsDto: {
 			selectedUuid?: string | null;
 			players: components['schemas']['PlayerDataDto'][];
@@ -5326,6 +6157,8 @@ export interface components {
 			wasRemoved: boolean;
 			/** Format: int64 */
 			lastUpdated: number;
+			/** Format: int64 */
+			lastDataChanged: number;
 		};
 		ApiAccessDto: {
 			inventories: boolean;
@@ -5366,6 +6199,8 @@ export interface components {
 			exportedCrops?: {
 				[key: string]: boolean;
 			} | null;
+			/** Format: int32 */
+			dnaMilestone: number;
 			levelCaps: {
 				[key: string]: number;
 			};
@@ -6855,6 +7690,7 @@ export interface components {
 			fontWeight?: number | null;
 		};
 		GetStyleRequest: Record<string, never>;
+		GetBlockTextureRequest: Record<string, never>;
 		InventoryItemMetaResponse: {
 			/** @description Texture Pack ID where the item texture is located */
 			packId?: string | null;
@@ -7957,6 +8793,82 @@ export interface operations {
 				content: {
 					'application/json': components['schemas']['AnnouncementDto'][];
 				};
+			};
+		};
+	};
+	GetAuditLogFilters: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AuditLogFiltersResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetAuditLogs: {
+		parameters: {
+			query: {
+				offset: number;
+				limit: number;
+				action?: string | null;
+				targetType?: string | null;
+				adminUserId?: string | null;
+				fromDate?: string | null;
+				toDate?: string | null;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetAuditLogsResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
 			};
 		};
 	};
@@ -11009,6 +11921,903 @@ export interface operations {
 			};
 		};
 	};
+	AdminPendingGuides: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GuideDto'][];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	ApproveComment: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				commentId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	ApproveGuide: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				guideId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	BookmarkGuide: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				guideId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	UnbookmarkGuide: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				guideId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Not Found */
+			404: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	CreateComment: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				guideId: number;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['CreateCommentRequest'];
+			};
+		};
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['CommentDto'];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	ListGuides: {
+		parameters: {
+			query: {
+				query?: string | null;
+				type?: components['schemas']['GuideType'] | null;
+				tags?: number[] | null;
+				sort: components['schemas']['GuideSort'];
+				page: number;
+				pageSize: number;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GuideDto'][];
+				};
+			};
+		};
+	};
+	CreateGuide: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['CreateGuideRequest'];
+			};
+		};
+		responses: {
+			/** @description Created */
+			201: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GuideDto'];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	CreateTag: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['CreateTagRequest'];
+			};
+		};
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['TagResponse'];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	DeleteComment: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				commentId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	UpdateGuide: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				id: number;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['UpdateGuideRequest'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	DeleteGuide: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				id: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Not Found */
+			404: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	UpdateTag: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				id: number;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['UpdateTagRequest'];
+			};
+		};
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['TagResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	DeleteTag: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				id: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Not Found */
+			404: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	EditComment: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				commentId: number;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['EditCommentRequest'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetGuide: {
+		parameters: {
+			query: {
+				draft: boolean;
+			};
+			header?: never;
+			path: {
+				slug: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['FullGuideDto'];
+				};
+			};
+		};
+	};
+	GetUserBookmarks: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				accountId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['UserGuideDto'][];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetUserGuides: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				accountId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['UserGuideDto'][];
+				};
+			};
+		};
+	};
+	ListComments: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				slug: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['CommentDto'][];
+				};
+			};
+		};
+	};
+	ListPendingComments: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['CommentDto'][];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	ListTags: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['TagResponse'][];
+				};
+			};
+		};
+	};
+	RejectGuide: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				guideId: number;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['RejectGuideRequest'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	SubmitGuideForApproval: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				guideId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	UnpublishGuide: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				guideId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Not Found */
+			404: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	VoteComment: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				commentId: number;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['VoteCommentRequest'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	VoteGuide: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				guideId: number;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['VoteGuideRequest'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
 	GetPublicGuildEvents: {
 		parameters: {
 			query?: never;
@@ -12525,6 +14334,116 @@ export interface operations {
 			};
 			/** @description Forbidden */
 			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	DeleteNotification: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetNotifications: {
+		parameters: {
+			query: {
+				offset: number;
+				limit: number;
+				unreadOnly: boolean;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetNotificationsResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	MarkAllNotificationsRead: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	MarkNotificationRead: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
 				headers: {
 					[name: string]: unknown;
 				};
@@ -14347,6 +16266,29 @@ export interface operations {
 				content: {
 					'application/json': components['schemas']['WeightStyleWithDataDto'][];
 				};
+			};
+		};
+	};
+	GetBlockTexture: {
+		parameters: {
+			query?: {
+				packs?: string | null;
+				face?: string | null;
+			};
+			header?: never;
+			path: {
+				blockId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
 			};
 		};
 	};

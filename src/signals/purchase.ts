@@ -1,9 +1,9 @@
 import { MessageFlags, TextDisplayBuilder } from 'discord.js';
 import { FetchProduct } from '../api/elite.js';
 import { EliteContainer } from '../classes/components.js';
-import { Signal, SignalRecieverOptions } from '../classes/Signal.js';
+import { Signal, SignalReceiverOptions } from '../classes/Signal.js';
 
-const settings: SignalRecieverOptions = {
+const settings: SignalReceiverOptions = {
 	name: 'purchase',
 	execute: execute,
 };

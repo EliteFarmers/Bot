@@ -1,9 +1,9 @@
 {
-	"x-generator": "NSwag v14.6.1.0 (NJsonSchema v11.5.1.0 (Newtonsoft.Json v13.0.0.0))",
+	"x-generator": "NSwag v14.6.2.0 (NJsonSchema v11.5.2.0 (Newtonsoft.Json v13.0.0.0))",
 	"openapi": "3.0.0",
 	"info": {
 		"title": "Elite API",
-		"description": "A backend API for https://elitebot.dev/ that provides Hypixel Skyblock data.\n<br><br>\nUse of this API requires following the [Elite API TOS](https://elitebot.dev/apiterms). This API is not affiliated with Hypixel or Mojang.",
+		"description": "A backend API for https://elitebot.dev/ that provides Hypixel Skyblock data.\r\n<br><br>\r\nUse of this API requires following the [Elite API TOS](https://elitebot.dev/apiterms). This API is not affiliated with Hypixel or Mojang.",
 		"termsOfService": "https://elitebot.dev/apiterms",
 		"contact": {
 			"name": "GitHub",
@@ -17,7 +17,7 @@
 	},
 	"servers": [
 		{
-			"url": "https://api.elitebot.dev"
+			"url": "http://localhost:5164"
 		}
 	],
 	"paths": {
@@ -1220,6 +1220,130 @@
 						}
 					}
 				}
+			}
+		},
+		"/admin/audit-logs/filters": {
+			"get": {
+				"tags": ["Admin"],
+				"summary": "Get available audit log filters",
+				"description": "Returns distinct actions and target types for filter dropdowns.",
+				"operationId": "GetAuditLogFilters",
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuditLogFiltersResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/admin/audit-logs": {
+			"get": {
+				"tags": ["Admin"],
+				"summary": "Get admin audit logs",
+				"description": "Retrieve paginated and filterable audit logs for administrative actions.",
+				"operationId": "GetAuditLogs",
+				"parameters": [
+					{
+						"name": "offset",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					},
+					{
+						"name": "limit",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					},
+					{
+						"name": "action",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "targetType",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "adminUserId",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "fromDate",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"format": "date-time",
+							"nullable": true
+						}
+					},
+					{
+						"name": "toDate",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"format": "date-time",
+							"nullable": true
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetAuditLogsResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
 			}
 		},
 		"/auth/confirmations/{id}/accept": {
@@ -5572,6 +5696,1129 @@
 				}
 			}
 		},
+		"/admin/guides/pending": {
+			"get": {
+				"tags": ["Admin"],
+				"summary": "Get pending guides",
+				"description": "Retrieves a list of guides waiting for approval.",
+				"operationId": "AdminPendingGuides",
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/GuideDto"
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/admin/comments/{commentId}/approve": {
+			"post": {
+				"tags": ["Admin"],
+				"summary": "Approve a comment",
+				"description": "Approves a pending comment, making it visible to all users.",
+				"operationId": "ApproveComment",
+				"parameters": [
+					{
+						"name": "commentId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/admin/guides/{guideId}/approve": {
+			"post": {
+				"tags": ["Admin"],
+				"summary": "Approve and publish a guide",
+				"description": "Approve a pending guide and publish it.",
+				"operationId": "ApproveGuide",
+				"parameters": [
+					{
+						"name": "guideId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/guides/{guideId}/bookmark": {
+			"post": {
+				"tags": ["Guides"],
+				"summary": "Bookmark a guide",
+				"description": "Add a guide to user's bookmarks/favorites.",
+				"operationId": "BookmarkGuide",
+				"parameters": [
+					{
+						"name": "guideId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"400": {
+						"description": "Bad Request"
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			},
+			"delete": {
+				"tags": ["Guides"],
+				"summary": "Remove bookmark",
+				"description": "Remove a guide from user's bookmarks.",
+				"operationId": "UnbookmarkGuide",
+				"parameters": [
+					{
+						"name": "guideId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"404": {
+						"description": "Not Found"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/guides/{guideId}/comments": {
+			"post": {
+				"tags": ["Guides"],
+				"summary": "Post a comment",
+				"description": "Create a new comment on a guide.",
+				"operationId": "CreateComment",
+				"parameters": [
+					{
+						"name": "guideId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "CreateCommentRequest",
+					"description": "",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateCommentRequest"
+							}
+						}
+					},
+					"required": true,
+					"x-position": 1
+				},
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/CommentDto"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/guides": {
+			"post": {
+				"tags": ["Guides"],
+				"summary": "Create a new guide draft",
+				"description": "Initializes a new empty guide draft for the user.",
+				"operationId": "CreateGuide",
+				"requestBody": {
+					"x-name": "CreateGuideRequest",
+					"description": "",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateGuideRequest"
+							}
+						}
+					},
+					"required": true,
+					"x-position": 1
+				},
+				"responses": {
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GuideDto"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			},
+			"get": {
+				"tags": ["Guides"],
+				"summary": "List guides",
+				"description": "Search and list published guides with optional filtering and sorting.",
+				"operationId": "ListGuides",
+				"parameters": [
+					{
+						"name": "query",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "type",
+						"in": "query",
+						"schema": {
+							"nullable": true,
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/GuideType"
+								}
+							]
+						}
+					},
+					{
+						"name": "tags",
+						"in": "query",
+						"style": "form",
+						"explode": true,
+						"schema": {
+							"type": "array",
+							"nullable": true,
+							"items": {
+								"type": "integer",
+								"format": "int32"
+							}
+						}
+					},
+					{
+						"name": "sort",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/GuideSort"
+								}
+							]
+						}
+					},
+					{
+						"name": "page",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					},
+					{
+						"name": "pageSize",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/GuideDto"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/tags": {
+			"post": {
+				"tags": ["Admin"],
+				"summary": "Create a tag",
+				"description": "Create a new guide tag. Moderator only.",
+				"operationId": "CreateTag",
+				"requestBody": {
+					"x-name": "CreateTagRequest",
+					"description": "",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateTagRequest"
+							}
+						}
+					},
+					"required": true,
+					"x-position": 1
+				},
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TagResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/admin/comments/{commentId}": {
+			"delete": {
+				"tags": ["Admin"],
+				"summary": "Delete a comment",
+				"description": "Deletes a comment.",
+				"operationId": "DeleteComment",
+				"parameters": [
+					{
+						"name": "commentId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/guides/{id}": {
+			"delete": {
+				"tags": ["Guides"],
+				"summary": "Delete a guide",
+				"description": "Soft delete a guide. Only the author or an admin can delete.",
+				"operationId": "DeleteGuide",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"404": {
+						"description": "Not Found"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			},
+			"put": {
+				"tags": ["Guides"],
+				"summary": "Update a guide draft",
+				"description": "Update the draft version of a guide. Only the author can update their own guide.",
+				"operationId": "UpdateGuide",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "UpdateGuideRequest",
+					"description": "",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateGuideRequest"
+							}
+						}
+					},
+					"required": true,
+					"x-position": 1
+				},
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/admin/tags/{id}": {
+			"delete": {
+				"tags": ["Admin"],
+				"summary": "Delete a tag",
+				"description": "Delete a guide tag. Moderator only.",
+				"operationId": "DeleteTag",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"404": {
+						"description": "Not Found"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			},
+			"put": {
+				"tags": ["Admin"],
+				"summary": "Update a tag",
+				"description": "Update an existing guide tag. Moderator only.",
+				"operationId": "UpdateTag",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "UpdateTagRequest",
+					"description": "",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateTagRequest"
+							}
+						}
+					},
+					"required": true,
+					"x-position": 1
+				},
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TagResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/comments/{commentId}": {
+			"put": {
+				"tags": ["Comments"],
+				"summary": "Edit a comment",
+				"description": "Edit comment content. Authors can edit their own comments, admins can edit any.",
+				"operationId": "EditComment",
+				"parameters": [
+					{
+						"name": "commentId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "EditCommentRequest",
+					"description": "",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/EditCommentRequest"
+							}
+						}
+					},
+					"required": true,
+					"x-position": 1
+				},
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/guides/{slug}": {
+			"get": {
+				"tags": ["Guides"],
+				"summary": "Get a guide",
+				"description": "Retrieve a guide by its slug. Use ?draft=true to view draft version (requires author/mod permission).",
+				"operationId": "GetGuide",
+				"parameters": [
+					{
+						"name": "slug",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "draft",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "boolean"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FullGuideDto"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/users/{accountId}/bookmarks": {
+			"get": {
+				"tags": ["Users"],
+				"summary": "Get user's bookmarked guides",
+				"description": "Returns all guides bookmarked by the user. Only the owner can see their bookmarks.",
+				"operationId": "GetUserBookmarks",
+				"parameters": [
+					{
+						"name": "accountId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "uint64"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/UserGuideDto"
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/users/{accountId}/guides": {
+			"get": {
+				"tags": ["Users"],
+				"summary": "Get guides by user",
+				"description": "Returns all guides by a specific user. Shows only published guides for anonymous users. Author sees all their own guides.",
+				"operationId": "GetUserGuides",
+				"parameters": [
+					{
+						"name": "accountId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "uint64"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/UserGuideDto"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/guides/{slug}/comments": {
+			"get": {
+				"tags": ["Guides"],
+				"summary": "List comments for a guide",
+				"description": "Returns all comments for a specific guide.",
+				"operationId": "ListComments",
+				"parameters": [
+					{
+						"name": "slug",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/CommentDto"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/comments/pending": {
+			"get": {
+				"tags": ["Admin"],
+				"summary": "List all pending comments",
+				"description": "Returns a list of all comments pending approval.",
+				"operationId": "ListPendingComments",
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/CommentDto"
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/tags": {
+			"get": {
+				"tags": ["Tags"],
+				"summary": "List all tags",
+				"description": "Returns all available guide tags.",
+				"operationId": "ListTags",
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/TagResponse"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/guides/{guideId}/reject": {
+			"post": {
+				"tags": ["Admin"],
+				"summary": "Reject a guide",
+				"description": "Reject a pending guide submission with an optional reason.",
+				"operationId": "RejectGuide",
+				"parameters": [
+					{
+						"name": "guideId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "RejectGuideRequest",
+					"description": "",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/RejectGuideRequest"
+							}
+						}
+					},
+					"required": true,
+					"x-position": 1
+				},
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/guides/{guideId}/submit": {
+			"post": {
+				"tags": ["Guides"],
+				"summary": "Submit guide for approval",
+				"description": "Submit a draft guide for admin review.",
+				"operationId": "SubmitGuideForApproval",
+				"parameters": [
+					{
+						"name": "guideId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/guides/{guideId}/unpublish": {
+			"post": {
+				"tags": ["Guides"],
+				"summary": "Unpublish a guide",
+				"description": "Revert a published guide back to draft status. Only author or admin can unpublish.",
+				"operationId": "UnpublishGuide",
+				"parameters": [
+					{
+						"name": "guideId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"404": {
+						"description": "Not Found"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/comments/{commentId}/vote": {
+			"post": {
+				"tags": ["Comments"],
+				"summary": "Vote on a comment",
+				"description": "Cast an upvote (+1) or downvote (-1) on a comment.",
+				"operationId": "VoteComment",
+				"parameters": [
+					{
+						"name": "commentId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "VoteCommentRequest",
+					"description": "",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/VoteCommentRequest"
+							}
+						}
+					},
+					"required": true,
+					"x-position": 1
+				},
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/guides/{guideId}/vote": {
+			"post": {
+				"tags": ["Guides"],
+				"summary": "Vote on a guide",
+				"description": "Cast an upvote (+1) or downvote (-1) on a guide.",
+				"operationId": "VoteGuide",
+				"parameters": [
+					{
+						"name": "guideId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "VoteGuideRequest",
+					"description": "",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/VoteGuideRequest"
+							}
+						}
+					},
+					"required": true,
+					"x-position": 1
+				},
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
 		"/guild/{discordId}/events": {
 			"post": {
 				"tags": ["Guild"],
@@ -7945,6 +9192,142 @@
 				]
 			}
 		},
+		"/notifications/{Id}": {
+			"delete": {
+				"tags": ["Notifications"],
+				"summary": "Delete a notification",
+				"operationId": "DeleteNotification",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/notifications": {
+			"get": {
+				"tags": ["Notifications"],
+				"summary": "Get user notifications",
+				"description": "Retrieve paginated notifications for the authenticated user.",
+				"operationId": "GetNotifications",
+				"parameters": [
+					{
+						"name": "offset",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					},
+					{
+						"name": "limit",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					},
+					{
+						"name": "unreadOnly",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "boolean"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetNotificationsResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/notifications/read-all": {
+			"post": {
+				"tags": ["Notifications"],
+				"summary": "Mark all notifications as read",
+				"operationId": "MarkAllNotificationsRead",
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/notifications/{Id}/read": {
+			"post": {
+				"tags": ["Notifications"],
+				"summary": "Mark notification as read",
+				"operationId": "MarkNotificationRead",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
 		"/player/{discordId}": {
 			"get": {
 				"tags": ["Player"],
@@ -10237,6 +11620,44 @@
 				}
 			}
 		},
+		"/textures/blocks/{blockId}": {
+			"get": {
+				"tags": ["Textures"],
+				"summary": "Get Minecraft Block Texture",
+				"operationId": "GetBlockTexture",
+				"parameters": [
+					{
+						"name": "blockId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "packs",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					},
+					{
+						"name": "face",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"nullable": true
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					}
+				}
+			}
+		},
 		"/textures/{inventoryUuid}/{slotId}/meta": {
 			"get": {
 				"tags": ["Textures"],
@@ -10771,7 +12192,7 @@
 			"MemberFortuneSettingsDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["strength", "communityCenter", "attributes", "chips"],
+				"required": ["strength", "communityCenter", "rosewaterFlasks", "attributes", "chips"],
 				"properties": {
 					"strength": {
 						"type": "integer",
@@ -10781,6 +12202,11 @@
 					"communityCenter": {
 						"type": "integer",
 						"description": "Community center farming fortune level",
+						"format": "int32"
+					},
+					"rosewaterFlasks": {
+						"type": "integer",
+						"description": "Consumed Filled Rosewater Flasks",
 						"format": "int32"
 					},
 					"attributes": {
@@ -11322,20 +12748,24 @@
 			},
 			"ErrorResponse": {
 				"type": "object",
+				"description": "the dto used to send an error response to the client",
 				"additionalProperties": false,
 				"required": ["statusCode", "message", "errors"],
 				"properties": {
 					"statusCode": {
 						"type": "integer",
+						"description": "the http status code sent to the client. default is 400.",
 						"format": "int32",
 						"default": 400
 					},
 					"message": {
 						"type": "string",
+						"description": "the message for the error response",
 						"default": "One or more errors occurred!"
 					},
 					"errors": {
 						"type": "object",
+						"description": "the collection of errors for the current context",
 						"additionalProperties": {
 							"type": "array",
 							"items": {
@@ -11702,6 +13132,7 @@
 			},
 			"ProblemDetails": {
 				"type": "object",
+				"description": "RFC7807 compatible problem details/ error response class. this can be used by configuring startup like so:\napp.UseFastEndpoints(c => c.Errors.UseProblemDetails())",
 				"additionalProperties": false,
 				"required": ["type", "title", "status", "instance", "traceId", "errors"],
 				"properties": {
@@ -11728,6 +13159,7 @@
 					},
 					"detail": {
 						"type": "string",
+						"description": "the details of the error",
 						"nullable": true
 					},
 					"errors": {
@@ -11740,23 +13172,28 @@
 			},
 			"ProblemDetails_Error": {
 				"type": "object",
+				"description": "the error details object",
 				"additionalProperties": false,
 				"required": ["name", "reason"],
 				"properties": {
 					"name": {
 						"type": "string",
+						"description": "the name of the error or property of the dto that caused the error",
 						"default": "Error or field name"
 					},
 					"reason": {
 						"type": "string",
+						"description": "the reason for the error",
 						"default": "Error reason"
 					},
 					"code": {
 						"type": "string",
+						"description": "the code of the error",
 						"nullable": true
 					},
 					"severity": {
 						"type": "string",
+						"description": "the severity of the error",
 						"nullable": true
 					}
 				}
@@ -12156,6 +13593,86 @@
 						"description": "Announcement id"
 					}
 				}
+			},
+			"AuditLogFiltersResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["actions", "targetTypes"],
+				"properties": {
+					"actions": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"targetTypes": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"GetAuditLogsResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["logs", "totalCount"],
+				"properties": {
+					"logs": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/AuditLogDto"
+						}
+					},
+					"totalCount": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"AuditLogDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["id", "adminUserId", "adminUserName", "action", "targetType", "createdAt"],
+				"properties": {
+					"id": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"adminUserId": {
+						"type": "string"
+					},
+					"adminUserName": {
+						"type": "string"
+					},
+					"action": {
+						"type": "string"
+					},
+					"targetType": {
+						"type": "string"
+					},
+					"targetId": {
+						"type": "string",
+						"nullable": true
+					},
+					"details": {
+						"type": "string",
+						"nullable": true
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"data": {
+						"type": "object",
+						"nullable": true,
+						"additionalProperties": {}
+					}
+				}
+			},
+			"GetAuditLogsRequest": {
+				"type": "object",
+				"additionalProperties": false
 			},
 			"ConfirmationDto": {
 				"type": "object",
@@ -14655,6 +16172,563 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"GuideDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["id", "slug", "title", "status", "author", "score", "views", "createdAt", "description", "tags"],
+				"properties": {
+					"id": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"slug": {
+						"type": "string"
+					},
+					"title": {
+						"type": "string"
+					},
+					"status": {
+						"type": "string"
+					},
+					"iconSkyblockId": {
+						"type": "string",
+						"nullable": true
+					},
+					"author": {
+						"$ref": "#/components/schemas/AuthorDto"
+					},
+					"score": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"views": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"description": {
+						"type": "string"
+					},
+					"tags": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"AuthorDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["id", "name"],
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"avatar": {
+						"type": "string",
+						"nullable": true
+					},
+					"uuid": {
+						"type": "string",
+						"nullable": true
+					}
+				}
+			},
+			"ApproveCommentRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ApproveGuideRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"BookmarkRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CommentDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"id",
+					"sqid",
+					"content",
+					"author",
+					"createdAt",
+					"score",
+					"isPending",
+					"isDeleted",
+					"isEdited",
+					"isEditedByAdmin",
+					"hasPendingEdit"
+				],
+				"properties": {
+					"id": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"sqid": {
+						"type": "string"
+					},
+					"parentId": {
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					},
+					"content": {
+						"type": "string"
+					},
+					"draftContent": {
+						"type": "string",
+						"nullable": true
+					},
+					"author": {
+						"$ref": "#/components/schemas/AuthorDto"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"editedAt": {
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
+					},
+					"score": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"liftedElementId": {
+						"type": "string",
+						"nullable": true
+					},
+					"userVote": {
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					},
+					"isPending": {
+						"type": "boolean"
+					},
+					"isDeleted": {
+						"type": "boolean"
+					},
+					"isEdited": {
+						"type": "boolean"
+					},
+					"isEditedByAdmin": {
+						"type": "boolean"
+					},
+					"hasPendingEdit": {
+						"type": "boolean"
+					}
+				}
+			},
+			"CreateCommentRequest": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["content"],
+				"properties": {
+					"parentId": {
+						"type": "integer",
+						"format": "int32",
+						"nullable": true
+					},
+					"content": {
+						"type": "string",
+						"maxLength": 2048,
+						"minLength": 0,
+						"nullable": false
+					},
+					"liftedElementId": {
+						"type": "string",
+						"maxLength": 128,
+						"minLength": 0,
+						"nullable": true
+					}
+				}
+			},
+			"CreateGuideRequest": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["type"],
+				"properties": {
+					"type": {
+						"$ref": "#/components/schemas/GuideType"
+					}
+				}
+			},
+			"GuideType": {
+				"type": "integer",
+				"description": "",
+				"x-enumNames": ["General", "Farm", "Greenhouse", "Contest"],
+				"enum": [0, 1, 2, 3]
+			},
+			"TagResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["id", "name", "category", "hexColor"],
+				"properties": {
+					"id": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"name": {
+						"type": "string"
+					},
+					"category": {
+						"type": "string"
+					},
+					"hexColor": {
+						"type": "string"
+					}
+				}
+			},
+			"CreateTagRequest": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["name", "category"],
+				"properties": {
+					"name": {
+						"type": "string",
+						"maxLength": 64,
+						"minLength": 0,
+						"nullable": false
+					},
+					"category": {
+						"type": "string",
+						"maxLength": 32,
+						"minLength": 0,
+						"nullable": false
+					},
+					"hexColor": {
+						"type": "string",
+						"maxLength": 7,
+						"minLength": 0,
+						"nullable": true
+					}
+				}
+			},
+			"DeleteCommentRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"DeleteGuideRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"DeleteTagRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"EditCommentRequest": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["content"],
+				"properties": {
+					"content": {
+						"type": "string",
+						"maxLength": 2048,
+						"minLength": 0,
+						"nullable": false
+					}
+				}
+			},
+			"FullGuideDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"id",
+					"slug",
+					"title",
+					"description",
+					"content",
+					"author",
+					"createdAt",
+					"score",
+					"viewCount",
+					"tags",
+					"isDraft",
+					"status"
+				],
+				"properties": {
+					"id": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"slug": {
+						"type": "string"
+					},
+					"title": {
+						"type": "string"
+					},
+					"iconSkyblockId": {
+						"type": "string",
+						"nullable": true
+					},
+					"description": {
+						"type": "string"
+					},
+					"content": {
+						"type": "string"
+					},
+					"author": {
+						"$ref": "#/components/schemas/AuthorDto"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"score": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"viewCount": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"tags": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"isDraft": {
+						"type": "boolean"
+					},
+					"status": {
+						"type": "string"
+					},
+					"userVote": {
+						"type": "integer",
+						"nullable": true
+					},
+					"isBookmarked": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"rejectionReason": {
+						"type": "string",
+						"nullable": true
+					}
+				}
+			},
+			"GetGuideRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserGuideDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["id", "slug", "title", "description", "type", "status", "score", "viewCount", "createdAt"],
+				"properties": {
+					"id": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"slug": {
+						"type": "string"
+					},
+					"title": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string"
+					},
+					"status": {
+						"type": "string"
+					},
+					"score": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"viewCount": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
+					}
+				}
+			},
+			"GetUserBookmarksRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetUserGuidesRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ListCommentsRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ListGuidesRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GuideSort": {
+				"type": "string",
+				"description": "",
+				"enum": ["newest", "topRated", "trending"]
+			},
+			"RejectGuideRequest": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"reason": {
+						"type": "string",
+						"description": "Optional reason for rejection to provide feedback to the author.",
+						"nullable": true
+					}
+				}
+			},
+			"SubmitGuideRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UnpublishGuideRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdateGuideRequest": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["title", "description", "markdownContent"],
+				"properties": {
+					"title": {
+						"type": "string"
+					},
+					"iconSkyblockId": {
+						"type": "string",
+						"nullable": true
+					},
+					"description": {
+						"type": "string"
+					},
+					"markdownContent": {
+						"type": "string"
+					},
+					"tags": {
+						"type": "array",
+						"nullable": true,
+						"items": {
+							"type": "string"
+						}
+					},
+					"richBlocks": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/GuideRichData"
+							}
+						]
+					}
+				}
+			},
+			"GuideRichData": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"greenhouseLayout": {
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/GreenhouseLayout"
+							}
+						]
+					}
+				}
+			},
+			"GreenhouseLayout": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["layoutId", "slots"],
+				"properties": {
+					"layoutId": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"slots": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/GreenhouseSlot"
+						}
+					}
+				}
+			},
+			"GreenhouseSlot": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["index", "itemId"],
+				"properties": {
+					"index": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"itemId": {
+						"type": "string"
+					},
+					"backgroundTexture": {
+						"type": "string",
+						"nullable": true
+					}
+				}
+			},
+			"UpdateTagRequest": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"name": {
+						"type": "string",
+						"nullable": true
+					},
+					"category": {
+						"type": "string",
+						"nullable": true
+					},
+					"hexColor": {
+						"type": "string",
+						"nullable": true
+					}
+				}
+			},
+			"VoteCommentRequest": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["value"],
+				"properties": {
+					"value": {
+						"type": "integer"
+					}
+				}
+			},
+			"VoteGuideRequest": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["value"],
+				"properties": {
+					"value": {
+						"type": "integer"
+					}
+				}
+			},
 			"SetEventFeatureRequest": {
 				"type": "object",
 				"additionalProperties": false
@@ -15742,16 +17816,16 @@
 				}
 			},
 			"LeaderboardType": {
-				"type": "integer",
+				"type": "string",
 				"description": "",
 				"x-enumNames": ["Current", "Weekly", "Monthly"],
-				"enum": [0, 1, 2]
+				"enum": ["Current", "Weekly", "Monthly"]
 			},
 			"LeaderboardScoreDataType": {
-				"type": "integer",
+				"type": "string",
 				"description": "",
 				"x-enumNames": ["Double", "Long", "Decimal"],
-				"enum": [0, 1, 2]
+				"enum": ["Double", "Long", "Decimal"]
 			},
 			"LeaderboardPositionDto": {
 				"type": "object",
@@ -15920,6 +17994,81 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"GetNotificationsResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["notifications", "unreadCount"],
+				"properties": {
+					"notifications": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/NotificationDto"
+						}
+					},
+					"unreadCount": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"NotificationDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["id", "type", "title", "isRead", "createdAt"],
+				"properties": {
+					"id": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"type": {
+						"$ref": "#/components/schemas/NotificationType"
+					},
+					"title": {
+						"type": "string"
+					},
+					"message": {
+						"type": "string",
+						"nullable": true
+					},
+					"link": {
+						"type": "string",
+						"nullable": true
+					},
+					"isRead": {
+						"type": "boolean"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"data": {
+						"type": "object",
+						"nullable": true,
+						"additionalProperties": {}
+					}
+				}
+			},
+			"NotificationType": {
+				"type": "string",
+				"description": "",
+				"enum": [
+					"system",
+					"guideApproved",
+					"guideEditApproved",
+					"guideRejected",
+					"guideDeleted",
+					"commentApproved",
+					"commentEditApproved",
+					"commentRejected",
+					"newComment",
+					"newReply",
+					"shopPurchase"
+				]
+			},
+			"GetNotificationsRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
 			"LinkedAccountsDto": {
 				"type": "object",
 				"additionalProperties": false,
@@ -15965,7 +18114,8 @@
 					"inventories",
 					"isSelected",
 					"wasRemoved",
-					"lastUpdated"
+					"lastUpdated",
+					"lastDataChanged"
 				],
 				"properties": {
 					"profileId": {
@@ -16089,6 +18239,10 @@
 					"lastUpdated": {
 						"type": "integer",
 						"format": "int64"
+					},
+					"lastDataChanged": {
+						"type": "integer",
+						"format": "int64"
 					}
 				}
 			},
@@ -16180,7 +18334,7 @@
 			"UnparsedApiDataDto": {
 				"type": "object",
 				"additionalProperties": false,
-				"required": ["copper", "consumed", "levelCaps"],
+				"required": ["copper", "consumed", "dnaMilestone", "levelCaps"],
 				"properties": {
 					"copper": {
 						"type": "integer",
@@ -16199,6 +18353,10 @@
 						"additionalProperties": {
 							"type": "boolean"
 						}
+					},
+					"dnaMilestone": {
+						"type": "integer",
+						"format": "int32"
 					},
 					"levelCaps": {
 						"type": "object",
@@ -20746,6 +22904,10 @@
 				}
 			},
 			"GetStyleRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetBlockTextureRequest": {
 				"type": "object",
 				"additionalProperties": false
 			},
