@@ -212,6 +212,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				.setLabel('Uptime')
 				.setEmoji('🕐')
 				.setStyle(active === 'uptime' ? ButtonStyle.Primary : ButtonStyle.Secondary),
+			new ButtonBuilder().setCustomId('GAININFO').setLabel('Info').setStyle(ButtonStyle.Secondary),
 			new ButtonBuilder()
 				.setLabel(`@${account.name}/${profile.profileName}`)
 				.setURL(`https://elitebot.dev/@${account.name}/${encodeURIComponent(profile.profileName)}`)

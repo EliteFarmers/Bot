@@ -40,6 +40,11 @@ async function execute(interaction: ButtonInteraction, settings: UserSettings) {
 			value:
 				'If it exists, older data may be viewed on the Elite Farmers [website](https://elitebot.dev). View someone\'s profile and click on the "Charts" tab.',
 		},
+		{
+			name: 'How is Guild XP (Uptime) calculated?',
+			value:
+				"A player's daily guild XP (GEXP) is provided by Hypixel's API. The uptime hours are calculated by dividing the GEXP gained by 9,000 (which is roughly max GEXP/hr for farming). This is only an estimation and requires the player to be in a guild.",
+		},
 	);
 
 	return interaction.reply({ embeds: [embed.data], ephemeral: true });
