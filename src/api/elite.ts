@@ -313,6 +313,15 @@ export const FetchSkillGraphs = (playerUuid: string, profileUuid: string, days?:
 		},
 	});
 
+export const FetchPlayerData = (player: string) =>
+	GET('/player/{player}', {
+		params: {
+			path: {
+				player,
+			},
+		},
+	});
+
 export const FetchContest = (timestamp: number) =>
 	GET('/contests/{timestamp}', {
 		params: {
