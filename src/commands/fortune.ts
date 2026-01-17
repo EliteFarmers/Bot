@@ -111,6 +111,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		chips: saved?.chips ?? {},
 		attributes: saved?.attributes ?? {},
 		communityCenter: saved?.communityCenter ?? 0,
+		filledRosewaterFlask: saved?.rosewaterFlasks ?? 0,
 	};
 
 	const player = createFarmingPlayer(options);

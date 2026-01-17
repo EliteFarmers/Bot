@@ -4,6 +4,7 @@ import {
 	Crop,
 	calculateAverageSpecialCrops,
 	calculateDetailedAverageDrops,
+	FarmingPet,
 	getCropDisplayName,
 	getPossibleResultsFromCrops,
 } from 'farming-weight';
@@ -50,11 +51,15 @@ const command = new EliteCommand({
 			description: 'The pet to calculate rates for!',
 			type: SlashCommandOptionType.String,
 			builder: (b) =>
-				b.addChoices({ name: 'Mooshroom Cow', value: 'mooshroom' }, { name: 'Elephant', value: 'elephant' }),
+				b.addChoices(
+					{ name: 'Rose Dragon', value: 'rose_dragon' },
+					{ name: 'Mooshroom Cow', value: 'mooshroom' },
+					{ name: 'Elephant', value: 'elephant' },
+				),
 		},
 		'max-tool': {
 			name: 'max-tool',
-			description: 'Whether to use a level 50 farming tool! (default: false)',
+			description: 'Whether to use a level 50 farming tool! (default: true)',
 			type: SlashCommandOptionType.Boolean,
 			builder: (b) => b.setRequired(false),
 		},
@@ -75,11 +80,24 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const fortuneInput = fortuneRaw ? fortuneRaw : undefined;
 	const blocks = interaction.options.getInteger('time', false) ?? 72_000;
 	const reforge = interaction.options.getString('reforge', false) ?? 'bountiful';
-	const pet = interaction.options.getString('pet', false) ?? 'mooshroom';
+	const pet = interaction.options.getString('pet', false) ?? 'rose_dragon';
 	const bps = interaction.options.getNumber('bps', false) ?? 20;
-	const useLevel50Tool = interaction.options.getBoolean('max-tool', false) ?? false;
+	const useLevel50Tool = interaction.options.getBoolean('max-tool', false) ?? true;
 	const timeName = TIME_OPTIONS[blocks as keyof typeof TIME_OPTIONS];
 	const blocksBroken = Math.round(blocks * (bps / 20));
+
+	const petName = pet === 'mooshroom' ? 'Mooshroom Cow' : pet === 'elephant' ? 'Elephant' : 'Rose Dragon';
+
+	let petData: undefined | FarmingPet;
+	if (pet === 'rose_dragon') {
+		petData = new FarmingPet({
+			type: 'ROSE_DRAGON',
+			exp: 1708399946,
+			active: true,
+			tier: 'LEGENDARY',
+			heldItem: 'GREEN_BANDANA',
+		});
+	}
 
 	const expectedDrops = calculateDetailedAverageDrops({
 		farmingFortune: fortuneInput,
@@ -87,6 +105,13 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		bountiful: reforge === 'bountiful',
 		mooshroom: pet === 'mooshroom',
 		maxTool: useLevel50Tool,
+		pet: petData,
+		chips: {
+			RAREFINDER: 20,
+		},
+		attributes: {
+			CROPEETLE: 64,
+		},
 	}) as Partial<ReturnType<typeof calculateDetailedAverageDrops>>;
 
 	delete expectedDrops[Crop.Seeds];
@@ -191,11 +216,13 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		})
 		.sort((a, b) => b.profit - a.profit);
 
-	const bpsText = `-# **${bps % 1 === 0 ? bps : bps.toFixed(2)}**/20 BPS (${((bps / 20) * 100).toFixed(1)}%)`;
+	const bpsText =
+		`-# **${bps % 1 === 0 ? bps : bps.toFixed(2)}**/20 BPS (${((bps / 20) * 100).toFixed(1)}%)` +
+		`${useLevel50Tool ? ', using a **Level 50** farming tool!' : ', not using a Level 50 farming tool.'}`;
 	const description =
 		`Expected rates for **${fortuneInput?.toLocaleString() ?? 'MAX'}** Farming Fortune in **${timeName}**! ` +
 		`\nUsing **${reforge === 'bountiful' ? 'Bountiful' : 'Blessed'}**, ` +
-		`**${pet === 'mooshroom' ? 'Mooshroom Cow' : 'Elephant'}**, and **4/4ths Helianthus Armor**!\n` +
+		`**${petName}**, and **4/4ths Helianthus Armor**!\n` +
 		bpsText;
 
 	await interaction.deferReply();
@@ -271,7 +298,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		const cropDetails =
 			`\nUsing **${reforge === 'bountiful' ? 'Bountiful' : 'Blessed'}**, ` +
-			`**${pet === 'mooshroom' ? 'Mooshroom Cow' : 'Elephant'}**, ` +
+			`**${petName}**, ` +
 			`and **4/4ths Helianthus Armor**!`;
 
 		const threeFourths = calculateAverageSpecialCrops(blocksBroken, crop as Crop, 3);
