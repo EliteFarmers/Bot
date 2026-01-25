@@ -152,6 +152,33 @@ export const FetchGuildJacob = (id: string) =>
 		},
 	});
 
+export const SubmitJacobScore = ({
+	guildId,
+	lbId,
+	discordUserId,
+	roles,
+}: {
+	guildId: string;
+	lbId: string;
+	discordUserId: string;
+	roles: string[];
+}) =>
+	POST('/user/guild/{discordId}/jacob/{leaderboardId}/submit', {
+		params: {
+			path: {
+				discordId: guildId as unknown as number,
+				leaderboardId: lbId,
+			},
+			query: {
+				discordUserId: discordUserId as unknown as number,
+			},
+		},
+		body: roles,
+		headers: {
+			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
+		},
+	});
+
 export const UpdateGuildJacob = (id: string, data: components['schemas']['GuildJacobLeaderboardFeature']) =>
 	PUT('/bot/{discordId}/jacob', {
 		params: {

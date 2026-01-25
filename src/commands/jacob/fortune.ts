@@ -26,12 +26,6 @@ const command = new EliteCommand({
 			type: SlashCommandOptionType.Number,
 			builder: (b) => b.setMinValue(10).setMaxValue(20),
 		},
-		dicer: {
-			name: 'dicer',
-			description: 'Include tier 3 dicer crops in the calculation?',
-			type: SlashCommandOptionType.Boolean,
-			required: false,
-		},
 		mooshroom: {
 			name: 'mooshroom',
 			description: 'Include mooshroom mushrooms in the calculation?',
@@ -46,7 +40,6 @@ export default command;
 const fortuneEmoji = '<:ff:1450022749631287330>';
 
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
-	const useDicers = interaction.options.getBoolean('dicer', false) ?? true;
 	const useMooshroom = interaction.options.getBoolean('mooshroom', false) ?? true;
 
 	const bpsValue = interaction.options.getNumber('bps', false) ?? undefined;
@@ -80,10 +73,9 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			`Requirements are averaged using contests from **<t:${+(brackets?.start ?? 0)}:R>** until now.\nUsing an efficiency of **${bps} BPS** (${(ratio * 100).toFixed(1)}%)`,
 		);
 
-	PrefixFooter(
-		embed,
-		`Dicer RNG drops ${useDicers ? 'included' : 'not included'} • Mooshroom Cow mushrooms ${useMooshroom ? 'included' : 'not included'}`,
-	);
+	if (useMooshroom) {
+		PrefixFooter(embed, `Mooshroom Cow mushrooms included.`);
+	}
 
 	const lessButton = new ButtonBuilder().setCustomId('less').setLabel('Decrease Range').setStyle(ButtonStyle.Secondary);
 
@@ -107,7 +99,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const reply = await interaction
 		.reply({
-			embeds: [higherEmbed(embed, brackets, blocksBroken, useDicers, useMooshroom)],
+			embeds: [higherEmbed(embed, brackets, blocksBroken, useMooshroom)],
 			components: [silverRow],
 		})
 		.catch(() => undefined);
@@ -176,7 +168,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		if (button.customId === 'higher') {
 			await button
 				.update({
-					embeds: [higherEmbed(embed, brackets, blocksBroken, useDicers, useMooshroom)],
+					embeds: [higherEmbed(embed, brackets, blocksBroken, useMooshroom)],
 					components: [silverRow],
 				})
 				.catch(() => undefined);
@@ -186,7 +178,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		if (button.customId === 'lower') {
 			await button
 				.update({
-					embeds: [lowerEmbed(embed, brackets, blocksBroken, useDicers, useMooshroom)],
+					embeds: [lowerEmbed(embed, brackets, blocksBroken, useMooshroom)],
 					components: [diamondRow],
 				})
 				.catch(() => undefined);
@@ -227,7 +219,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		await button
 			.update({
-				embeds: [higherEmbed(embed, brackets, blocksBroken, useDicers, useMooshroom)],
+				embeds: [higherEmbed(embed, brackets, blocksBroken, useMooshroom)],
 				components: [silverRow],
 			})
 			.catch(() => undefined);
@@ -244,13 +236,12 @@ function higherEmbed(
 	embed: EmbedBuilder,
 	brackets: components['schemas']['ContestBracketsDetailsDto'] | undefined,
 	blocksBroken: number,
-	useDicers = true,
 	useMooshroom = true,
 ) {
 	embed.setFields([
-		makeField(brackets, 'Diamond', blocksBroken, useDicers, useMooshroom),
-		makeField(brackets, 'Platinum', blocksBroken, useDicers, useMooshroom),
-		makeField(brackets, 'Gold', blocksBroken, useDicers, useMooshroom),
+		makeField(brackets, 'Diamond', blocksBroken, useMooshroom),
+		makeField(brackets, 'Platinum', blocksBroken, useMooshroom),
+		makeField(brackets, 'Gold', blocksBroken, useMooshroom),
 	]);
 
 	return embed;
@@ -260,12 +251,11 @@ function lowerEmbed(
 	embed: EmbedBuilder,
 	brackets: components['schemas']['ContestBracketsDetailsDto'] | undefined,
 	blocksBroken: number,
-	useDicers = true,
 	useMooshroom = true,
 ) {
 	embed.setFields([
-		makeField(brackets, 'Silver', blocksBroken, useDicers, useMooshroom),
-		makeField(brackets, 'Bronze', blocksBroken, useDicers, useMooshroom),
+		makeField(brackets, 'Silver', blocksBroken, useMooshroom),
+		makeField(brackets, 'Bronze', blocksBroken, useMooshroom),
 		{
 			name: 'Confused by Zeroes?',
 			value: 'Even with no fortune, you can still get these medals by farming for the whole contest!',
@@ -280,7 +270,6 @@ function makeField(
 	data: components['schemas']['ContestBracketsDetailsDto'] | undefined,
 	bracket: string,
 	blocksBroken: number,
-	useDicers = true,
 	useMooshroom = true,
 ) {
 	const requirements = Object.entries(data?.brackets ?? {})

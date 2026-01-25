@@ -7606,6 +7606,263 @@
 				]
 			}
 		},
+		"/guilds/{discordId}/jacob/exclusions/timespans": {
+			"post": {
+				"tags": ["Guilds"],
+				"summary": "Add an excluded timespan",
+				"operationId": "AddJacobLeaderboardExcludedTimespan",
+				"parameters": [
+					{
+						"name": "discordId",
+						"in": "path",
+						"required": true,
+						"description": "Discord Snowflake ID of the requested resource (guild, user, etc.)",
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "body",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AddExcludedTimespanRequest_AddExcludedTimespanRequestBody"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			},
+			"delete": {
+				"tags": ["Guilds"],
+				"summary": "Remove an excluded timespan",
+				"operationId": "RemoveJacobLeaderboardExcludedTimespan",
+				"parameters": [
+					{
+						"name": "discordId",
+						"in": "path",
+						"required": true,
+						"description": "Discord Snowflake ID of the requested resource (guild, user, etc.)",
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					{
+						"name": "start",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					{
+						"name": "end",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/guilds/{discordId}/jacob/bans/participations": {
+			"post": {
+				"tags": ["Guilds"],
+				"summary": "Ban a specific participation from the leaderboard",
+				"operationId": "BanParticipationFromJacobLeaderboard",
+				"parameters": [
+					{
+						"name": "discordId",
+						"in": "path",
+						"required": true,
+						"description": "Discord Snowflake ID of the requested resource (guild, user, etc.)",
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "body",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BanParticipationRequest_BanParticipationRequestBody"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/guilds/{discordId}/jacob/bans/players": {
+			"post": {
+				"tags": ["Guilds"],
+				"summary": "Ban a player from all Jacob leaderboards",
+				"operationId": "BanPlayerFromJacobLeaderboard",
+				"parameters": [
+					{
+						"name": "discordId",
+						"in": "path",
+						"required": true,
+						"description": "Discord Snowflake ID of the requested resource (guild, user, etc.)",
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "body",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BanPlayerRequest_BanPlayerRequestBody"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/guilds/{discordId}/jacob/bans/participations/{participationId}": {
+			"delete": {
+				"tags": ["Guilds"],
+				"summary": "Unban a specific participation",
+				"operationId": "UnbanParticipationFromJacobLeaderboard",
+				"parameters": [
+					{
+						"name": "discordId",
+						"in": "path",
+						"required": true,
+						"description": "Discord Snowflake ID of the requested resource (guild, user, etc.)",
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					{
+						"name": "participationId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
+		"/guilds/{discordId}/jacob/bans/players/{playerUuid}": {
+			"delete": {
+				"tags": ["Guilds"],
+				"summary": "Unban a player from Jacob leaderboards",
+				"operationId": "UnbanPlayerFromJacobLeaderboard",
+				"parameters": [
+					{
+						"name": "discordId",
+						"in": "path",
+						"required": true,
+						"description": "Discord Snowflake ID of the requested resource (guild, user, etc.)",
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					{
+						"name": "playerUuid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"JWTBearerAuth": []
+					}
+				]
+			}
+		},
 		"/user/guild/{discordId}/jacob/{leaderboardId}/send": {
 			"post": {
 				"tags": ["User"],
@@ -7654,6 +7911,80 @@
 						"JWTBearerAuth": []
 					}
 				]
+			}
+		},
+		"/user/guild/{discordId}/jacob/{leaderboardId}/submit": {
+			"post": {
+				"tags": ["User"],
+				"summary": "Submit scores to a Jacob leaderboard",
+				"operationId": "SubmitScore",
+				"parameters": [
+					{
+						"name": "discordId",
+						"in": "path",
+						"required": true,
+						"description": "Discord Snowflake ID of the requested resource (guild, user, etc.)",
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					{
+						"name": "leaderboardId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "discordUserId",
+						"in": "query",
+						"description": "Discord User ID of the submitter. Required when called by Bot.\nIf not provided, the authenticated user's Discord ID is used.",
+						"schema": {
+							"type": "integer",
+							"format": "int64",
+							"nullable": true
+						}
+					}
+				],
+				"requestBody": {
+					"x-name": "userRoleIds",
+					"description": "Optional role IDs of the submitter. If provided, these are used for role checks.\nIf not provided, the backend will fetch the user's roles from stored guild member data.",
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "Success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SubmitScoreResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
 			}
 		},
 		"/user/refresh-guilds": {
@@ -14186,6 +14517,7 @@
 					"maxLeaderboards",
 					"blockedRoles",
 					"blockedUsers",
+					"blockedPlayerUuids",
 					"requiredRoles",
 					"excludedParticipations",
 					"excludedTimespans",
@@ -14207,6 +14539,12 @@
 						"items": {
 							"type": "integer",
 							"format": "uint64"
+						}
+					},
+					"blockedPlayerUuids": {
+						"type": "array",
+						"items": {
+							"type": "string"
 						}
 					},
 					"requiredRoles": {
@@ -17119,9 +17457,180 @@
 					}
 				}
 			},
+			"RemoveExcludedTimespanRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AddExcludedTimespanRequest_AddExcludedTimespanRequestBody": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["start", "end"],
+				"properties": {
+					"start": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"end": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"reason": {
+						"type": "string",
+						"nullable": true
+					}
+				}
+			},
+			"BanParticipationRequest_BanParticipationRequestBody": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["uuid", "crop", "timestamp"],
+				"properties": {
+					"uuid": {
+						"type": "string"
+					},
+					"crop": {
+						"type": "string"
+					},
+					"timestamp": {
+						"type": "integer",
+						"format": "int64"
+					}
+				}
+			},
+			"BanPlayerRequest_BanPlayerRequestBody": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["playerUuid"],
+				"properties": {
+					"playerUuid": {
+						"type": "string"
+					}
+				}
+			},
+			"UnbanParticipationRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UnbanPlayerRequest": {
+				"type": "object",
+				"additionalProperties": false
+			},
 			"SendJacobLeaderboardRequest": {
 				"type": "object",
 				"additionalProperties": false
+			},
+			"SubmitScoreResponse": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["changes", "hasNewRecords", "shouldPing"],
+				"properties": {
+					"changes": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/ScoreChangeDto"
+						}
+					},
+					"hasNewRecords": {
+						"type": "boolean"
+					},
+					"shouldPing": {
+						"type": "boolean"
+					}
+				}
+			},
+			"ScoreChangeDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["crop", "newPosition", "oldPosition", "submitter", "record", "isNewHighScore", "isImprovement"],
+				"properties": {
+					"crop": {
+						"type": "string"
+					},
+					"newPosition": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"oldPosition": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"submitter": {
+						"$ref": "#/components/schemas/SubmitterInfoDto"
+					},
+					"record": {
+						"$ref": "#/components/schemas/ContestParticipationDto"
+					},
+					"displacedEntry": {
+						"description": "Information about the previous record holder at this position, if any.",
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/DisplacedEntryDto"
+							}
+						]
+					},
+					"knockedOutEntry": {
+						"description": "Information about the entry that was knocked out of the leaderboard (e.g., 3rd place -> off).",
+						"nullable": true,
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/DisplacedEntryDto"
+							}
+						]
+					},
+					"improvement": {
+						"type": "integer",
+						"description": "The amount the submitter improved their own score (if applicable).",
+						"format": "int32",
+						"nullable": true
+					},
+					"isNewHighScore": {
+						"type": "boolean"
+					},
+					"isImprovement": {
+						"type": "boolean"
+					}
+				}
+			},
+			"SubmitterInfoDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["uuid", "ign", "discordId"],
+				"properties": {
+					"uuid": {
+						"type": "string"
+					},
+					"ign": {
+						"type": "string"
+					},
+					"discordId": {
+						"type": "string"
+					}
+				}
+			},
+			"DisplacedEntryDto": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["uuid", "ign", "discordId", "collected", "previousPosition"],
+				"properties": {
+					"uuid": {
+						"type": "string"
+					},
+					"ign": {
+						"type": "string"
+					},
+					"discordId": {
+						"type": "string"
+					},
+					"collected": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"previousPosition": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
 			},
 			"GetHypixelGuildResponse": {
 				"type": "object",
@@ -18062,7 +18571,8 @@
 					"commentRejected",
 					"newComment",
 					"newReply",
-					"shopPurchase"
+					"shopPurchase",
+					"guideSubmitted"
 				]
 			},
 			"GetNotificationsRequest": {

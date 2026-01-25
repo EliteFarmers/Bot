@@ -2498,6 +2498,92 @@ export interface paths {
 		patch: operations['UpdateGuildJacobFeature'];
 		trace?: never;
 	};
+	'/guilds/{discordId}/jacob/exclusions/timespans': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Add an excluded timespan */
+		post: operations['AddJacobLeaderboardExcludedTimespan'];
+		/** Remove an excluded timespan */
+		delete: operations['RemoveJacobLeaderboardExcludedTimespan'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/guilds/{discordId}/jacob/bans/participations': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Ban a specific participation from the leaderboard */
+		post: operations['BanParticipationFromJacobLeaderboard'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/guilds/{discordId}/jacob/bans/players': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Ban a player from all Jacob leaderboards */
+		post: operations['BanPlayerFromJacobLeaderboard'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/guilds/{discordId}/jacob/bans/participations/{participationId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		post?: never;
+		/** Unban a specific participation */
+		delete: operations['UnbanParticipationFromJacobLeaderboard'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/guilds/{discordId}/jacob/bans/players/{playerUuid}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		post?: never;
+		/** Unban a player from Jacob leaderboards */
+		delete: operations['UnbanPlayerFromJacobLeaderboard'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/user/guild/{discordId}/jacob/{leaderboardId}/send': {
 		parameters: {
 			query?: never;
@@ -2509,6 +2595,23 @@ export interface paths {
 		put?: never;
 		/** Send a Jacob leaderboard to Discord */
 		post: operations['SendGuildJacobFeature'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/user/guild/{discordId}/jacob/{leaderboardId}/submit': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Submit scores to a Jacob leaderboard */
+		post: operations['SubmitScore'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -4880,6 +4983,7 @@ export interface components {
 			maxLeaderboards: number;
 			blockedRoles: components['schemas']['DiscordRole'][];
 			blockedUsers: number[];
+			blockedPlayerUuids: string[];
 			requiredRoles: components['schemas']['DiscordRole'][];
 			excludedParticipations: string[];
 			excludedTimespans: components['schemas']['ExcludedTimespan'][];
@@ -5757,7 +5861,65 @@ export interface components {
 			updateRoleId?: string | null;
 			pingForSmallImprovements?: boolean | null;
 		};
+		RemoveExcludedTimespanRequest: Record<string, never>;
+		AddExcludedTimespanRequest_AddExcludedTimespanRequestBody: {
+			/** Format: int64 */
+			start: number;
+			/** Format: int64 */
+			end: number;
+			reason?: string | null;
+		};
+		BanParticipationRequest_BanParticipationRequestBody: {
+			uuid: string;
+			crop: string;
+			/** Format: int64 */
+			timestamp: number;
+		};
+		BanPlayerRequest_BanPlayerRequestBody: {
+			playerUuid: string;
+		};
+		UnbanParticipationRequest: Record<string, never>;
+		UnbanPlayerRequest: Record<string, never>;
 		SendJacobLeaderboardRequest: Record<string, never>;
+		SubmitScoreResponse: {
+			changes: components['schemas']['ScoreChangeDto'][];
+			hasNewRecords: boolean;
+			shouldPing: boolean;
+		};
+		ScoreChangeDto: {
+			crop: string;
+			/** Format: int32 */
+			newPosition: number;
+			/** Format: int32 */
+			oldPosition: number;
+			submitter: components['schemas']['SubmitterInfoDto'];
+			record: components['schemas']['ContestParticipationDto'];
+			/** @description Information about the previous record holder at this position, if any. */
+			displacedEntry?: components['schemas']['DisplacedEntryDto'] | null;
+			/** @description Information about the entry that was knocked out of the leaderboard (e.g., 3rd place -> off). */
+			knockedOutEntry?: components['schemas']['DisplacedEntryDto'] | null;
+			/**
+			 * Format: int32
+			 * @description The amount the submitter improved their own score (if applicable).
+			 */
+			improvement?: number | null;
+			isNewHighScore: boolean;
+			isImprovement: boolean;
+		};
+		SubmitterInfoDto: {
+			uuid: string;
+			ign: string;
+			discordId: string;
+		};
+		DisplacedEntryDto: {
+			uuid: string;
+			ign: string;
+			discordId: string;
+			/** Format: int32 */
+			collected: number;
+			/** Format: int32 */
+			previousPosition: number;
+		};
 		GetHypixelGuildResponse: {
 			guild: components['schemas']['HypixelGuildDto'];
 		};
@@ -6109,7 +6271,8 @@ export interface components {
 			| 'commentRejected'
 			| 'newComment'
 			| 'newReply'
-			| 'shopPurchase';
+			| 'shopPurchase'
+			| 'guideSubmitted';
 		GetNotificationsRequest: Record<string, never>;
 		LinkedAccountsDto: {
 			selectedUuid?: string | null;
@@ -13433,6 +13596,191 @@ export interface operations {
 			};
 		};
 	};
+	AddJacobLeaderboardExcludedTimespan: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description Discord Snowflake ID of the requested resource (guild, user, etc.) */
+				discordId: number;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['AddExcludedTimespanRequest_AddExcludedTimespanRequestBody'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	RemoveJacobLeaderboardExcludedTimespan: {
+		parameters: {
+			query: {
+				start: number;
+				end: number;
+			};
+			header?: never;
+			path: {
+				/** @description Discord Snowflake ID of the requested resource (guild, user, etc.) */
+				discordId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	BanParticipationFromJacobLeaderboard: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description Discord Snowflake ID of the requested resource (guild, user, etc.) */
+				discordId: number;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['BanParticipationRequest_BanParticipationRequestBody'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	BanPlayerFromJacobLeaderboard: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description Discord Snowflake ID of the requested resource (guild, user, etc.) */
+				discordId: number;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['BanPlayerRequest_BanPlayerRequestBody'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	UnbanParticipationFromJacobLeaderboard: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description Discord Snowflake ID of the requested resource (guild, user, etc.) */
+				discordId: number;
+				participationId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	UnbanPlayerFromJacobLeaderboard: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description Discord Snowflake ID of the requested resource (guild, user, etc.) */
+				discordId: number;
+				playerUuid: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
 	SendGuildJacobFeature: {
 		parameters: {
 			query?: never;
@@ -13468,6 +13816,53 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content?: never;
+			};
+		};
+	};
+	SubmitScore: {
+		parameters: {
+			query?: {
+				/**
+				 * @description Discord User ID of the submitter. Required when called by Bot.
+				 *     If not provided, the authenticated user's Discord ID is used.
+				 */
+				discordUserId?: number | null;
+			};
+			header?: never;
+			path: {
+				/** @description Discord Snowflake ID of the requested resource (guild, user, etc.) */
+				discordId: number;
+				leaderboardId: string;
+			};
+			cookie?: never;
+		};
+		/**
+		 * @description Optional role IDs of the submitter. If provided, these are used for role checks.
+		 *     If not provided, the backend will fetch the user's roles from stored guild member data.
+		 */
+		requestBody: {
+			content: {
+				'application/json': string[];
+			};
+		};
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['SubmitScoreResponse'];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
 			};
 		};
 	};
