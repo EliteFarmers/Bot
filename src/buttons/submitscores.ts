@@ -72,6 +72,17 @@ async function execute(interaction: ButtonInteraction) {
 	}).catch((err) => ({ error: err, data: null }));
 
 	if (response.error || !response.data) {
+		// Update leaderboard image anyways if admin user (so admins can clear out removed scores)
+		if (interaction.memberPermissions.has(PermissionFlagsBits.Administrator | PermissionFlagsBits.ManageGuild)) {
+			const payload = await getLeaderboardPayload(leaderboard, interaction.guildId, interaction.guild.name);
+			await interaction.message
+				.edit({
+					...payload,
+					allowedMentions: { parse: [] },
+				})
+				.catch(() => undefined);
+		}
+
 		const status = response.error?.response?.status || response.error.statusCode;
 		const msg =
 			response.error?.response?.data?.message || response.error.errors.generalErrors.join('\n') || 'Unknown error';
@@ -217,7 +228,27 @@ async function execute(interaction: ButtonInteraction) {
 		.setDescription('Your scores were submitted! Congratulations!');
 	interaction.editReply({ embeds: [embed] });
 
-	const payload = await getLeaderboardPayload(leaderboard, interaction.guildId, interaction.guild.name);
+	const { data: newGuild } = await FetchGuildJacob(interaction.guildId).catch(() => ({ data: null }));
+
+	if (!newGuild) {
+		const embed = ErrorEmbed('Guild Not Found!').setDescription(
+			'This server is not registered!\nPlease invite the bot and set up a Jacob Leaderboard to use this command.',
+		);
+		interaction.editReply({ embeds: [embed] });
+		return;
+	}
+
+	const newLeaderboard = newGuild?.leaderboards?.find((lb) => lb.id === lbId);
+
+	if (!newLeaderboard) {
+		const embed = ErrorEmbed('Leaderboard not found!').setDescription(
+			'This leaderboard does not exist or Jacob Leaderboards are not enabled for this server.',
+		);
+		interaction.editReply({ embeds: [embed] });
+		return;
+	}
+
+	const payload = await getLeaderboardPayload(newLeaderboard, interaction.guildId, interaction.guild.name);
 	await interaction.message
 		.edit({
 			...payload,
