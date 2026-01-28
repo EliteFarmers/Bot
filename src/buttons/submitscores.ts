@@ -11,7 +11,7 @@ import {
 } from 'discord.js';
 import { Crop, getCropDisplayName, getCropFromName } from 'farming-weight';
 import { components } from '../api/api.js'; // Assuming this has the new schemas
-import { FetchGuildJacob, SubmitJacobScore } from '../api/elite.js'; // Added SubmitJacobScore
+import { FetchAccount, FetchGuildJacob, SubmitJacobScore } from '../api/elite.js'; // Added SubmitJacobScore
 import { commandReferences } from '../bot.js';
 import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
@@ -39,6 +39,18 @@ async function execute(interaction: ButtonInteraction) {
 	}
 
 	await interaction.deferReply({ ephemeral: true });
+
+	const { data: account } = await FetchAccount(interaction.user.id).catch(() => ({ data: null }));
+
+	if (!account) {
+		const embed = ErrorEmbed('Account Not Found!').setDescription(
+			`You must link your account before submitting scores.\nUse the ${commandReferences.get(
+				'link',
+			)} command to link your account.`,
+		);
+		interaction.editReply({ embeds: [embed] });
+		return;
+	}
 
 	const [, lbId] = interaction.customId.split('|');
 
