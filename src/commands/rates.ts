@@ -7,6 +7,7 @@ import {
 	FarmingPet,
 	getCropDisplayName,
 	getPossibleResultsFromCrops,
+	MAX_CROP_FORTUNE,
 } from 'farming-weight';
 import { FetchProducts, UserSettings } from '../api/elite.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
@@ -75,6 +76,10 @@ const command = new EliteCommand({
 
 export default command;
 
+const ElephantFortuneDiff = 396.7 - 210;
+const MooshroomFortuneDiff = 396.7 - 217;
+const fortuneEmoji = '<:ff:1450022749631287330>';
+
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	const fortuneRaw = interaction.options.getInteger('fortune', false) ?? undefined;
 	const fortuneInput = fortuneRaw ? fortuneRaw : undefined;
@@ -99,7 +104,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		});
 	}
 
-	const expectedDrops = calculateDetailedAverageDrops({
+	const options: Parameters<typeof calculateDetailedAverageDrops>[0] = {
 		farmingFortune: fortuneInput,
 		blocksBroken: blocksBroken,
 		bountiful: reforge === 'bountiful',
@@ -112,7 +117,21 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		attributes: {
 			CROPEETLE: 64,
 		},
-	}) as Partial<ReturnType<typeof calculateDetailedAverageDrops>>;
+	};
+
+	// Subtract difference from not using rose dragon pet if we don't have it
+	// selected (default behavior already uses MAX_CROP_FORTUNE)
+	if (fortuneInput === undefined && pet !== 'rose_dragon') {
+		const diff = pet === 'mooshroom' ? MooshroomFortuneDiff : ElephantFortuneDiff;
+		options.cropFortune = Object.fromEntries(
+			Object.entries(MAX_CROP_FORTUNE).map(([crop, max]) => [crop, max - diff]),
+		) as typeof MAX_CROP_FORTUNE;
+	}
+
+	// Cast to Partial to be able to delete seeds
+	const expectedDrops = calculateDetailedAverageDrops(options) as Partial<
+		ReturnType<typeof calculateDetailedAverageDrops>
+	>;
 
 	delete expectedDrops[Crop.Seeds];
 
@@ -236,8 +255,10 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const cropList = Object.keys(EliteCropEmojis) as Crop[];
 
-	for (const { emoji, profit, bz } of formatted) {
-		const values = `:coin: \`${profit.toLocaleString().padStart(profitLength, ' ')}\` **BZ** \`${(bz[0]?.total ?? 0).toLocaleString().padStart(bzLength, ' ')}\``;
+	for (const { emoji, profit, bz, details } of formatted) {
+		const values = `:coin: \`${profit.toLocaleString().padStart(profitLength, ' ')}\` **BZ** \`${(bz[0]?.total ?? 0).toLocaleString().padStart(bzLength, ' ')}\` ${fortuneEmoji} \`${(
+			details.fortune
+		).toLocaleString()}\``;
 
 		compactContainer.addText(`${emoji} ${values}`);
 	}
@@ -251,12 +272,14 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			'\n\n**Custom Fortune Warning**\n-# The amount of fortune available varies depending on the crop. For the best results, only look at the crop your entered fortune is for.';
 	}
 
+	compactContainer.addActionRowComponents(row);
+
 	compactContainer.addSeparator();
 	compactContainer.addText("**What's my fortune?**\n-# " + details);
 	compactContainer.addFooter();
 
 	const reply = await interaction.editReply({
-		components: [compactContainer, row],
+		components: [compactContainer],
 		flags: [MessageFlags.IsComponentsV2],
 	});
 
@@ -279,7 +302,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		if (inter.customId == 'back') {
 			await inter.update({
-				components: [compactContainer, row],
+				components: [compactContainer],
 				flags: [MessageFlags.IsComponentsV2],
 			});
 			cropContainer = undefined;
@@ -309,7 +332,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		cropContainer = new EliteContainer(settings)
 			.addTitle('## ' + cropName + ' Rates', false)
 			.addDescription(
-				`Expected rates for **${fortuneInput?.toLocaleString() ?? `${cropInfo.details.fortune.toLocaleString()} (MAX)`}** Farming Fortune in **${timeName}**!${cropDetails}\n${bpsText}`,
+				`Expected rates for **${fortuneInput?.toLocaleString() ?? cropInfo.details.fortune.toLocaleString()}** Farming Fortune in **${timeName}**!${cropDetails}\n${bpsText}`,
 			)
 			.addSeparator()
 			.addCollapsible({
@@ -378,7 +401,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			cropContainer.disableEverything();
 			await interaction.editReply({ components: [cropContainer] });
 		} else {
-			interaction.editReply({ components: [compactContainer] }).catch(() => undefined);
+			interaction.editReply({ components: [compactContainer.disableEverything()] }).catch(() => undefined);
 		}
 	});
 }
