@@ -186,13 +186,13 @@ async function execute(interaction: ButtonInteraction) {
 
 		if (oldPos !== -1 && improvement) {
 			// User improved their own score
-			message += `\n<@${interaction.user.id}> **(${escapeIgn(change.submitter.ign)})** improved their score by **${improvement.toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${change.record.timestamp})`;
+			message += `\n<@${interaction.user.id}> **(${escapeIgn(change.submitter.ign)})** improved their score by **${improvement.toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitesb.gg/contest/${change.record.timestamp})`;
 		} else {
 			// New entry
 			if (change.displacedEntry) {
-				message += `\n<@${interaction.user.id}> **(${escapeIgn(change.submitter.ign)})** has beaten <@${change.displacedEntry.discordId}> **(${escapeIgn(change.displacedEntry.ign)})** by **${(collected - change.displacedEntry.collected).toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitebot.dev/contest/${change.record.timestamp})`;
+				message += `\n<@${interaction.user.id}> **(${escapeIgn(change.submitter.ign)})** has beaten <@${change.displacedEntry.discordId}> **(${escapeIgn(change.displacedEntry.ign)})** by **${(collected - change.displacedEntry.collected).toLocaleString()}** collection for a total of **${collected.toLocaleString()}**! [⧉](https://elitesb.gg/contest/${change.record.timestamp})`;
 			} else {
-				message += `\n<@${interaction.user.id}> **(${escapeIgn(change.submitter.ign)})** has set a new score of **${collected.toLocaleString()}** collection! [⧉](https://elitebot.dev/contest/${change.record.timestamp})`;
+				message += `\n<@${interaction.user.id}> **(${escapeIgn(change.submitter.ign)})** has set a new score of **${collected.toLocaleString()}** collection! [⧉](https://elitesb.gg/contest/${change.record.timestamp})`;
 			}
 		}
 
@@ -313,7 +313,7 @@ export async function getLeaderboardPayload(
 			new ButtonBuilder().setCustomId(`LBSUBMIT|${lb.id}`).setLabel('Submit Scores').setStyle(ButtonStyle.Primary),
 			new ButtonBuilder()
 				.setLabel('View Online')
-				.setURL(`https://elitebot.dev/server/${guildId}`)
+				.setURL(`https://elitesb.gg/server/${guildId}`)
 				.setStyle(ButtonStyle.Link),
 		),
 	);

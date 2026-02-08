@@ -186,7 +186,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const linkRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			new ButtonBuilder()
 				.setLabel(`@${account?.name}/${profile?.profileName}`)
-				.setURL(`https://elitebot.dev/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')}`)
+				.setURL(`https://elitesb.gg/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')}`)
 				.setStyle(ButtonStyle.Link),
 		);
 
@@ -291,7 +291,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		linkRow.addComponents(
 			new ButtonBuilder()
 				.setLabel(`@${account?.name}/${profile?.profileName}`)
-				.setURL(`https://elitebot.dev/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')}`)
+				.setURL(`https://elitesb.gg/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')}`)
 				.setStyle(ButtonStyle.Link),
 		);
 
@@ -437,7 +437,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		linkRow.addComponents(
 			new ButtonBuilder()
 				.setLabel(`@${account?.name}/${profile?.profileName}`)
-				.setURL(`https://elitebot.dev/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')}`)
+				.setURL(`https://elitesb.gg/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')}`)
 				.setStyle(ButtonStyle.Link),
 		);
 
@@ -589,7 +589,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		linkRow.addComponents(
 			new ButtonBuilder()
 				.setLabel(`@${account?.name}/${profile?.profileName}`)
-				.setURL(`https://elitebot.dev/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')}`)
+				.setURL(`https://elitesb.gg/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')}`)
 				.setStyle(ButtonStyle.Link),
 		);
 

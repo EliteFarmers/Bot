@@ -13,7 +13,7 @@ export function EliteEmbed(settings?: UserSettings, footer = true) {
 	if (footer) {
 		embed.setFooter({
 			text: 'Powered by Elite Farmers API • kaeso.dev',
-			iconURL: 'https://elitebot.dev/favicon.webp',
+			iconURL: 'https://elitesb.gg/favicon.webp',
 		});
 	}
 
@@ -23,7 +23,7 @@ export function EliteEmbed(settings?: UserSettings, footer = true) {
 export function ErrorEmbed(title: string, description?: string) {
 	const embed = EliteEmbed().setTitle(`Error: ${title}`).setColor('#ff0000').addFields({
 		name: 'Contact',
-		value: '[Support Server](https://elitebot.dev/support)',
+		value: '[Support Server](https://elitesb.gg/support)',
 	});
 
 	if (description) {

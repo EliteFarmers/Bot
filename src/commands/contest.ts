@@ -63,7 +63,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const isOngoing = date.dayUnixSeconds === currentTime.dayUnixSeconds;
 
 	const description =
-		`<t:${date.dayUnixSeconds}:R> • [View Online](https://elitebot.dev/contest/${date.dayUnixSeconds})` +
+		`<t:${date.dayUnixSeconds}:R> • [View Online](https://elitesb.gg/contest/${date.dayUnixSeconds})` +
 		(isOngoing ? '\n-# This contest is currently active! Data is incomplete.' : '');
 
 	const embed = EliteEmbed(settings).setTitle(date.toString()).setDescription(description);
@@ -79,7 +79,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			.map(({ playerName, playerUuid, profileUuid, collected, position, medal }) => {
 				return (
 					`**${position === undefined || position === -1 ? '???' : position + 1}.** ${escapeIgn(playerName) ?? 'Unknown'}` +
-					`\n-# [⧉](https://elitebot.dev/@${playerUuid}/${profileUuid}) ${collected?.toLocaleString()} ${medal ? GetMedalEmoji(medal) : ''}`
+					`\n-# [⧉](https://elitesb.gg/@${playerUuid}/${profileUuid}) ${collected?.toLocaleString()} ${medal ? GetMedalEmoji(medal) : ''}`
 				);
 			})
 			.join('\n');

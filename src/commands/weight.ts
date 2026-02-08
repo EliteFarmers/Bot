@@ -123,7 +123,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	row.addComponents(
 		new ButtonBuilder()
 			.setLabel(`@${account.name}/${profile.profileName}`)
-			.setURL(`https://elitebot.dev/@${account.name}/${encodeURIComponent(profile.profileName)}`)
+			.setURL(`https://elitesb.gg/@${account.name}/${encodeURIComponent(profile.profileName)}`)
 			.setStyle(ButtonStyle.Link),
 	);
 
@@ -184,7 +184,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const linkRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			new ButtonBuilder()
 				.setLabel(`@${account.name}/${profile.profileName}`)
-				.setURL(`https://elitebot.dev/@${account.name}/${encodeURIComponent(profile.profileName ?? '')}`)
+				.setURL(`https://elitesb.gg/@${account.name}/${encodeURIComponent(profile.profileName ?? '')}`)
 				.setStyle(ButtonStyle.Link),
 		);
 		await reply.edit({ components: [linkRow] }).catch(() => undefined);
@@ -209,14 +209,14 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		const weightRankText =
 			weightRank > -1
-				? `[#${weightRank}](https://elitebot.dev/leaderboard/farmingweight/${account.name}-${profile.profileName}?fallback=${weightRank}) • `
+				? `[#${weightRank}](https://elitesb.gg/leaderboard/farmingweight/${account.name}-${profile.profileName}?fallback=${weightRank}) • `
 				: '';
 
 		const farmingRank = rankings?.farming?.rank ?? -1;
 		const farmingLevel = getLevel(member?.skills?.farming ?? 0, LEVELING_XP, 50 + (member?.jacob.perks?.levelCap ?? 0));
 		const farmingRankText =
 			farmingRank > -1
-				? `[#${farmingRank}](https://elitebot.dev/leaderboard/farming/${account.name}-${profile.profileName}?fallback=${farmingRank}) • `
+				? `[#${farmingRank}](https://elitesb.gg/leaderboard/farming/${account.name}-${profile.profileName}?fallback=${farmingRank}) • `
 				: '';
 
 		embed.addFields(
@@ -253,7 +253,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			const { rank = -1, key: lb } = cropRanks.find((c) => c.crop === crop) ?? {};
 			const rankString =
 				rank > -1
-					? `[#${rank}](https://elitebot.dev/leaderboard/${lb}/${account.name}-${profile.profileName}?fallback=${rank}) • `
+					? `[#${rank}](https://elitesb.gg/leaderboard/${lb}/${account.name}-${profile.profileName}?fallback=${rank}) • `
 					: '';
 
 			return (
@@ -294,7 +294,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			},
 			{
 				name: '⠀',
-				value: `[Questions?](https://elitebot.dev/info)⠀ ⠀[@${account?.name}/${profile?.profileName}](https://elitebot.dev/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')})⠀ ⠀[SkyCrypt](https://sky.shiiyu.moe/stats/${account?.name}/${encodeURIComponent(profile?.profileName ?? '')})`,
+				value: `[Questions?](https://elitesb.gg/info)⠀ ⠀[@${account?.name}/${profile?.profileName}](https://elitesb.gg/@${account?.name}/${encodeURIComponent(profile?.profileName ?? '')})⠀ ⠀[SkyCrypt](https://sky.shiiyu.moe/stats/${account?.name}/${encodeURIComponent(profile?.profileName ?? '')})`,
 			},
 		);
 

@@ -35,27 +35,27 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			{
 				name: 'Elite Farmer Badge',
 				value:
-					'Awarded to players who have obtained the Elite Farmer role in the [Elite Farmers](https://elitebot.dev/discord) Discord server.',
+					'Awarded to players who have obtained the Elite Farmer role in the [Elite Farmers](https://elitesb.gg/discord) Discord server.',
 				inline: true,
 			},
 			{
 				name: 'Donator Badge',
-				value: 'Awarded to players who have donated to the project. [Donate Here!](https://elitebot.dev/donate)',
+				value: 'Awarded to players who have donated to the project. [Donate Here!](https://elitesb.gg/donate)',
 				inline: true,
 			},
 			{
 				name: 'Patron of the Arts Badge',
-				value: "Awarded to players who have bought anything from [Lumini's Esty Shop!](https://elitebot.dev/stickers)",
+				value: "Awarded to players who have bought anything from [Lumini's Esty Shop!](https://elitesb.gg/stickers)",
 				inline: true,
 			},
 			{
 				name: 'Claiming Badges',
 				value:
-					'Join the [Development Server](https://elitebot.dev/support) and open a ticket to claim your badges! The Elite Farmer badge can be claimed with this same command in the [Elite Farmers](https://elitebot.dev/discord) server.',
+					'Join the [Development Server](https://elitesb.gg/support) and open a ticket to claim your badges! The Elite Farmer badge can be claimed with this same command in the [Elite Farmers](https://elitesb.gg/discord) server.',
 			},
 			{
 				name: 'More information',
-				value: '[View all badges online](https://elitebot.dev/info#Badges)',
+				value: '[View all badges online](https://elitesb.gg/info#Badges)',
 			},
 		]);
 
@@ -115,7 +115,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			const newEmbed = EliteEmbed()
 				.setTitle('Claim Elite Farmer Badge')
 				.setDescription(
-					`Your primary Minecraft account is ${escapeIgn(account.name)} (\`${account.id}\`)\nIf this is incorrect please change it in your [profile settings](https://elitebot.dev/profile) and try again.`,
+					`Your primary Minecraft account is ${escapeIgn(account.name)} (\`${account.id}\`)\nIf this is incorrect please change it in your [profile settings](https://elitesb.gg/profile) and try again.`,
 				);
 
 			const row = new ActionRowBuilder<ButtonBuilder>().addComponents(

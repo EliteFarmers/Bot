@@ -182,7 +182,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			`No collection data found. ${escapeIgn(
 				playerName,
 			)} may not have farmed recently or has collections API disabled.` +
-				` [Check Online Profile](https://elitebot.dev/@${account.id})`,
+				` [Check Online Profile](https://elitesb.gg/@${account.id})`,
 		);
 
 		interaction.editReply({ embeds: [embed] });
@@ -215,7 +215,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			new ButtonBuilder().setCustomId('GAININFO').setLabel('Info').setStyle(ButtonStyle.Secondary),
 			new ButtonBuilder()
 				.setLabel(`@${account.name}/${profile.profileName}`)
-				.setURL(`https://elitebot.dev/@${account.name}/${encodeURIComponent(profile.profileName)}`)
+				.setURL(`https://elitesb.gg/@${account.name}/${encodeURIComponent(profile.profileName)}`)
 				.setStyle(ButtonStyle.Link),
 		);
 	}
@@ -333,7 +333,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		return buildGenericView<DayProgress>({
 			title: `Crop Gain for ${escapeIgn(playerName)}`,
-			description: `View charts and older data [here!](https://elitebot.dev/@${account.id}/${profile.profileId}/charts)\n\n${details}`,
+			description: `View charts and older data [here!](https://elitesb.gg/@${account.id}/${profile.profileId}/charts)\n\n${details}`,
 			days: cropDays,
 			getValue: (d) => d.weight,
 			formatValue: (d) => d.weight.toFixed(2),
@@ -373,7 +373,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	function buildUptimeView() {
 		const guildName = account.playerData?.guildMember?.guild?.name;
 		const guildId = account.playerData?.guildMember?.guild?.id;
-		const guildDisplay = guildName ? `in [**${guildName}**](https://elitebot.dev/guild/${guildId})` : 'in a guild';
+		const guildDisplay = guildName ? `in [**${guildName}**](https://elitesb.gg/guild/${guildId})` : 'in a guild';
 
 		const dailyAverage = uptimeDays.reduce((sum, day) => sum + day.gexp, 0) / uptimeDays.length;
 		const total = uptimeDays.reduce((sum, day) => sum + day.gexp, 0);

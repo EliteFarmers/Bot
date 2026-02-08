@@ -79,7 +79,7 @@ async function execute(signal: Signal) {
 				new ButtonBuilder()
 					.setLabel('View Guide')
 					.setStyle(ButtonStyle.Link)
-					.setURL(`https://elitebot.dev/guides/${guide.slug}`),
+					.setURL(`https://elitesb.gg/guides/${guide.slug}`),
 			),
 		);
 
@@ -89,7 +89,7 @@ async function execute(signal: Signal) {
 				components: [guideEmbed],
 				withComponents: true,
 				flags: MessageFlags.IsComponentsV2,
-				avatarURL: 'https://elitebot.dev/favicon.webp',
+				avatarURL: 'https://elitesb.gg/favicon.webp',
 				username: 'Elite Guides',
 			})
 			.catch((e) => console.error('Failed to send guide approved webhook:', e));

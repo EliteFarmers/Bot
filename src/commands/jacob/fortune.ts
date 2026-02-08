@@ -117,7 +117,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				.setTitle('Help Menu')
 				.setDescription(
 					'This command shows you the estimated farming fortune required to get each medal in Jacob contests!' +
-						' Data is obtained from participations saved in [elitebot.dev/contests](https://elitebot.dev/contests)' +
+						' Data is obtained from participations saved in [elitebot.dev/contests](https://elitesb.gg/contests)' +
 						' which will not be 100% accurate, but should give you a good idea of what to aim for.\n' +
 						EmptyString,
 				)

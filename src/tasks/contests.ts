@@ -77,7 +77,7 @@ async function execute(client: Client) {
 				},
 				{
 					name: 'Next Contest',
-					value: `Starts <t:${nextContest.unixSeconds}:R> [View All](<https://elitebot.dev/contests/upcoming#${nextContest.unixSeconds}>)`,
+					value: `Starts <t:${nextContest.unixSeconds}:R> [View All](<https://elitesb.gg/contests/upcoming#${nextContest.unixSeconds}>)`,
 				},
 			]);
 
@@ -117,14 +117,14 @@ async function execute(client: Client) {
 	const embed = EliteEmbed()
 		.setTitle(GetSkyblockDate(+timestamp).Readable)
 		.setDescription(
-			`${getCropEmojis(crops)} **starts <t:${timestamp}:R>!** [⧉](<https://elitebot.dev/contest/${timestamp}>)`,
+			`${getCropEmojis(crops)} **starts <t:${timestamp}:R>!** [⧉](<https://elitesb.gg/contest/${timestamp}>)`,
 		)
 		.setFields(getFields(reqs))
 		.addFields([
 			{
 				name: 'Next Contest',
 				value: nextContest
-					? `${getCropEmojis(nextContest[1])} starts <t:${nextContest[0]}:R> [View All](<https://elitebot.dev/contests/upcoming#${nextContest[0]}>)`
+					? `${getCropEmojis(nextContest[1])} starts <t:${nextContest[0]}:R> [View All](<https://elitesb.gg/contests/upcoming#${nextContest[0]}>)`
 					: 'Not available yet!',
 			},
 		]);

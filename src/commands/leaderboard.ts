@@ -96,7 +96,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			})
 			.addFields({
 				name: 'Want to view the leaderboard online?',
-				value: `Please go to [elitebot.dev/leaderboard/${leaderboardId}](https://elitebot.dev/leaderboard/${leaderboardId})`,
+				value: `Please go to [elitebot.dev/leaderboard/${leaderboardId}](https://elitesb.gg/leaderboard/${leaderboardId})`,
 			});
 		interaction.editReply({ embeds: [errorEmbed] });
 		return;
@@ -143,7 +143,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 					})
 					.addFields({
 						name: 'Want to view the leaderboard online?',
-						value: `Please go to [elitebot.dev/leaderboard/${leaderboardId}](https://elitebot.dev/leaderboard/${leaderboardId})`,
+						value: `Please go to [elitebot.dev/leaderboard/${leaderboardId}](https://elitesb.gg/leaderboard/${leaderboardId})`,
 					});
 
 				i.followUp({ embeds: [errorEmbed], ephemeral: true });
@@ -197,7 +197,7 @@ async function getEmbed(
 	const embed = EliteEmbed(settings)
 		.setTitle(title)
 		.setDescription(
-			`Showing **${index + 1}** - **${index + entries.length}** of **${(maxIndex + 12).toLocaleString()}** entries! [⧉](https://elitebot.dev/leaderboard/${leaderboardId}/${index + 1})${interval}`,
+			`Showing **${index + 1}** - **${index + entries.length}** of **${(maxIndex + 12).toLocaleString()}** entries! [⧉](https://elitesb.gg/leaderboard/${leaderboardId}/${index + 1})${interval}`,
 		);
 
 	const profileLb = entries[0]?.members?.length;
@@ -213,7 +213,7 @@ async function getEmbed(
 function getPlayerLbFields(entries: components['schemas']['LeaderboardEntryDto'][], index: number) {
 	return entries.map((entry, i) => ({
 		name: `#${index + i + 1} ${lbIgn(entry) ?? 'Unknown'}⠀`,
-		value: `[⧉](https://elitebot.dev/@${entry.ign}/${encodeURIComponent(entry.profile ?? '')}) ${(entry.amount ?? 0).toLocaleString()}`,
+		value: `[⧉](https://elitesb.gg/@${entry.ign}/${encodeURIComponent(entry.profile ?? '')}) ${(entry.amount ?? 0).toLocaleString()}`,
 		inline: true,
 	}));
 }
@@ -240,7 +240,7 @@ function getProfileLbFields(entries: components['schemas']['LeaderboardEntryDto'
 
 		return {
 			name: `#${index + i + 1} ${escapeIgn(firstMember?.ign) ?? 'Unknown'}⠀`,
-			value: `[⧉](https://elitebot.dev/@${firstMember?.ign}/${encodeURIComponent(entry.uuid ?? '')}/garden) ${(entry.amount ?? 0).toLocaleString()}${members}`,
+			value: `[⧉](https://elitesb.gg/@${firstMember?.ign}/${encodeURIComponent(entry.uuid ?? '')}/garden) ${(entry.amount ?? 0).toLocaleString()}${members}`,
 			inline: true,
 		};
 	});
@@ -269,7 +269,7 @@ function getButtonRow(index: number, maxIndex = 1000, leaderboardId?: string) {
 			.setStyle(ButtonStyle.Secondary)
 			.setDisabled(index + 12 > maxIndex),
 		new ButtonBuilder()
-			.setURL(`https://elitebot.dev/leaderboard/${leaderboardId ?? 'farmingweight'}/${index + 1}`)
+			.setURL(`https://elitesb.gg/leaderboard/${leaderboardId ?? 'farmingweight'}/${index + 1}`)
 			.setStyle(ButtonStyle.Link)
 			.setLabel('View Online'),
 	);

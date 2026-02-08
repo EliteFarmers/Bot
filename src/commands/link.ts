@@ -88,7 +88,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 				})
 				.addFields({
 					name: 'Want to unlink your account?',
-					value: 'Please go to [elitebot.dev/profile](https://elitebot.dev/profile) and remove your account there.',
+					value: 'Please go to [elitebot.dev/profile](https://elitesb.gg/profile) and remove your account there.',
 				});
 			return interaction.editReply({ embeds: [embed] });
 		}
@@ -101,7 +101,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
 			.addFields({
 				name: 'Want to unlink your account?',
 				value:
-					'Please go to [elitebot.dev/profile](https://elitebot.dev/profile) and remove your account there. This is also where you can change which account is primary.',
+					'Please go to [elitebot.dev/profile](https://elitesb.gg/profile) and remove your account there. This is also where you can change which account is primary.',
 			});
 
 		return interaction.editReply({ embeds: [embed] });

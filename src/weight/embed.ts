@@ -26,7 +26,7 @@ export async function createWeightEmbed({
 
 	let description = `**${result}**`;
 	if (weightRank !== -1) {
-		description += ` [#${weightRank}](https://elitebot.dev/leaderboard/farmingweight/${uuid}-${profileId})`;
+		description += ` [#${weightRank}](https://elitesb.gg/leaderboard/farmingweight/${uuid}-${profileId})`;
 	}
 	description += '\n-# Farming Weight';
 
@@ -35,7 +35,7 @@ export async function createWeightEmbed({
 	const embed = EliteEmbed(undefined, false)
 		.setAuthor({
 			name: `${ign} (${profileName})`,
-			url: `https://elitebot.dev/@${uuid}/${profileId}`,
+			url: `https://elitesb.gg/@${uuid}/${profileId}`,
 			iconURL: `https://mc-heads.net/head/${uuid}/right`,
 		})
 		.setDescription(description)

@@ -120,7 +120,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		player.selectPet(player.pets.sort((a, b) => b.fortune - a.fortune)[0]);
 	}
 
-	const url = `https://elitebot.dev/@${account.id}/${profile.profileId}/rates#fortune`;
+	const url = `https://elitesb.gg/@${account.id}/${profile.profileId}/rates#fortune`;
 
 	const cropOverview = (crop: Crop) => {
 		const tool = player.getBestTool(crop);

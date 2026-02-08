@@ -66,7 +66,7 @@ function getDetailedField(crop: string, scores?: components['schemas']['GuildJac
 
 			return (
 				`${prefix} **${scoreFormat(s.record?.collected)}** - ${UserHyperLink(s.discordId)} (${s.ign})\n` +
-				`-# ${GetEmbeddedTimestamp(s.record?.timestamp ?? 0)} • [View Contest](https://elitebot.dev/contest/${s.record?.timestamp ?? 0})`
+				`-# ${GetEmbeddedTimestamp(s.record?.timestamp ?? 0)} • [View Contest](https://elitesb.gg/contest/${s.record?.timestamp ?? 0})`
 			);
 		})
 		.join('\n\n');

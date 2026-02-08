@@ -36,7 +36,7 @@ Check out the estimated collection and coin rates based on your inputs.
 
 ---
 ### /leaderboard
-View all of the leaderboards available on [elitebot.dev/leaderboard](https://elitebot.dev/leaderboard).
+View all of the leaderboards available on [elitebot.dev/leaderboard](https://elitesb.gg/leaderboard).
 
 **Usage:** `/leaderboard` \
 `(leaderboard): <leaderboard name>` \
@@ -82,7 +82,7 @@ View your estimated fortune to see what you can do to improve.
 
 ---
 ### /gain
-Check your collection and weight gain over the past week. View your profile on [elitebot.dev](https://elitebot.dev/) for a more detailed version.
+Check your collection and weight gain over the past week. View your profile on [elitebot.dev](https://elitesb.gg/) for a more detailed version.
 
 **Usage:** `/gain` \
 `(player): <ign or uuid or discord id>` \

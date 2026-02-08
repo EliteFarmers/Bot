@@ -83,7 +83,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 			})
 			.addFields({
 				name: 'Want to view online?',
-				value: `Please go to [elitebot.dev/@${rawName}/${profileName}](https://elitebot.dev/@${rawName}/${encodeURIComponent(profileName)})`,
+				value: `Please go to [elitebot.dev/@${rawName}/${profileName}](https://elitesb.gg/@${rawName}/${encodeURIComponent(profileName)})`,
 			});
 		await interaction.deleteReply().catch(() => undefined);
 		interaction.followUp({ embeds: [embed], ephemeral: true });
@@ -112,7 +112,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 		.addFields(
 			contests.slice(0, 3).map((contest) => ({
 				name: `${GetReadableDate(contest.timestamp ?? 0)}`,
-				value: `${GetCropEmoji(contest.crop ?? '')} ${GetMedalEmoji(contest.medal ?? undefined)}${contest?.crop ?? 'ERROR'} - **${contest.collected?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** [⧉](https://elitebot.dev/contest/${contest.timestamp})`,
+				value: `${GetCropEmoji(contest.crop ?? '')} ${GetMedalEmoji(contest.medal ?? undefined)}${contest?.crop ?? 'ERROR'} - **${contest.collected?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** [⧉](https://elitesb.gg/contest/${contest.timestamp})`,
 			})),
 		);
 
@@ -240,7 +240,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 			newEmbed.addFields({
 				name: `${GetReadableDate(contest.timestamp ?? 0)}`,
 				value:
-					`${GetCropEmoji(contest.crop ?? '')} ${GetMedalEmoji(contest.medal ?? undefined)}${selectedCrop ? 'Collected ' : `${contest?.crop ?? 'ERROR'} - `}**${contest.collected.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** [⧉](https://elitebot.dev/contest/${contest.timestamp})\n` +
+					`${GetCropEmoji(contest.crop ?? '')} ${GetMedalEmoji(contest.medal ?? undefined)}${selectedCrop ? 'Collected ' : `${contest?.crop ?? 'ERROR'} - `}**${contest.collected.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** [⧉](https://elitesb.gg/contest/${contest.timestamp})\n` +
 					details,
 				inline: true,
 			});
@@ -279,7 +279,7 @@ function getComponents(page: number, playerName?: string, profileName?: string) 
 				.setStyle(ButtonStyle.Primary)
 				.setDisabled(page === 1),
 			new ButtonBuilder()
-				.setURL(`https://elitebot.dev/@${playerName}/${encodeURIComponent(profileName ?? '')}`)
+				.setURL(`https://elitesb.gg/@${playerName}/${encodeURIComponent(profileName ?? '')}`)
 				.setLabel(`@${playerName}/${profileName ?? ''}`)
 				.setStyle(ButtonStyle.Link),
 		),

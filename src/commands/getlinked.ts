@@ -29,6 +29,6 @@ async function execute(interaction: UserContextMenuCommandInteraction) {
 	}
 
 	interaction.editReply({
-		content: `${user} https://elitebot.dev/@${found.name}`,
+		content: `${user} https://elitesb.gg/@${found.name}`,
 	});
 }

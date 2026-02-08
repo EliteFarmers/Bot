@@ -71,7 +71,7 @@ export class EliteContainer extends ContainerBuilder {
 			this.addSeparator();
 		}
 
-		let text = '-# <:icon:1376644165588488212> [elitebot.dev](<https://elitebot.dev/>)';
+		let text = '-# <:icon:1376644165588488212> [elitebot.dev](<https://elitesb.gg/>)';
 
 		if (!this.settings?.features?.hideShopPromotions && process.env.FOOTER_SKU) {
 			// Use this if they eventually make these buttons look better
@@ -79,7 +79,7 @@ export class EliteContainer extends ContainerBuilder {
 			//     .setStyle(ButtonStyle.Premium)
 			//     .setSKUId(process.env.FOOTER_SKU));
 
-			text += ` • Support development with [Elite Premium](<https://elitebot.dev/shop/${process.env.FOOTER_SKU}>)!`;
+			text += ` • Support development with [Elite Premium](<https://elitesb.gg/shop/${process.env.FOOTER_SKU}>)!`;
 		}
 
 		if (backButton) {

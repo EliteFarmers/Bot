@@ -23,7 +23,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		.addFields({
 			name: 'Bought Something?',
 			value:
-				'-# Thank you!\nManage your new settings/options on [elitebot.dev/profile/settings](https://elitebot.dev/profile/settings)!',
+				'-# Thank you!\nManage your new settings/options on [elitebot.dev/profile/settings](https://elitesb.gg/profile/settings)!',
 		});
 
 	await interaction

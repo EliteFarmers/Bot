@@ -17,7 +17,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const embed = EliteEmbed(settings)
 		.setTitle('Farming Weight Information')
 		.setDescription(
-			'Farming weight is based off of multiple different factors to provide a number for comparsion between all farmers.\n\n**Info has been moved to [elitebot.dev/info](https://elitebot.dev/info)**',
+			'Farming weight is based off of multiple different factors to provide a number for comparsion between all farmers.\n\n**Info has been moved to [elitebot.dev/info](https://elitesb.gg/info)**',
 		)
 		.addFields([
 			{
@@ -33,7 +33,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			{
 				name: 'Links',
 				value:
-					'[Website](https://elitebot.dev/)⠀⠀  [Bot Invite Link](https://elitebot.dev/invite)⠀⠀  [Source code](https://github.com/EliteFarmers/Bot)⠀ ⠀ [Feedback](https://forms.gle/9XFNcj4ownZj23nM8)',
+					'[Website](https://elitesb.gg/)⠀⠀  [Bot Invite Link](https://elitesb.gg/invite)⠀⠀  [Source code](https://github.com/EliteFarmers/Bot)⠀ ⠀ [Feedback](https://forms.gle/9XFNcj4ownZj23nM8)',
 			},
 		]);
 
