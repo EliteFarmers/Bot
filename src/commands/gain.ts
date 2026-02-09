@@ -373,7 +373,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	function buildUptimeView() {
 		const guildName = account.playerData?.guildMember?.guild?.name;
 		const guildId = account.playerData?.guildMember?.guild?.id;
-		const guildDisplay = guildName ? `in [**${guildName}**](https://elitesb.gg/guild/${guildId})` : 'in a guild';
+		const guildDisplay = guildName ? `in [**${guildName}**](https://elitesb.gg/guilds/${guildId})` : 'in a guild';
 
 		const dailyAverage = uptimeDays.reduce((sum, day) => sum + day.gexp, 0) / uptimeDays.length;
 		const total = uptimeDays.reduce((sum, day) => sum + day.gexp, 0);
