@@ -1,7 +1,8 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType } from 'discord.js';
-import { FetchProduct, FetchProducts, UserSettings } from '../api/elite.js';
+import { EliteEmbed, NotYoursReply } from 'classes/embeds.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from 'discord.js';
+import { FetchProducts, UserSettings } from '../api/elite.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
-import { EliteEmbed } from 'classes/embeds.js';
+
 
 export interface MutationAnalysis {
 	id: string;
@@ -12,11 +13,17 @@ export interface MutationAnalysis {
 export interface MutationCopperRatio {
 	id: string;
 	name: string;
+	copper: MutationAnalysis['copper'];
 	buyCoinPerCopper: number;
+	buyCoinTotal: number;
 	buyOrderCoinPerCopper: number;
+	buyOrderCoinTotal: number;
 }
 
-let mutations: MutationAnalysis[] = [
+type MutationBuyType = 'instabuy' | 'buyorder';
+
+//waiting for farming-weight@14.0 to be usable on the bot repository to moove it
+const mutations: MutationAnalysis[] = [
 	{ id: "ASHWREATH", analysisCost: 10000, copper: 5 },
 	{ id: "CHOCONUT", analysisCost: 10000, copper: 5 },
 	{ id: "DUSTGRAIN", analysisCost: 10000, copper: 5 },
@@ -61,7 +68,7 @@ let mutations: MutationAnalysis[] = [
 
 const command = new EliteCommand({
 	name: 'mutations',
-	description: 'Show mutations with the best coin/copper ratios for analysis',
+	description: 'Shows best mutations to analyse for copper',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
 	options: {
@@ -91,7 +98,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const mutationIds = mutations.map(m => m.id);
 	const { data: bazaar } = await FetchProducts(mutationIds);
 
-	let mutationRatios: MutationCopperRatio[] = mutations.map(mutation => {
+	const mutationRatios: MutationCopperRatio[] = mutations.map(mutation => {
 		const bazaarItem = bazaar?.items?.[mutation.id];
 		const buy = bazaarItem?.bazaar?.buy as number | undefined;
 		const buyOrder = bazaarItem?.bazaar?.buyOrder as number | undefined;
@@ -100,50 +107,45 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			return {
 				id: mutation.id,
 				name: bazaarItem?.name ?? mutation.id,
+				copper: mutation.copper,
 				buyCoinPerCopper: Infinity,
+				buyCoinTotal: Infinity,
 				buyOrderCoinPerCopper: Infinity,
+				buyOrderCoinTotal: Infinity,
 			};
 		}
 		const copper = mutation.copper * (1 + synthesis / 100 + rose_dragon / 100);
+		const buyCoinTotal = mutation.analysisCost + (buy ?? 0);
+		const buyOrderCoinTotal = mutation.analysisCost + (buyOrder ?? 0);
 		return {
 			id: mutation.id,
 			name: bazaarItem?.name ?? mutation.id,
-			buyCoinPerCopper: (mutation.analysisCost + (buy ?? 0)) / copper,
-			buyOrderCoinPerCopper: (mutation.analysisCost + (buyOrder ?? 0)) / copper,
+			copper: mutation.copper,
+			buyCoinPerCopper: buyCoinTotal / copper,
+			buyOrderCoinPerCopper: buyOrderCoinTotal / copper,
+			buyCoinTotal,
+			buyOrderCoinTotal,
 		};
 	});
 
-	mutationRatios = mutationRatios.sort((a, b) => a.buyCoinPerCopper - b.buyCoinPerCopper);
-
-	const allItems = Object.values(mutationRatios);
 	const ITEMS_PER_PAGE = 10;
 	let page = 0;
-	const maxPage = Math.max(0, Math.ceil(allItems.length / ITEMS_PER_PAGE) - 1);
+	let selectedType: MutationBuyType = 'instabuy'; // default to instabuy
 
-	function getPageItems(page: number) {
-		return allItems.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
+	function getSortedItems(type: MutationBuyType) {
+		return mutationRatios.slice().sort((a, b) => {
+			if (type === 'instabuy') return a.buyCoinPerCopper - b.buyCoinPerCopper;
+			return a.buyOrderCoinPerCopper - b.buyOrderCoinPerCopper;
+		});
+	}
+
+	function getPageItems(page: number, type: MutationBuyType) {
+		const sorted = getSortedItems(type);
+		return sorted.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
 	}
 
 	function getMutationIndex(page: number, index: number) {
 		return page * ITEMS_PER_PAGE + index + 1;
-	}
-
-	function buildEmbed(settings: UserSettings | undefined, page: number) {
-		const pageItems = getPageItems(page);
-		const names = pageItems.map((item, i) => `**\`#${getMutationIndex(page, i)}\`** ${item.name}`).join('\n');
-		const buyRatios = pageItems.map(item => isFinite(item.buyCoinPerCopper) ?
-			`:coin: \`${item.buyCoinPerCopper.toFixed(2)}\`` : 'N/A').join('\n');
-		const sellRatios = pageItems.map(item => isFinite(item.buyOrderCoinPerCopper) ?
-			`:coin: \`${item.buyOrderCoinPerCopper.toFixed(2)}\`` : 'N/A').join('\n');
-		const embed = EliteEmbed(settings)
-			.setTitle('Mutation Analysis - Coin/Copper Ratios')
-			.setDescription(`Synthesis Bonus: **${synthesis}%**\nRose Dragon Bonus: **${rose_dragon}%**\nShowing **${page + 1}** - ${maxPage + 1} pages.`)
-			.addFields([
-				{ name: 'Mutation', value: names, inline: true },
-				{ name: 'Cost (Insta Buy)', value: buyRatios, inline: true },
-				{ name: 'Cost (Buy Order)', value: sellRatios, inline: true },
-			]);
-		return embed;
 	}
 
 	function getButtonRow(page: number, maxPage: number) {
@@ -171,79 +173,138 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		);
 	}
 
-	const embed = buildEmbed(settings, page);
+	function getSelectRow(buyType: MutationBuyType) {
+		const instaBuyLabel = 'Bazaar Insta Buy';
+		const buyOrderLabel = 'Bazaar Buy Order';
+		const instaBuyEmoji = '💸';
+		const buyOrderEmoji = '📒';
+		const selectRow = new ActionRowBuilder<StringSelectMenuBuilder>()
+		.addComponents(
+			new StringSelectMenuBuilder()
+				.setCustomId('mutation-select')
+				.addOptions(
+					new StringSelectMenuOptionBuilder()
+						.setLabel(instaBuyLabel)
+						.setValue('instabuy')
+						.setEmoji(instaBuyEmoji),
+					new StringSelectMenuOptionBuilder()
+						.setLabel(buyOrderLabel)
+						.setValue('buyorder')
+						.setEmoji(buyOrderEmoji))
+				.setPlaceholder(buyType === 'instabuy' 
+					? `${instaBuyEmoji} ${instaBuyLabel}` 
+					: `${buyOrderEmoji} ${buyOrderLabel}`)
+		);
+
+		return selectRow;
+	}
+
+	const maxPage = Math.max(0, Math.ceil(mutationRatios.length / ITEMS_PER_PAGE) - 1);
+	function buildEmbed(page: number, type: MutationBuyType) {
+		const pageItems = getPageItems(page, type);
+		const description = `Synthesis Bonus: **${synthesis}%**\nRose Dragon Bonus: **${rose_dragon}%**`;
+		let mutationsField = '';
+		pageItems.forEach((item, i) => {
+			const idx = getMutationIndex(page, i);
+			let priceText, totalText = '';
+			if (type === 'instabuy') {
+				priceText = isFinite(item.buyCoinPerCopper) ? `\`${item.buyCoinPerCopper.toFixed(2)}\`` : '`N/A`';
+				totalText = isFinite(item.buyCoinTotal) ? `${formatNumber(item.buyCoinTotal)}` : '`N/A`';
+			} else {
+				priceText = isFinite(item.buyOrderCoinPerCopper) ? `\`${item.buyOrderCoinPerCopper.toFixed(2)}\`` : '`N/A`';
+				totalText = isFinite(item.buyOrderCoinTotal) ? `${formatNumber(item.buyOrderCoinTotal)}` : '`N/A`';
+			}
+			mutationsField += `\`#${idx}\` **${item.name}**: ${priceText} coins/Copper (\`${item.copper.toLocaleString()} Copper\`/\`${totalText}\`)\n`;
+		});
+		return EliteEmbed(settings)
+			.setTitle('Mutation Analysis - Coin/Copper Ratios')
+			.setDescription(description)
+			.addFields({ name: `Mutations - ${type === 'instabuy' ? 'Bazaar Insta Buy' : 'Bazaar Buy Order'}`, value: mutationsField, inline: false });
+	}
+
 	const reply = await interaction.editReply({
-		embeds: [embed],
-		components: [getButtonRow(page, maxPage)],
+		embeds: [buildEmbed(page, selectedType)],
+		components: [getSelectRow(selectedType), getButtonRow(page, maxPage)],
 	});
 
-	const collector = reply.createMessageComponentCollector({
+	const buttonCollector = reply.createMessageComponentCollector({
 		componentType: ComponentType.Button,
 		time: 60_000,
 	});
 
-	collector.on('collect', async (i) => {
-		if (i.user.id === interaction.user.id) {
-			collector.resetTimer({ time: 30_000 });
-
-			if (i.customId === 'first') {
+	buttonCollector.on('collect', async (inter) => {
+		if (inter.user.id !== interaction.user.id) {
+			return NotYoursReply(inter);
+		} else {
+			resetCollectors();
+			if (inter.customId === 'first') {
 				page = 0;
-			} else if (i.customId === 'back') {
+			} else if (inter.customId === 'back') {
 				if (page > 0) {
 					page -= 1;
 				}
-			} else if (i.customId === 'forward') {
+			} else if (inter.customId === 'forward') {
 				if (page < maxPage) {
 					page += 1;
 				}
-			} else if (i.customId === 'last') {
+			} else if (inter.customId === 'last') {
 				if (page !== maxPage) {
 					page = maxPage;
 				}
 			}
 
-			const newEmbed = buildEmbed(settings, page);
-			await i.update({
-				embeds: [newEmbed],
-				components: [getButtonRow(page, maxPage)],
+			await inter.update({
+				embeds: [buildEmbed(page, selectedType)],
+				components: [getSelectRow(selectedType), getButtonRow(page, maxPage)],
 			}).catch(() => {
-				collector.stop();
+				buttonCollector.stop();
 			});
-		} else {
-			i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
 		}
 	});
 
-	collector.on('end', async () => {
-		const finalEmbed = buildEmbed(settings, page);
-		await interaction.editReply({
-			embeds: [finalEmbed],
-			components: [],
-		});
+	buttonCollector.on('end', async () => {
+		clearComponents();
 	});
+
+	const selectCollector = reply.createMessageComponentCollector({
+		componentType: ComponentType.StringSelect,
+		time: 60_000,
+	});
+
+	selectCollector.on('collect', async (inter) => {
+		if (inter.user.id !== interaction.user.id) {
+			return NotYoursReply(inter);
+		} else {
+			resetCollectors();
+			const value = inter.values[0];
+			if (value === 'instabuy' || value === 'buyorder') {
+				selectedType = value;
+				page = 0; // reset page
+				await inter.update({
+					embeds: [buildEmbed(page, selectedType)],
+					components: [getSelectRow(selectedType), getButtonRow(page, maxPage)],
+				});
+			}
+		} 
+	});
+
+	selectCollector.on('end', async () => {
+		clearComponents();
+	});
+
+	function resetCollectors() {
+		buttonCollector.resetTimer({ time: 30_000 });
+		selectCollector.resetTimer({ time: 30_000 });
+	}
+
+	async function clearComponents() {
+		await interaction.editReply({
+			embeds: [buildEmbed(page, selectedType)],
+			components: [], //remove buttons & select menu
+		});
+	}
 }
 
-function getButtonRow(index: number, maxIndex = 1000, leaderboardId?: string) {
-	return new ActionRowBuilder<ButtonBuilder>().addComponents(
-		new ButtonBuilder()
-			.setCustomId('first')
-			.setLabel('First')
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(index < 12),
-		new ButtonBuilder()
-			.setCustomId('back')
-			.setLabel('Back')
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(index < 12),
-		new ButtonBuilder()
-			.setCustomId('forward')
-			.setLabel('Next')
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(index + 12 > maxIndex),
-		new ButtonBuilder()
-			.setCustomId('last')
-			.setLabel('Last')
-			.setStyle(ButtonStyle.Secondary)
-			.setDisabled(index + 12 > maxIndex),
-	);
+function formatNumber(num: number) {
+	return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 }).format(num);
 }
