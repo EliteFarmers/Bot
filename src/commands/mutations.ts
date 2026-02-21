@@ -61,7 +61,7 @@ let mutations: MutationAnalysis[] = [
 
 const command = new EliteCommand({
 	name: 'mutations',
-	description: 'Show mutations with the best coin/copper ratios for analysis',
+	description: 'Shows best mutations to analyse for copper',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
 	options: {
