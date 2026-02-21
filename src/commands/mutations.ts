@@ -68,7 +68,13 @@ const command = new EliteCommand({
 		synthesis: {
 			name: 'synthesis',
 			description: 'Synthesis Chip Bonus (%)',
-			type: SlashCommandOptionType.Integer,
+			type: SlashCommandOptionType.Number,
+			builder: (b) => b.setMinValue(0).setMaxValue(40),
+		},
+		rose_dragon: {
+			name: 'rose_dragon',
+			description: 'Rose Dragon Bonus (%)',
+			type: SlashCommandOptionType.Number,
 			builder: (b) => b.setMinValue(0).setMaxValue(20),
 		},
 	},
@@ -80,7 +86,8 @@ export default command;
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	await interaction.deferReply();
 
-	const synthesis = interaction.options.getInteger('synthesis', false) ?? 0;
+	const synthesis = interaction.options.getNumber('synthesis', false) ?? 0;
+	const rose_dragon = interaction.options.getNumber('rose_dragon', false) ?? 0;
 	const mutationIds = mutations.map(m => m.id);
 	const { data: bazaar } = await FetchProducts(mutationIds);
 
@@ -97,7 +104,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				buyOrderCoinPerCopper: Infinity,
 			};
 		}
-		const copper = mutation.copper * (1 + synthesis / 100);
+		const copper = mutation.copper * (1 + synthesis / 100 + rose_dragon / 100);
 		return {
 			id: mutation.id,
 			name: bazaarItem?.name ?? mutation.id,
@@ -130,7 +137,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			`:coin: \`${item.buyOrderCoinPerCopper.toFixed(2)}\`` : 'N/A').join('\n');
 		const embed = EliteEmbed(settings)
 			.setTitle('Mutation Analysis - Coin/Copper Ratios')
-			.setDescription(`Synthesis Bonus: **${synthesis}%**\nShowing **${page + 1}** - ${maxPage + 1} pages.`)
+			.setDescription(`Synthesis Bonus: **${synthesis}%**\nRose Dragon Bonus: **${rose_dragon}%**\nShowing **${page + 1}** - ${maxPage + 1} pages.`)
 			.addFields([
 				{ name: 'Mutation', value: names, inline: true },
 				{ name: 'Cost (Insta Buy)', value: buyRatios, inline: true },
