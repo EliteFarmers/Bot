@@ -27,7 +27,7 @@
 	"dependencies": {
 		"@date-fns/utc": "^2.1.1",
 		"@napi-rs/canvas": "^0.1.80",
-		"@sentry/cli": "^2.57.0",
+		"@sentry/cli": "^3.0.0",
 		"@sentry/node": "^10.22.0",
 		"@sentry/profiling-node": "^10.22.0",
 		"bufferutil": "^4.0.9",
