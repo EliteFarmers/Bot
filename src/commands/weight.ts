@@ -209,14 +209,14 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		const weightRankText =
 			weightRank > -1
-				? `[#${weightRank}](https://elitesb.gg/leaderboard/farmingweight/${account.name}-${profile.profileName}?fallback=${weightRank}) • `
+				? `[#${weightRank}](https://elitesb.gg/leaderboard/farmingweight/${account.name}-${profile.profileName}?f=${weightRank}) • `
 				: '';
 
 		const farmingRank = rankings?.farming?.rank ?? -1;
 		const farmingLevel = getLevel(member?.skills?.farming ?? 0, LEVELING_XP, 50 + (member?.jacob.perks?.levelCap ?? 0));
 		const farmingRankText =
 			farmingRank > -1
-				? `[#${farmingRank}](https://elitesb.gg/leaderboard/farming/${account.name}-${profile.profileName}?fallback=${farmingRank}) • `
+				? `[#${farmingRank}](https://elitesb.gg/leaderboard/farming/${account.name}-${profile.profileName}?f=${farmingRank}) • `
 				: '';
 
 		embed.addFields(
@@ -253,7 +253,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			const { rank = -1, key: lb } = cropRanks.find((c) => c.crop === crop) ?? {};
 			const rankString =
 				rank > -1
-					? `[#${rank}](https://elitesb.gg/leaderboard/${lb}/${account.name}-${profile.profileName}?fallback=${rank}) • `
+					? `[#${rank}](https://elitesb.gg/leaderboard/${lb}/${account.name}-${profile.profileName}?f=${rank}) • `
 					: '';
 
 			return (
