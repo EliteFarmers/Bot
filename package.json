@@ -31,7 +31,7 @@
 		"@sentry/node": "^10.22.0",
 		"@sentry/profiling-node": "^10.22.0",
 		"bufferutil": "^4.0.9",
-		"cron": "^3.5.0",
+		"cron": "^4.0.0",
 		"date-fns": "^4.1.0",
 		"discord.js": "^14.24.0",
 		"farming-weight": "^0.13.4",
