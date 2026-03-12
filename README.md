@@ -39,7 +39,7 @@ Contributions are welcome! Please open an issue or pull request if you have any 
 	```env
 	BOT_TOKEN="bot-token-here"
 
-	ELITE_API_URL="https://api.elitebot.dev"
+	ELITE_API_URL="https://api.eliteskyblock.com"
 	```
 	Enter your bot token in the `BOT_TOKEN` field. The `ELITE_API_URL` field can be left as is, but if you want to use [your instance of the API](https://github.com/EliteFarmers/API), change it to your API's URL. 
 	

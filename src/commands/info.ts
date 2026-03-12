@@ -17,7 +17,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const embed = EliteEmbed(settings)
 		.setTitle('Farming Weight Information')
 		.setDescription(
-			'Farming weight is based off of multiple different factors to provide a number for comparsion between all farmers.\n\n**Info has been moved to [elitebot.dev/info](https://elitesb.gg/info)**',
+			'Farming weight is based off of multiple different factors to provide a number for comparsion between all farmers.\n\n**Info has been moved to [eliteskyblock.com/info](https://elitesb.gg/info)**',
 		)
 		.addFields([
 			{

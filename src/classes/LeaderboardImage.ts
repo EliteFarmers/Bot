@@ -158,7 +158,7 @@ export async function GenerateLeaderboardImage(guildName: string, lb: components
 
 	ctx.fillText(lbName, watermarkX, watermarkY);
 	ctx.fillText(guildName, watermarkX, watermarkY - 40);
-	ctx.fillText('elitebot.dev', watermarkX, watermarkY - 80);
+	ctx.fillText('eliteskyblock.com', watermarkX, watermarkY - 80);
 	ctx.restore();
 
 	return canvas.encode('png');

@@ -42,7 +42,7 @@ async function execute(signal: Signal) {
 
 	if (!member.farmingWeight.totalWeight || member.farmingWeight.totalWeight <= 50) {
 		// Send short and simple message if the weight is low
-		const message = `**${username}** (${member?.profileName ?? 'Unknown'})${ping ? ` (${ping})` : ''} has been wiped! [API](https://api.elitebot.dev/profile/${uuid}/${profileId})`;
+		const message = `**${username}** (${member?.profileName ?? 'Unknown'})${ping ? ` (${ping})` : ''} has been wiped! [API](https://api.eliteskyblock.com/profile/${uuid}/${profileId})`;
 		channel?.send({ content: message }).catch(() => undefined);
 		return;
 	}
@@ -93,7 +93,7 @@ async function execute(signal: Signal) {
 			`## **${username}** (${member?.profileName ?? 'Unknown'})${ping ? ` (${ping})` : ''} has been wiped!\n` +
 				`-# UUID: \`${uuid}\`\n` +
 				`-# Profile ID: \`${profileId}\`\n` +
-				`-# [Link to API Data](https://api.elitebot.dev/profile/${uuid}/${profileId})`,
+				`-# [Link to API Data](https://api.eliteskyblock.com/profile/${uuid}/${profileId})`,
 		)
 		.setTimestamp();
 

@@ -3,8 +3,8 @@
 	"openapi": "3.0.0",
 	"info": {
 		"title": "Elite API",
-		"description": "A backend API for https://elitebot.dev/ that provides Hypixel Skyblock data.\r\n<br><br>\r\nUse of this API requires following the [Elite API TOS](https://elitebot.dev/apiterms). This API is not affiliated with Hypixel or Mojang.",
-		"termsOfService": "https://elitebot.dev/apiterms",
+		"description": "A backend API for https://eliteskyblock.com/ that provides Hypixel Skyblock data.\r\n<br><br>\r\nUse of this API requires following the [Elite API TOS](https://eliteskyblock.com/apiterms). This API is not affiliated with Hypixel or Mojang.",
+		"termsOfService": "https://eliteskyblock.com/apiterms",
 		"contact": {
 			"name": "GitHub",
 			"url": "https://github.com/EliteFarmers/API"
