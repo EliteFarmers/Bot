@@ -83,7 +83,7 @@ async function commandExecute(interaction: ChatInputCommandInteraction | ButtonI
 			})
 			.addFields({
 				name: 'Want to view online?',
-				value: `Please go to [elitebot.dev/@${rawName}/${profileName}](https://elitesb.gg/@${rawName}/${encodeURIComponent(profileName)})`,
+				value: `Please go to [eliteskyblock.com/@${rawName}/${profileName}](https://elitesb.gg/@${rawName}/${encodeURIComponent(profileName)})`,
 			});
 		await interaction.deleteReply().catch(() => undefined);
 		interaction.followUp({ embeds: [embed], ephemeral: true });

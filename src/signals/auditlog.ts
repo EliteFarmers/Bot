@@ -64,7 +64,7 @@ async function execute(signal: Signal) {
 			guideEmbed.addSectionComponents((section) =>
 				section
 					.setThumbnailAccessory((a) =>
-						a.setURL('https://api.elitebot.dev/textures/items/' + guide.iconSkyblockId + '.webp'),
+						a.setURL('https://api.eliteskyblock.com/textures/items/' + guide.iconSkyblockId + '.webp'),
 					)
 					.addTextDisplayComponents((text) => text.setContent('## ' + guide.title))
 					.addTextDisplayComponents((text) => text.setContent(description)),

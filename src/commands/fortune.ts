@@ -147,7 +147,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		return (
 			`**${name}** \n` +
 			(source.api === false && !total
-				? `-# Configure [on elitebot.dev!](${url})  ${missing} **/ ${max.toLocaleString()}**${emoji}`
+				? `-# Configure [on eliteskyblock.com!](${url})  ${missing} **/ ${max.toLocaleString()}**${emoji}`
 				: `${progressBar(Math.min(total / max, 1), 10)}  ${missing} / ${max.toLocaleString()}${emoji}`)
 		);
 	};
@@ -174,7 +174,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const row = CropSelectRow('crop-select-fortune', 'Select a crop to view its fortune!');
 
-	const containerTitleSuffix = `for ${escapeIgn(playerName)} (${profile.profileName})\n${apiWarning}-# View more [on elitebot.dev!](${url})`;
+	const containerTitleSuffix = `for ${escapeIgn(playerName)} (${profile.profileName})\n${apiWarning}-# View more [on eliteskyblock.com!](${url})`;
 
 	const container = new EliteContainer(settings)
 		.addTitle(`## ${fortuneEmoji} Farming Fortune ` + containerTitleSuffix)
@@ -201,7 +201,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		.addActionRowComponents(row)
 		.addFooter();
 
-	const disclaimer = `-# Sources with \":warning:\" don't exist in the Hypixel API and can only be set on elitebot.dev.`;
+	const disclaimer = `-# Sources with \":warning:\" don't exist in the Hypixel API and can only be set on eliteskyblock.com.`;
 	const reply = await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2 });
 
 	const collector = reply.createMessageComponentCollector({

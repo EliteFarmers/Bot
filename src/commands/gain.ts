@@ -69,7 +69,7 @@ function generateBarGraph(data: BarGraphData[], options: BarGraphOptions): Buffe
 	// Credit
 	ctx.fillStyle = '#80848e';
 	ctx.font = '10px "Open Sans"';
-	ctx.fillText('elitebot.dev', padding.left, 38);
+	ctx.fillText('eliteskyblock.com', padding.left, 38);
 
 	// Date range and player info (right side)
 	if (filteredData.length > 0) {

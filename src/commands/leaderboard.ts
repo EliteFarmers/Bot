@@ -96,7 +96,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			})
 			.addFields({
 				name: 'Want to view the leaderboard online?',
-				value: `Please go to [elitebot.dev/leaderboard/${leaderboardId}](https://elitesb.gg/leaderboard/${leaderboardId})`,
+				value: `Please go to [eliteskyblock.com/leaderboard/${leaderboardId}](https://elitesb.gg/leaderboard/${leaderboardId})`,
 			});
 		interaction.editReply({ embeds: [errorEmbed] });
 		return;
@@ -143,7 +143,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 					})
 					.addFields({
 						name: 'Want to view the leaderboard online?',
-						value: `Please go to [elitebot.dev/leaderboard/${leaderboardId}](https://elitesb.gg/leaderboard/${leaderboardId})`,
+						value: `Please go to [eliteskyblock.com/leaderboard/${leaderboardId}](https://elitesb.gg/leaderboard/${leaderboardId})`,
 					});
 
 				i.followUp({ embeds: [errorEmbed], ephemeral: true });

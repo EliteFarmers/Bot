@@ -54,7 +54,7 @@ export class Signal<T = unknown> {
 
 	async success(title: string, content: string) {
 		const embed = ErrorEmbed(title).setDescription(content).setFooter({
-			text: 'This action was triggered online via elitebot.dev.',
+			text: 'This action was triggered online via eliteskyblock.com.',
 		});
 
 		return this.dmUser({ embeds: [embed] });
@@ -62,7 +62,7 @@ export class Signal<T = unknown> {
 
 	async fail(title: string, content: string) {
 		const embed = ErrorEmbed(title).setDescription(content).setFooter({
-			text: 'This action was triggered online via elitebot.dev.',
+			text: 'This action was triggered online via eliteskyblock.com.',
 		});
 
 		return this.dmUser({ embeds: [embed] });

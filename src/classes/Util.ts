@@ -96,19 +96,19 @@ export function GetEmbeddedTimestamp(unixSeconds: number, format = 'R') {
 }
 
 export function GetCropURL(crop: string) {
-	if (crop === 'Cactus') return 'https://elitebot.dev/images/crops/cactus.png';
-	if (crop === 'Carrot') return 'https://elitebot.dev/images/crops/carrot.png';
-	if (crop === 'Cocoa Beans') return 'https://elitebot.dev/images/crops/cocoa.png';
-	if (crop === 'Melon') return 'https://elitebot.dev/images/crops/melon.png';
-	if (crop === 'Mushroom') return 'https://elitebot.dev/images/crops/mushroom.png';
-	if (crop === 'Nether Wart') return 'https://elitebot.dev/images/crops/netherwart.png';
-	if (crop === 'Potato') return 'https://elitebot.dev/images/crops/potato.png';
-	if (crop === 'Pumpkin') return 'https://elitebot.dev/images/crops/pumpkin.png';
-	if (crop === 'Sugar Cane') return 'https://elitebot.dev/images/crops/sugarcane.png';
-	if (crop === 'Wheat') return 'https://elitebot.dev/images/crops/wheat.png';
-	if (crop === 'Sunflower') return 'https://elitebot.dev/images/crops/sunflower.png';
-	if (crop === 'Moonflower') return 'https://elitebot.dev/images/crops/moonflower.png';
-	if (crop === 'Wild Rose') return 'https://elitebot.dev/images/crops/wildrose.png';
+	if (crop === 'Cactus') return 'https://eliteskyblock.com/images/crops/cactus.png';
+	if (crop === 'Carrot') return 'https://eliteskyblock.com/images/crops/carrot.png';
+	if (crop === 'Cocoa Beans') return 'https://eliteskyblock.com/images/crops/cocoa.png';
+	if (crop === 'Melon') return 'https://eliteskyblock.com/images/crops/melon.png';
+	if (crop === 'Mushroom') return 'https://eliteskyblock.com/images/crops/mushroom.png';
+	if (crop === 'Nether Wart') return 'https://eliteskyblock.com/images/crops/netherwart.png';
+	if (crop === 'Potato') return 'https://eliteskyblock.com/images/crops/potato.png';
+	if (crop === 'Pumpkin') return 'https://eliteskyblock.com/images/crops/pumpkin.png';
+	if (crop === 'Sugar Cane') return 'https://eliteskyblock.com/images/crops/sugarcane.png';
+	if (crop === 'Wheat') return 'https://eliteskyblock.com/images/crops/wheat.png';
+	if (crop === 'Sunflower') return 'https://eliteskyblock.com/images/crops/sunflower.png';
+	if (crop === 'Moonflower') return 'https://eliteskyblock.com/images/crops/moonflower.png';
+	if (crop === 'Wild Rose') return 'https://eliteskyblock.com/images/crops/wildrose.png';
 
 	return undefined;
 }
