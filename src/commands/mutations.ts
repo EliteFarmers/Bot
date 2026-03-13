@@ -1,19 +1,13 @@
 import { EliteEmbed, NotYoursReply } from 'classes/embeds.js';
+import { GREENHOUSE_MUTATIONS } from 'farming-weight';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from 'discord.js';
 import { FetchProducts, UserSettings } from '../api/elite.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
 
-
-export interface MutationAnalysis {
-	id: string;
-	analysisCost: number;
-	copper: number;
-}
-
 export interface MutationCopperRatio {
 	id: string;
 	name: string;
-	copper: MutationAnalysis['copper'];
+	copper: number;
 	buyCoinPerCopper: number;
 	buyCoinTotal: number;
 	buyOrderCoinPerCopper: number;
@@ -22,49 +16,7 @@ export interface MutationCopperRatio {
 
 type MutationBuyType = 'instabuy' | 'buyorder';
 
-//waiting for farming-weight@14.0 to be usable on the bot repository to moove it
-const mutations: MutationAnalysis[] = [
-	{ id: "ASHWREATH", analysisCost: 10000, copper: 5 },
-	{ id: "CHOCONUT", analysisCost: 10000, copper: 5 },
-	{ id: "DUSTGRAIN", analysisCost: 10000, copper: 5 },
-	{ id: "GLOOMGOURD", analysisCost: 10000, copper: 5 },
-	{ id: "LONELILY", analysisCost: 50000, copper: 25 },
-	{ id: "SCOURROOT", analysisCost: 10000, copper: 5 },
-	{ id: "SHADEVINE", analysisCost: 10000, copper: 5 },
-	{ id: "VEILSHROOM", analysisCost: 10000, copper: 5 },
-	{ id: "WITHERBLOOM", analysisCost: 40000, copper: 20 },
-	{ id: "CHOCOBERRY", analysisCost: 60000, copper: 30 },
-	{ id: "CINDERSHADE", analysisCost: 80000, copper: 40 },
-	{ id: "COALROOT", analysisCost: 80000, copper: 40 },
-	{ id: "CREAMBLOOM", analysisCost: 60000, copper: 30 },
-	{ id: "DUSKBLOOM", analysisCost: 80000, copper: 40 },
-	{ id: "THORNSHADE", analysisCost: 80000, copper: 40 },
-	{ id: "BLASTBERRY", analysisCost: 240000, copper: 120 },
-	{ id: "CHEESEBITE", analysisCost: 80000, copper: 80 },
-	{ id: "CHLORONITE", analysisCost: 40000, copper: 20 },
-	{ id: "DO_NOT_EAT_SHROOM", analysisCost: 240000, copper: 120 },
-	{ id: "FLESHTRAP", analysisCost: 360000, copper: 180 },
-	{ id: "MAGIC_JELLYBEAN", analysisCost: 160000, copper: 80 },
-	{ id: "NOCTILUME", analysisCost: 300000, copper: 150 },
-	{ id: "SNOOZLING", analysisCost: 600000, copper: 300 },
-	{ id: "SOGGYBUD", analysisCost: 60000, copper: 30 },
-	{ id: "CHORUS_FRUIT", analysisCost: 600000, copper: 300 },
-	{ id: "PLANTBOY_ADVANCE", analysisCost: 700000, copper: 350 },
-	{ id: "PUFFERCLOUD", analysisCost: 1000000, copper: 500 },
-	{ id: "SHELLFRUIT", analysisCost: 500000, copper: 250 },
-	{ id: "STARTLEVINE", analysisCost: 500000, copper: 250 },
-	{ id: "STOPLIGHT_PETAL", analysisCost: 4000000, copper: 2000 },
-	{ id: "THUNDERLING", analysisCost: 800000, copper: 400 },
-	{ id: "TURTLELLINI", analysisCost: 240000, copper: 120 },
-	{ id: "ZOMBUD", analysisCost: 1000000, copper: 500 },
-	{ id: "ALL_IN_ALOE", analysisCost: 4600000, copper: 2300 },
-	{ id: "DEVOURER", analysisCost: 10000000, copper: 5000 },
-	{ id: "GLASSCORN", analysisCost: 4000000, copper: 2000 },
-	{ id: "GODSEED", analysisCost: 1000000, copper: 500 },
-	{ id: "JERRYFLOWER", analysisCost: 20000, copper: 10 },
-	{ id: "PHANTOMLEAF", analysisCost: 3000000, copper: 1500 },
-	{ id: "TIMESTALK", analysisCost: 19000000, copper: 9500 }
-];
+const mutations = Object.values(GREENHOUSE_MUTATIONS);
 
 const command = new EliteCommand({
 	name: 'mutations',
@@ -98,35 +50,36 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const mutationIds = mutations.map(m => m.id);
 	const { data: bazaar } = await FetchProducts(mutationIds);
 
-	const mutationRatios: MutationCopperRatio[] = mutations.map(mutation => {
-		const bazaarItem = bazaar?.items?.[mutation.id];
-		const buy = bazaarItem?.bazaar?.buy as number | undefined;
-		const buyOrder = bazaarItem?.bazaar?.buyOrder as number | undefined;
-		if (buy === undefined && buyOrder === undefined) {
-			//if neither buy nor buy order exist, return infinite ratio (Jerryflower)
-			return {
-				id: mutation.id,
-				name: bazaarItem?.name ?? mutation.id,
-				copper: mutation.copper,
-				buyCoinPerCopper: Infinity,
-				buyCoinTotal: Infinity,
-				buyOrderCoinPerCopper: Infinity,
-				buyOrderCoinTotal: Infinity,
-			};
-		}
-		const copper = mutation.copper * (1 + synthesis / 100 + rose_dragon / 100);
-		const buyCoinTotal = mutation.analysisCost + (buy ?? 0);
-		const buyOrderCoinTotal = mutation.analysisCost + (buyOrder ?? 0);
-		return {
-			id: mutation.id,
-			name: bazaarItem?.name ?? mutation.id,
-			copper: mutation.copper,
-			buyCoinPerCopper: buyCoinTotal / copper,
-			buyOrderCoinPerCopper: buyOrderCoinTotal / copper,
-			buyCoinTotal,
-			buyOrderCoinTotal,
-		};
-	});
+	       const mutationRatios: MutationCopperRatio[] = mutations.map(mutation => {
+		       const bazaarItem = bazaar?.items?.[mutation.id];
+		       const buy = bazaarItem?.bazaar?.buy as number | undefined;
+		       const buyOrder = bazaarItem?.bazaar?.buyOrder as number | undefined;
+		       const analysisCost = mutation.analysis.baseCost;
+		       const copper = mutation.analysis.copper * (1 + synthesis / 100 + rose_dragon / 100);
+		       if (buy === undefined && buyOrder === undefined) {
+			       //if neither buy nor buy order exist, return infinite ratio (Jerryflower)
+			       return {
+				       id: mutation.id,
+				       name: mutation.display.name ?? mutation.id,
+				       copper: mutation.analysis.copper,
+				       buyCoinPerCopper: Infinity,
+				       buyCoinTotal: Infinity,
+				       buyOrderCoinPerCopper: Infinity,
+				       buyOrderCoinTotal: Infinity,
+			       };
+		       }
+		       const buyCoinTotal = analysisCost + (buy ?? 0);
+		       const buyOrderCoinTotal = analysisCost + (buyOrder ?? 0);
+		       return {
+			       id: mutation.id,
+			       name: mutation.display.name ?? mutation.id,
+			       copper: mutation.analysis.copper,
+			       buyCoinPerCopper: buyCoinTotal / copper,
+			       buyOrderCoinPerCopper: buyOrderCoinTotal / copper,
+			       buyCoinTotal,
+			       buyOrderCoinTotal,
+		       };
+	       });
 
 	const ITEMS_PER_PAGE = 10;
 	let page = 0;
