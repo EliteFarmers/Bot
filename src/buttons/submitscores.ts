@@ -3,6 +3,7 @@ import {
 	ButtonBuilder,
 	ButtonInteraction,
 	ButtonStyle,
+	ComponentType,
 	ContainerBuilder,
 	MediaGalleryBuilder,
 	MessageFlags,
@@ -14,6 +15,7 @@ import { components } from '../api/api.js'; // Assuming this has the new schemas
 import { FetchAccount, FetchGuildJacob, SubmitJacobScore } from '../api/elite.js'; // Added SubmitJacobScore
 import { commandReferences } from '../bot.js';
 import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
+import { EliteContainer } from '../classes/components.js';
 import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
 import { GenerateLeaderboardImage } from '../classes/LeaderboardImage.js';
 import { GetReadableDate } from '../classes/SkyblockDate.js';
@@ -73,6 +75,24 @@ async function execute(interaction: ButtonInteraction) {
 			'This leaderboard does not exist or Jacob Leaderboards are not enabled for this server.',
 		);
 		interaction.editReply({ embeds: [embed] });
+
+		if (interaction.memberPermissions.has(PermissionFlagsBits.Administrator | PermissionFlagsBits.ManageGuild)) {
+			const components = interaction.message.components;
+			const lastComponent = components.at(-1);
+			if (!lastComponent?.type || lastComponent.type !== ComponentType.Container) {
+				return;
+			}
+
+			await interaction.message
+				.edit({
+					components: [
+						...components.slice(0, -1),
+						new EliteContainer(undefined, lastComponent.data).disableEverything(),
+					],
+					allowedMentions: { parse: [] },
+				})
+				.catch(() => undefined);
+		}
 		return;
 	}
 
