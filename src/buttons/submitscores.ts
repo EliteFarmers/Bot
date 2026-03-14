@@ -87,7 +87,7 @@ async function execute(interaction: ButtonInteraction) {
 				.edit({
 					components: [
 						...components.slice(0, -1),
-						new EliteContainer(undefined, lastComponent.data).disableEverything(),
+						new EliteContainer().addText("-# This leaderboard has been archived!"),
 					],
 					allowedMentions: { parse: [] },
 				})
