@@ -1,5 +1,6 @@
-import { EliteEmbed, NotYoursReply } from 'classes/embeds.js';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from 'discord.js';
+import { NotYoursReply } from 'classes/embeds.js';
+import { EliteContainer } from '../classes/components.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from 'discord.js';
 import { GREENHOUSE_MUTATIONS } from 'farming-weight';
 import { FetchProducts, UserSettings } from '../api/elite.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
@@ -42,6 +43,7 @@ const command = new EliteCommand({
 
 export default command;
 
+
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	await interaction.deferReply();
 
@@ -50,36 +52,36 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const mutationIds = mutations.map(m => m.id);
 	const { data: bazaar } = await FetchProducts(mutationIds);
 
-	       const mutationRatios: MutationCopperRatio[] = mutations.map(mutation => {
-		       const bazaarItem = bazaar?.items?.[mutation.id];
-		       const buy = bazaarItem?.bazaar?.buy as number | undefined;
-		       const buyOrder = bazaarItem?.bazaar?.buyOrder as number | undefined;
-		       const analysisCost = mutation.analysis.baseCost;
-		       const copper = mutation.analysis.copper * (1 + synthesis / 100 + rose_dragon / 100);
-		       if (buy === undefined && buyOrder === undefined) {
-			       //if neither buy nor buy order exist, return infinite ratio (Jerryflower)
-			       return {
-				       id: mutation.id,
-				       name: mutation.display.name ?? mutation.id,
-				       copper: mutation.analysis.copper,
-				       buyCoinPerCopper: Infinity,
-				       buyCoinTotal: Infinity,
-				       buyOrderCoinPerCopper: Infinity,
-				       buyOrderCoinTotal: Infinity,
-			       };
-		       }
-		       const buyCoinTotal = analysisCost + (buy ?? 0);
-		       const buyOrderCoinTotal = analysisCost + (buyOrder ?? 0);
-		       return {
-			       id: mutation.id,
-			       name: mutation.display.name ?? mutation.id,
-			       copper: mutation.analysis.copper,
-			       buyCoinPerCopper: buyCoinTotal / copper,
-			       buyOrderCoinPerCopper: buyOrderCoinTotal / copper,
-			       buyCoinTotal,
-			       buyOrderCoinTotal,
-		       };
-	       });
+	const mutationRatios: MutationCopperRatio[] = mutations.map(mutation => {
+		const bazaarItem = bazaar?.items?.[mutation.id];
+		const buy = bazaarItem?.bazaar?.buy as number | undefined;
+		const buyOrder = bazaarItem?.bazaar?.buyOrder as number | undefined;
+		const analysisCost = mutation.analysis.baseCost;
+		const copper = mutation.analysis.copper * (1 + synthesis / 100 + rose_dragon / 100);
+		if (buy === undefined && buyOrder === undefined) {
+			//if neither buy nor buy order exist, return infinite ratio (Jerryflower)
+			return {
+				id: mutation.id,
+				name: mutation.display.name ?? mutation.id,
+				copper: mutation.analysis.copper,
+				buyCoinPerCopper: Infinity,
+				buyCoinTotal: Infinity,
+				buyOrderCoinPerCopper: Infinity,
+				buyOrderCoinTotal: Infinity,
+			};
+		}
+		const buyCoinTotal = analysisCost + (buy ?? 0);
+		const buyOrderCoinTotal = analysisCost + (buyOrder ?? 0);
+		return {
+			id: mutation.id,
+			name: mutation.display.name ?? mutation.id,
+			copper: mutation.analysis.copper,
+			buyCoinPerCopper: buyCoinTotal / copper,
+			buyOrderCoinPerCopper: buyOrderCoinTotal / copper,
+			buyCoinTotal,
+			buyOrderCoinTotal,
+		};
+	});
 
 	const ITEMS_PER_PAGE = 10;
 	let page = 0;
@@ -132,30 +134,30 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const instaBuyEmoji = '💸';
 		const buyOrderEmoji = '📒';
 		const selectRow = new ActionRowBuilder<StringSelectMenuBuilder>()
-		.addComponents(
-			new StringSelectMenuBuilder()
-				.setCustomId('mutation-select')
-				.addOptions(
-					new StringSelectMenuOptionBuilder()
-						.setLabel(instaBuyLabel)
-						.setValue('instabuy')
-						.setEmoji(instaBuyEmoji),
-					new StringSelectMenuOptionBuilder()
-						.setLabel(buyOrderLabel)
-						.setValue('buyorder')
-						.setEmoji(buyOrderEmoji))
-				.setPlaceholder(buyType === 'instabuy' 
-					? `${instaBuyEmoji} ${instaBuyLabel}` 
-					: `${buyOrderEmoji} ${buyOrderLabel}`)
-		);
-
+			.addComponents(
+				new StringSelectMenuBuilder()
+					.setCustomId('mutation-select')
+					.addOptions(
+						new StringSelectMenuOptionBuilder()
+							.setLabel(instaBuyLabel)
+							.setValue('instabuy')
+							.setEmoji(instaBuyEmoji),
+						new StringSelectMenuOptionBuilder()
+							.setLabel(buyOrderLabel)
+							.setValue('buyorder')
+							.setEmoji(buyOrderEmoji))
+					.setPlaceholder(buyType === 'instabuy'
+						? `${instaBuyEmoji} ${instaBuyLabel}`
+						: `${buyOrderEmoji} ${buyOrderLabel}`)
+			);
 		return selectRow;
 	}
 
 	const maxPage = Math.max(0, Math.ceil(mutationRatios.length / ITEMS_PER_PAGE) - 1);
-	function buildEmbed(page: number, type: MutationBuyType) {
+
+	function buildContainer(page: number, type: MutationBuyType) {
 		const pageItems = getPageItems(page, type);
-		const description = `Synthesis Bonus: **${synthesis}%**\nRose Dragon Bonus: **${rose_dragon}%**`;
+		const boosts = `Synthesis Bonus: **${synthesis}%**\nRose Dragon Bonus: **${rose_dragon}%**`;
 		let mutationsField = '';
 		pageItems.forEach((item, i) => {
 			const idx = getMutationIndex(page, i);
@@ -169,15 +171,21 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			}
 			mutationsField += `\`#${idx}\` **${item.name}**: ${priceText} coins/Copper (\`${item.copper.toLocaleString()} Copper\`/\`${totalText}\`)\n`;
 		});
-		return EliteEmbed(settings)
-			.setTitle('Mutation Analysis - Coin/Copper Ratios')
-			.setDescription(description)
-			.addFields({ name: `Mutations - ${type === 'instabuy' ? 'Bazaar Insta Buy' : 'Bazaar Buy Order'}`, value: mutationsField, inline: false });
+
+		const container = new EliteContainer(settings)
+			.addTitle('**Mutation Analysis - Coin/Copper Ratios**')
+			.addText(boosts)
+			.addSeparator()
+			.addDescription(mutationsField)
+			.addFooter();
+		return container;
 	}
 
+	let currentContainer = buildContainer(page, selectedType);
+
 	const reply = await interaction.editReply({
-		embeds: [buildEmbed(page, selectedType)],
-		components: [getSelectRow(selectedType), getButtonRow(page, maxPage)],
+		components: [currentContainer, getSelectRow(selectedType), getButtonRow(page, maxPage)],
+		flags: MessageFlags.IsComponentsV2
 	});
 
 	const buttonCollector = reply.createMessageComponentCollector({
@@ -206,9 +214,9 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				}
 			}
 
+			currentContainer = buildContainer(page, selectedType);
 			await inter.update({
-				embeds: [buildEmbed(page, selectedType)],
-				components: [getSelectRow(selectedType), getButtonRow(page, maxPage)],
+				components: [currentContainer, getSelectRow(selectedType), getButtonRow(page, maxPage)],
 			}).catch(() => {
 				buttonCollector.stop();
 			});
@@ -233,12 +241,12 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			if (value === 'instabuy' || value === 'buyorder') {
 				selectedType = value;
 				page = 0; // reset page
+				currentContainer = buildContainer(page, selectedType);
 				await inter.update({
-					embeds: [buildEmbed(page, selectedType)],
-					components: [getSelectRow(selectedType), getButtonRow(page, maxPage)],
+					components: [currentContainer, getSelectRow(selectedType), getButtonRow(page, maxPage)],
 				});
 			}
-		} 
+		}
 	});
 
 	selectCollector.on('end', async () => {
@@ -251,9 +259,9 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	}
 
 	async function clearComponents() {
+		currentContainer.disableEverything();
 		await interaction.editReply({
-			embeds: [buildEmbed(page, selectedType)],
-			components: [], //remove buttons & select menu
+			components: [currentContainer],
 		});
 	}
 }
