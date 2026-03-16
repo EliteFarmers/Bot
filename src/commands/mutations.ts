@@ -1,9 +1,9 @@
 import { NotYoursReply } from 'classes/embeds.js';
-import { EliteContainer } from '../classes/components.js';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from 'discord.js';
 import { GREENHOUSE_MUTATIONS } from 'farming-weight';
 import { FetchProducts, UserSettings } from '../api/elite.js';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
+import { EliteContainer } from '../classes/components.js';
 
 export interface MutationCopperRatio {
 	id: string;
@@ -84,23 +84,29 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	});
 
 	const ITEMS_PER_PAGE = 10;
-	let page = 0;
-	let selectedType: MutationBuyType = 'instabuy'; // default to instabuy
+	const COLLECTOR_TIMEOUT = 60_000;
+	const COLLECTOR_RESET = 30_000;
+
+	const state = {
+		page: 0,
+		selectedType: 'instabuy' as MutationBuyType
+	}; // default to instabuy
+
+	const sortedInstabuy = [...mutationRatios].sort(
+		(a, b) => a.buyCoinPerCopper - b.buyCoinPerCopper
+	);
+
+	const sortedBuyOrder = [...mutationRatios].sort(
+		(a, b) => a.buyOrderCoinPerCopper - b.buyOrderCoinPerCopper
+	);
 
 	function getSortedItems(type: MutationBuyType) {
-		return mutationRatios.slice().sort((a, b) => {
-			if (type === 'instabuy') return a.buyCoinPerCopper - b.buyCoinPerCopper;
-			return a.buyOrderCoinPerCopper - b.buyOrderCoinPerCopper;
-		});
+		   return type === "instabuy" ? sortedInstabuy : sortedBuyOrder;
 	}
 
 	function getPageItems(page: number, type: MutationBuyType) {
 		const sorted = getSortedItems(type);
 		return sorted.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
-	}
-
-	function getMutationIndex(page: number, index: number) {
-		return page * ITEMS_PER_PAGE + index + 1;
 	}
 
 	function getButtonRow(page: number, maxPage: number) {
@@ -160,15 +166,19 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const boosts = `Synthesis Bonus: **${synthesis}%**\nRose Dragon Bonus: **${rose_dragon}%**`;
 		let mutationsField = '';
 		pageItems.forEach((item, i) => {
-			const idx = getMutationIndex(page, i);
+			const idx = page * ITEMS_PER_PAGE + i + 1;
 			let priceText, totalText = '';
-			if (type === 'instabuy') {
-				priceText = isFinite(item.buyCoinPerCopper) ? `\`${item.buyCoinPerCopper.toFixed(2)}\`` : '`N/A`';
-				totalText = isFinite(item.buyCoinTotal) ? `${formatNumber(item.buyCoinTotal)}` : '`N/A`';
-			} else {
-				priceText = isFinite(item.buyOrderCoinPerCopper) ? `\`${item.buyOrderCoinPerCopper.toFixed(2)}\`` : '`N/A`';
-				totalText = isFinite(item.buyOrderCoinTotal) ? `${formatNumber(item.buyOrderCoinTotal)}` : '`N/A`';
-			}
+
+			const price = type === 'instabuy'
+				? item.buyCoinPerCopper
+				: item.buyOrderCoinPerCopper;
+
+			const total = type === 'instabuy'
+				? item.buyCoinTotal
+				: item.buyOrderCoinTotal;
+
+			priceText = isFinite(price) ? `\`${price.toFixed(2)}\`` : '`N/A`';
+			totalText = isFinite(total) ? `${formatNumber(total)}` : '`N/A`';
 			mutationsField += `\`#${idx}\` **${item.name}**: ${priceText} coins/Copper (\`${item.copper.toLocaleString()} Copper\`/\`${totalText}\`)\n`;
 		});
 
@@ -181,16 +191,16 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		return container;
 	}
 
-	let currentContainer = buildContainer(page, selectedType);
+	let currentContainer = buildContainer(state.page, state.selectedType);
 
 	const reply = await interaction.editReply({
-		components: [currentContainer, getSelectRow(selectedType), getButtonRow(page, maxPage)],
+		components: [currentContainer, getSelectRow(state.selectedType), getButtonRow(state.page, maxPage)],
 		flags: MessageFlags.IsComponentsV2
 	});
 
 	const buttonCollector = reply.createMessageComponentCollector({
 		componentType: ComponentType.Button,
-		time: 60_000,
+		time: COLLECTOR_TIMEOUT,
 	});
 
 	buttonCollector.on('collect', async (inter) => {
@@ -199,24 +209,24 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		} else {
 			resetCollectors();
 			if (inter.customId === 'first') {
-				page = 0;
+				state.page = 0;
 			} else if (inter.customId === 'back') {
-				if (page > 0) {
-					page -= 1;
+				if (state.page > 0) {
+					state.page -= 1;
 				}
 			} else if (inter.customId === 'forward') {
-				if (page < maxPage) {
-					page += 1;
+				if (state.page < maxPage) {
+					state.page += 1;
 				}
 			} else if (inter.customId === 'last') {
-				if (page !== maxPage) {
-					page = maxPage;
+				if (state.page !== maxPage) {
+					state.page = maxPage;
 				}
 			}
 
-			currentContainer = buildContainer(page, selectedType);
+			currentContainer = buildContainer(state.page, state.selectedType);
 			await inter.update({
-				components: [currentContainer, getSelectRow(selectedType), getButtonRow(page, maxPage)],
+				components: [currentContainer, getSelectRow(state.selectedType), getButtonRow(state.page, maxPage)],
 			}).catch(() => {
 				buttonCollector.stop();
 			});
@@ -229,7 +239,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const selectCollector = reply.createMessageComponentCollector({
 		componentType: ComponentType.StringSelect,
-		time: 60_000,
+		time: COLLECTOR_TIMEOUT,
 	});
 
 	selectCollector.on('collect', async (inter) => {
@@ -239,11 +249,11 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			resetCollectors();
 			const value = inter.values[0];
 			if (value === 'instabuy' || value === 'buyorder') {
-				selectedType = value;
-				page = 0; // reset page
-				currentContainer = buildContainer(page, selectedType);
+				state.selectedType = value;
+				state.page = 0; // reset page
+				currentContainer = buildContainer(state.page, state.selectedType);
 				await inter.update({
-					components: [currentContainer, getSelectRow(selectedType), getButtonRow(page, maxPage)],
+					components: [currentContainer, getSelectRow(state.selectedType), getButtonRow(state.page, maxPage)],
 				});
 			}
 		}
@@ -254,8 +264,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	});
 
 	function resetCollectors() {
-		buttonCollector.resetTimer({ time: 30_000 });
-		selectCollector.resetTimer({ time: 30_000 });
+		buttonCollector.resetTimer({ time: COLLECTOR_RESET });
+		selectCollector.resetTimer({ time: COLLECTOR_RESET });
 	}
 
 	async function clearComponents() {
