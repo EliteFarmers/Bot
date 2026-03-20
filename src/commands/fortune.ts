@@ -108,8 +108,9 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		refinedTruffles: member.chocolateFactory?.refinedTrufflesConsumed,
 		cocoaFortuneUpgrade: member.chocolateFactory?.cocoaFortuneUpgrades,
 		exportableCrops: member.unparsed.exportedCrops ?? {},
-		chips: saved?.chips ?? {},
-		attributes: saved?.attributes ?? {},
+		chips: member.memberData?.garden?.chips ?? {},
+		attributes: member.memberData?.attributes ?? {},
+		dnaMilestone: member.memberData?.garden?.dnaMilestone ?? 0,
 		communityCenter: saved?.communityCenter ?? 0,
 		filledRosewaterFlask: saved?.rosewaterFlasks ?? 0,
 	};
