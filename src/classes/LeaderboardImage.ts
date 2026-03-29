@@ -1,8 +1,8 @@
 import { Canvas, GlobalFonts, Image, loadImage } from '@napi-rs/canvas';
 import { join } from 'path';
 import { cwd } from 'process';
-import { components } from '../api/api.js';
-import { GetCropColor, GetCropURL } from './Util.js';
+import { components } from '../api/api';
+import { GetCropColor, GetCropURL } from './Util';
 
 // Register font
 GlobalFonts.registerFromPath(join(cwd(), 'src', 'assets', 'fonts', 'OpenSans-Regular.ttf'), 'Open Sans');

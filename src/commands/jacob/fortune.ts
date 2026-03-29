@@ -7,11 +7,11 @@ import {
 	EmbedBuilder,
 } from 'discord.js';
 import { getCropFromName, getFortuneRequiredForCollection } from 'farming-weight';
-import type { components } from '../../api/api.js';
-import { FetchCurrentMonthlyBrackets, UserSettings } from '../../api/elite.js';
-import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../../classes/commands/index.js';
-import { EliteEmbed, EmptyString, ErrorEmbed, NotYoursEmbed, PrefixFooter } from '../../classes/embeds.js';
-import { GetCropEmoji } from '../../classes/Util.js';
+import type { components } from '../../api/api';
+import { FetchCurrentMonthlyBrackets, UserSettings } from '../../api/elite';
+import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../../classes/commands/index';
+import { EliteEmbed, EmptyString, ErrorEmbed, NotYoursEmbed, PrefixFooter } from '../../classes/embeds';
+import { GetCropEmoji } from '../../classes/Util';
 
 const command = new EliteCommand({
 	name: 'fortune',

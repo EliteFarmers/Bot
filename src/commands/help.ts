@@ -1,14 +1,14 @@
 import { AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js';
-import { UserSettings } from '../api/elite.js';
-import { commands } from '../bot.js';
+import { UserSettings } from '../api/elite';
+import { commands } from '../bot';
 import {
 	CommandAccess,
 	CommandGroup,
 	CommandType,
 	EliteCommand,
 	SlashCommandOptionType,
-} from '../classes/commands/index.js';
-import { EliteEmbed } from '../classes/embeds.js';
+} from '../classes/commands/index';
+import { EliteEmbed } from '../classes/embeds';
 
 const command = new EliteCommand({
 	name: 'help',

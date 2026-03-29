@@ -1,10 +1,10 @@
 import { StringSelectMenuInteraction } from 'discord.js';
 import { getCropDisplayName } from 'farming-weight';
-import { components } from '../api/api.js';
-import { FetchGuildJacob } from '../api/elite.js';
-import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
-import { EliteEmbed, ErrorEmbed } from '../classes/embeds.js';
-import { CROP_ARRAY, GetCropEmoji, GetEmbeddedTimestamp, UserHyperLink } from '../classes/Util.js';
+import { components } from '../api/api';
+import { FetchGuildJacob } from '../api/elite';
+import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index';
+import { EliteEmbed, ErrorEmbed } from '../classes/embeds';
+import { CROP_ARRAY, GetCropEmoji, GetEmbeddedTimestamp, UserHyperLink } from '../classes/Util';
 
 const command = new EliteCommand({
 	name: 'LB_DETAILS',

@@ -4,10 +4,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 const proccessArgs = process.argv.slice(1);
 
-const manager = new ShardingManager('./dist/bot.js', {
+const manager = new ShardingManager('./src/bot.ts', {
 	token: process.env.BOT_TOKEN,
 	totalShards: 'auto',
 	shardArgs: proccessArgs,
+	execArgv: ['--import', 'tsx'],
 });
 
 manager.on('shardCreate', (shard) => {

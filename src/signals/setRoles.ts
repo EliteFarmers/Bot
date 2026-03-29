@@ -1,6 +1,6 @@
 import { PermissionFlagsBits } from 'discord.js';
-import { EliteEmbed } from '../classes/embeds.js';
-import { Signal, SignalReceiverOptions } from '../classes/Signal.js';
+import { EliteEmbed } from '../classes/embeds';
+import { Signal, SignalReceiverOptions } from '../classes/Signal';
 
 const settings: SignalReceiverOptions = {
 	name: 'setRoles',

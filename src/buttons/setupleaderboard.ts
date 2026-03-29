@@ -1,8 +1,8 @@
 import { ButtonInteraction, MessageFlags, PermissionFlagsBits } from 'discord.js';
-import { FetchGuildJacob } from '../api/elite.js';
-import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
-import { EliteEmbed, ErrorEmbed } from '../classes/embeds.js';
-import { getLeaderboardPayload } from './submitscores.js';
+import { FetchGuildJacob } from '../api/elite';
+import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index';
+import { EliteEmbed, ErrorEmbed } from '../classes/embeds';
+import { getLeaderboardPayload } from './submitscores';
 
 const command = new EliteCommand({
 	name: 'LBSETUP',

@@ -7,21 +7,21 @@
 	"scripts": {
 		"start": "pnpm tsx src/index.ts",
 		"lint": "pnpm biome check --write",
-		"build": "tsc && pnpm sentry:sourcemaps",
-		"dev": "npx nodemon --exec \"npx tsx\" src/bot.ts",
+		"build": "tsc",
+		"dev": "tsx --watch src/bot.ts",
 		"slash": "pnpm tsx src/deploy.ts",
 		"singleslash": "pnpm tsx src/deploy.ts single",
-		"prod": "node dist/index.js",
-		"generate-api-types": "npx openapi-typescript \"./src/api/swagger.json\" -o \"./src/api/api.d.ts\"",
-		"sentry:sourcemaps": "sentry-cli sourcemaps inject --org kaeso --project bot ./dist && sentry-cli sourcemaps upload --org kaeso --project bot ./dist"
+		"prod": "tsx src/index.ts",
+		"generate-api": "pnpm orval",
+		"postprocess-api": "tsx ./src/api/util/morph-api.ts ./src/api/client/EliteAPI.ts && pnpm biome check --write ./src/api/client/EliteAPI.ts ./src/api/schemas"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.4",
 		"@types/amqplib": "^0.10.8",
 		"@types/node": "^24.9.1",
 		"dotenv": "^17.2.3",
+		"ts-morph": "^27.0.2",
 		"tslib": "^2.8.1",
-		"tsx": "^4.20.6",
 		"typescript": "^5.9.3"
 	},
 	"dependencies": {
@@ -36,7 +36,9 @@
 		"discord.js": "^14.24.0",
 		"farming-weight": "^0.14.0",
 		"openapi-fetch": "^0.14.1",
+		"orval": "^8.6.2",
 		"redis": "^5.9.0",
+		"tsx": "^4.20.6",
 		"utf-8-validate": "^6.0.5",
 		"zlib-sync": "^0.1.10",
 		"zod": "^4.1.12"

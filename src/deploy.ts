@@ -6,8 +6,8 @@ import {
 	Routes,
 } from 'discord.js';
 import dotenv from 'dotenv';
-import { CommandGroup, EliteCommand } from './classes/commands/index.js';
-import { registerCommandGroups, registerFiles } from './classes/register.js';
+import { CommandGroup, EliteCommand } from './classes/commands/index';
+import { registerCommandGroups, registerFiles } from './classes/register';
 
 dotenv.config();
 

@@ -1,10 +1,10 @@
 import { ChatInputCommandInteraction } from 'discord.js';
 import { Crop, getCropDisplayName, getCropFromName, SkyBlockTime } from 'farming-weight';
-import { FetchContest, UserSettings } from '../api/elite.js';
-import { eliteDayOption, eliteMonthOption, eliteYearOption } from '../autocomplete/dates.js';
-import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
-import { EliteEmbed } from '../classes/embeds.js';
-import { escapeIgn, GetCropEmoji, GetMedalEmoji } from '../classes/Util.js';
+import { FetchContest, UserSettings } from '../api/elite';
+import { eliteDayOption, eliteMonthOption, eliteYearOption } from '../autocomplete/dates';
+import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index';
+import { EliteEmbed } from '../classes/embeds';
+import { escapeIgn, GetCropEmoji, GetMedalEmoji } from '../classes/Util';
 
 const command = new EliteCommand({
 	name: 'contest',

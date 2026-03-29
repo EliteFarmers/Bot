@@ -1,5 +1,5 @@
 import fs from 'fs';
-import type { CommandGroup } from './commands/index.js';
+import type { CommandGroup } from './commands/index';
 
 export async function registerFiles<T>(
 	folder: string,
@@ -9,7 +9,7 @@ export async function registerFiles<T>(
 	const files = fs.readdirSync(`./src/${folder}`);
 
 	for (const file of files.filter(filter)) {
-		const imported = await import(`../${folder}/${file.replace('.ts', '.js')}`);
+		const imported = await import(`../${folder}/${file}`);
 		callback(imported.default);
 	}
 }
@@ -23,7 +23,7 @@ export async function registerCommandGroups(
 		.filter((fileName) => fs.lstatSync(`./src/${folder}/${fileName}`).isDirectory());
 
 	for (const file of files) {
-		const imported = await import(`../${folder}/${file}/command.js`);
+		const imported = await import(`../${folder}/${file}/command.ts`);
 		await callback(`${folder}/${file}`, imported.default);
 	}
 }

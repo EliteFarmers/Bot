@@ -1,12 +1,11 @@
 {
 	"compilerOptions": {
 		"target": "ES2022",
-		"module": "NodeNext",
+		"module": "preserve",
 		"rootDir": "./src",
-		"outDir": "./dist",
 		"strict": true,
 		"strictNullChecks": true,
-		"moduleResolution": "NodeNext",
+		"moduleResolution": "bundler",
 		"importHelpers": true,
 		"experimentalDecorators": true,
 		"esModuleInterop": true,
@@ -14,24 +13,13 @@
 		"allowSyntheticDefaultImports": true,
 		"resolveJsonModule": true,
 		"forceConsistentCasingInFileNames": true,
-		"removeComments": true,
 		"isolatedModules": true,
+		"noEmit": true,
 
 		"typeRoots": ["node_modules/@types"],
 
-		"sourceMap": true,
-		"baseUrl": "./src",
-		"inlineSources": true,
-
-		// Set `sourceRoot` to  "/" to strip the build path prefix
-		// from generated source code references.
-		// This improves issue grouping in Sentry.
-		"sourceRoot": "/"
+		"baseUrl": "./src"
 	},
-	"include": ["./**/*.ts", "./**/**/*.ts"],
-	"exclude": ["node_modules"],
-	"ts-node": {
-		"esm": true,
-		"experimentalSpecifierResolution": "node"
-	}
+	"include": ["src/**/*.ts"],
+	"exclude": ["node_modules"]
 }

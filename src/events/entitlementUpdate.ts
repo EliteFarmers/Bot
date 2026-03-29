@@ -1,5 +1,5 @@
 import { Entitlement, Events } from 'discord.js';
-import { RefreshUserEntitlements } from '../api/elite.js';
+import { RefreshUserEntitlements } from '../api/elite';
 
 const settings = {
 	event: Events.EntitlementUpdate,

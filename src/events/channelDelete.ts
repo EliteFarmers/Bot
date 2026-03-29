@@ -1,5 +1,5 @@
 import { Events, GuildChannel } from 'discord.js';
-import { RequestGuildUpdate } from '../api/elite.js';
+import { RequestGuildUpdate } from '../api/elite';
 
 const settings = {
 	event: Events.ChannelDelete,

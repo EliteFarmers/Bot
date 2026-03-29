@@ -1,12 +1,12 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType } from 'discord.js';
-import { components } from '../api/api.js';
-import { FetchLeaderboardRank, FetchLeaderboardSlice, UserSettings } from '../api/elite.js';
-import { eliteLeaderboardOption } from '../autocomplete/leaderboard.js';
-import { elitePlayerOption } from '../autocomplete/player.js';
-import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
-import { EliteEmbed, ErrorEmbed } from '../classes/embeds.js';
-import { escapeIgn } from '../classes/Util.js';
-import { getAccount } from '../classes/validate.js';
+import { components } from '../api/api';
+import { FetchLeaderboardRank, FetchLeaderboardSlice, UserSettings } from '../api/elite';
+import { eliteLeaderboardOption } from '../autocomplete/leaderboard';
+import { elitePlayerOption } from '../autocomplete/player';
+import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index';
+import { EliteEmbed, ErrorEmbed } from '../classes/embeds';
+import { escapeIgn } from '../classes/Util';
+import { getAccount } from '../classes/validate';
 
 const command = new EliteCommand({
 	name: 'leaderboard',

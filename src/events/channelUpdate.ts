@@ -1,5 +1,5 @@
 import { Events, GuildChannel } from 'discord.js';
-import { UpdateGuildChannel } from '../api/elite.js';
+import { UpdateGuildChannel } from '../api/elite';
 
 const settings = {
 	event: Events.ChannelUpdate,

@@ -1,7 +1,7 @@
 import { User } from 'discord.js';
 import dotenv from 'dotenv';
 import createClient from 'openapi-fetch';
-import { components, paths } from './api.d.js';
+import { components, paths } from './api.d';
 
 dotenv.config();
 

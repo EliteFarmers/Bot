@@ -7,11 +7,11 @@ import {
 	ComponentType,
 	Interaction,
 } from 'discord.js';
-import { FetchAccount, GrantUserBadge, UserSettings } from '../api/elite.js';
-import { commandReferences } from '../bot.js';
-import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
-import { EliteEmbed, ErrorEmbed } from '../classes/embeds.js';
-import { escapeIgn } from '../classes/Util.js';
+import { FetchAccount, GrantUserBadge, UserSettings } from '../api/elite';
+import { commandReferences } from '../bot';
+import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index';
+import { EliteEmbed, ErrorEmbed } from '../classes/embeds';
+import { escapeIgn } from '../classes/Util';
 
 const command = new EliteCommand({
 	name: 'badges',

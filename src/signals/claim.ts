@@ -1,7 +1,7 @@
 import { MessageFlags, TextDisplayBuilder } from 'discord.js';
-import { FetchProduct } from '../api/elite.js';
-import { EliteContainer } from '../classes/components.js';
-import { Signal, SignalReceiverOptions } from '../classes/Signal.js';
+import { FetchProduct } from '../api/elite';
+import { EliteContainer } from '../classes/components';
+import { Signal, SignalReceiverOptions } from '../classes/Signal';
 
 const settings: SignalReceiverOptions = {
 	name: 'claim',
