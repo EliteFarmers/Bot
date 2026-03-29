@@ -7,11 +7,13 @@
 	"scripts": {
 		"start": "pnpm tsx src/index.ts",
 		"lint": "pnpm biome check --write",
-		"build": "tsc",
+		"build": "tsdown && pnpm sentry:sourcemaps",
+		"typecheck": "tsc",
 		"dev": "tsx --watch src/bot.ts",
 		"slash": "pnpm tsx src/deploy.ts",
 		"singleslash": "pnpm tsx src/deploy.ts single",
-		"prod": "tsx src/index.ts",
+		"prod": "node dist/index.js",
+		"sentry:sourcemaps": "sentry-cli sourcemaps inject --org kaeso --project bot ./dist && sentry-cli sourcemaps upload --org kaeso --project bot ./dist",
 		"generate-api": "pnpm orval",
 		"postprocess-api": "tsx ./src/api/util/morph-api.ts ./src/api/client/EliteAPI.ts && pnpm biome check --write ./src/api/client/EliteAPI.ts ./src/api/schemas"
 	},
@@ -21,7 +23,9 @@
 		"@types/node": "^24.9.1",
 		"dotenv": "^17.2.3",
 		"ts-morph": "^27.0.2",
+		"tsdown": "^0.21.7",
 		"tslib": "^2.8.1",
+		"tsx": "^4.20.6",
 		"typescript": "^5.9.3"
 	},
 	"dependencies": {
@@ -38,7 +42,6 @@
 		"openapi-fetch": "^0.14.1",
 		"orval": "^8.6.2",
 		"redis": "^5.9.0",
-		"tsx": "^4.20.6",
 		"utf-8-validate": "^6.0.5",
 		"zlib-sync": "^0.1.10",
 		"zod": "^4.1.12"

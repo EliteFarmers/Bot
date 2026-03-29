@@ -9,7 +9,7 @@ export async function registerFiles<T>(
 	const files = fs.readdirSync(`./src/${folder}`);
 
 	for (const file of files.filter(filter)) {
-		const imported = await import(`../${folder}/${file}`);
+		const imported = await import(`../${folder}/${file.replace(/\.ts$/, '.js')}`);
 		callback(imported.default);
 	}
 }
@@ -23,7 +23,7 @@ export async function registerCommandGroups(
 		.filter((fileName) => fs.lstatSync(`./src/${folder}/${fileName}`).isDirectory());
 
 	for (const file of files) {
-		const imported = await import(`../${folder}/${file}/command.ts`);
+		const imported = await import(`../${folder}/${file}/command.js`);
 		await callback(`${folder}/${file}`, imported.default);
 	}
 }

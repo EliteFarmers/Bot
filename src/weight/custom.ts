@@ -27,7 +27,7 @@ const formatters: Record<string, CustomFormatter> = {
 
 // import * as TestStyle from './testing.json';
 
-let stylesCache: Record<number, components['schemas']['WeightStyleWithDataDto']> = {};
+let stylesCache: Record<number, components['schemas']['WeightStyleListDto']> = {};
 
 export function getCustomFormatter(
 	options: CustomFormatterOptions,
@@ -63,7 +63,7 @@ export function getCustomFormatter(
 export async function LoadWeightStyles() {
 	const { data: styles } = await FetchWeightStyles();
 
-	const newStyles = styles?.reduce<Record<number, components['schemas']['WeightStyleWithDataDto']>>((acc, style) => {
+	const newStyles = styles?.reduce<Record<number, components['schemas']['WeightStyleListDto']>>((acc, style) => {
 		if (!style.id || !validStyle(style.data)) return acc;
 		acc[style.id] = style;
 		return acc;
