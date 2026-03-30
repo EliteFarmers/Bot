@@ -1,6 +1,6 @@
+import { GuildJacobLeaderboardEntry } from 'api/schemas';
 import { StringSelectMenuInteraction } from 'discord.js';
 import { getCropDisplayName } from 'farming-weight';
-import { components } from '../api/api';
 import { FetchGuildJacob } from '../api/elite';
 import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index';
 import { EliteEmbed, ErrorEmbed } from '../classes/embeds';
@@ -43,9 +43,7 @@ async function execute(interaction: StringSelectMenuInteraction) {
 	const selectedCropIndex = parseInt(interaction.values[0], 10);
 	const selectedCrop = getCropDisplayName(CROP_ARRAY[selectedCropIndex]);
 	const propName = getCropProperty(selectedCrop);
-	const scores = leaderboard.crops?.[
-		propName as keyof typeof leaderboard.crops
-	] as components['schemas']['GuildJacobLeaderboardEntry'][];
+	const scores = leaderboard.crops?.[propName as keyof typeof leaderboard.crops] as GuildJacobLeaderboardEntry[];
 
 	const embed = EliteEmbed()
 		.setTitle(`${GetCropEmoji(selectedCrop)} ${selectedCrop} Placements`)
@@ -54,7 +52,7 @@ async function execute(interaction: StringSelectMenuInteraction) {
 	interaction.editReply({ embeds: [embed] });
 }
 
-function getDetailedField(crop: string, scores?: components['schemas']['GuildJacobLeaderboardEntry'][]) {
+function getDetailedField(crop: string, scores?: GuildJacobLeaderboardEntry[]) {
 	if (!scores || scores.length === 0) {
 		return `No Scores Set Yet!`;
 	}

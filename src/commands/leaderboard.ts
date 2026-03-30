@@ -1,5 +1,5 @@
+import { LeaderboardDto, LeaderboardEntryDto } from 'api/schemas';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType } from 'discord.js';
-import { components } from '../api/api';
 import { FetchLeaderboardRank, FetchLeaderboardSlice, UserSettings } from '../api/elite';
 import { eliteLeaderboardOption } from '../autocomplete/leaderboard';
 import { elitePlayerOption } from '../autocomplete/player';
@@ -62,7 +62,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	let index = Math.max(Math.floor(givenIndex / 12) * 12, 0);
 	let maxIndex = 1000;
-	let entries: components['schemas']['LeaderboardEntryDto'][] = [];
+	let entries: LeaderboardEntryDto[] = [];
 
 	const lb = await FetchLeaderboard(leaderboardId, index, 12)
 		.then((res) => {
@@ -171,8 +171,8 @@ async function getEmbed(
 	index: number,
 	maxIndex: number,
 	leaderboardId: string,
-	lb: components['schemas']['LeaderboardDto'],
-	entries?: components['schemas']['LeaderboardEntryDto'][],
+	lb: LeaderboardDto,
+	entries?: LeaderboardEntryDto[],
 ) {
 	if (!entries) {
 		entries = await FetchLeaderboard(leaderboardId, index, 12)
@@ -210,7 +210,7 @@ async function getEmbed(
 	return embed;
 }
 
-function getPlayerLbFields(entries: components['schemas']['LeaderboardEntryDto'][], index: number) {
+function getPlayerLbFields(entries: LeaderboardEntryDto[], index: number) {
 	return entries.map((entry, i) => ({
 		name: `#${index + i + 1} ${lbIgn(entry) ?? 'Unknown'}⠀`,
 		value: `[⧉](https://elitesb.gg/@${entry.ign}/${encodeURIComponent(entry.profile ?? '')}) ${(entry.amount ?? 0).toLocaleString()}`,
@@ -218,7 +218,7 @@ function getPlayerLbFields(entries: components['schemas']['LeaderboardEntryDto']
 	}));
 }
 
-function getProfileLbFields(entries: components['schemas']['LeaderboardEntryDto'][], index: number) {
+function getProfileLbFields(entries: LeaderboardEntryDto[], index: number) {
 	return entries.map((entry, i) => {
 		const firstMember = entry.members?.[0];
 		const otherMembers = entry.members?.slice(1, 3);
@@ -279,7 +279,7 @@ function FetchLeaderboard(leaderboardId: string, offset: number, limit: number) 
 	return FetchLeaderboardSlice(leaderboardId, offset, limit);
 }
 
-function lbIgn(entry: components['schemas']['LeaderboardEntryDto']) {
+function lbIgn(entry: LeaderboardEntryDto) {
 	if (!entry.meta) return escapeIgn(entry.ign ?? 'N/A');
 	return escapeIgn(`${entry.meta?.prefix ?? ''} ${entry.ign ?? 'N/A'} ${entry.meta?.suffix ?? ''}`.trim());
 }

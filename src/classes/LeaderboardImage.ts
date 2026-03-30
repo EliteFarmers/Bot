@@ -1,7 +1,7 @@
 import { Canvas, GlobalFonts, Image, loadImage } from '@napi-rs/canvas';
+import { GuildJacobLeaderboard, GuildJacobLeaderboardEntry } from 'api/schemas';
 import { join } from 'path';
 import { cwd } from 'process';
-import { components } from '../api/api';
 import { GetCropColor, GetCropURL } from './Util';
 
 // Register font
@@ -25,7 +25,7 @@ async function loadAllCropImages(crops: string[]) {
 	await Promise.all(promises);
 }
 
-export async function GenerateLeaderboardImage(guildName: string, lb: components['schemas']['GuildJacobLeaderboard']) {
+export async function GenerateLeaderboardImage(guildName: string, lb: GuildJacobLeaderboard) {
 	const canvas = new Canvas(1600, 1020);
 	const ctx = canvas.getContext('2d');
 	ctx.imageSmoothingEnabled = false;
@@ -64,9 +64,7 @@ export async function GenerateLeaderboardImage(guildName: string, lb: components
 	for (let i = 0; i < cropList.length; i++) {
 		const cropName = cropList[i];
 		const propName = getCropProperty(cropName);
-		const scores = lb.crops?.[
-			propName as keyof typeof lb.crops
-		] as components['schemas']['GuildJacobLeaderboardEntry'][];
+		const scores = lb.crops?.[propName as keyof typeof lb.crops] as GuildJacobLeaderboardEntry[];
 
 		const x = col * (colWidth + padding);
 		const y = startY + row * (rowHeight + padding);

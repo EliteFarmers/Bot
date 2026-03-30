@@ -1,3 +1,4 @@
+import { ContestBracketsDetailsDto } from 'api/schemas';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -7,7 +8,6 @@ import {
 	EmbedBuilder,
 } from 'discord.js';
 import { getCropFromName, getFortuneRequiredForCollection } from 'farming-weight';
-import type { components } from '../../api/api';
 import { FetchCurrentMonthlyBrackets, UserSettings } from '../../api/elite';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../../classes/commands/index';
 import { EliteEmbed, EmptyString, ErrorEmbed, NotYoursEmbed, PrefixFooter } from '../../classes/embeds';
@@ -234,7 +234,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 function higherEmbed(
 	embed: EmbedBuilder,
-	brackets: components['schemas']['ContestBracketsDetailsDto'] | undefined,
+	brackets: ContestBracketsDetailsDto | undefined,
 	blocksBroken: number,
 	useMooshroom = true,
 ) {
@@ -249,7 +249,7 @@ function higherEmbed(
 
 function lowerEmbed(
 	embed: EmbedBuilder,
-	brackets: components['schemas']['ContestBracketsDetailsDto'] | undefined,
+	brackets: ContestBracketsDetailsDto | undefined,
 	blocksBroken: number,
 	useMooshroom = true,
 ) {
@@ -267,7 +267,7 @@ function lowerEmbed(
 }
 
 function makeField(
-	data: components['schemas']['ContestBracketsDetailsDto'] | undefined,
+	data: ContestBracketsDetailsDto | undefined,
 	bracket: string,
 	blocksBroken: number,
 	useMooshroom = true,

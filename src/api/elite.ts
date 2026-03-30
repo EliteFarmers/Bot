@@ -1,7 +1,8 @@
 import { User } from 'discord.js';
 import dotenv from 'dotenv';
 import createClient from 'openapi-fetch';
-import { components, paths } from './api.d';
+import { paths } from './api.d';
+import { GuildJacobLeaderboardFeature, IncomingGuildChannelDto, IncomingGuildRoleDto, UserSettingsDto } from './schemas';
 
 dotenv.config();
 
@@ -13,7 +14,7 @@ const { GET, PUT, POST, DELETE, PATCH } = createClient<paths>({
 	},
 });
 
-export type UserSettings = components['schemas']['UserSettingsDto'];
+export type UserSettings = UserSettingsDto;
 export const FetchUserSettings = (id: string) =>
 	GET('/account/{discordId}/settings', {
 		params: {
@@ -179,7 +180,7 @@ export const SubmitJacobScore = ({
 		},
 	});
 
-export const UpdateGuildJacob = (id: string, data: components['schemas']['GuildJacobLeaderboardFeature']) =>
+export const UpdateGuildJacob = (id: string, data: GuildJacobLeaderboardFeature) =>
 	PUT('/bot/{discordId}/jacob', {
 		params: {
 			path: {
@@ -398,7 +399,7 @@ export const RequestGuildUpdate = (guildId: string) =>
 		},
 	});
 
-export const UpdateGuildChannel = (guildId: string, channel: components['schemas']['IncomingGuildChannelDto']) =>
+export const UpdateGuildChannel = (guildId: string, channel: IncomingGuildChannelDto) =>
 	POST('/bot/guild/{discordId}/channels', {
 		params: {
 			path: {
@@ -411,7 +412,7 @@ export const UpdateGuildChannel = (guildId: string, channel: components['schemas
 		},
 	});
 
-export const UpdateGuildRole = (guildId: string, role: components['schemas']['IncomingGuildRoleDto']) =>
+export const UpdateGuildRole = (guildId: string, role: IncomingGuildRoleDto) =>
 	POST('/bot/guild/{discordId}/roles', {
 		params: {
 			path: {

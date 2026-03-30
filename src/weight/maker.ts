@@ -1,7 +1,7 @@
 import { Canvas, createCanvas, Image, loadImage, SKRSContext2D } from '@napi-rs/canvas';
+import { FarmingWeightDto } from 'api/schemas';
 import { AttachmentBuilder } from 'discord.js';
 import { getCropFromName } from 'farming-weight';
-import { components } from '../api/api';
 import { UserSettings } from '../api/elite';
 import { ErrorEmbed } from '../classes/embeds';
 import { CreateRoundCornerPath } from '../classes/Util';
@@ -402,7 +402,7 @@ function drawStrokedText(ctx: SKRSContext2D, text: string, element: ElementPosit
 	};
 }
 
-function getDecalImage(weight: components['schemas']['FarmingWeightDto'], decal?: WeightStyleDecal) {
+function getDecalImage(weight: FarmingWeightDto, decal?: WeightStyleDecal) {
 	if (!decal?.crops) {
 		return decal?.imageUrl ? loadImage(decal.imageUrl) : null;
 	}

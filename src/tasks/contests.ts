@@ -1,6 +1,6 @@
+import { ContestPingsFeatureDto } from 'api/schemas';
 import { Client, EmbedBuilder, MessageCreateOptions, PermissionFlagsBits } from 'discord.js';
 import { Crop, getCropFromName, getFortuneRequiredForCollection, SkyBlockTime } from 'farming-weight';
-import { components } from '../api/api';
 import {
 	DisableGuildContestPings,
 	FetchCurrentMonthlyBrackets,
@@ -134,12 +134,7 @@ async function execute(client: Client) {
 	await sendMessages(client, embed, guilds, crops);
 }
 
-async function sendMessages(
-	client: Client,
-	embed: EmbedBuilder,
-	guilds: components['schemas']['ContestPingsFeatureDto'][],
-	crops?: string[],
-) {
+async function sendMessages(client: Client, embed: EmbedBuilder, guilds: ContestPingsFeatureDto[], crops?: string[]) {
 	for (const pings of guilds) {
 		if (!pings.guildId || !pings?.enabled || !pings.channelId) {
 			console.log('Invalid pings config', pings);

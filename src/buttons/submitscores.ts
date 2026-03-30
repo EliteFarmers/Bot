@@ -1,3 +1,4 @@
+import { GuildJacobLeaderboard } from 'api/schemas';
 import {
 	AttachmentBuilder,
 	ButtonBuilder,
@@ -11,7 +12,6 @@ import {
 	TextDisplayBuilder,
 } from 'discord.js';
 import { Crop, getCropDisplayName, getCropFromName } from 'farming-weight';
-import { components } from '../api/api';
 import { FetchAccount, FetchGuildJacob, SubmitJacobScore } from '../api/elite';
 import { commandReferences } from '../bot';
 import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index';
@@ -290,7 +290,7 @@ async function execute(interaction: ButtonInteraction) {
 }
 
 export async function getLeaderboardPayload(
-	lb: components['schemas']['GuildJacobLeaderboard'],
+	lb: GuildJacobLeaderboard,
 	guildId?: string,
 	guildName = "Jacob's Contest",
 ) {
