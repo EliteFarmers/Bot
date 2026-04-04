@@ -11,8 +11,8 @@ import {
 	StringSelectMenuBuilder,
 } from 'discord.js';
 import { Crop, GearSlot } from 'farming-weight';
-import { client } from '../bot.js';
-import { CommandAccess } from './commands/index.js';
+import { client } from '../bot';
+import { CommandAccess } from './commands/index';
 
 export function isValidAccess(access: CommandAccess | CommandAccess[], type: ChannelType): boolean {
 	const a = access instanceof Array ? access : [access];

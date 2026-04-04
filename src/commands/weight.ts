@@ -8,13 +8,13 @@ import {
 	EmbedBuilder,
 } from 'discord.js';
 import { getCropFromName, getLevel } from 'farming-weight';
-import { FetchLeaderboardRankings, FetchProfile, UserSettings } from '../api/elite.js';
-import { elitePlayerOption } from '../autocomplete/player.js';
-import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
-import { EliteEmbed, EmptyField, EmptyString, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
-import { escapeIgn, GetCropEmoji, LEVELING_XP } from '../classes/Util.js';
-import { getAccount } from '../classes/validate.js';
-import { getCustomFormatter } from '../weight/custom.js';
+import { FetchLeaderboardRankings, FetchProfile, UserSettings } from '../api/elite';
+import { elitePlayerOption } from '../autocomplete/player';
+import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index';
+import { EliteEmbed, EmptyField, EmptyString, ErrorEmbed, WarningEmbed } from '../classes/embeds';
+import { escapeIgn, GetCropEmoji, LEVELING_XP } from '../classes/Util';
+import { getAccount } from '../classes/validate';
+import { getCustomFormatter } from '../weight/custom';
 
 const command = new EliteCommand({
 	name: 'weight',

@@ -15,12 +15,12 @@ import {
 	UpgradeReason,
 	ZorroMode,
 } from 'farming-weight';
-import { FetchProfile, UserSettings } from '../api/elite.js';
-import { elitePlayerOption } from '../autocomplete/player.js';
-import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
-import { EliteContainer } from '../classes/components.js';
-import { ErrorEmbed, NotYoursReply } from '../classes/embeds.js';
-import { progressBar } from '../classes/progressbar.js';
+import { FetchProfile, UserSettings } from '../api/elite';
+import { elitePlayerOption } from '../autocomplete/player';
+import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index';
+import { EliteContainer } from '../classes/components';
+import { ErrorEmbed, NotYoursReply } from '../classes/embeds';
+import { progressBar } from '../classes/progressbar';
 import {
 	CROP_ARRAY,
 	CropSelectRow,
@@ -29,8 +29,8 @@ import {
 	GetCropEmoji,
 	LEVELING_XP,
 	removeColorCodes,
-} from '../classes/Util.js';
-import { getAccount } from '../classes/validate.js';
+} from '../classes/Util';
+import { getAccount } from '../classes/validate';
 
 const command = new EliteCommand({
 	name: 'fortune',
@@ -104,12 +104,13 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		),
 		gardenLevel: getGardenLevel(member.garden?.experience ?? 0).level,
 		plotsUnlocked: member.garden?.plots?.length,
-		milestones: getCropMilestoneLevels(member.garden?.crops ?? {}),
+		milestones: getCropMilestoneLevels((member.garden?.crops ?? {}) as Record<string, number>),
 		refinedTruffles: member.chocolateFactory?.refinedTrufflesConsumed,
 		cocoaFortuneUpgrade: member.chocolateFactory?.cocoaFortuneUpgrades,
 		exportableCrops: member.unparsed.exportedCrops ?? {},
-		chips: saved?.chips ?? {},
-		attributes: saved?.attributes ?? {},
+		chips: member.memberData?.garden?.chips ?? {},
+		attributes: member.memberData?.attributes ?? {},
+		dnaMilestone: member.memberData?.garden?.dnaMilestone ?? 0,
 		communityCenter: saved?.communityCenter ?? 0,
 		filledRosewaterFlask: saved?.rosewaterFlasks ?? 0,
 	};

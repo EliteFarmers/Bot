@@ -117,6 +117,125 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/account/gifts/{OrderId}/claim': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Claim a Pending Gift */
+		post: operations['ClaimGift'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/account/gifts/{OrderId}/decline': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Decline Pending Gift Items */
+		post: operations['DeclineGift'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/account/gifts/pending': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Pending Gift Orders */
+		get: operations['GetPendingGifts'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/account/gifts/{OrderId}/resend': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Reassign Expired or Returned Gift Items */
+		post: operations['ResendGift'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/account/orders/{OrderId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get User Order Detail */
+		get: operations['GetUserOrderDetail'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/account/orders': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get User Order History */
+		get: operations['GetUserOrders'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/account/purchases/reconcile': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Reconcile User Purchases */
+		post: operations['ReconcileUserPurchases'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/account/purchases': {
 		parameters: {
 			query?: never;
@@ -439,6 +558,26 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/admin/leaderboards/sync': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Sync leaderboards
+		 * @description Sync leaderboards in case of wrong data
+		 */
+		get: operations['SyncLeaderboards'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/admin/unlink-account': {
 		parameters: {
 			query?: never;
@@ -450,6 +589,193 @@ export interface paths {
 		put?: never;
 		/** Unlink an Account */
 		post: operations['UnlinkUserAccount'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/payments/orders/{OrderId}/cancel-recurring': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Cancel Tebex Recurring Payment (Admin) */
+		post: operations['CancelRecurringPayment'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/payments/orders/{OrderId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Order Detail (Admin) */
+		get: operations['GetAdminOrderDetail'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/payments/orders/{OrderId}/events': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Order Provider Events (Admin) */
+		get: operations['GetOrderEvents'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/payments/orders': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** List Orders (Admin) */
+		get: operations['GetAdminOrders'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/payments/orders/{OrderId}/pause-recurring': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Pause Tebex Recurring Payment (Admin) */
+		post: operations['PauseRecurringPayment'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/payments/orders/{OrderId}/reconcile': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Reconcile Order (Admin) */
+		post: operations['ReconcileOrder'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/payments/orders/{OrderId}/refresh-provider-state': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Refresh Tebex Provider State (Admin) */
+		post: operations['RefreshProviderState'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/payments/orders/{OrderId}/refund': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Refund Tebex Order (Admin) */
+		post: operations['RefundOrder'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/payments/tebex/webhooks/{WebhookId}/replay': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Replay Tebex Webhook (Admin) */
+		post: operations['ReplayWebhook'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/payments/orders/{OrderId}/resolve-recipient': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Resolve Gift Recipient (Admin) */
+		post: operations['ResolveRecipient'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/payments/orders/{OrderId}/resume-recurring': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Resume Tebex Recurring Payment (Admin) */
+		post: operations['ResumeRecurringPayment'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -2509,8 +2835,7 @@ export interface paths {
 		put?: never;
 		/** Add an excluded timespan */
 		post: operations['AddJacobLeaderboardExcludedTimespan'];
-		/** Remove an excluded timespan */
-		delete: operations['RemoveJacobLeaderboardExcludedTimespan'];
+		delete?: never;
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -2545,6 +2870,23 @@ export interface paths {
 		/** Ban a player from all Jacob leaderboards */
 		post: operations['BanPlayerFromJacobLeaderboard'];
 		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/guilds/{discordId}/jacob/exclusions/timespans/{start}/{end}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		post?: never;
+		/** Remove an excluded timespan */
+		delete: operations['RemoveJacobLeaderboardExcludedTimespan'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -2994,6 +3336,93 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/admin/products/{ProductId}/providers/tebex': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Tebex Product Settings */
+		get: operations['GetTebexProductSettings'];
+		/** Create or Update Tebex Product Settings */
+		put: operations['UpsertTebexProductSettings'];
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/payments/tebex/checkout': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Create Tebex Checkout Session */
+		post: operations['HiddenCreateTebexCheckout'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/payments/tebex/checkout/{OrderId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		/** Update Tebex Checkout Session */
+		put: operations['HiddenUpdateTebexCheckout'];
+		post?: never;
+		/** Delete Tebex Checkout Session Locally */
+		delete: operations['HiddenDeleteTebexCheckout'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/payments/tebex/checkout/current': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Current Tebex Checkout Session */
+		get: operations['HiddenGetCurrentTebexCheckout'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/webhooks/tebex': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Handle Tebex Webhook */
+		post: operations['HiddenTebexWebhook'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/notifications/{Id}': {
 		parameters: {
 			query?: never;
@@ -3059,6 +3488,23 @@ export interface paths {
 		put?: never;
 		/** Mark notification as read */
 		post: operations['MarkNotificationRead'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/payments/orders/{OrderId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Order Status */
+		get: operations['GetOrderStatus'];
+		put?: never;
+		post?: never;
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -3656,6 +4102,23 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/shop/category/{categoryId}/banner': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Upload Category Banner Image */
+		post: operations['AddCategoryBanner'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/shop/category/{categoryId}/product/{productId}': {
 		parameters: {
 			query?: never;
@@ -3669,6 +4132,23 @@ export interface paths {
 		post: operations['AddProductToCategory'];
 		/** Remove Product from Shop Category */
 		delete: operations['RemoveProductToCategory'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/shop/category/{categoryId}/artist/{accountId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Assign Artist to Category */
+		post: operations['AssignArtist'];
+		delete?: never;
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -3772,6 +4252,23 @@ export interface paths {
 		/** Reorder Products in Shop Category */
 		post: operations['ReorderCategoryProducts'];
 		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/shop/category/{categoryId}/artist': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		post?: never;
+		/** Unassign Artist from Category */
+		delete: operations['UnassignArtist'];
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -4002,6 +4499,23 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/product/style/{styleId}/artist/{accountId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Reassign Style to a Different Artist */
+		post: operations['ReassignStyle'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/textures/blocks/{blockId}': {
 		parameters: {
 			query?: never;
@@ -4107,6 +4621,74 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/tool-settings': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * List tool settings
+		 * @description List the authenticated user's settings with optional target/visibility filters.
+		 */
+		get: operations['ListToolSettings'];
+		put?: never;
+		/**
+		 * Create a tool setting
+		 * @description Create a new tool setting entry with optional public visibility.
+		 */
+		post: operations['CreateToolSetting'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/tool-settings/{SettingId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get a tool setting
+		 * @description Get a setting by sqid. Public settings can be read by any authenticated user.
+		 */
+		get: operations['GetToolSetting'];
+		put?: never;
+		post?: never;
+		/**
+		 * Delete a tool setting
+		 * @description Delete a setting by sqid. Only the owner can delete.
+		 */
+		delete: operations['DeleteToolSetting'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/tool-settings/{settingId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		/**
+		 * Update a tool setting
+		 * @description Update an existing setting by sqid. Only the owner can update.
+		 */
+		put: operations['UpdateToolSetting'];
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/weights/all': {
 		parameters: {
 			query?: never;
@@ -4173,6 +4755,27 @@ export interface paths {
 		 * @description Get farming weight for all profiles of a player
 		 */
 		get: operations['GetWeightForProfiles'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/weights': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get crop weight constants
+		 * @deprecated
+		 * @description Get crop weight constants
+		 */
+		get: operations['GetWeights'];
 		put?: never;
 		post?: never;
 		delete?: never;
@@ -4449,20 +5052,14 @@ export interface components {
 			youtube?: string | null;
 		};
 		PlayerRequest: Record<string, never>;
-		/** @description the dto used to send an error response to the client */
 		ErrorResponse: {
 			/**
 			 * Format: int32
-			 * @description the http status code sent to the client. default is 400.
 			 * @default 400
 			 */
 			statusCode: number;
-			/**
-			 * @description the message for the error response
-			 * @default One or more errors occurred!
-			 */
+			/** @default One or more errors occurred! */
 			message: string;
-			/** @description the collection of errors for the current context */
 			errors: {
 				[key: string]: string[];
 			};
@@ -4559,6 +5156,13 @@ export interface components {
 			isSubscription: boolean;
 			isGuildSubscription: boolean;
 			isUserSubscription: boolean;
+			/**
+			 * Format: date-time
+			 * @description Product release date
+			 */
+			releasedAt?: string | null;
+			/** @description Tebex-specific checkout settings for the product */
+			tebex?: components['schemas']['TebexProductSettingsDto'] | null;
 		};
 		/** @enum {integer} */
 		ProductType: 2 | 3 | 5 | 6 | -1;
@@ -4593,6 +5197,37 @@ export interface components {
 			/** @description Unlocked product flags */
 			flags?: string[] | null;
 		};
+		TebexProductSettingsDto: {
+			/** Format: guid */
+			id: string;
+			/** Format: uint64 */
+			productId: number;
+			enabled: boolean;
+			supportsGifting: boolean;
+			config?: components['schemas']['TebexProductConfig'] | null;
+		};
+		TebexProductConfig: {
+			allowGiftUser: boolean;
+			allowGiftGuild: boolean;
+			creatorCodeAllowed: boolean;
+			requiresMinecraftIdentity: boolean;
+			defaultCreatorCode?: string | null;
+			checkoutNameOverride?: string | null;
+			checkoutDescriptionOverride?: string | null;
+			imageUrlOverride?: string | null;
+			billingType?: string | null;
+			billingPeriod?: string | null;
+			/** Format: int32 */
+			billingFrequency?: number | null;
+			variableData?: components['schemas']['TebexVariableData'] | null;
+		};
+		TebexVariableData: {
+			entries: components['schemas']['TebexVariableDataEntry'][];
+		};
+		TebexVariableDataEntry: {
+			key: string;
+			value: string;
+		};
 		MinecraftAccountDetailsDto: {
 			id: string;
 			name: string;
@@ -4600,10 +5235,69 @@ export interface components {
 			badges: components['schemas']['UserBadgeDto'][];
 			skin: components['schemas']['MinecraftSkinDto'];
 		};
-		/**
-		 * @description RFC7807 compatible problem details/ error response class. this can be used by configuring startup like so:
-		 *     app.UseFastEndpoints(c => c.Errors.UseProblemDetails())
-		 */
+		ClaimGiftRequest: {
+			orderItemIds: string[];
+		};
+		DeclineGiftRequest: {
+			orderItemIds: string[];
+		};
+		/** @description Summary of a pending gift order that the authenticated user can claim. */
+		PendingGiftDto: {
+			/** Format: guid */
+			orderId: string;
+			buyerId: string;
+			buyerName: string;
+			provider: string;
+			/** Format: date-time */
+			orderDate: string;
+			/** Format: date-time */
+			completedAt?: string | null;
+			/** Format: date-time */
+			claimExpiresAt?: string | null;
+			giftMessage?: string | null;
+			items: components['schemas']['GiftItemDto'][];
+		};
+		GiftItemDto: {
+			orderItemId: string;
+			productId: string;
+			productName?: string | null;
+			/** Format: int32 */
+			quantity: number;
+			gift?: components['schemas']['GiftItemStateDto'] | null;
+		};
+		GiftItemStateDto: {
+			recipientId?: string | null;
+			recipientGuildId?: string | null;
+			recipientType?: string | null;
+			recipientResolutionStatus?: string | null;
+			/** Format: date-time */
+			claimExpiresAt?: string | null;
+			recipientSnapshot?: components['schemas']['TebexRecipientSnapshot'] | null;
+			isReassignable: boolean;
+			canAdminResolveRecipient?: boolean | null;
+		};
+		TebexRecipientSnapshot: {
+			mode?: components['schemas']['TebexRecipientMode'] | null;
+			recipientType: components['schemas']['PurchaseRecipientType'];
+			/** Format: uint64 */
+			discordUserId?: number | null;
+			/** Format: uint64 */
+			guildId?: number | null;
+			minecraftUuid?: string | null;
+			minecraftIgn?: string | null;
+		};
+		/** @enum {string} */
+		TebexRecipientMode: 'Self' | 'GiftUser' | 'GiftGuild';
+		/** @enum {integer} */
+		PurchaseRecipientType: 1 | 2;
+		ResendGiftRequest: {
+			orderItemIds: string[];
+			mode?: components['schemas']['TebexRecipientMode'] | null;
+			playerUuidOrIgn?: string | null;
+			/** Format: uint64 */
+			guildId?: number | null;
+			message?: string | null;
+		};
 		ProblemDetails: {
 			/** @default https://www.rfc-editor.org/rfc/rfc7231#section-6.5.1 */
 			type: string;
@@ -4618,26 +5312,252 @@ export interface components {
 			instance: string;
 			/** @default 0HMPNHL0JHL76:00000001 */
 			traceId: string;
-			/** @description the details of the error */
 			detail?: string | null;
 			errors: components['schemas']['ProblemDetails_Error'][];
 		};
-		/** @description the error details object */
 		ProblemDetails_Error: {
-			/**
-			 * @description the name of the error or property of the dto that caused the error
-			 * @default Error or field name
-			 */
+			/** @default Error or field name */
 			name: string;
-			/**
-			 * @description the reason for the error
-			 * @default Error reason
-			 */
+			/** @default Error reason */
 			reason: string;
-			/** @description the code of the error */
 			code?: string | null;
-			/** @description the severity of the error */
 			severity?: string | null;
+		};
+		UserOrderDto: {
+			/** Format: guid */
+			orderId: string;
+			buyerId: string;
+			recipientId?: string | null;
+			recipientGuildId?: string | null;
+			status: string;
+			provider: string;
+			transactionId?: string | null;
+			basketIdent?: string | null;
+			recurringReference?: string | null;
+			providerStatus?: string | null;
+			purchaseMode?: string | null;
+			recipientResolutionStatus?: string | null;
+			/** Format: decimal */
+			totalPrice: number;
+			currency: string;
+			/** Format: date-time */
+			orderDate: string;
+			/** Format: date-time */
+			completedAt?: string | null;
+			/** Format: date-time */
+			refundedAt?: string | null;
+			/** Format: date-time */
+			disputedAt?: string | null;
+			isBuyer: boolean;
+			isRecipient: boolean;
+			isGiftSent: boolean;
+			isGiftReceived: boolean;
+			recipientSnapshot?: components['schemas']['TebexRecipientSnapshot'] | null;
+			giftMetadata?: components['schemas']['GiftMetadata'] | null;
+			tebex?: components['schemas']['TebexUserOrderStateDto'] | null;
+			items: components['schemas']['UserOrderItemDto'][];
+		};
+		GiftMetadata: {
+			message?: string | null;
+			/** Format: date-time */
+			claimExpiresAt?: string | null;
+		};
+		TebexUserOrderStateDto: {
+			basketIdent?: string | null;
+			basketUrl?: string | null;
+			checkoutLinks?: components['schemas']['TebexUserCheckoutLinksDto'] | null;
+			recurringReference?: string | null;
+			providerStatus?: string | null;
+			/** Format: date-time */
+			lastSyncedAt?: string | null;
+			lastWebhook?: components['schemas']['TebexWebhookSummary'] | null;
+			basket?: components['schemas']['TebexUserBasketDto'] | null;
+			/** Format: date-time */
+			expiresAt?: string | null;
+			priceDetails?: components['schemas']['TebexPriceDetailsSnapshot'] | null;
+			lastErrorCode?: string | null;
+			basketMismatch?: components['schemas']['TebexBasketMismatchSnapshot'] | null;
+			payment?: components['schemas']['TebexAdminPaymentStateDto'] | null;
+			recurring?: components['schemas']['TebexAdminRecurringStateDto'] | null;
+		};
+		TebexUserCheckoutLinksDto: {
+			checkoutUrl?: string | null;
+			authUrl?: string | null;
+		};
+		TebexWebhookSummary: {
+			id: string;
+			type: string;
+			/** Format: date-time */
+			receivedAt: string;
+		};
+		TebexUserBasketDto: {
+			ident?: string | null;
+			creatorCode?: string | null;
+			country?: string | null;
+			paymentStarted: boolean;
+			/** Format: date-time */
+			expiresAt?: string | null;
+			/** Format: decimal */
+			price?: number | null;
+			priceDetails?: components['schemas']['TebexPriceDetailsSnapshot'] | null;
+			rows: components['schemas']['TebexUserBasketRowDto'][];
+		};
+		TebexPriceDetailsSnapshot: {
+			/** Format: decimal */
+			subTotal?: number | null;
+			/** Format: decimal */
+			tax?: number | null;
+			/** Format: decimal */
+			total?: number | null;
+			/** Format: decimal */
+			fullPrice?: number | null;
+			currency?: string | null;
+		};
+		TebexUserBasketRowDto: {
+			/** Format: int32 */
+			rowId?: number | null;
+			orderItemId?: string | null;
+			productId?: string | null;
+			type?: string | null;
+			/** Format: int32 */
+			quantity: number;
+			/** Format: decimal */
+			unitPrice?: number | null;
+			/** Format: decimal */
+			totalPrice?: number | null;
+			name?: string | null;
+			description?: string | null;
+			imageUrl?: string | null;
+		};
+		TebexBasketMismatchSnapshot: {
+			reason?: string | null;
+			expectedItems: components['schemas']['TebexExpectedBasketItem'][];
+			receivedItems: components['schemas']['TebexExpectedBasketItem'][];
+			/** Format: decimal */
+			expectedAmount?: number | null;
+			/** Format: decimal */
+			receivedAmount?: number | null;
+			receivedBasketIdent?: string | null;
+		};
+		TebexExpectedBasketItem: {
+			/** Format: uint64 */
+			orderItemId: number;
+			/** Format: uint64 */
+			productId: number;
+			name?: string | null;
+			description?: string | null;
+			/** Format: int32 */
+			quantity: number;
+			/** Format: decimal */
+			unitPrice?: number | null;
+			currency?: string | null;
+			billingType?: string | null;
+			billingPeriod?: string | null;
+			/** Format: int32 */
+			billingFrequency?: number | null;
+			imageUrl?: string | null;
+		};
+		TebexAdminPaymentStateDto: {
+			transactionId?: string | null;
+			status?: string | null;
+			statusClass?: string | null;
+			paymentSequence?: string | null;
+			paymentMethod?: string | null;
+			refundable?: boolean | null;
+			declineReason?: string | null;
+			/** Format: decimal */
+			price?: number | null;
+			/** Format: decimal */
+			pricePaid?: number | null;
+			currency?: string | null;
+			/** Format: date-time */
+			createdAt?: string | null;
+			recurringReference?: string | null;
+		};
+		TebexAdminRecurringStateDto: {
+			reference?: string | null;
+			status?: string | null;
+			statusClass?: string | null;
+			isActive?: boolean | null;
+			/** Format: date-time */
+			createdAt?: string | null;
+			/** Format: date-time */
+			updatedAt?: string | null;
+			/** Format: date-time */
+			nextPaymentDate?: string | null;
+			/** Format: date-time */
+			pausedAt?: string | null;
+			/** Format: date-time */
+			pausedUntil?: string | null;
+			/** Format: date-time */
+			cancelledAt?: string | null;
+			/** Format: date-time */
+			cancellationRequestedAt?: string | null;
+			interval?: string | null;
+			/** Format: decimal */
+			amount?: number | null;
+			/** Format: decimal */
+			tax?: number | null;
+			cancelReason?: string | null;
+			initialPaymentUrl?: string | null;
+			paymentHistoryUrls: string[];
+		};
+		UserOrderItemDto: {
+			orderItemId: string;
+			productId: string;
+			productName?: string | null;
+			/** Format: int32 */
+			quantity: number;
+			/** Format: decimal */
+			unitPrice: number;
+			/** Format: decimal */
+			totalPrice: number;
+			tebexPackageId?: string | null;
+			tebexPackage?: components['schemas']['TebexPackageSnapshot'] | null;
+			tebexVariables?: components['schemas']['TebexVariableData'] | null;
+			gift?: components['schemas']['GiftItemStateDto'] | null;
+		};
+		TebexPackageSnapshot: {
+			/** Format: int32 */
+			id: number;
+			name: string;
+			slug?: string | null;
+			description?: string | null;
+			type?: string | null;
+			/** Format: decimal */
+			basePrice: number;
+			/** Format: decimal */
+			salesPrice?: number | null;
+			/** Format: decimal */
+			totalPrice?: number | null;
+			currency?: string | null;
+			category?: components['schemas']['TebexPackageCategorySnapshot'] | null;
+			image?: string | null;
+		};
+		TebexPackageCategorySnapshot: {
+			/** Format: int32 */
+			id: number;
+			name: string;
+		};
+		UserOrdersResponseDto: {
+			/** Format: int32 */
+			totalCount: number;
+			/** Format: int32 */
+			offset: number;
+			/** Format: int32 */
+			limit: number;
+			orders: components['schemas']['UserOrderDto'][];
+		};
+		GetUserOrdersRequest: Record<string, never>;
+		/** @description Result from a reconciliation attempt. */
+		ReconciliationResultDto: {
+			/** Format: int32 */
+			ordersProcessed: number;
+			/** Format: int32 */
+			ordersResolved: number;
+			/** Format: int32 */
+			accessGranted: number;
+			errors: string[];
 		};
 		SearchRequest: Record<string, never>;
 		AccountSearchResultDto: {
@@ -4745,6 +5665,194 @@ export interface components {
 		AdminUnlinkAccountRequest: {
 			discordId: string;
 			player: string;
+		};
+		/** @description Admin-facing detailed order view. */
+		AdminOrderDetailDto: {
+			/** Format: guid */
+			orderId: string;
+			buyerId: string;
+			recipientId?: string | null;
+			recipientGuildId?: string | null;
+			status: string;
+			provider: string;
+			transactionId?: string | null;
+			basketIdent?: string | null;
+			recurringReference?: string | null;
+			providerStatus?: string | null;
+			purchaseMode?: string | null;
+			recipientResolutionStatus?: string | null;
+			/** Format: decimal */
+			totalPrice: number;
+			currency: string;
+			/** Format: date-time */
+			orderDate: string;
+			/** Format: date-time */
+			completedAt?: string | null;
+			/** Format: date-time */
+			refundedAt?: string | null;
+			/** Format: date-time */
+			disputedAt?: string | null;
+			recipientSnapshot?: components['schemas']['TebexRecipientSnapshot'] | null;
+			giftMetadata?: components['schemas']['GiftMetadata'] | null;
+			tebex?: components['schemas']['TebexAdminOrderDetailDto'] | null;
+			items: components['schemas']['GiftItemDto'][];
+		};
+		TebexAdminOrderDetailDto: {
+			basketIdent?: string | null;
+			basketUrl?: string | null;
+			recurringReference?: string | null;
+			providerStatus?: string | null;
+			/** Format: date-time */
+			lastSyncedAt?: string | null;
+			expectedBasket?: components['schemas']['TebexExpectedBasketSnapshot'] | null;
+			orderSnapshot?: components['schemas']['TebexOrderSnapshot'] | null;
+			basketMismatch?: components['schemas']['TebexBasketMismatchSnapshot'] | null;
+			payment?: components['schemas']['TebexAdminPaymentStateDto'] | null;
+			recurring?: components['schemas']['TebexAdminRecurringStateDto'] | null;
+		};
+		TebexExpectedBasketSnapshot: {
+			/** Format: guid */
+			orderId: string;
+			/** Format: uint64 */
+			buyerId: number;
+			purchaseMode: components['schemas']['PurchaseMode'];
+			creatorCode?: string | null;
+			country?: string | null;
+			fingerprint?: string | null;
+			sale?: components['schemas']['TebexSaleSnapshot'] | null;
+			recipient?: components['schemas']['TebexRecipientSnapshot'] | null;
+			items: components['schemas']['TebexExpectedBasketItem'][];
+		};
+		/** @enum {integer} */
+		PurchaseMode: 1 | 2;
+		TebexSaleSnapshot: {
+			name?: string | null;
+			discountType?: string | null;
+			/** Format: decimal */
+			amount?: number | null;
+		};
+		TebexOrderSnapshot: {
+			links?: components['schemas']['TebexCheckoutLinks'] | null;
+			lastWebhook?: components['schemas']['TebexWebhookSummary'] | null;
+			basket?: components['schemas']['TebexBasketSnapshot'] | null;
+			basketJson?: string | null;
+			paymentJson?: string | null;
+			recurringJson?: string | null;
+			creatorCodeJson?: string | null;
+			lastWebhookPayloadJson?: string | null;
+			currency?: string | null;
+			/** Format: decimal */
+			totalPrice?: number | null;
+			/** Format: date-time */
+			expiresAt?: string | null;
+			priceDetails?: components['schemas']['TebexPriceDetailsSnapshot'] | null;
+			lastErrorCode?: string | null;
+		};
+		TebexCheckoutLinks: {
+			checkoutUrl?: string | null;
+			authUrl?: string | null;
+		};
+		TebexBasketSnapshot: {
+			ident?: string | null;
+			checkoutUrl?: string | null;
+			paymentUrl?: string | null;
+			completeUrl?: string | null;
+			cancelUrl?: string | null;
+			creatorCode?: string | null;
+			country?: string | null;
+			fingerprint?: string | null;
+			paymentStarted: boolean;
+			/** Format: date-time */
+			expiresAt?: string | null;
+			/** Format: decimal */
+			price?: number | null;
+			priceDetails?: components['schemas']['TebexPriceDetailsSnapshot'] | null;
+			rows: components['schemas']['TebexBasketRowSnapshot'][];
+		};
+		TebexBasketRowSnapshot: {
+			/** Format: int32 */
+			rowId?: number | null;
+			/** Format: uint64 */
+			orderItemId?: number | null;
+			/** Format: uint64 */
+			productId?: number | null;
+			type?: string | null;
+			/** Format: int32 */
+			quantity: number;
+			/** Format: decimal */
+			unitPrice?: number | null;
+			/** Format: decimal */
+			totalPrice?: number | null;
+			name?: string | null;
+			description?: string | null;
+			imageUrl?: string | null;
+		};
+		/** @description Provider event from the append-only event log. */
+		ProviderEventDto: {
+			/** Format: guid */
+			id: string;
+			provider: string;
+			source: string;
+			eventType?: string | null;
+			externalEventId?: string | null;
+			/** Format: date-time */
+			occurredAt: string;
+			payloadJson?: string | null;
+		};
+		AdminOrdersResponseDto: {
+			/** Format: int32 */
+			totalCount: number;
+			orders: components['schemas']['AdminOrderSummaryDto'][];
+		};
+		AdminOrderSummaryDto: {
+			/** Format: guid */
+			orderId: string;
+			buyerId: string;
+			recipientId?: string | null;
+			recipientGuildId?: string | null;
+			status: string;
+			provider: string;
+			transactionId?: string | null;
+			basketIdent?: string | null;
+			recurringReference?: string | null;
+			providerStatus?: string | null;
+			purchaseMode?: string | null;
+			recipientResolutionStatus?: string | null;
+			/** Format: decimal */
+			totalPrice: number;
+			currency: string;
+			/** Format: date-time */
+			orderDate: string;
+			/** Format: date-time */
+			completedAt?: string | null;
+			/** Format: date-time */
+			refundedAt?: string | null;
+			/** Format: date-time */
+			disputedAt?: string | null;
+			/** Format: int32 */
+			itemCount: number;
+			payment?: components['schemas']['TebexAdminPaymentStateDto'] | null;
+			recurring?: components['schemas']['TebexAdminRecurringStateDto'] | null;
+		};
+		GetAdminOrdersRequest: Record<string, never>;
+		PauseRecurringPaymentRequest: {
+			/** Format: date-time */
+			pausedUntil: string;
+		};
+		ReplayWebhookResponse: {
+			webhookId: string;
+			/** Format: guid */
+			orderId?: string | null;
+			succeeded: boolean;
+			failureReason?: string | null;
+			/** Format: date-time */
+			processedAt?: string | null;
+		};
+		/** @description Request to manually resolve a gift recipient. */
+		ResolveRecipientRequest: {
+			recipientType: string;
+			minecraftUuid?: string | null;
+			guildId?: string | null;
 		};
 		CreateAnnouncementDto: {
 			/** @description Announcement title */
@@ -5494,6 +6602,15 @@ export interface components {
 			visitors: {
 				[key: string]: components['schemas']['VisitorDto'];
 			};
+			/**
+			 * Format: int64
+			 * @description Unix timestamp of the last greenhouse growth stage in milliseconds
+			 */
+			lastGrowthStageTime: number;
+			/** @description Tracked unlocked greenhouse slots */
+			greenhouseSlots: components['schemas']['GreenhouseSlotUnlock'][];
+			/** @description Greenhouse upgrades */
+			gardenUpgrades: components['schemas']['GardenUpgradesDto'];
 			/** @description Last save time in unix seconds */
 			lastSave: string;
 		};
@@ -5562,6 +6679,20 @@ export interface components {
 			visits: number;
 			/** Format: int32 */
 			accepted: number;
+		};
+		GreenhouseSlotUnlock: {
+			/** Format: int32 */
+			x: number;
+			/** Format: int32 */
+			z: number;
+		};
+		GardenUpgradesDto: {
+			/** Format: int32 */
+			greenhouseYield: number;
+			/** Format: int32 */
+			greenhousePlotLimit: number;
+			/** Format: int32 */
+			greenhouseGrowthSpeed: number;
 		};
 		ProfileUuidRequest: Record<string, never>;
 		CropCollectionsDataPointDto: {
@@ -5693,6 +6824,8 @@ export interface components {
 			userVote?: number | null;
 			isBookmarked?: boolean | null;
 			rejectionReason?: string | null;
+			/** Format: int32 */
+			concurrencyVersion: number;
 		};
 		GetGuideRequest: Record<string, never>;
 		UserGuideDto: {
@@ -5724,6 +6857,10 @@ export interface components {
 		};
 		SubmitGuideRequest: Record<string, never>;
 		UnpublishGuideRequest: Record<string, never>;
+		UpdateGuideResponse: {
+			/** Format: int32 */
+			concurrencyVersion: number;
+		};
 		UpdateGuideRequest: {
 			title: string;
 			iconSkyblockId?: string | null;
@@ -5731,6 +6868,8 @@ export interface components {
 			markdownContent: string;
 			tags?: string[] | null;
 			richBlocks?: components['schemas']['GuideRichData'] | null;
+			/** Format: int32 */
+			concurrencyVersion: number;
 		};
 		GuideRichData: {
 			greenhouseLayout?: components['schemas']['GreenhouseLayout'] | null;
@@ -6156,6 +7295,11 @@ export interface components {
 			 * @description Minimum score required to be on the leaderboard
 			 */
 			minimumScore: number;
+			/**
+			 * Format: int32
+			 * @description Amount of top ranks cached in Redis for this leaderboard.
+			 */
+			cachedRankAmount: number;
 			/** @description Interval type of the leaderboard */
 			intervalType: components['schemas']['LeaderboardType'];
 			/** @description Score data type of the leaderboard */
@@ -6194,9 +7338,37 @@ export interface components {
 			 */
 			upcomingRank: number;
 			/** @description List of upcoming players */
-			upcomingPlayers?: components['schemas']['LeaderboardEntryDto'][] | null;
+			upcomingPlayers?: components['schemas']['LeaderboardEntryWithRankDto'][] | null;
 			/** @description List of previous players */
 			previous?: components['schemas']['LeaderboardEntryDto'][] | null;
+			/** @description True if endpoint was disabled for this request */
+			disabled?: boolean | null;
+		};
+		LeaderboardEntryWithRankDto: {
+			/** @description Player's IGN if player leaderboard */
+			ign?: string | null;
+			/** @description Player's profile name if player leaderboard */
+			profile?: string | null;
+			/** @description Uuid of the player or profile */
+			uuid: string;
+			/**
+			 * Format: double
+			 * @description Score of the entry
+			 */
+			amount: number;
+			removed: boolean;
+			/**
+			 * Format: double
+			 * @description Initial score of the entry
+			 */
+			initialAmount: number;
+			/** @description Game mode of the entry. Classic profiles are considered default/null. */
+			mode?: string | null;
+			members?: components['schemas']['ProfileLeaderboardMemberDto'][] | null;
+			/** @description Metadata of the entry */
+			meta?: components['schemas']['MemberCosmeticsDto'] | null;
+			/** Format: int32 */
+			rank: number;
 		};
 		GetMultiplePlayerRanksRequest: Record<string, never>;
 		LeaderboardRanksResponse: {
@@ -6240,6 +7412,62 @@ export interface components {
 		GetProfileRankRequest: Record<string, never>;
 		GetEntitlementsRequest: Record<string, never>;
 		UserEntitlementRequest: Record<string, never>;
+		UpsertTebexProductSettingsRequest: {
+			enabled: boolean;
+			supportsGifting: boolean;
+			config?: components['schemas']['TebexProductConfig'] | null;
+		};
+		TebexCheckoutResponseDto: {
+			/** Format: guid */
+			orderId: string;
+			provider: string;
+			status: string;
+			checkoutIdent?: string | null;
+			checkoutUrl?: string | null;
+			authUrl?: string | null;
+			currency?: string | null;
+			/** Format: decimal */
+			totalPrice?: number | null;
+			/** Format: date-time */
+			expiresAt?: string | null;
+		};
+		CreateTebexCheckoutRequest: {
+			items: components['schemas']['CheckoutItemDto'][];
+			recipient?: components['schemas']['CheckoutRecipientDto'] | null;
+			creatorCode?: string | null;
+			country?: string | null;
+			fingerprint?: string | null;
+		};
+		CheckoutItemDto: {
+			productId: string;
+			/** Format: int32 */
+			quantity: number;
+		};
+		CheckoutRecipientDto: {
+			mode?: components['schemas']['TebexRecipientMode'] | null;
+			playerUuidOrIgn?: string | null;
+			/** Format: uint64 */
+			guildId?: number | null;
+			message?: string | null;
+		};
+		TebexCurrentCheckoutDto: {
+			/** Format: guid */
+			orderId: string;
+			provider: string;
+			status: string;
+			providerStatus?: string | null;
+			checkoutIdent?: string | null;
+			checkoutUrl?: string | null;
+			authUrl?: string | null;
+			currency?: string | null;
+			/** Format: decimal */
+			totalPrice?: number | null;
+			/** Format: date-time */
+			expiresAt?: string | null;
+			paymentStarted: boolean;
+			canMutate: boolean;
+			checkoutRequest: components['schemas']['CreateTebexCheckoutRequest'];
+		};
 		GetNotificationsResponse: {
 			notifications: components['schemas']['NotificationDto'][];
 			/** Format: int32 */
@@ -6272,8 +7500,29 @@ export interface components {
 			| 'newComment'
 			| 'newReply'
 			| 'shopPurchase'
-			| 'guideSubmitted';
+			| 'guideSubmitted'
+			| 'shopRefund'
+			| 'giftReceived'
+			| 'giftReassignable'
+			| 'giftClaimed';
 		GetNotificationsRequest: Record<string, never>;
+		/** @description Response for querying order status. */
+		OrderStatusDto: {
+			/** Format: guid */
+			orderId: string;
+			status: string;
+			provider: string;
+			providerStatus?: string | null;
+			transactionId?: string | null;
+			basketIdent?: string | null;
+			checkoutUrl?: string | null;
+			recurringReference?: string | null;
+			accessGranted: boolean;
+			/** Format: date-time */
+			orderDate: string;
+			/** Format: date-time */
+			completedAt?: string | null;
+		};
 		LinkedAccountsDto: {
 			selectedUuid?: string | null;
 			players: components['schemas']['PlayerDataDto'][];
@@ -6313,6 +7562,7 @@ export interface components {
 			farmingWeight: components['schemas']['FarmingWeightDto'];
 			garden?: components['schemas']['GardenDto'] | null;
 			skills: components['schemas']['SkillsDto'];
+			memberData: components['schemas']['ProfileMemberDataDto'];
 			chocolateFactory: components['schemas']['ChocolateFactoryDto'];
 			events: components['schemas']['ProfileEventMemberDto'][];
 			inventories: components['schemas']['HypixelInventoryOverviewDto'][];
@@ -6684,6 +7934,58 @@ export interface components {
 			taming: number;
 			/** Format: double */
 			social: number;
+			/** Format: double */
+			hunting: number;
+		};
+		ProfileMemberDataDto: {
+			attributes: {
+				[key: string]: number;
+			};
+			capturedShards: components['schemas']['ProfileMemberShardDataDto'][];
+			garden: components['schemas']['ProfileMemberGardenDataDto'];
+		};
+		ProfileMemberShardDataDto: {
+			type: string;
+			/** Format: int32 */
+			amount: number;
+			/** Format: int64 */
+			capturedAt: number;
+		};
+		ProfileMemberGardenDataDto: {
+			/** Format: int32 */
+			copper: number;
+			/** Format: int32 */
+			dnaMilestone: number;
+			chips?: components['schemas']['ProfileMemberGardenChipsDataDto'] | null;
+			mutations: {
+				[key: string]: components['schemas']['ProfileMemberMutationDataDto'];
+			};
+		};
+		ProfileMemberGardenChipsDataDto: {
+			/** Format: int32 */
+			cropshot?: number | null;
+			/** Format: int32 */
+			sowledge?: number | null;
+			/** Format: int32 */
+			hypercharge?: number | null;
+			/** Format: int32 */
+			quickdraw?: number | null;
+			/** Format: int32 */
+			mechamind?: number | null;
+			/** Format: int32 */
+			overdrive?: number | null;
+			/** Format: int32 */
+			synthesis?: number | null;
+			/** Format: int32 */
+			verminVaporizer?: number | null;
+			/** Format: int32 */
+			evergreen?: number | null;
+			/** Format: int32 */
+			rarefinder?: number | null;
+		};
+		ProfileMemberMutationDataDto: {
+			analyzed: boolean;
+			discovered: boolean;
 		};
 		ChocolateFactoryDto: {
 			/** Format: int64 */
@@ -7253,6 +8555,16 @@ export interface components {
 			buyOrder: number;
 			/**
 			 * Format: double
+			 * @description Top buy-order price from the current order book
+			 */
+			topBuyOrder: number;
+			/**
+			 * Format: double
+			 * @description Top sell-order price from the current order book
+			 */
+			topSellOrder: number;
+			/**
+			 * Format: double
 			 * @description Calculated average Instant Sell price that should be more resistant to price fluctuations
 			 */
 			averageSell: number;
@@ -7268,9 +8580,19 @@ export interface components {
 			averageSellOrder: number;
 			/**
 			 * Format: double
+			 * @description Calculated average top sell-order price
+			 */
+			averageTopSellOrder: number;
+			/**
+			 * Format: double
 			 * @description Calculated average Buy Order price that should be more resistant to price fluctuations
 			 */
 			averageBuyOrder: number;
+			/**
+			 * Format: double
+			 * @description Calculated average top buy-order price
+			 */
+			averageTopBuyOrder: number;
 			/** @description Current orders in the bazaar for this item if they exist. */
 			orders?: components['schemas']['BazaarOrders'] | null;
 		};
@@ -7306,7 +8628,11 @@ export interface components {
 			/** Format: double */
 			buyOrderPrice: number;
 			/** Format: double */
+			topBuyOrderPrice: number;
+			/** Format: double */
 			sellOrderPrice: number;
+			/** Format: double */
+			topSellOrderPrice: number;
 		};
 		GetBazaarProductHistoryRequest: Record<string, never>;
 		GetBazaarProductsResponse: {
@@ -7540,10 +8866,18 @@ export interface components {
 		};
 		SkyblockProductRequest: Record<string, never>;
 		AddProductToCategoryRequest: Record<string, never>;
+		UploadImageDto: {
+			title?: string | null;
+			description?: string | null;
+			/** Format: binary */
+			image: string;
+		};
+		AssignArtistRequest: Record<string, never>;
 		CreateCategoryDto: {
 			title: string;
 			slug: string;
 			description?: string | null;
+			longDescription?: string | null;
 		};
 		DeleteCategoryRequest: Record<string, never>;
 		ShopCategoryDto: {
@@ -7552,6 +8886,9 @@ export interface components {
 			title: string;
 			slug: string;
 			description?: string | null;
+			longDescription?: string | null;
+			bannerImage?: components['schemas']['ImageAttachmentDto'] | null;
+			assignedArtist?: components['schemas']['AuthorDto'] | null;
 			/** Format: int32 */
 			order: number;
 			published: boolean;
@@ -7577,20 +8914,16 @@ export interface components {
 			/** Format: int32 */
 			order: number;
 		};
+		UnassignArtistRequest: Record<string, never>;
 		AddCosmeticToProductRequest: Record<string, never>;
 		EditCategoryDto: {
 			title?: string | null;
 			slug?: string | null;
 			description?: string | null;
+			longDescription?: string | null;
 			published?: boolean | null;
 		};
 		DeleteProductImageRequest: Record<string, never>;
-		UploadImageDto: {
-			title?: string | null;
-			description?: string | null;
-			/** Format: binary */
-			image: string;
-		};
 		RemoveCosmeticToProductRequest: Record<string, never>;
 		CreateStyleRequest: {
 			styleFormatter?: string | null;
@@ -7717,10 +9050,14 @@ export interface components {
 			collection?: string | null;
 			description?: string | null;
 			image?: components['schemas']['ImageAttachmentDto'] | null;
+			author?: components['schemas']['AuthorDto'] | null;
 			images: components['schemas']['ImageAttachmentDto'][];
 			products: components['schemas']['ParentProductDto'][];
 			data?: components['schemas']['WeightStyleDataDto'] | null;
 			leaderboard?: components['schemas']['LeaderboardStyleDataDto'] | null;
+			imageRefs: {
+				[key: string]: components['schemas']['ImageAttachmentDto'];
+			};
 		};
 		ParentProductDto: {
 			id: string;
@@ -7853,6 +9190,51 @@ export interface components {
 			fontWeight?: number | null;
 		};
 		GetStyleRequest: Record<string, never>;
+		WeightStyleListDto: {
+			/** Format: int32 */
+			id: number;
+			styleFormatter?: string | null;
+			name?: string | null;
+			description?: string | null;
+			author?: components['schemas']['AuthorDto'] | null;
+			data?: components['schemas']['WeightStyleData'] | null;
+			leaderboard?: components['schemas']['LeaderboardStyleData'] | null;
+			imageRefs: {
+				[key: string]: components['schemas']['ImageAttachmentDto'];
+			};
+		};
+		LeaderboardStyleData: {
+			background?: components['schemas']['LeaderboardStyleLayer'] | null;
+			overlay?: components['schemas']['LeaderboardStyleLayer'] | null;
+			/** Format: double */
+			gradientOpacity?: number | null;
+			gradientColor?: string | null;
+			font?: string | null;
+			name?: components['schemas']['LeaderboardStyleText'] | null;
+			score?: components['schemas']['LeaderboardStyleText'] | null;
+			rank?: components['schemas']['LeaderboardStyleText'] | null;
+			subtitle?: components['schemas']['LeaderboardStyleText'] | null;
+		};
+		LeaderboardStyleLayer: {
+			imageUrl?: string | null;
+			imageOpacity?: string | null;
+			fillColor?: string | null;
+			/** Format: double */
+			fillOpacity?: number | null;
+			borderColor?: string | null;
+			/** Format: double */
+			borderOpacity?: number | null;
+			align?: string | null;
+		};
+		LeaderboardStyleText: {
+			color?: string | null;
+			shadowColor?: string | null;
+			/** Format: double */
+			shadowOpacity?: number | null;
+			/** Format: int32 */
+			fontWeight?: number | null;
+		};
+		ReassignStyleRequest: Record<string, never>;
 		GetBlockTextureRequest: Record<string, never>;
 		InventoryItemMetaResponse: {
 			/** @description Texture Pack ID where the item texture is located */
@@ -7867,6 +9249,40 @@ export interface components {
 		GetItemTextureRequest: Record<string, never>;
 		GetPetTextureRequest: Record<string, never>;
 		GetTexturePackIcon: Record<string, never>;
+		ToolSettingDto: {
+			id: string;
+			ownerId: string;
+			targetId: string;
+			/** Format: int32 */
+			version: number;
+			name?: string | null;
+			description?: string | null;
+			isPublic: boolean;
+			data: unknown;
+			/** Format: date-time */
+			createdAt: string;
+			/** Format: date-time */
+			updatedAt: string;
+		};
+		CreateToolSettingRequest: {
+			targetId: string;
+			/** Format: int32 */
+			version: number;
+			name?: string | null;
+			description?: string | null;
+			isPublic: boolean;
+			data: unknown;
+		};
+		ListToolSettingsRequest: Record<string, never>;
+		UpdateToolSettingRequest: {
+			targetId: string;
+			/** Format: int32 */
+			version: number;
+			name?: string | null;
+			description?: string | null;
+			isPublic: boolean;
+			data: unknown;
+		};
 		WeightsDto: {
 			crops: {
 				[key: string]: number;
@@ -8154,6 +9570,266 @@ export interface operations {
 			};
 			/** @description Unauthorized */
 			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	ClaimGift: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				orderId: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['ClaimGiftRequest'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	DeclineGift: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				orderId: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['DeclineGiftRequest'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetPendingGifts: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['PendingGiftDto'][];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	ResendGift: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				orderId: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['ResendGiftRequest'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetUserOrderDetail: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				orderId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['UserOrderDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetUserOrders: {
+		parameters: {
+			query: {
+				search?: string | null;
+				provider?: string | null;
+				status?: string | null;
+				relationship?: string | null;
+				includeCheckoutStates: boolean;
+				offset: number;
+				limit: number;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['UserOrdersResponseDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	ReconcileUserPurchases: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ReconciliationResultDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
 				headers: {
 					[name: string]: unknown;
 				};
@@ -8843,6 +10519,38 @@ export interface operations {
 			};
 		};
 	};
+	SyncLeaderboards: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
 	UnlinkUserAccount: {
 		parameters: {
 			query?: never;
@@ -8871,6 +10579,419 @@ export interface operations {
 				content: {
 					'application/problem+json': components['schemas']['ProblemDetails'];
 				};
+			};
+		};
+	};
+	CancelRecurringPayment: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				orderId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AdminOrderDetailDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetAdminOrderDetail: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				orderId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AdminOrderDetailDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetOrderEvents: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				orderId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ProviderEventDto'][];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetAdminOrders: {
+		parameters: {
+			query: {
+				search?: string | null;
+				provider?: string | null;
+				status?: string | null;
+				providerStatus?: string | null;
+				transactionId?: string | null;
+				basketIdent?: string | null;
+				recurringReference?: string | null;
+				buyerId?: number | null;
+				recipientId?: number | null;
+				recipientGuildId?: number | null;
+				offset: number;
+				limit: number;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AdminOrdersResponseDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	PauseRecurringPayment: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				orderId: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['PauseRecurringPaymentRequest'];
+			};
+		};
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AdminOrderDetailDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	ReconcileOrder: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				orderId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ReconciliationResultDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	RefreshProviderState: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				orderId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AdminOrderDetailDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	RefundOrder: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				orderId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AdminOrderDetailDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	ReplayWebhook: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				webhookId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ReplayWebhookResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	ResolveRecipient: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				orderId: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['ResolveRecipientRequest'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	ResumeRecurringPayment: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				orderId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AdminOrderDetailDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
 			};
 		};
 	};
@@ -12466,12 +14587,14 @@ export interface operations {
 			};
 		};
 		responses: {
-			/** @description No Content */
-			204: {
+			/** @description Success */
+			200: {
 				headers: {
 					[name: string]: unknown;
 				};
-				content?: never;
+				content: {
+					'application/json': components['schemas']['UpdateGuideResponse'];
+				};
 			};
 			/** @description Unauthorized */
 			401: {
@@ -13628,37 +15751,6 @@ export interface operations {
 			};
 		};
 	};
-	RemoveJacobLeaderboardExcludedTimespan: {
-		parameters: {
-			query: {
-				start: number;
-				end: number;
-			};
-			header?: never;
-			path: {
-				/** @description Discord Snowflake ID of the requested resource (guild, user, etc.) */
-				discordId: number;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description No Content */
-			204: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-			/** @description Unauthorized */
-			401: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-		};
-	};
 	BanParticipationFromJacobLeaderboard: {
 		parameters: {
 			query?: never;
@@ -13706,6 +15798,36 @@ export interface operations {
 				'application/json': components['schemas']['BanPlayerRequest_BanPlayerRequestBody'];
 			};
 		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	RemoveJacobLeaderboardExcludedTimespan: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description Discord Snowflake ID of the requested resource (guild, user, etc.) */
+				discordId: number;
+				start: number;
+				end: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
 		responses: {
 			/** @description No Content */
 			204: {
@@ -14376,8 +16498,17 @@ export interface operations {
 				upcoming?: number | null;
 				/** @description Amount of passed players to include (max 3). */
 				previous?: number | null;
-				/** @description Start at a specified rank for upcoming players */
+				/**
+				 * @description Start at a specified rank for upcoming players.
+				 *     Use AtAmount instead for better lookups.
+				 */
 				atRank?: number | null;
+				/**
+				 * @description Start at a specified score threshold for upcoming players.
+				 *     Pass your locally tracked score to get upcoming players
+				 *     without needing to calculate the correct rank.
+				 */
+				atAmount?: number | null;
 				/** @description Time interval key of a monthly leaderboard. Format: yyyy-MM */
 				interval?: string | null;
 				/**
@@ -14432,6 +16563,7 @@ export interface operations {
 				upcoming?: number | null;
 				previous?: number | null;
 				atRank?: number | null;
+				atAmount?: number | null;
 				interval?: string | null;
 				mode?: string | null;
 				removed?: components['schemas']['RemovedFilter'] | null;
@@ -14736,6 +16868,246 @@ export interface operations {
 			};
 		};
 	};
+	GetTebexProductSettings: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				productId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['TebexProductSettingsDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	UpsertTebexProductSettings: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				productId: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['UpsertTebexProductSettingsRequest'];
+			};
+		};
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['TebexProductSettingsDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	HiddenCreateTebexCheckout: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['CreateTebexCheckoutRequest'];
+			};
+		};
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['TebexCheckoutResponseDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	HiddenUpdateTebexCheckout: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				orderId: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['CreateTebexCheckoutRequest'];
+			};
+		};
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['TebexCheckoutResponseDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	HiddenDeleteTebexCheckout: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				orderId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	HiddenGetCurrentTebexCheckout: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['TebexCurrentCheckoutDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	HiddenTebexWebhook: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
 	DeleteNotification: {
 		parameters: {
 			query?: never;
@@ -14839,6 +17211,42 @@ export interface operations {
 			};
 			/** @description Unauthorized */
 			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetOrderStatus: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				orderId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['OrderStatusDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
 				headers: {
 					[name: string]: unknown;
 				};
@@ -15724,6 +18132,44 @@ export interface operations {
 			};
 		};
 	};
+	AddCategoryBanner: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				categoryId: number;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'multipart/form-data': components['schemas']['UploadImageDto'];
+			};
+		};
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
 	AddProductToCategory: {
 		parameters: {
 			query?: never;
@@ -15770,6 +18216,41 @@ export interface operations {
 				categoryId: number;
 				/** @description Id of the product to add to the category */
 				productId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	AssignArtist: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				categoryId: number;
+				accountId: number;
 			};
 			cookie?: never;
 		};
@@ -16030,6 +18511,40 @@ export interface operations {
 				content: {
 					'application/problem+json': components['schemas']['ErrorResponse'];
 				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	UnassignArtist: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				categoryId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
 			};
 			/** @description Unauthorized */
 			401: {
@@ -16659,8 +19174,43 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					'application/json': components['schemas']['WeightStyleWithDataDto'][];
+					'application/json': components['schemas']['WeightStyleListDto'][];
 				};
+			};
+		};
+	};
+	ReassignStyle: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				styleId: number;
+				accountId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Forbidden */
+			403: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
 			};
 		};
 	};
@@ -16803,6 +19353,185 @@ export interface operations {
 			};
 		};
 	};
+	ListToolSettings: {
+		parameters: {
+			query: {
+				targetId?: string | null;
+				isPublic?: boolean | null;
+				limit: number;
+				offset: number;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ToolSettingDto'][];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	CreateToolSetting: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['CreateToolSettingRequest'];
+			};
+		};
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ToolSettingDto'];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetToolSetting: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				settingId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ToolSettingDto'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	DeleteToolSetting: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				settingId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No Content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	UpdateToolSetting: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				settingId: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['UpdateToolSettingRequest'];
+			};
+		};
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ToolSettingDto'];
+				};
+			};
+			/** @description Bad Request */
+			400: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/problem+json': components['schemas']['ErrorResponse'];
+				};
+			};
+			/** @description Unauthorized */
+			401: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
 	GetAllWeights: {
 		parameters: {
 			query?: never;
@@ -16914,6 +19643,28 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content?: never;
+			};
+		};
+	};
+	GetWeights: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Success */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': {
+						[key: string]: number;
+					};
+				};
 			};
 		};
 	};

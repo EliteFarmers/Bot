@@ -1,8 +1,10 @@
+import { GuildJacobLeaderboard } from 'api/schemas';
 import {
 	AttachmentBuilder,
 	ButtonBuilder,
 	ButtonInteraction,
 	ButtonStyle,
+	ComponentType,
 	ContainerBuilder,
 	MediaGalleryBuilder,
 	MessageFlags,
@@ -10,14 +12,14 @@ import {
 	TextDisplayBuilder,
 } from 'discord.js';
 import { Crop, getCropDisplayName, getCropFromName } from 'farming-weight';
-import { components } from '../api/api.js'; // Assuming this has the new schemas
-import { FetchAccount, FetchGuildJacob, SubmitJacobScore } from '../api/elite.js'; // Added SubmitJacobScore
-import { commandReferences } from '../bot.js';
-import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
-import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
-import { GenerateLeaderboardImage } from '../classes/LeaderboardImage.js';
-import { GetReadableDate } from '../classes/SkyblockDate.js';
-import { CropSelectRow, escapeIgn, GetCropEmoji, GetCropTuple } from '../classes/Util.js';
+import { FetchAccount, FetchGuildJacob, SubmitJacobScore } from '../api/elite';
+import { commandReferences } from '../bot';
+import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index';
+import { EliteContainer } from '../classes/components';
+import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds';
+import { GenerateLeaderboardImage } from '../classes/LeaderboardImage';
+import { GetReadableDate } from '../classes/SkyblockDate';
+import { CropSelectRow, escapeIgn, GetCropEmoji, GetCropTuple } from '../classes/Util';
 
 const command = new EliteCommand({
 	name: 'LBSUBMIT',
@@ -73,6 +75,24 @@ async function execute(interaction: ButtonInteraction) {
 			'This leaderboard does not exist or Jacob Leaderboards are not enabled for this server.',
 		);
 		interaction.editReply({ embeds: [embed] });
+
+		if (interaction.memberPermissions.has(PermissionFlagsBits.Administrator | PermissionFlagsBits.ManageGuild)) {
+			const components = interaction.message.components;
+			const lastComponent = components.at(-1);
+			if (!lastComponent?.type || lastComponent.type !== ComponentType.Container) {
+				return;
+			}
+
+			await interaction.message
+				.edit({
+					components: [
+						...components.slice(0, -1),
+						new EliteContainer().addText('-# This leaderboard has been archived!'),
+					],
+					allowedMentions: { parse: [] },
+				})
+				.catch(() => undefined);
+		}
 		return;
 	}
 
@@ -270,7 +290,7 @@ async function execute(interaction: ButtonInteraction) {
 }
 
 export async function getLeaderboardPayload(
-	lb: components['schemas']['GuildJacobLeaderboard'],
+	lb: GuildJacobLeaderboard,
 	guildId?: string,
 	guildName = "Jacob's Contest",
 ) {

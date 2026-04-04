@@ -1,5 +1,5 @@
 import fs from 'fs';
-import type { CommandGroup } from './commands/index.js';
+import type { CommandGroup } from './commands/index';
 
 export async function registerFiles<T>(
 	folder: string,
@@ -9,7 +9,7 @@ export async function registerFiles<T>(
 	const files = fs.readdirSync(`./src/${folder}`);
 
 	for (const file of files.filter(filter)) {
-		const imported = await import(`../${folder}/${file.replace('.ts', '.js')}`);
+		const imported = await import(`../${folder}/${file.replace(/\.ts$/, '.js')}`);
 		callback(imported.default);
 	}
 }

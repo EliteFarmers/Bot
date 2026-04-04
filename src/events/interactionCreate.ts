@@ -10,10 +10,10 @@ import {
 	Interaction,
 	StringSelectMenuInteraction,
 } from 'discord.js';
-import { FetchGuild, FetchUserSettings } from '../api/elite.js';
-import { commands } from '../bot.js';
-import { CommandGroup, EliteCommand } from '../classes/commands/index.js';
-import { HasRole, isValidAccess } from '../classes/Util.js';
+import { FetchGuild, FetchUserSettings } from '../api/elite';
+import { commands } from '../bot';
+import { CommandGroup, EliteCommand } from '../classes/commands/index';
+import { HasRole, isValidAccess } from '../classes/Util';
 
 const settings = {
 	event: Events.InteractionCreate,
@@ -155,7 +155,7 @@ async function HasPermsAndAccess(
 
 /*
 import { BaseInteraction, ChatInputCommandInteraction, Events } from "discord.js";
-import { commands } from "../bot.js";
+import { commands } from "../bot";
 
 const settings = {
 	event: Events.InteractionCreate,

@@ -1,4 +1,4 @@
-import { CommandAccess, CommandGroup, CommandType } from '../../classes/commands/index.js';
+import { CommandAccess, CommandGroup, CommandType } from '../../classes/commands/index';
 
 const command = new CommandGroup({
 	name: 'jacob',

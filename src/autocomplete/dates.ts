@@ -1,6 +1,6 @@
 import { AutocompleteInteraction, SlashCommandIntegerOption } from 'discord.js';
 import { SkyBlockTime } from 'farming-weight';
-import { EliteSlashCommandOption, SlashCommandOptionType } from '../classes/commands/options.js';
+import { EliteSlashCommandOption, SlashCommandOptionType } from '../classes/commands/options';
 
 export const eliteYearOption: EliteSlashCommandOption = {
 	name: 'year',

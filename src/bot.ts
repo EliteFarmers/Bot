@@ -1,15 +1,15 @@
-import './sentry.js';
+import './sentry';
 import { GlobalFonts } from '@napi-rs/canvas';
 import * as Sentry from '@sentry/node';
 import { CronJob } from 'cron';
 import { ActivityType, Client, ClientEvents, Collection, Events, GatewayIntentBits } from 'discord.js';
 import dotenv from 'dotenv';
 import path from 'path';
-import { ConnectToRedis } from './api/redis.js';
-import { CommandGroup, CommandReferences, CronTask, EliteCommand } from './classes/commands/index.js';
-import { registerCommandGroups, registerFiles } from './classes/register.js';
-import { SignalReceiverOptions } from './classes/Signal.js';
-import { LoadWeightStyles } from './weight/custom.js';
+import { ConnectToRedis } from './api/redis';
+import { CommandGroup, CommandReferences, CronTask, EliteCommand } from './classes/commands/index';
+import { registerCommandGroups, registerFiles } from './classes/register';
+import { SignalReceiverOptions } from './classes/Signal';
+import { LoadWeightStyles } from './weight/custom';
 
 dotenv.config();
 

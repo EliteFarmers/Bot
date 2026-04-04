@@ -1,6 +1,6 @@
 import { UserContextMenuCommandInteraction } from 'discord.js';
-import { FetchAccount } from '../api/elite.js';
-import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
+import { FetchAccount } from '../api/elite';
+import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index';
 
 const settings = new EliteCommand({
 	name: 'Get Linked Account',
