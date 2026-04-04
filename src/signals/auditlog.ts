@@ -1,7 +1,7 @@
 import { ButtonBuilder, ButtonStyle, ChannelType, Client, MessageFlags, WebhookClient } from 'discord.js';
-import { FetchGuide } from '../api/elite.js';
-import { EliteContainer } from '../classes/components.js';
-import { Signal, SignalReceiverOptions } from '../classes/Signal.js';
+import { FetchGuide } from '../api/elite';
+import { EliteContainer } from '../classes/components';
+import { Signal, SignalReceiverOptions } from '../classes/Signal';
 
 const settings: SignalReceiverOptions = {
 	name: 'audit_log',

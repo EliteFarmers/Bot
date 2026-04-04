@@ -1,16 +1,10 @@
 import { ChatInputCommandInteraction } from 'discord.js';
-import { FetchAccount, FetchUpdateAccount, LinkAccount } from '../api/elite.js';
-import { autocomplete } from '../autocomplete/player.js';
-import { commandReferences } from '../bot.js';
-import {
-	Command,
-	CommandAccess,
-	CommandType,
-	EliteCommand,
-	SlashCommandOptionType,
-} from '../classes/commands/index.js';
-import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds.js';
-import { escapeIgn } from '../classes/Util.js';
+import { FetchAccount, FetchUpdateAccount, LinkAccount } from '../api/elite';
+import { autocomplete } from '../autocomplete/player';
+import { commandReferences } from '../bot';
+import { Command, CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index';
+import { EliteEmbed, ErrorEmbed, WarningEmbed } from '../classes/embeds';
+import { escapeIgn } from '../classes/Util';
 
 export const linkCommand = {
 	name: 'link',

@@ -1,6 +1,6 @@
 import { AutocompleteInteraction, SlashCommandStringOption } from 'discord.js';
-import { FetchLeaderboardSlice, SearchUsers } from '../api/elite.js';
-import { EliteSlashCommandOption, SlashCommandOptionType } from '../classes/commands/options.js';
+import { FetchLeaderboardSlice, SearchUsers } from '../api/elite';
+import { EliteSlashCommandOption, SlashCommandOptionType } from '../classes/commands/options';
 
 export const elitePlayerOption: EliteSlashCommandOption = {
 	name: 'player',

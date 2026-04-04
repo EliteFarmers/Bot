@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction } from 'discord.js';
-import { UserSettings } from '../api/elite.js';
-import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index.js';
-import { EliteEmbed } from '../classes/embeds.js';
+import { UserSettings } from '../api/elite';
+import { CommandAccess, CommandType, EliteCommand } from '../classes/commands/index';
+import { EliteEmbed } from '../classes/embeds';
 
 const command = new EliteCommand({
 	name: 'shop',

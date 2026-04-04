@@ -27,7 +27,7 @@ import {
 	SlashCommand,
 	SlashCommandOptionType,
 	SubCommand,
-} from './index.js';
+} from './index';
 
 export class EliteCommand implements CommandBase {
 	declare slash?:

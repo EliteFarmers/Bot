@@ -1,6 +1,6 @@
 FROM node:lts
 
-RUN npm install -g pnpm typescript
+RUN npm install -g pnpm
 WORKDIR /app
 
 COPY package.json ./

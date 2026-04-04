@@ -7,7 +7,7 @@ import {
 	SlashCommandSubcommandBuilder,
 	SlashCommandSubcommandsOnlyBuilder,
 } from 'discord.js';
-import { CommandAccess, CommandType, EliteCommand, GroupCommand } from './index.js';
+import { CommandAccess, CommandType, EliteCommand, GroupCommand } from './index';
 
 export class CommandGroup implements GroupCommand {
 	public declare name: string;

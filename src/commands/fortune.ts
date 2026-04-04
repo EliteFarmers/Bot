@@ -15,12 +15,12 @@ import {
 	UpgradeReason,
 	ZorroMode,
 } from 'farming-weight';
-import { FetchProfile, UserSettings } from '../api/elite.js';
-import { elitePlayerOption } from '../autocomplete/player.js';
-import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
-import { EliteContainer } from '../classes/components.js';
-import { ErrorEmbed, NotYoursReply } from '../classes/embeds.js';
-import { progressBar } from '../classes/progressbar.js';
+import { FetchProfile, UserSettings } from '../api/elite';
+import { elitePlayerOption } from '../autocomplete/player';
+import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index';
+import { EliteContainer } from '../classes/components';
+import { ErrorEmbed, NotYoursReply } from '../classes/embeds';
+import { progressBar } from '../classes/progressbar';
 import {
 	CROP_ARRAY,
 	CropSelectRow,
@@ -29,8 +29,8 @@ import {
 	GetCropEmoji,
 	LEVELING_XP,
 	removeColorCodes,
-} from '../classes/Util.js';
-import { getAccount } from '../classes/validate.js';
+} from '../classes/Util';
+import { getAccount } from '../classes/validate';
 
 const command = new EliteCommand({
 	name: 'fortune',

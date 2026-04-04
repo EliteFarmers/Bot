@@ -9,11 +9,11 @@ import {
 	getPossibleResultsFromCrops,
 	MAX_CROP_FORTUNE,
 } from 'farming-weight';
-import { FetchProducts, UserSettings } from '../api/elite.js';
-import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
-import { EliteContainer } from '../classes/components.js';
-import { NotYoursReply } from '../classes/embeds.js';
-import { CropSelectRow, EliteCropEmojis, GetCropEmoji } from '../classes/Util.js';
+import { FetchProducts, UserSettings } from '../api/elite';
+import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index';
+import { EliteContainer } from '../classes/components';
+import { NotYoursReply } from '../classes/embeds';
+import { CropSelectRow, EliteCropEmojis, GetCropEmoji } from '../classes/Util';
 
 const TIME_OPTIONS = {
 	24_000: 'Jacob Contest',

@@ -8,13 +8,13 @@ import {
 	ComponentType,
 	StringSelectMenuBuilder,
 } from 'discord.js';
-import { FetchProfile, UserSettings } from '../../api/elite.js';
-import { elitePlayerOption } from '../../autocomplete/player.js';
-import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../../classes/commands/index.js';
-import { EliteEmbed, ErrorEmbed } from '../../classes/embeds.js';
-import { GetReadableDate } from '../../classes/SkyblockDate.js';
-import { escapeIgn, GetCropEmoji, GetMedalEmoji } from '../../classes/Util.js';
-import { getAccount } from '../../classes/validate.js';
+import { FetchProfile, UserSettings } from '../../api/elite';
+import { elitePlayerOption } from '../../autocomplete/player';
+import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../../classes/commands/index';
+import { EliteEmbed, ErrorEmbed } from '../../classes/embeds';
+import { GetReadableDate } from '../../classes/SkyblockDate';
+import { escapeIgn, GetCropEmoji, GetMedalEmoji } from '../../classes/Util';
+import { getAccount } from '../../classes/validate';
 
 const command = new EliteCommand({
 	name: 'player',

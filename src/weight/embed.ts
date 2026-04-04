@@ -1,6 +1,6 @@
-import { EliteEmbed } from '../classes/embeds.js';
-import { GetCropColor } from '../classes/Util.js';
-import { CustomFormatterOptions } from './custom.js';
+import { EliteEmbed } from '../classes/embeds';
+import { GetCropColor } from '../classes/Util';
+import { CustomFormatterOptions } from './custom';
 
 export async function createWeightEmbed({
 	account,

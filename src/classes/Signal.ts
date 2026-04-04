@@ -1,6 +1,6 @@
 import { Client, MessageCreateOptions } from 'discord.js';
-import { client } from '../bot.js';
-import { ErrorEmbed } from './embeds.js';
+import { client } from '../bot';
+import { ErrorEmbed } from './embeds';
 
 // Redis Pub/Sub Message "Signal"
 // This is the message that is recieved from the Redis server.

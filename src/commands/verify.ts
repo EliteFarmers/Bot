@@ -1,5 +1,5 @@
-import { EliteCommand } from '../classes/commands/index.js';
-import { linkCommand } from './link.js';
+import { EliteCommand } from '../classes/commands/index';
+import { linkCommand } from './link';
 
 const command = new EliteCommand({
 	...linkCommand,

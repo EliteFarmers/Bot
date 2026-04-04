@@ -1,3 +1,4 @@
+import { ContestBracketsDetailsDto } from 'api/schemas';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -7,11 +8,10 @@ import {
 	EmbedBuilder,
 } from 'discord.js';
 import { getCropFromName, getFortuneRequiredForCollection } from 'farming-weight';
-import type { components } from '../../api/api.js';
-import { FetchCurrentMonthlyBrackets, UserSettings } from '../../api/elite.js';
-import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../../classes/commands/index.js';
-import { EliteEmbed, EmptyString, ErrorEmbed, NotYoursEmbed, PrefixFooter } from '../../classes/embeds.js';
-import { GetCropEmoji } from '../../classes/Util.js';
+import { FetchCurrentMonthlyBrackets, UserSettings } from '../../api/elite';
+import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../../classes/commands/index';
+import { EliteEmbed, EmptyString, ErrorEmbed, NotYoursEmbed, PrefixFooter } from '../../classes/embeds';
+import { GetCropEmoji } from '../../classes/Util';
 
 const command = new EliteCommand({
 	name: 'fortune',
@@ -234,7 +234,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 function higherEmbed(
 	embed: EmbedBuilder,
-	brackets: components['schemas']['ContestBracketsDetailsDto'] | undefined,
+	brackets: ContestBracketsDetailsDto | undefined,
 	blocksBroken: number,
 	useMooshroom = true,
 ) {
@@ -249,7 +249,7 @@ function higherEmbed(
 
 function lowerEmbed(
 	embed: EmbedBuilder,
-	brackets: components['schemas']['ContestBracketsDetailsDto'] | undefined,
+	brackets: ContestBracketsDetailsDto | undefined,
 	blocksBroken: number,
 	useMooshroom = true,
 ) {
@@ -267,7 +267,7 @@ function lowerEmbed(
 }
 
 function makeField(
-	data: components['schemas']['ContestBracketsDetailsDto'] | undefined,
+	data: ContestBracketsDetailsDto | undefined,
 	bracket: string,
 	blocksBroken: number,
 	useMooshroom = true,

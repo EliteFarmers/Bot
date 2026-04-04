@@ -1,7 +1,7 @@
+import { LeaderboardInfoDto } from 'api/schemas';
 import { AutocompleteInteraction, SlashCommandStringOption } from 'discord.js';
-import { components } from '../api/api.js';
-import { FetchLeaderboardList } from '../api/elite.js';
-import { EliteSlashCommandOption, SlashCommandOptionType } from '../classes/commands/options.js';
+import { FetchLeaderboardList } from '../api/elite';
+import { EliteSlashCommandOption, SlashCommandOptionType } from '../classes/commands/options';
 
 export const eliteLeaderboardOption: EliteSlashCommandOption = {
 	name: 'leaderboard',
@@ -20,7 +20,7 @@ export function leaderboardOption(required = true) {
 			.setRequired(required);
 }
 
-let leaderboards: (components['schemas']['LeaderboardInfoDto'] & { id: string })[] | undefined;
+let leaderboards: (LeaderboardInfoDto & { id: string })[] | undefined;
 
 export async function autocomplete(interaction: AutocompleteInteraction) {
 	if (interaction.responded) return;

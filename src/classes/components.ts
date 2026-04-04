@@ -10,8 +10,8 @@ import {
 	SeparatorSpacingSize,
 	TextDisplayBuilder,
 } from 'discord.js';
-import { UserSettings } from '../api/elite.js';
-import { GetColorTuple } from './Util.js';
+import { UserSettings } from '../api/elite';
+import { GetColorTuple } from './Util';
 
 export class EliteContainer extends ContainerBuilder {
 	declare collapsibles: CollapsibleSection[];

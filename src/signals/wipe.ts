@@ -1,8 +1,8 @@
 import { Crop, getCropDisplayName, getCropFromItemId, getCropFromName } from 'farming-weight';
-import { FetchProfile } from '../api/elite.js';
-import { EliteEmbed, PrefixFooter } from '../classes/embeds.js';
-import { Signal, SignalReceiverOptions } from '../classes/Signal.js';
-import { GetCropEmoji } from '../classes/Util.js';
+import { FetchProfile } from '../api/elite';
+import { EliteEmbed, PrefixFooter } from '../classes/embeds';
+import { Signal, SignalReceiverOptions } from '../classes/Signal';
+import { GetCropEmoji } from '../classes/Util';
 
 const settings: SignalReceiverOptions = {
 	name: 'wipe',

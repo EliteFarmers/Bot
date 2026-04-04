@@ -1,16 +1,16 @@
+import { FarmingWeightDto, MinecraftAccountDto, WeightStyleListDto } from 'api/schemas';
 import { AttachmentBuilder, EmbedBuilder } from 'discord.js';
-import { components } from '../api/api.js';
-import { FetchWeightStyles, UserSettings } from '../api/elite.js';
-import { ErrorEmbed } from '../classes/embeds.js';
-import { validStyle, WeightStyle } from '../schemas/style.js';
-import { DEFAULT_STYLE } from './defaultstyle.js';
-import { createWeightEmbed } from './embed.js';
-import { createFromData } from './maker.js';
+import { FetchWeightStyles, UserSettings } from '../api/elite';
+import { ErrorEmbed } from '../classes/embeds';
+import { validStyle, WeightStyle } from '../schemas/style';
+import { DEFAULT_STYLE } from './defaultstyle';
+import { createWeightEmbed } from './embed';
+import { createFromData } from './maker';
 
 export interface CustomFormatterOptions {
 	settings?: UserSettings;
-	account: components['schemas']['MinecraftAccountDto'];
-	profile: components['schemas']['FarmingWeightDto'];
+	account: MinecraftAccountDto;
+	profile: FarmingWeightDto;
 	profileId: string;
 	badgeUrl?: string;
 	weightRank?: number;
@@ -27,7 +27,7 @@ const formatters: Record<string, CustomFormatter> = {
 
 // import * as TestStyle from './testing.json';
 
-let stylesCache: Record<number, components['schemas']['WeightStyleWithDataDto']> = {};
+let stylesCache: Record<number, WeightStyleListDto> = {};
 
 export function getCustomFormatter(
 	options: CustomFormatterOptions,
@@ -63,7 +63,7 @@ export function getCustomFormatter(
 export async function LoadWeightStyles() {
 	const { data: styles } = await FetchWeightStyles();
 
-	const newStyles = styles?.reduce<Record<number, components['schemas']['WeightStyleWithDataDto']>>((acc, style) => {
+	const newStyles = styles?.reduce<Record<number, WeightStyleListDto>>((acc, style) => {
 		if (!style.id || !validStyle(style.data)) return acc;
 		acc[style.id] = style;
 		return acc;

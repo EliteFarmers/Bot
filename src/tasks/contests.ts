@@ -1,16 +1,16 @@
+import { ContestPingsFeatureDto } from 'api/schemas';
 import { Client, EmbedBuilder, MessageCreateOptions, PermissionFlagsBits } from 'discord.js';
 import { Crop, getCropFromName, getFortuneRequiredForCollection, SkyBlockTime } from 'farming-weight';
-import { components } from '../api/api.js';
 import {
 	DisableGuildContestPings,
 	FetchCurrentMonthlyBrackets,
 	GetCurrentContests,
 	GetGuildsToPing,
-} from '../api/elite.js';
-import { CronTask } from '../classes/commands/index.js';
-import { EliteEmbed, PrefixFooter } from '../classes/embeds.js';
-import { GetSkyblockDate } from '../classes/SkyblockDate.js';
-import { CropFromSimple, GetCropEmoji, GetMedalEmoji } from '../classes/Util.js';
+} from '../api/elite';
+import { CronTask } from '../classes/commands/index';
+import { EliteEmbed, PrefixFooter } from '../classes/embeds';
+import { GetSkyblockDate } from '../classes/SkyblockDate';
+import { CropFromSimple, GetCropEmoji, GetMedalEmoji } from '../classes/Util';
 
 const settings = {
 	cron: '0 10 * * * *',
@@ -134,12 +134,7 @@ async function execute(client: Client) {
 	await sendMessages(client, embed, guilds, crops);
 }
 
-async function sendMessages(
-	client: Client,
-	embed: EmbedBuilder,
-	guilds: components['schemas']['ContestPingsFeatureDto'][],
-	crops?: string[],
-) {
+async function sendMessages(client: Client, embed: EmbedBuilder, guilds: ContestPingsFeatureDto[], crops?: string[]) {
 	for (const pings of guilds) {
 		if (!pings.guildId || !pings?.enabled || !pings.channelId) {
 			console.log('Invalid pings config', pings);

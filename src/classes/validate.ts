@@ -1,12 +1,11 @@
+import { MinecraftAccountDto, ProfileDetailsDto } from 'api/schemas';
 import { EmbedBuilder } from 'discord.js';
-import type { components } from '../api/api.js';
-import { FetchAccount } from '../api/elite.js';
-import { EliteCommand } from './commands/index.js';
-import { ErrorEmbed } from './embeds.js';
-import { escapeIgn } from './Util.js';
+import { FetchAccount } from '../api/elite';
+import { EliteCommand } from './commands/index';
+import { ErrorEmbed } from './embeds';
+import { escapeIgn } from './Util';
 
-type AccountWithNameAndId = Required<Pick<components['schemas']['MinecraftAccountDto'], 'id' | 'name'>> &
-	components['schemas']['MinecraftAccountDto'];
+type AccountWithNameAndId = Required<Pick<MinecraftAccountDto, 'id' | 'name'>> & MinecraftAccountDto;
 
 export type GetAccountReturn =
 	| {
@@ -16,7 +15,7 @@ export type GetAccountReturn =
 	| {
 			success: true;
 			account: AccountWithNameAndId;
-			profile: components['schemas']['ProfileDetailsDto'];
+			profile: ProfileDetailsDto;
 			name: string;
 			rawName: string;
 	  };

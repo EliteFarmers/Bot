@@ -12,9 +12,9 @@ import {
 	groupGardenVisitors,
 	Rarity,
 } from 'farming-weight';
-import { FetchProfile, UserSettings } from '../api/elite.js';
-import { elitePlayerOption } from '../autocomplete/player.js';
-import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
+import { FetchProfile, UserSettings } from '../api/elite';
+import { elitePlayerOption } from '../autocomplete/player';
+import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index';
 import {
 	EliteEmbed,
 	EmptyField,
@@ -23,9 +23,9 @@ import {
 	NotYoursReply,
 	PrefixFooter,
 	WarningEmbed,
-} from '../classes/embeds.js';
-import { escapeIgn, GetCropEmoji } from '../classes/Util.js';
-import { getAccount } from '../classes/validate.js';
+} from '../classes/embeds';
+import { escapeIgn, GetCropEmoji } from '../classes/Util';
+import { getAccount } from '../classes/validate';
 
 const command = new EliteCommand({
 	name: 'garden',

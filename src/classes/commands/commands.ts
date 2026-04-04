@@ -5,8 +5,8 @@ import {
 	SlashCommandSubcommandBuilder,
 	SlashCommandSubcommandsOnlyBuilder,
 } from 'discord.js';
-import { EliteCommand } from './command.js';
-import { EliteSlashCommandOption } from './index.js';
+import { EliteCommand } from './command';
+import { EliteSlashCommandOption } from './index';
 
 export interface CommandBase {
 	name: string;
