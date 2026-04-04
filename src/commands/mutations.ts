@@ -1,9 +1,18 @@
-import { NotYoursReply } from 'classes/embeds.js';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from 'discord.js';
+import {
+	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+	ChatInputCommandInteraction,
+	ComponentType,
+	MessageFlags,
+	StringSelectMenuBuilder,
+	StringSelectMenuOptionBuilder,
+} from 'discord.js';
 import { GREENHOUSE_MUTATIONS } from 'farming-weight';
-import { FetchProducts, UserSettings } from '../api/elite.js';
-import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index.js';
-import { EliteContainer } from '../classes/components.js';
+import { FetchProducts, UserSettings } from '../api/elite';
+import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index';
+import { EliteContainer } from '../classes/components';
+import { NotYoursReply } from '../classes/embeds';
 
 export interface MutationCopperRatio {
 	id: string;
@@ -43,23 +52,23 @@ const command = new EliteCommand({
 
 export default command;
 
-
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	await interaction.deferReply();
 
 	const synthesis = interaction.options.getNumber('synthesis', false) ?? 0;
 	const rose_dragon = interaction.options.getNumber('rose_dragon', false) ?? 0;
-	const mutationIds = mutations.map(m => m.id);
+	const mutationIds = mutations.map((m) => m.id);
 	const { data: bazaar } = await FetchProducts(mutationIds);
 
-	const mutationRatios: MutationCopperRatio[] = mutations.map(mutation => {
+	const mutationRatios: MutationCopperRatio[] = mutations.map((mutation) => {
 		const bazaarItem = bazaar?.items?.[mutation.id];
 		const buy = bazaarItem?.bazaar?.buy as number | undefined;
 		const buyOrder = bazaarItem?.bazaar?.buyOrder as number | undefined;
 		const analysisCost = mutation.analysis.baseCost;
 		const copper = mutation.analysis.copper * (1 + synthesis / 100 + rose_dragon / 100);
+
 		if (buy === undefined && buyOrder === undefined) {
-			//if neither buy nor buy order exist, return infinite ratio (Jerryflower)
+			// if neither buy nor buy order exist, return infinite ratio (Jerryflower)
 			return {
 				id: mutation.id,
 				name: mutation.display.name ?? mutation.id,
@@ -70,8 +79,10 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				buyOrderCoinTotal: Infinity,
 			};
 		}
+
 		const buyCoinTotal = analysisCost + (buy ?? 0);
 		const buyOrderCoinTotal = analysisCost + (buyOrder ?? 0);
+		
 		return {
 			id: mutation.id,
 			name: mutation.display.name ?? mutation.id,
@@ -89,19 +100,15 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const state = {
 		page: 0,
-		selectedType: 'instabuy' as MutationBuyType
+		selectedType: 'instabuy' as MutationBuyType,
 	}; // default to instabuy
 
-	const sortedInstabuy = [...mutationRatios].sort(
-		(a, b) => a.buyCoinPerCopper - b.buyCoinPerCopper
-	);
+	const sortedInstabuy = [...mutationRatios].sort((a, b) => a.buyCoinPerCopper - b.buyCoinPerCopper);
 
-	const sortedBuyOrder = [...mutationRatios].sort(
-		(a, b) => a.buyOrderCoinPerCopper - b.buyOrderCoinPerCopper
-	);
+	const sortedBuyOrder = [...mutationRatios].sort((a, b) => a.buyOrderCoinPerCopper - b.buyOrderCoinPerCopper);
 
 	function getSortedItems(type: MutationBuyType) {
-		   return type === "instabuy" ? sortedInstabuy : sortedBuyOrder;
+		return type === 'instabuy' ? sortedInstabuy : sortedBuyOrder;
 	}
 
 	function getPageItems(page: number, type: MutationBuyType) {
@@ -139,23 +146,17 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const buyOrderLabel = 'Bazaar Buy Order';
 		const instaBuyEmoji = '💸';
 		const buyOrderEmoji = '📒';
-		const selectRow = new ActionRowBuilder<StringSelectMenuBuilder>()
-			.addComponents(
-				new StringSelectMenuBuilder()
-					.setCustomId('mutation-select')
-					.addOptions(
-						new StringSelectMenuOptionBuilder()
-							.setLabel(instaBuyLabel)
-							.setValue('instabuy')
-							.setEmoji(instaBuyEmoji),
-						new StringSelectMenuOptionBuilder()
-							.setLabel(buyOrderLabel)
-							.setValue('buyorder')
-							.setEmoji(buyOrderEmoji))
-					.setPlaceholder(buyType === 'instabuy'
-						? `${instaBuyEmoji} ${instaBuyLabel}`
-						: `${buyOrderEmoji} ${buyOrderLabel}`)
-			);
+		const selectRow = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+			new StringSelectMenuBuilder()
+				.setCustomId('mutation-select')
+				.addOptions(
+					new StringSelectMenuOptionBuilder().setLabel(instaBuyLabel).setValue('instabuy').setEmoji(instaBuyEmoji),
+					new StringSelectMenuOptionBuilder().setLabel(buyOrderLabel).setValue('buyorder').setEmoji(buyOrderEmoji),
+				)
+				.setPlaceholder(
+					buyType === 'instabuy' ? `${instaBuyEmoji} ${instaBuyLabel}` : `${buyOrderEmoji} ${buyOrderLabel}`,
+				),
+		);
 		return selectRow;
 	}
 
@@ -167,15 +168,12 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		let mutationsField = '';
 		pageItems.forEach((item, i) => {
 			const idx = page * ITEMS_PER_PAGE + i + 1;
-			let priceText, totalText = '';
+			let priceText,
+				totalText = '';
 
-			const price = type === 'instabuy'
-				? item.buyCoinPerCopper
-				: item.buyOrderCoinPerCopper;
+			const price = type === 'instabuy' ? item.buyCoinPerCopper : item.buyOrderCoinPerCopper;
 
-			const total = type === 'instabuy'
-				? item.buyCoinTotal
-				: item.buyOrderCoinTotal;
+			const total = type === 'instabuy' ? item.buyCoinTotal : item.buyOrderCoinTotal;
 
 			priceText = isFinite(price) ? `\`${price.toFixed(2)}\`` : '`N/A`';
 			totalText = isFinite(total) ? `${formatNumber(total)}` : '`N/A`';
@@ -195,7 +193,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const reply = await interaction.editReply({
 		components: [currentContainer, getSelectRow(state.selectedType), getButtonRow(state.page, maxPage)],
-		flags: MessageFlags.IsComponentsV2
+		flags: MessageFlags.IsComponentsV2,
 	});
 
 	const buttonCollector = reply.createMessageComponentCollector({
@@ -225,11 +223,13 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			}
 
 			currentContainer = buildContainer(state.page, state.selectedType);
-			await inter.update({
-				components: [currentContainer, getSelectRow(state.selectedType), getButtonRow(state.page, maxPage)],
-			}).catch(() => {
-				buttonCollector.stop();
-			});
+			await inter
+				.update({
+					components: [currentContainer, getSelectRow(state.selectedType), getButtonRow(state.page, maxPage)],
+				})
+				.catch(() => {
+					buttonCollector.stop();
+				});
 		}
 	});
 
