@@ -104,7 +104,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		),
 		gardenLevel: getGardenLevel(member.garden?.experience ?? 0).level,
 		plotsUnlocked: member.garden?.plots?.length,
-		milestones: getCropMilestoneLevels(member.garden?.crops ?? {}),
+		milestones: getCropMilestoneLevels((member.garden?.crops ?? {}) as Record<string, number>),
 		refinedTruffles: member.chocolateFactory?.refinedTrufflesConsumed,
 		cocoaFortuneUpgrade: member.chocolateFactory?.cocoaFortuneUpgrades,
 		exportableCrops: member.unparsed.exportedCrops ?? {},
