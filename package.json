@@ -6,7 +6,8 @@
 	"packageManager": "pnpm@10.17.0",
 	"scripts": {
 		"start": "pnpm tsx src/index.ts",
-		"lint": "pnpm biome check --write",
+		"lint": "pnpm biome check",
+		"format": "pnpm biome check --write",
 		"build": "tsdown && pnpm sentry:sourcemaps",
 		"typecheck": "tsc",
 		"dev": "tsx --watch src/bot.ts",
@@ -39,7 +40,6 @@
 		"date-fns": "^4.1.0",
 		"discord.js": "^14.24.0",
 		"farming-weight": "^0.14.0",
-		"openapi-fetch": "^0.14.1",
 		"orval": "^8.6.2",
 		"redis": "^5.9.0",
 		"utf-8-validate": "^6.0.5",

@@ -38,9 +38,6 @@ importers:
       farming-weight:
         specifier: ^0.14.0
         version: 0.14.0
-      openapi-fetch:
-        specifier: ^0.14.1
-        version: 0.14.1
       orval:
         specifier: ^8.6.2
         version: 8.6.2(typescript@5.9.3)
@@ -1612,12 +1609,6 @@ packages:
 
   obug@2.1.1:
     resolution: {integrity: sha512-uTqF9MuPraAQ+IsnPf366RG4cP9RtUi7MLO1N3KEc+wb0a6yKpeL0lmk2IB1jY5KHPAlTc6T/JRdC/YqxHNwkQ==}
-
-  openapi-fetch@0.14.1:
-    resolution: {integrity: sha512-l7RarRHxlEZYjMLd/PR0slfMVse2/vvIAGm75/F7J6MlQ8/b9uUQmUF2kCPrQhJqMXSxmYWObVgeYXbFYzZR+A==}
-
-  openapi-typescript-helpers@0.0.15:
-    resolution: {integrity: sha512-opyTPaunsklCBpTK8JGef6mfPhLSnyy5a0IN9vKtx3+4aExf+KxEqYwIy3hqkedXIB97u357uLMJsOnm3GVjsw==}
 
   orval@8.6.2:
     resolution: {integrity: sha512-hnWdF7jrdgZFhRy4ZVMpLMYpkmfLDkO1wTh881Ll0w18XOmvJauYvrsTmTby3gf4qEChtWxNULI3HlY173NqvA==}
@@ -3503,12 +3494,6 @@ snapshots:
       unicorn-magic: 0.3.0
 
   obug@2.1.1: {}
-
-  openapi-fetch@0.14.1:
-    dependencies:
-      openapi-typescript-helpers: 0.0.15
-
-  openapi-typescript-helpers@0.0.15: {}
 
   orval@8.6.2(typescript@5.9.3):
     dependencies:

@@ -1,157 +1,91 @@
 import { User } from 'discord.js';
-import dotenv from 'dotenv';
-import createClient from 'openapi-fetch';
-import { paths } from './api.d';
-import { GuildJacobLeaderboardFeature, IncomingGuildChannelDto, IncomingGuildRoleDto, UserSettingsDto } from './schemas';
-
-dotenv.config();
-
-const { GET, PUT, POST, DELETE, PATCH } = createClient<paths>({
-	baseUrl: process.env.ELITE_API_URL,
-	headers: {
-		'User-Agent': 'EliteDiscordBot',
-		Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-	},
-});
+import {
+	disableContestPingsPings,
+	getAccount,
+	getAccountSettings,
+	getBotGuild,
+	getContestPings,
+	getContestsAtTimestamp,
+	getCropGraphs,
+	getCurrentContests,
+	getCurrentMedalBrackets,
+	getGuide,
+	getJacobFeature,
+	getLeaderboard,
+	getLeaderboards,
+	getMedalBrackets,
+	getMedalBracketsGraph,
+	getPlayerData,
+	getPlayerLeaderboardRanks,
+	getPlayerParticipations,
+	getPlayerRank2,
+	getProduct,
+	getProfile,
+	getSelectedProfile,
+	getSkillGraphs,
+	getSpecifiedSkyblockItems,
+	getStyles,
+	getWeightForProfiles,
+	grantBadge,
+	linkAccountBot,
+	makePrimaryAccount,
+	refreshGuild,
+	refreshUserPurchases,
+	searchAccounts,
+	submitScore,
+	unlinkAccountBot,
+	updateDiscordAccount,
+	updateGuildChannel,
+	updateGuildMemberRoles,
+	updateGuildRole,
+	updateJacobFeature,
+} from './client/EliteAPI';
+import {
+	GuildJacobLeaderboardFeature,
+	IncomingGuildChannelDto,
+	IncomingGuildRoleDto,
+	UserSettingsDto,
+} from './schemas';
 
 export type UserSettings = UserSettingsDto;
-export const FetchUserSettings = (id: string) =>
-	GET('/account/{discordId}/settings', {
-		params: {
-			path: {
-				discordId: id as unknown as number,
-			},
-		},
-	});
 
-export const FetchAccount = (id: string) =>
-	GET('/account/{player}', {
-		params: {
-			path: {
-				player: id,
-			},
-		},
-	});
+export const FetchUserSettings = (id: string) => getAccountSettings(id as unknown as number);
+
+export const FetchAccount = (id: string) => getAccount(id);
 
 export const FetchUpdateAccount = (user: User, locale?: string) =>
-	PATCH('/bot/account', {
-		body: {
-			id: user.id as unknown as number,
-			username: user.username,
-			discriminator: user.discriminator,
-			avatar: user.avatar,
-			locale: locale,
-		},
+	updateDiscordAccount({
+		id: user.id as unknown as number,
+		username: user.username,
+		discriminator: user.discriminator,
+		avatar: user.avatar,
+		locale,
 	});
 
 export const FetchWeight = (playerUuid: string, collections = false) =>
-	GET('/weight/{playerUuid}', {
-		params: {
-			path: { playerUuid },
-			query: { collections },
-		},
-	});
+	getWeightForProfiles(playerUuid, { collections });
 
-export const FetchProfile = (playerUuid: string, profileUuid: string) =>
-	GET('/profile/{playerUuid}/{profileUuid}', {
-		params: {
-			path: {
-				playerUuid,
-				profileUuid,
-			},
-		},
-	});
+export const FetchProfile = (playerUuid: string, profileUuid: string) => getProfile(playerUuid, profileUuid);
 
-export const FetchSelectedProfile = (playerUuid: string) =>
-	GET('/profile/{playerUuid}/selected', {
-		params: {
-			path: {
-				playerUuid: playerUuid,
-			},
-		},
-	});
+export const FetchSelectedProfile = (playerUuid: string) => getSelectedProfile(playerUuid);
 
-export const FetchContests = (playerUuid: string) =>
-	GET('/contests/{playerUuid}', {
-		params: {
-			path: {
-				playerUuid,
-			},
-		},
-	});
+export const FetchContests = (playerUuid: string) => getPlayerParticipations(playerUuid);
 
 export const FetchWeightLeaderboardRank = (playerUuid: string, profileUuid: string) =>
-	GET('/leaderboard/{leaderboard}/{playerUuid}/{profileUuid}', {
-		params: {
-			path: {
-				leaderboard: 'farmingweight',
-				playerUuid,
-				profileUuid,
-			},
-		},
-	});
+	getPlayerRank2('farmingweight', playerUuid, profileUuid);
 
 export const FetchLeaderboardRankings = (playerUuid: string, profileUuid: string, max = 10_000) =>
-	GET('/leaderboards/{playerUuid}/{profileUuid}', {
-		params: {
-			path: {
-				playerUuid,
-				profileUuid,
-			},
-			query: {
-				max,
-			},
-		},
-	});
+	getPlayerLeaderboardRanks(playerUuid, profileUuid, { max });
 
 export const FetchLeaderboardRank = (leaderboardId: string, playerUuid: string, profileUuid: string) =>
-	GET('/leaderboard/{leaderboard}/{playerUuid}/{profileUuid}', {
-		params: {
-			path: {
-				leaderboard: leaderboardId,
-				playerUuid,
-				profileUuid,
-			},
-		},
-	});
+	getPlayerRank2(leaderboardId, playerUuid, profileUuid);
 
 export const FetchLeaderboardSlice = (leaderboardId: string, offset = 0, limit = 20) =>
-	GET('/leaderboard/{leaderboard}', {
-		params: {
-			path: {
-				leaderboard: leaderboardId,
-			},
-			query: {
-				offset,
-				limit,
-				new: true,
-			},
-		},
-	});
+	getLeaderboard(leaderboardId, { offset, limit });
 
-export const FetchGuild = (id: string) =>
-	GET('/bot/{discordId}', {
-		params: {
-			path: {
-				discordId: id as unknown as number,
-			},
-		},
-		headers: {
-			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-		},
-	});
+export const FetchGuild = (id: string) => getBotGuild(id as unknown as number);
 
-export const FetchGuildJacob = (id: string) =>
-	GET('/bot/{discordId}/jacob', {
-		params: {
-			path: {
-				discordId: id as unknown as number,
-			},
-		},
-		headers: {
-			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-		},
-	});
+export const FetchGuildJacob = (id: string) => getJacobFeature(id as unknown as number);
 
 export const SubmitJacobScore = ({
 	guildId,
@@ -164,296 +98,67 @@ export const SubmitJacobScore = ({
 	discordUserId: string;
 	roles: string[];
 }) =>
-	POST('/user/guild/{discordId}/jacob/{leaderboardId}/submit', {
-		params: {
-			path: {
-				discordId: guildId as unknown as number,
-				leaderboardId: lbId,
-			},
-			query: {
-				discordUserId: discordUserId as unknown as number,
-			},
-		},
-		body: roles,
-		headers: {
-			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-		},
+	submitScore(guildId as unknown as number, lbId, roles, {
+		discordUserId: discordUserId as unknown as number,
 	});
 
 export const UpdateGuildJacob = (id: string, data: GuildJacobLeaderboardFeature) =>
-	PUT('/bot/{discordId}/jacob', {
-		params: {
-			path: {
-				discordId: id as unknown as number,
-			},
-		},
-		body: data,
-		headers: {
-			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-		},
-	});
+	updateJacobFeature(id as unknown as number, data);
 
-export const GetGuildsToPing = () =>
-	GET('/bot/contestpings', {
-		headers: {
-			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-		},
-	});
+export const GetGuildsToPing = () => getContestPings();
 
 export const DisableGuildContestPings = (id: string, reason: string) =>
-	DELETE('/bot/contestpings/{discordId}', {
-		params: {
-			path: {
-				discordId: id as unknown as number,
-			},
-			query: {
-				reason,
-			},
-		},
-		headers: {
-			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-		},
-	});
+	disableContestPingsPings(id as unknown as number, { reason });
 
-export const GetCurrentContests = () => GET('/contests/at/now', {});
+export const GetCurrentContests = () => getCurrentContests();
 
-export const SearchUsers = (query: string) =>
-	GET('/account/search', {
-		params: {
-			query: {
-				q: query,
-			},
-		},
-	});
+export const SearchUsers = (query: string) => searchAccounts({ q: query });
 
-export const LinkAccount = (id: string, player: string) =>
-	POST('/bot/account/{discordId}/{player}', {
-		params: {
-			path: {
-				discordId: id as unknown as number,
-				player: player,
-			},
-		},
-		headers: {
-			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-		},
-	});
+export const LinkAccount = (id: string, player: string) => linkAccountBot(id as unknown as number, player);
 
-export const UnlinkAccount = (id: string, player: string) =>
-	DELETE('/bot/account/{discordId}/{player}', {
-		params: {
-			path: {
-				discordId: id as unknown as number,
-				player: player,
-			},
-		},
-		headers: {
-			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-		},
-	});
+export const UnlinkAccount = (id: string, player: string) => unlinkAccountBot(id as unknown as number, player);
 
-export const MakeAccountPrimary = (id: string, player: string) =>
-	POST('/bot/account/{discordId}/{player}/primary', {
-		params: {
-			path: {
-				discordId: id as unknown as number,
-				player: player,
-			},
-		},
-		headers: {
-			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-		},
-	});
+export const MakeAccountPrimary = (id: string, player: string) => makePrimaryAccount(id as unknown as number, player);
 
 export const FetchContestMonthlyBrackets = (year: number, month: number, months?: number) =>
-	GET('/graph/medals/{year}/{month}', {
-		params: {
-			path: {
-				year: year,
-				month: month,
-			},
-			query: {
-				months,
-			},
-		},
-	});
+	getMedalBrackets(year, month, { months });
 
-export const FetchCurrentMonthlyBrackets = (months?: number) =>
-	GET('/graph/medals/now', {
-		params: {
-			query: {
-				months,
-			},
-		},
-	});
+export const FetchCurrentMonthlyBrackets = (months?: number) => getCurrentMedalBrackets({ months });
 
 export const FetchContestYearlyMonthlyBrackets = (year: number, months?: number, years?: number) =>
-	GET('/graph/medals/{year}', {
-		params: {
-			path: {
-				year: year,
-			},
-			query: {
-				months,
-				years,
-			},
-		},
-	});
+	getMedalBracketsGraph(year, { months, years });
 
-export const GrantUserBadge = (player: string, badgeId: number) =>
-	POST('/bot/badges/{player}/{badgeId}', {
-		params: {
-			path: {
-				player,
-				badgeId,
-			},
-		},
-		headers: {
-			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-		},
-	});
+export const GrantUserBadge = (player: string, badgeId: number) => grantBadge(player, badgeId);
 
 export const FetchCollectionGraphs = (playerUuid: string, profileUuid: string, days?: number, perDay?: number) =>
-	GET('/graph/{playerUuid}/{profileUuid}/crops', {
-		params: {
-			path: {
-				playerUuid,
-				profileUuid,
-			},
-			query: {
-				days,
-				perDay,
-			},
-		},
-	});
+	getCropGraphs(playerUuid, profileUuid, { days, perDay });
 
 export const FetchSkillGraphs = (playerUuid: string, profileUuid: string, days?: number, perDay?: number) =>
-	GET('/graph/{playerUuid}/{profileUuid}/skills', {
-		params: {
-			path: {
-				playerUuid,
-				profileUuid,
-			},
-			query: {
-				days,
-				perDay,
-			},
-		},
-	});
+	getSkillGraphs(playerUuid, profileUuid, { days, perDay });
 
-export const FetchPlayerData = (player: string) =>
-	GET('/player/{player}', {
-		params: {
-			path: {
-				player,
-			},
-		},
-	});
+export const FetchPlayerData = (player: string) => getPlayerData(player);
 
-export const FetchContest = (timestamp: number) =>
-	GET('/contests/{timestamp}', {
-		params: {
-			path: {
-				timestamp,
-			},
-			query: {
-				limit: -1,
-			},
-		},
-	});
+export const FetchContest = (timestamp: number) => getContestsAtTimestamp(timestamp, { limit: -1 });
 
-export const FetchGuide = (guideId: string) =>
-	GET('/guides/{slug}', {
-		params: {
-			path: {
-				slug: guideId,
-			},
-			query: {
-				draft: false,
-			},
-		},
-	});
+export const FetchGuide = (guideId: string) => getGuide(guideId, { draft: false });
 
-export const FetchWeightStyles = () => GET('/product/styles', {});
+export const FetchWeightStyles = () => getStyles();
 
-export const FetchProduct = (skuId: string) =>
-	GET('/product/{discordId}', {
-		params: {
-			path: {
-				discordId: skuId as unknown as number,
-			},
-		},
-	});
+export const FetchProduct = (skuId: string) => getProduct(skuId as unknown as number);
 
-export const FetchLeaderboardList = () => GET('/leaderboards', {});
+export const FetchLeaderboardList = () => getLeaderboards();
 
-export const RequestGuildUpdate = (guildId: string) =>
-	POST('/bot/guild/{discordId}', {
-		params: {
-			path: {
-				discordId: guildId as unknown as number,
-			},
-		},
-		headers: {
-			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-		},
-	});
+export const RequestGuildUpdate = (guildId: string) => refreshGuild(guildId as unknown as number);
 
 export const UpdateGuildChannel = (guildId: string, channel: IncomingGuildChannelDto) =>
-	POST('/bot/guild/{discordId}/channels', {
-		params: {
-			path: {
-				discordId: guildId as unknown as number,
-			},
-		},
-		body: channel,
-		headers: {
-			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-		},
-	});
+	updateGuildChannel(guildId as unknown as number, channel);
 
 export const UpdateGuildRole = (guildId: string, role: IncomingGuildRoleDto) =>
-	POST('/bot/guild/{discordId}/roles', {
-		params: {
-			path: {
-				discordId: guildId as unknown as number,
-			},
-		},
-		body: role,
-		headers: {
-			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-		},
-	});
+	updateGuildRole(guildId as unknown as number, role);
 
 export const UpdateGuildMemberRoles = (guildId: string, userId: string, roles: string[]) =>
-	POST('/bot/guild/{discordId}/members/{userId}/roles', {
-		params: {
-			path: {
-				discordId: guildId as unknown as number,
-				userId: userId,
-			},
-		},
-		body: roles,
-		headers: {
-			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-		},
-	});
+	updateGuildMemberRoles(guildId as unknown as number, userId, roles);
 
-export const RefreshUserEntitlements = (discordId: string) =>
-	POST('/bot/account/{discordId}/purchases', {
-		params: {
-			path: {
-				discordId: discordId as unknown as number,
-			},
-		},
-		headers: {
-			Authorization: `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`,
-		},
-	});
+export const RefreshUserEntitlements = (discordId: string) => refreshUserPurchases(discordId as unknown as number);
 
-export const FetchProducts = (list: string[]) =>
-	POST('/resources/items', {
-		body: {
-			items: list,
-		},
-	});
+export const FetchProducts = (list: string[]) => getSpecifiedSkyblockItems({ items: list });
