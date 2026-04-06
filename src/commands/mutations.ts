@@ -62,7 +62,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	} else if (synthesis > 15 && synthesis <= 20) {
 		synthesisRarity = Rarity.Legendary;
 	}
-	const synthesisBonus = (GARDEN_CHIPS?.synthesis?.statsPerRarity?.[synthesisRarity]?.[Stat.BonusCopperPercentage] ?? 0) * synthesis;
+	const synthesisBonus =
+		(GARDEN_CHIPS?.synthesis?.statsPerRarity?.[synthesisRarity]?.[Stat.BonusCopperPercentage] ?? 0) * synthesis;
 	console.log(`Synthesis Bonus: ${synthesisBonus}% (Rarity: ${synthesisRarity}, Level: ${synthesis})`);
 	const rose_dragon = interaction.options.getNumber('rose_dragon', false) ?? 0;
 	const roseDragonBonus = rose_dragon > 100 ? rose_dragon * 0.1 : 0;
@@ -91,7 +92,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		const buyCoinTotal = analysisCost + (buy ?? 0);
 		const buyOrderCoinTotal = analysisCost + (buyOrder ?? 0);
-		
+
 		return {
 			id: mutation.id,
 			name: mutation.display.name ?? mutation.id,
