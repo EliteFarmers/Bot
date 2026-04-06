@@ -8,7 +8,7 @@ import {
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
 } from 'discord.js';
-import { GREENHOUSE_MUTATIONS } from 'farming-weight';
+import { GARDEN_CHIPS, GREENHOUSE_MUTATIONS, Rarity, Stat } from 'farming-weight';
 import { FetchProducts, UserSettings } from '../api/elite';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index';
 import { EliteContainer } from '../classes/components';
@@ -36,15 +36,15 @@ const command = new EliteCommand({
 	options: {
 		synthesis: {
 			name: 'synthesis',
-			description: 'Synthesis Chip Bonus (%)',
+			description: 'Synthesis Chip Level',
 			type: SlashCommandOptionType.Number,
-			builder: (b) => b.setMinValue(0).setMaxValue(40),
+			builder: (b) => b.setMinValue(0).setMaxValue(20),
 		},
 		rose_dragon: {
 			name: 'rose_dragon',
-			description: 'Rose Dragon Bonus (%)',
+			description: 'Rose Dragon Level',
 			type: SlashCommandOptionType.Number,
-			builder: (b) => b.setMinValue(0).setMaxValue(20),
+			builder: (b) => b.setMinValue(0).setMaxValue(200),
 		},
 	},
 	execute: execute,
@@ -56,7 +56,16 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	await interaction.deferReply();
 
 	const synthesis = interaction.options.getNumber('synthesis', false) ?? 0;
+	let synthesisRarity: Rarity = Rarity.Rare;
+	if (synthesis > 10 && synthesis <= 15) {
+		synthesisRarity = Rarity.Epic;
+	} else if (synthesis > 15 && synthesis <= 20) {
+		synthesisRarity = Rarity.Legendary;
+	}
+	const synthesisBonus = (GARDEN_CHIPS?.synthesis?.statsPerRarity?.[synthesisRarity]?.[Stat.BonusCopperPercentage] ?? 0) * synthesis;
+	console.log(`Synthesis Bonus: ${synthesisBonus}% (Rarity: ${synthesisRarity}, Level: ${synthesis})`);
 	const rose_dragon = interaction.options.getNumber('rose_dragon', false) ?? 0;
+	const roseDragonBonus = rose_dragon > 100 ? rose_dragon * 0.1 : 0;
 	const mutationIds = mutations.map((m) => m.id);
 	const { data: bazaar } = await FetchProducts(mutationIds);
 
@@ -65,14 +74,14 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const buy = bazaarItem?.bazaar?.buy as number | undefined;
 		const buyOrder = bazaarItem?.bazaar?.buyOrder as number | undefined;
 		const analysisCost = mutation.analysis.baseCost;
-		const copper = mutation.analysis.copper * (1 + synthesis / 100 + rose_dragon / 100);
+		const copper = mutation.analysis.copper * (1 + synthesisBonus / 100 + roseDragonBonus / 100);
 
 		if (buy === undefined && buyOrder === undefined) {
 			// if neither buy nor buy order exist, return infinite ratio (Jerryflower)
 			return {
 				id: mutation.id,
 				name: mutation.display.name ?? mutation.id,
-				copper: mutation.analysis.copper,
+				copper: copper,
 				buyCoinPerCopper: Infinity,
 				buyCoinTotal: Infinity,
 				buyOrderCoinPerCopper: Infinity,
@@ -86,7 +95,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		return {
 			id: mutation.id,
 			name: mutation.display.name ?? mutation.id,
-			copper: mutation.analysis.copper,
+			copper: copper,
 			buyCoinPerCopper: buyCoinTotal / copper,
 			buyOrderCoinPerCopper: buyOrderCoinTotal / copper,
 			buyCoinTotal,
@@ -164,7 +173,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	function buildContainer(page: number, type: MutationBuyType) {
 		const pageItems = getPageItems(page, type);
-		const boosts = `Synthesis Bonus: **${synthesis}%**\nRose Dragon Bonus: **${rose_dragon}%**`;
+		// use toFixed(1) to avoid very long decimals due to JS floating point imprecision
+		const boosts = `Synthesis Chip Rarity (determined by the level): **${synthesisRarity}**\nSynthesis Bonus: **${synthesisBonus.toFixed(1)}%**\nRose Dragon Bonus: **${roseDragonBonus.toFixed(1)}%**`;
 		let mutationsField = '';
 		pageItems.forEach((item, i) => {
 			const idx = page * ITEMS_PER_PAGE + i + 1;
