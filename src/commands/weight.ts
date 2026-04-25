@@ -243,39 +243,46 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		const cropWeight = +crops.reduce((acc, [, value]) => acc + (value ?? 0), 0).toFixed(2);
 
-		const formattedCrops = crops.map(([key, value]) => {
-			const crop = getCropFromName(key);
-			if (!crop) return '';
+		const getFormattedCrops = () => {
+			return crops.map(([key, value]) => {
+				const crop = getCropFromName(key);
+				if (!crop) return '';
 
-			const collection = member?.collections?.[crop];
-			const percent = Math.round(((value ?? 0) / cropWeight) * 1000) / 10;
+				const collection = member?.collections?.[crop];
+				const percent = Math.round(((value ?? 0) / cropWeight) * 1000) / 10;
 
-			const { rank = -1, key: lb } = cropRanks.find((c) => c.crop === crop) ?? {};
-			const rankString =
-				rank > -1
-					? `[#${rank}](https://elitesb.gg/leaderboard/${lb}/${account.name}-${profile.profileName}?f=${rank}) • `
-					: '';
+				const { rank = -1, key: lb } = cropRanks.find((c) => c.crop === crop) ?? {};
+				const rankString =
+					rank > -1
+						? `[#${rank}](https://elitesb.gg/lb/${lb}/${account.name}-${profile.profileName}?f=${rank}) • `
+						: '';
 
-			return (
-				`${GetCropEmoji(key)} **${(+(value?.toFixed(2) ?? 0))?.toLocaleString() ?? 0}** ⠀${percent > 2 ? `${percent}%` : ''}` +
-				`\n-# ${rankString}${(collection ?? 0).toLocaleString()} ${key}`
-			);
-		});
+				return (
+					`${GetCropEmoji(key)} **${(+(value?.toFixed(2) ?? 0))?.toLocaleString() ?? 0}** ⠀${percent > 2 ? `${percent}%` : ''}` +
+					`\n-# ${rankString}${(collection ?? 0).toLocaleString()} ${key}`
+				);
+			});
+		};
+
+		const formattedCrops = getFormattedCrops();
+
+		const fieldValue = formattedCrops.slice(0, 7).join('\n') || 'No crop weight!';
 
 		embed.addFields(
 			{
 				inline: true,
 				name: `Crop Weight • ${cropWeight.toLocaleString()}`,
-				value: formattedCrops.slice(0, 7).join('\n') || 'No crop weight!',
+				value: fieldValue.length > 1024 ? fieldValue.slice(0, 1021) + '...' : fieldValue,
 			},
 			EmptyField(),
 		);
 
 		if (formattedCrops.length > 7) {
+			const remaining = formattedCrops.slice(7).join('\n');
 			embed.addFields({
 				inline: true,
 				name: EmptyString,
-				value: formattedCrops.slice(7).join('\n'),
+				value: (remaining.length > 1024 ? remaining.slice(0, 1021) + '...' : remaining) || 'No more crops!',
 			});
 		}
 
