@@ -25,6 +25,7 @@ import {
 	getSkillGraphs,
 	getSpecifiedSkyblockItems,
 	getStyles,
+	getVirtualFarmingInventory,
 	getWeightForProfiles,
 	grantBadge,
 	linkAccountBot,
@@ -41,6 +42,7 @@ import {
 	updateJacobFeature,
 } from './client/EliteAPI';
 import {
+	FarmingInventoryDto,
 	GuildJacobLeaderboardFeature,
 	IncomingGuildChannelDto,
 	IncomingGuildRoleDto,
@@ -66,6 +68,18 @@ export const FetchWeight = (playerUuid: string, collections = false) =>
 	getWeightForProfiles(playerUuid, { collections });
 
 export const FetchProfile = (playerUuid: string, profileUuid: string) => getProfile(playerUuid, profileUuid);
+
+const EmptyFarmingInventory: FarmingInventoryDto = {
+	armor: [],
+	tools: [],
+	equipment: [],
+	accessories: [],
+};
+
+export const FetchVirtualFarmingInventory = async (playerUuid: string, profileUuid: string) => {
+	const result = await getVirtualFarmingInventory(playerUuid, profileUuid).catch(() => undefined);
+	return result?.data ?? EmptyFarmingInventory;
+};
 
 export const FetchSelectedProfile = (playerUuid: string) => getSelectedProfile(playerUuid);
 
