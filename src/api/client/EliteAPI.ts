@@ -31,6 +31,7 @@ import type {
 	AuthResponseDto,
 	AuthSessionDto,
 	BadgeDto,
+	BadgeUnlockCondition,
 	BanParticipationRequestBanParticipationRequestBody,
 	BanPlayerRequestBanPlayerRequestBody,
 	BazaarOverviewResponse,
@@ -45,6 +46,7 @@ import type {
 	CreateBadgeRequestCreateBadge,
 	CreateCategoryDto,
 	CreateCommentRequest,
+	CreateConditionRequest,
 	CreateConfirmationDto,
 	CreateEventDto,
 	CreateEventTeamDto,
@@ -56,6 +58,8 @@ import type {
 	CreateTebexCheckoutRequest,
 	CreateToolSettingRequest,
 	CropCollectionsDataPointDto,
+	DataExportDownloadUrlResponse,
+	DataExportStatusResponse,
 	DeclineGiftRequest,
 	DeleteContestPingsParams,
 	DeleteMemberAdminParams,
@@ -76,6 +80,7 @@ import type {
 	EventMemberDto,
 	EventTeamsWordListDto,
 	EventTeamWithMembersDto,
+	FarmingInventoryDto,
 	FarmingWeightAllProfilesDto,
 	FarmingWeightDto,
 	ForceAddMemberAdminParams,
@@ -84,6 +89,10 @@ import type {
 	GetAdminCropGraphsParams,
 	GetAdminOrdersParams,
 	GetAdminSkillGraphsParams,
+	GetAuctionHouseNeu200,
+	GetAuctionHouseNeuAverageLowestBin200,
+	GetAuctionHouseNeuGzipParams,
+	GetAuctionHouseNeuParams,
 	GetAuctionPriceHistoryParams,
 	GetAuctionPriceHistoryResponse,
 	GetAuctionResponse,
@@ -116,6 +125,8 @@ import type {
 	GetItemsFromBytesResponse,
 	GetItemTextureParams,
 	GetLeaderboardParams,
+	GetManagedResourcePackAuditLogsParams,
+	GetManagedResourcePackVersionsParams,
 	GetMedalBracketsGraphParams,
 	GetMedalBracketsParams,
 	GetMultiplePlayerRanks200,
@@ -147,6 +158,8 @@ import type {
 	GuildJacobLeaderboardFeature,
 	GuildMemberDto,
 	GuildMembersLeaderboardDto,
+	HarvestFeastCurrentDto,
+	HarvestFeastCurrentRequest,
 	HypixelInventoryDto,
 	IncomingAccountDto,
 	IncomingGuildChannelDto,
@@ -163,7 +176,11 @@ import type {
 	LeaderboardsResponse,
 	LinkedAccountsDto,
 	ListGuidesParams,
+	ListManagedResourcePacksParams,
 	ListToolSettingsParams,
+	ManagedResourcePackAuditLogResponse,
+	ManagedResourcePackDto,
+	ManagedResourcePackVersionListResponse,
 	MemberFortuneSettingsDto,
 	MinecraftAccountDto,
 	NetworthBreakdown,
@@ -181,12 +198,15 @@ import type {
 	PublicGuildDto,
 	ReconciliationResultDto,
 	RejectGuideRequest,
+	RejectManagedResourcePackVersionRequest,
 	RemoveTestEntitlementParams,
 	ReorderCategoryProductsRequest,
 	ReorderIntRequest,
 	ReplayWebhookResponse,
 	ResendGiftRequest,
 	ResolveRecipientRequest,
+	ResourcePackDto,
+	ResourcePackReloadResult,
 	SearchAccountsParams,
 	SearchAuctionItemsParams,
 	SearchAuctionItemsResponse,
@@ -205,6 +225,7 @@ import type {
 	SkyblockFiresalesResponse,
 	SkyblockGemShopsResponse,
 	SkyblockItemResponse,
+	SubmitManagedResourcePackVersionRequest,
 	SubmitScoreParams,
 	SubmitScoreResponse,
 	TagResponse,
@@ -214,6 +235,7 @@ import type {
 	ToggleRecapVisibilityRequestBody,
 	ToolSettingDto,
 	UpdateBadgeRequestUpdateBadge,
+	UpdateConditionRequest,
 	UpdateConfirmationRequest,
 	UpdateContestPingsRequestUpdateContestPings,
 	UpdateEventTeamDto,
@@ -228,6 +250,7 @@ import type {
 	UpdateUserSettingsDto,
 	UploadCurrentContestsBody,
 	UploadImageDto,
+	UpsertManagedResourcePackBody,
 	UpsertTebexProductSettingsRequest,
 	UserGuideDto,
 	UserOrderDto,
@@ -235,6 +258,7 @@ import type {
 	UserSettingsDto,
 	VoteCommentRequest,
 	VoteGuideRequest,
+	WebsiteCacheReloadSignalDto,
 	WeightStyleListDto,
 	WeightStyleWithDataDto,
 	WeightsDto,
@@ -1066,6 +1090,188 @@ export const updateAccount = async (updateUserSettingsDto: UpdateUserSettingsDto
 };
 
 /**
+ * @summary Create a Badge Unlock Condition (Admin)
+ */
+export type createBadgeConditionResponse200 = {
+	data: BadgeUnlockCondition;
+	status: 200;
+};
+
+export type createBadgeConditionResponse400 = {
+	data: ErrorResponse;
+	status: 400;
+};
+
+export type createBadgeConditionResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type createBadgeConditionResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type createBadgeConditionResponseSuccess = createBadgeConditionResponse200 & {
+	headers: Headers;
+};
+export type createBadgeConditionResponseError = (
+	| createBadgeConditionResponse400
+	| createBadgeConditionResponse401
+	| createBadgeConditionResponse403
+) & {
+	headers: Headers;
+};
+
+export type createBadgeConditionResponse = createBadgeConditionResponseSuccess | createBadgeConditionResponseError;
+
+export const getCreateBadgeConditionUrl = (badgeId: number) => {
+	return `${ELITE_API_URL}/admin/badges/${badgeId}/conditions`;
+};
+
+export const createBadgeCondition = async (
+	badgeId: number,
+	createConditionRequest: CreateConditionRequest,
+	options?: RequestInit,
+) => {
+	return customFetch<createBadgeConditionResponse>(getCreateBadgeConditionUrl(badgeId), {
+		...options,
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		body: JSON.stringify(createConditionRequest),
+	});
+};
+
+/**
+ * @summary Delete a Badge Unlock Condition (Admin)
+ */
+export type deleteBadgeConditionResponse204 = {
+	data: void;
+	status: 204;
+};
+
+export type deleteBadgeConditionResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type deleteBadgeConditionResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type deleteBadgeConditionResponseSuccess = deleteBadgeConditionResponse204 & {
+	headers: Headers;
+};
+export type deleteBadgeConditionResponseError = (deleteBadgeConditionResponse401 | deleteBadgeConditionResponse403) & {
+	headers: Headers;
+};
+
+export type deleteBadgeConditionResponse = deleteBadgeConditionResponseSuccess | deleteBadgeConditionResponseError;
+
+export const getDeleteBadgeConditionUrl = (conditionId: string) => {
+	return `${ELITE_API_URL}/admin/badges/conditions/${conditionId}`;
+};
+
+export const deleteBadgeCondition = async (conditionId: string, options?: RequestInit) => {
+	return customFetch<deleteBadgeConditionResponse>(getDeleteBadgeConditionUrl(conditionId), {
+		...options,
+		method: 'DELETE',
+	});
+};
+
+/**
+ * @summary List Badge Unlock Conditions (Admin)
+ */
+export type getBadgeConditionsResponse200 = {
+	data: BadgeUnlockCondition[];
+	status: 200;
+};
+
+export type getBadgeConditionsResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type getBadgeConditionsResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type getBadgeConditionsResponseSuccess = getBadgeConditionsResponse200 & {
+	headers: Headers;
+};
+export type getBadgeConditionsResponseError = (getBadgeConditionsResponse401 | getBadgeConditionsResponse403) & {
+	headers: Headers;
+};
+
+export type getBadgeConditionsResponse = getBadgeConditionsResponseSuccess | getBadgeConditionsResponseError;
+
+export const getGetBadgeConditionsUrl = (badgeId: string) => {
+	return `${ELITE_API_URL}/admin/badges/${badgeId}/conditions`;
+};
+
+export const getBadgeConditions = async (badgeId: string, options?: RequestInit) => {
+	return customFetch<getBadgeConditionsResponse>(getGetBadgeConditionsUrl(badgeId), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
+ * @summary Update a Badge Unlock Condition (Admin)
+ */
+export type updateBadgeConditionResponse204 = {
+	data: void;
+	status: 204;
+};
+
+export type updateBadgeConditionResponse400 = {
+	data: ErrorResponse;
+	status: 400;
+};
+
+export type updateBadgeConditionResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type updateBadgeConditionResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type updateBadgeConditionResponseSuccess = updateBadgeConditionResponse204 & {
+	headers: Headers;
+};
+export type updateBadgeConditionResponseError = (
+	| updateBadgeConditionResponse400
+	| updateBadgeConditionResponse401
+	| updateBadgeConditionResponse403
+) & {
+	headers: Headers;
+};
+
+export type updateBadgeConditionResponse = updateBadgeConditionResponseSuccess | updateBadgeConditionResponseError;
+
+export const getUpdateBadgeConditionUrl = (conditionId: number) => {
+	return `${ELITE_API_URL}/admin/badges/conditions/${conditionId}`;
+};
+
+export const updateBadgeCondition = async (
+	conditionId: number,
+	updateConditionRequest: UpdateConditionRequest,
+	options?: RequestInit,
+) => {
+	return customFetch<updateBadgeConditionResponse>(getUpdateBadgeConditionUrl(conditionId), {
+		...options,
+		method: 'PUT',
+		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		body: JSON.stringify(updateConditionRequest),
+	});
+};
+
+/**
  * @summary Add a role to a user
  */
 export type addRoleToUserResponse204 = {
@@ -1588,6 +1794,45 @@ export const getRefreshHypixelGuildUrl = (guildId: string) => {
 
 export const refreshHypixelGuild = async (guildId: string, options?: RequestInit) => {
 	return customFetch<refreshHypixelGuildResponse>(getRefreshHypixelGuildUrl(guildId), {
+		...options,
+		method: 'POST',
+	});
+};
+
+/**
+ * Reloads Minecraft resource packs from disk and clears related output-cache entries.
+ * @summary Reload resource packs
+ */
+export type reloadResourcePacksResponse200 = {
+	data: ResourcePackReloadResult;
+	status: 200;
+};
+
+export type reloadResourcePacksResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type reloadResourcePacksResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type reloadResourcePacksResponseSuccess = reloadResourcePacksResponse200 & {
+	headers: Headers;
+};
+export type reloadResourcePacksResponseError = (reloadResourcePacksResponse401 | reloadResourcePacksResponse403) & {
+	headers: Headers;
+};
+
+export type reloadResourcePacksResponse = reloadResourcePacksResponseSuccess | reloadResourcePacksResponseError;
+
+export const getReloadResourcePacksUrl = () => {
+	return `${ELITE_API_URL}/admin/resourcepacks/reload`;
+};
+
+export const reloadResourcePacks = async (options?: RequestInit) => {
+	return customFetch<reloadResourcePacksResponse>(getReloadResourcePacksUrl(), {
 		...options,
 		method: 'POST',
 	});
@@ -3887,6 +4132,251 @@ export const getSelectedMemberParticipations = async (playerUuid: string, option
 	return customFetch<getSelectedMemberParticipationsResponse>(getGetSelectedMemberParticipationsUrl(playerUuid), {
 		...options,
 		method: 'GET',
+	});
+};
+
+/**
+ * @summary Get a presigned download URL for any export (admin)
+ */
+export type adminGetDataExportDownloadUrlResponse200 = {
+	data: DataExportDownloadUrlResponse;
+	status: 200;
+};
+
+export type adminGetDataExportDownloadUrlResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type adminGetDataExportDownloadUrlResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type adminGetDataExportDownloadUrlResponseSuccess = adminGetDataExportDownloadUrlResponse200 & {
+	headers: Headers;
+};
+export type adminGetDataExportDownloadUrlResponseError = (
+	| adminGetDataExportDownloadUrlResponse401
+	| adminGetDataExportDownloadUrlResponse403
+) & {
+	headers: Headers;
+};
+
+export type adminGetDataExportDownloadUrlResponse =
+	| adminGetDataExportDownloadUrlResponseSuccess
+	| adminGetDataExportDownloadUrlResponseError;
+
+export const getAdminGetDataExportDownloadUrlUrl = (id: string) => {
+	return `${ELITE_API_URL}/admin/data-exports/${id}/download`;
+};
+
+export const adminGetDataExportDownloadUrl = async (id: string, options?: RequestInit) => {
+	return customFetch<adminGetDataExportDownloadUrlResponse>(getAdminGetDataExportDownloadUrlUrl(id), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
+ * Queues a personal data export for the specified user. Bypasses cooldown restrictions.
+ * @summary Request data export for a user (admin)
+ */
+export type adminRequestDataExportResponse200 = {
+	data: DataExportStatusResponse;
+	status: 200;
+};
+
+export type adminRequestDataExportResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type adminRequestDataExportResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type adminRequestDataExportResponseSuccess = adminRequestDataExportResponse200 & {
+	headers: Headers;
+};
+export type adminRequestDataExportResponseError = (
+	| adminRequestDataExportResponse401
+	| adminRequestDataExportResponse403
+) & {
+	headers: Headers;
+};
+
+export type adminRequestDataExportResponse =
+	| adminRequestDataExportResponseSuccess
+	| adminRequestDataExportResponseError;
+
+export const getAdminRequestDataExportUrl = (userId: string) => {
+	return `${ELITE_API_URL}/admin/data-exports/${userId}`;
+};
+
+export const adminRequestDataExport = async (userId: string, options?: RequestInit) => {
+	return customFetch<adminRequestDataExportResponse>(getAdminRequestDataExportUrl(userId), {
+		...options,
+		method: 'POST',
+	});
+};
+
+/**
+ * @summary Get a presigned download URL for an export
+ */
+export type getDataExportDownloadUrlResponse200 = {
+	data: DataExportDownloadUrlResponse;
+	status: 200;
+};
+
+export type getDataExportDownloadUrlResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type getDataExportDownloadUrlResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type getDataExportDownloadUrlResponseSuccess = getDataExportDownloadUrlResponse200 & {
+	headers: Headers;
+};
+export type getDataExportDownloadUrlResponseError = (
+	| getDataExportDownloadUrlResponse401
+	| getDataExportDownloadUrlResponse403
+) & {
+	headers: Headers;
+};
+
+export type getDataExportDownloadUrlResponse =
+	| getDataExportDownloadUrlResponseSuccess
+	| getDataExportDownloadUrlResponseError;
+
+export const getGetDataExportDownloadUrlUrl = (id: string) => {
+	return `${ELITE_API_URL}/account/data-exports/${id}/download`;
+};
+
+export const getDataExportDownloadUrl = async (id: string, options?: RequestInit) => {
+	return customFetch<getDataExportDownloadUrlResponse>(getGetDataExportDownloadUrlUrl(id), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
+ * @summary Get account data export by id
+ */
+export type getDataExportResponse200 = {
+	data: DataExportStatusResponse;
+	status: 200;
+};
+
+export type getDataExportResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type getDataExportResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type getDataExportResponseSuccess = getDataExportResponse200 & {
+	headers: Headers;
+};
+export type getDataExportResponseError = (getDataExportResponse401 | getDataExportResponse403) & {
+	headers: Headers;
+};
+
+export type getDataExportResponse = getDataExportResponseSuccess | getDataExportResponseError;
+
+export const getGetDataExportUrl = (id: string) => {
+	return `${ELITE_API_URL}/account/data-exports/${id}`;
+};
+
+export const getDataExport = async (id: string, options?: RequestInit) => {
+	return customFetch<getDataExportResponse>(getGetDataExportUrl(id), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
+ * @summary Get latest account data export
+ */
+export type getLatestDataExportResponse200 = {
+	data: DataExportStatusResponse;
+	status: 200;
+};
+
+export type getLatestDataExportResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type getLatestDataExportResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type getLatestDataExportResponseSuccess = getLatestDataExportResponse200 & {
+	headers: Headers;
+};
+export type getLatestDataExportResponseError = (getLatestDataExportResponse401 | getLatestDataExportResponse403) & {
+	headers: Headers;
+};
+
+export type getLatestDataExportResponse = getLatestDataExportResponseSuccess | getLatestDataExportResponseError;
+
+export const getGetLatestDataExportUrl = () => {
+	return `${ELITE_API_URL}/account/data-exports/latest`;
+};
+
+export const getLatestDataExport = async (options?: RequestInit) => {
+	return customFetch<getLatestDataExportResponse>(getGetLatestDataExportUrl(), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
+ * Queues a personal data export for the authenticated user. Exports are limited to one request every 30 days.
+ * @summary Request account data export
+ */
+export type requestDataExportResponse200 = {
+	data: DataExportStatusResponse;
+	status: 200;
+};
+
+export type requestDataExportResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type requestDataExportResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type requestDataExportResponseSuccess = requestDataExportResponse200 & {
+	headers: Headers;
+};
+export type requestDataExportResponseError = (requestDataExportResponse401 | requestDataExportResponse403) & {
+	headers: Headers;
+};
+
+export type requestDataExportResponse = requestDataExportResponseSuccess | requestDataExportResponseError;
+
+export const getRequestDataExportUrl = () => {
+	return `${ELITE_API_URL}/account/data-exports`;
+};
+
+export const requestDataExport = async (options?: RequestInit) => {
+	return customFetch<requestDataExportResponse>(getRequestDataExportUrl(), {
+		...options,
+		method: 'POST',
 	});
 };
 
@@ -8116,6 +8606,63 @@ export const updateGuildPurchases = async (discordId: number, options?: RequestI
 };
 
 /**
+ * Uses crowd-sourced data, which may not be accurate.
+ * @summary Get current Harvest Feast crops
+ */
+export type getCurrentHarvestFeastResponse200 = {
+	data: HarvestFeastCurrentDto;
+	status: 200;
+};
+
+export type getCurrentHarvestFeastResponseSuccess = getCurrentHarvestFeastResponse200 & {
+	headers: Headers;
+};
+
+export type getCurrentHarvestFeastResponse = getCurrentHarvestFeastResponseSuccess;
+
+export const getGetCurrentHarvestFeastUrl = () => {
+	return `${ELITE_API_URL}/harvest-feast/current`;
+};
+
+export const getCurrentHarvestFeast = async (options?: RequestInit) => {
+	return customFetch<getCurrentHarvestFeastResponse>(getGetCurrentHarvestFeastUrl(), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
+ * Crowd-sourced current Harvest Feast data.
+ * @summary Upload current Harvest Feast crops
+ */
+export type uploadCurrentHarvestFeastResponse204 = {
+	data: void;
+	status: 204;
+};
+
+export type uploadCurrentHarvestFeastResponseSuccess = uploadCurrentHarvestFeastResponse204 & {
+	headers: Headers;
+};
+
+export type uploadCurrentHarvestFeastResponse = uploadCurrentHarvestFeastResponseSuccess;
+
+export const getUploadCurrentHarvestFeastUrl = () => {
+	return `${ELITE_API_URL}/harvest-feast/current`;
+};
+
+export const uploadCurrentHarvestFeast = async (
+	harvestFeastCurrentRequest: HarvestFeastCurrentRequest,
+	options?: RequestInit,
+) => {
+	return customFetch<uploadCurrentHarvestFeastResponse>(getUploadCurrentHarvestFeastUrl(), {
+		...options,
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		body: JSON.stringify(harvestFeastCurrentRequest),
+	});
+};
+
+/**
  * @summary Get Hypixel Guild
  */
 export type getHypixelGuildResponse200 = {
@@ -9394,6 +9941,558 @@ export const markNotificationRead = async (id: string, options?: RequestInit) =>
 };
 
 /**
+ * @summary Approve a pending managed pack version
+ */
+export type approveManagedResourcePackVersionResponse200 = {
+	data: ManagedResourcePackDto;
+	status: 200;
+};
+
+export type approveManagedResourcePackVersionResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type approveManagedResourcePackVersionResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type approveManagedResourcePackVersionResponseSuccess = approveManagedResourcePackVersionResponse200 & {
+	headers: Headers;
+};
+export type approveManagedResourcePackVersionResponseError = (
+	| approveManagedResourcePackVersionResponse401
+	| approveManagedResourcePackVersionResponse403
+) & {
+	headers: Headers;
+};
+
+export type approveManagedResourcePackVersionResponse =
+	| approveManagedResourcePackVersionResponseSuccess
+	| approveManagedResourcePackVersionResponseError;
+
+export const getApproveManagedResourcePackVersionUrl = (packId: string) => {
+	return `${ELITE_API_URL}/admin/resourcepacks/manage/${packId}/approve`;
+};
+
+export const approveManagedResourcePackVersion = async (packId: string, options?: RequestInit) => {
+	return customFetch<approveManagedResourcePackVersionResponse>(getApproveManagedResourcePackVersionUrl(packId), {
+		...options,
+		method: 'POST',
+	});
+};
+
+/**
+ * @summary Assign a PackOwner to a managed pack
+ */
+export type assignManagedResourcePackOwnerResponse204 = {
+	data: void;
+	status: 204;
+};
+
+export type assignManagedResourcePackOwnerResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type assignManagedResourcePackOwnerResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type assignManagedResourcePackOwnerResponseSuccess = assignManagedResourcePackOwnerResponse204 & {
+	headers: Headers;
+};
+export type assignManagedResourcePackOwnerResponseError = (
+	| assignManagedResourcePackOwnerResponse401
+	| assignManagedResourcePackOwnerResponse403
+) & {
+	headers: Headers;
+};
+
+export type assignManagedResourcePackOwnerResponse =
+	| assignManagedResourcePackOwnerResponseSuccess
+	| assignManagedResourcePackOwnerResponseError;
+
+export const getAssignManagedResourcePackOwnerUrl = (packId: string, accountId: string) => {
+	return `${ELITE_API_URL}/admin/resourcepacks/manage/${packId}/owners/${accountId}`;
+};
+
+export const assignManagedResourcePackOwner = async (packId: string, accountId: string, options?: RequestInit) => {
+	return customFetch<assignManagedResourcePackOwnerResponse>(getAssignManagedResourcePackOwnerUrl(packId, accountId), {
+		...options,
+		method: 'POST',
+	});
+};
+
+/**
+ * @summary Remove a PackOwner from a managed pack
+ */
+export type removeManagedResourcePackOwnerResponse204 = {
+	data: void;
+	status: 204;
+};
+
+export type removeManagedResourcePackOwnerResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type removeManagedResourcePackOwnerResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type removeManagedResourcePackOwnerResponseSuccess = removeManagedResourcePackOwnerResponse204 & {
+	headers: Headers;
+};
+export type removeManagedResourcePackOwnerResponseError = (
+	| removeManagedResourcePackOwnerResponse401
+	| removeManagedResourcePackOwnerResponse403
+) & {
+	headers: Headers;
+};
+
+export type removeManagedResourcePackOwnerResponse =
+	| removeManagedResourcePackOwnerResponseSuccess
+	| removeManagedResourcePackOwnerResponseError;
+
+export const getRemoveManagedResourcePackOwnerUrl = (packId: string, accountId: string) => {
+	return `${ELITE_API_URL}/admin/resourcepacks/manage/${packId}/owners/${accountId}`;
+};
+
+export const removeManagedResourcePackOwner = async (packId: string, accountId: string, options?: RequestInit) => {
+	return customFetch<removeManagedResourcePackOwnerResponse>(getRemoveManagedResourcePackOwnerUrl(packId, accountId), {
+		...options,
+		method: 'DELETE',
+	});
+};
+
+/**
+ * Creates a managed resource pack definition backed by a Modrinth project.
+ * @summary Create a managed resource pack
+ */
+export type createManagedResourcePackResponse200 = {
+	data: ManagedResourcePackDto;
+	status: 200;
+};
+
+export type createManagedResourcePackResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type createManagedResourcePackResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type createManagedResourcePackResponseSuccess = createManagedResourcePackResponse200 & {
+	headers: Headers;
+};
+export type createManagedResourcePackResponseError = (
+	| createManagedResourcePackResponse401
+	| createManagedResourcePackResponse403
+) & {
+	headers: Headers;
+};
+
+export type createManagedResourcePackResponse =
+	| createManagedResourcePackResponseSuccess
+	| createManagedResourcePackResponseError;
+
+export const getCreateManagedResourcePackUrl = () => {
+	return `${ELITE_API_URL}/admin/resourcepacks/manage`;
+};
+
+export const createManagedResourcePack = async (
+	upsertManagedResourcePackBody: UpsertManagedResourcePackBody,
+	options?: RequestInit,
+) => {
+	return customFetch<createManagedResourcePackResponse>(getCreateManagedResourcePackUrl(), {
+		...options,
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		body: JSON.stringify(upsertManagedResourcePackBody),
+	});
+};
+
+/**
+ * Downloads the selected Modrinth version into isolated staging and validates it in a fresh renderer.
+ * @summary Download and stage a managed pack version
+ */
+export type downloadManagedResourcePackVersionResponse200 = {
+	data: ManagedResourcePackDto;
+	status: 200;
+};
+
+export type downloadManagedResourcePackVersionResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type downloadManagedResourcePackVersionResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type downloadManagedResourcePackVersionResponseSuccess = downloadManagedResourcePackVersionResponse200 & {
+	headers: Headers;
+};
+export type downloadManagedResourcePackVersionResponseError = (
+	| downloadManagedResourcePackVersionResponse401
+	| downloadManagedResourcePackVersionResponse403
+) & {
+	headers: Headers;
+};
+
+export type downloadManagedResourcePackVersionResponse =
+	| downloadManagedResourcePackVersionResponseSuccess
+	| downloadManagedResourcePackVersionResponseError;
+
+export const getDownloadManagedResourcePackVersionUrl = (packId: string, versionId: string) => {
+	return `${ELITE_API_URL}/resourcepacks/manage/${packId}/versions/${versionId}/download`;
+};
+
+export const downloadManagedResourcePackVersion = async (packId: string, versionId: string, options?: RequestInit) => {
+	return customFetch<downloadManagedResourcePackVersionResponse>(
+		getDownloadManagedResourcePackVersionUrl(packId, versionId),
+		{
+			...options,
+			method: 'POST',
+		},
+	);
+};
+
+/**
+ * Returns the audit history for a managed resource pack.
+ * @summary Get managed resource pack audit logs
+ */
+export type getManagedResourcePackAuditLogsResponse200 = {
+	data: ManagedResourcePackAuditLogResponse;
+	status: 200;
+};
+
+export type getManagedResourcePackAuditLogsResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type getManagedResourcePackAuditLogsResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type getManagedResourcePackAuditLogsResponseSuccess = getManagedResourcePackAuditLogsResponse200 & {
+	headers: Headers;
+};
+export type getManagedResourcePackAuditLogsResponseError = (
+	| getManagedResourcePackAuditLogsResponse401
+	| getManagedResourcePackAuditLogsResponse403
+) & {
+	headers: Headers;
+};
+
+export type getManagedResourcePackAuditLogsResponse =
+	| getManagedResourcePackAuditLogsResponseSuccess
+	| getManagedResourcePackAuditLogsResponseError;
+
+export const getGetManagedResourcePackAuditLogsUrl = (
+	packId: number,
+	params: GetManagedResourcePackAuditLogsParams,
+) => {
+	const normalizedParams = new URLSearchParams();
+
+	Object.entries(params || {}).forEach(([key, value]) => {
+		if (value !== undefined) {
+			normalizedParams.append(key, value === null ? 'null' : value.toString());
+		}
+	});
+
+	const stringifiedParams = normalizedParams.toString();
+
+	return stringifiedParams.length > 0
+		? `${ELITE_API_URL}/resourcepacks/manage/${packId}/audit-logs?${stringifiedParams}`
+		: `${ELITE_API_URL}/resourcepacks/manage/${packId}/audit-logs`;
+};
+
+export const getManagedResourcePackAuditLogs = async (
+	packId: number,
+	params: GetManagedResourcePackAuditLogsParams,
+	options?: RequestInit,
+) => {
+	return customFetch<getManagedResourcePackAuditLogsResponse>(getGetManagedResourcePackAuditLogsUrl(packId, params), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
+ * Returns paginated resource-pack versions from Modrinth, newest first.
+ * @summary List Modrinth versions for a managed pack
+ */
+export type getManagedResourcePackVersionsResponse200 = {
+	data: ManagedResourcePackVersionListResponse;
+	status: 200;
+};
+
+export type getManagedResourcePackVersionsResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type getManagedResourcePackVersionsResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type getManagedResourcePackVersionsResponseSuccess = getManagedResourcePackVersionsResponse200 & {
+	headers: Headers;
+};
+export type getManagedResourcePackVersionsResponseError = (
+	| getManagedResourcePackVersionsResponse401
+	| getManagedResourcePackVersionsResponse403
+) & {
+	headers: Headers;
+};
+
+export type getManagedResourcePackVersionsResponse =
+	| getManagedResourcePackVersionsResponseSuccess
+	| getManagedResourcePackVersionsResponseError;
+
+export const getGetManagedResourcePackVersionsUrl = (packId: number, params: GetManagedResourcePackVersionsParams) => {
+	const normalizedParams = new URLSearchParams();
+
+	Object.entries(params || {}).forEach(([key, value]) => {
+		if (value !== undefined) {
+			normalizedParams.append(key, value === null ? 'null' : value.toString());
+		}
+	});
+
+	const stringifiedParams = normalizedParams.toString();
+
+	return stringifiedParams.length > 0
+		? `${ELITE_API_URL}/resourcepacks/manage/${packId}/versions?${stringifiedParams}`
+		: `${ELITE_API_URL}/resourcepacks/manage/${packId}/versions`;
+};
+
+export const getManagedResourcePackVersions = async (
+	packId: number,
+	params: GetManagedResourcePackVersionsParams,
+	options?: RequestInit,
+) => {
+	return customFetch<getManagedResourcePackVersionsResponse>(getGetManagedResourcePackVersionsUrl(packId, params), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
+ * Returns the managed resource packs available to the authenticated user.
+ * @summary List managed resource packs
+ */
+export type listManagedResourcePacksResponse200 = {
+	data: ManagedResourcePackDto[];
+	status: 200;
+};
+
+export type listManagedResourcePacksResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type listManagedResourcePacksResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type listManagedResourcePacksResponseSuccess = listManagedResourcePacksResponse200 & {
+	headers: Headers;
+};
+export type listManagedResourcePacksResponseError = (
+	| listManagedResourcePacksResponse401
+	| listManagedResourcePacksResponse403
+) & {
+	headers: Headers;
+};
+
+export type listManagedResourcePacksResponse =
+	| listManagedResourcePacksResponseSuccess
+	| listManagedResourcePacksResponseError;
+
+export const getListManagedResourcePacksUrl = (params: ListManagedResourcePacksParams) => {
+	const normalizedParams = new URLSearchParams();
+
+	Object.entries(params || {}).forEach(([key, value]) => {
+		if (value !== undefined) {
+			normalizedParams.append(key, value === null ? 'null' : value.toString());
+		}
+	});
+
+	const stringifiedParams = normalizedParams.toString();
+
+	return stringifiedParams.length > 0
+		? `${ELITE_API_URL}/resourcepacks/manage?${stringifiedParams}`
+		: `${ELITE_API_URL}/resourcepacks/manage`;
+};
+
+export const listManagedResourcePacks = async (params: ListManagedResourcePacksParams, options?: RequestInit) => {
+	return customFetch<listManagedResourcePacksResponse>(getListManagedResourcePacksUrl(params), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
+ * @summary Reject a pending managed pack version
+ */
+export type rejectManagedResourcePackVersionResponse200 = {
+	data: ManagedResourcePackDto;
+	status: 200;
+};
+
+export type rejectManagedResourcePackVersionResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type rejectManagedResourcePackVersionResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type rejectManagedResourcePackVersionResponseSuccess = rejectManagedResourcePackVersionResponse200 & {
+	headers: Headers;
+};
+export type rejectManagedResourcePackVersionResponseError = (
+	| rejectManagedResourcePackVersionResponse401
+	| rejectManagedResourcePackVersionResponse403
+) & {
+	headers: Headers;
+};
+
+export type rejectManagedResourcePackVersionResponse =
+	| rejectManagedResourcePackVersionResponseSuccess
+	| rejectManagedResourcePackVersionResponseError;
+
+export const getRejectManagedResourcePackVersionUrl = (packId: number) => {
+	return `${ELITE_API_URL}/admin/resourcepacks/manage/${packId}/reject`;
+};
+
+export const rejectManagedResourcePackVersion = async (
+	packId: number,
+	rejectManagedResourcePackVersionRequest: RejectManagedResourcePackVersionRequest,
+	options?: RequestInit,
+) => {
+	return customFetch<rejectManagedResourcePackVersionResponse>(getRejectManagedResourcePackVersionUrl(packId), {
+		...options,
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		body: JSON.stringify(rejectManagedResourcePackVersionRequest),
+	});
+};
+
+/**
+ * Marks the currently staged version as pending admin approval.
+ * @summary Submit a staged pack version for approval
+ */
+export type submitManagedResourcePackVersionResponse200 = {
+	data: ManagedResourcePackDto;
+	status: 200;
+};
+
+export type submitManagedResourcePackVersionResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type submitManagedResourcePackVersionResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type submitManagedResourcePackVersionResponseSuccess = submitManagedResourcePackVersionResponse200 & {
+	headers: Headers;
+};
+export type submitManagedResourcePackVersionResponseError = (
+	| submitManagedResourcePackVersionResponse401
+	| submitManagedResourcePackVersionResponse403
+) & {
+	headers: Headers;
+};
+
+export type submitManagedResourcePackVersionResponse =
+	| submitManagedResourcePackVersionResponseSuccess
+	| submitManagedResourcePackVersionResponseError;
+
+export const getSubmitManagedResourcePackVersionUrl = (packId: number) => {
+	return `${ELITE_API_URL}/resourcepacks/manage/${packId}/submit`;
+};
+
+export const submitManagedResourcePackVersion = async (
+	packId: number,
+	submitManagedResourcePackVersionRequest: SubmitManagedResourcePackVersionRequest,
+	options?: RequestInit,
+) => {
+	return customFetch<submitManagedResourcePackVersionResponse>(getSubmitManagedResourcePackVersionUrl(packId), {
+		...options,
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		body: JSON.stringify(submitManagedResourcePackVersionRequest),
+	});
+};
+
+/**
+ * @summary Update a managed resource pack
+ */
+export type updateManagedResourcePackResponse200 = {
+	data: ManagedResourcePackDto;
+	status: 200;
+};
+
+export type updateManagedResourcePackResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type updateManagedResourcePackResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type updateManagedResourcePackResponseSuccess = updateManagedResourcePackResponse200 & {
+	headers: Headers;
+};
+export type updateManagedResourcePackResponseError = (
+	| updateManagedResourcePackResponse401
+	| updateManagedResourcePackResponse403
+) & {
+	headers: Headers;
+};
+
+export type updateManagedResourcePackResponse =
+	| updateManagedResourcePackResponseSuccess
+	| updateManagedResourcePackResponseError;
+
+export const getUpdateManagedResourcePackUrl = (packId: number) => {
+	return `${ELITE_API_URL}/admin/resourcepacks/manage/${packId}`;
+};
+
+export const updateManagedResourcePack = async (
+	packId: number,
+	upsertManagedResourcePackBody: UpsertManagedResourcePackBody,
+	options?: RequestInit,
+) => {
+	return customFetch<updateManagedResourcePackResponse>(getUpdateManagedResourcePackUrl(packId), {
+		...options,
+		method: 'PUT',
+		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		body: JSON.stringify(upsertManagedResourcePackBody),
+	});
+};
+
+/**
  * @summary Get Order Status
  */
 export type getOrderStatusResponse200 = {
@@ -9792,6 +10891,49 @@ export const getSelectedProfile = async (playerUuid: string, options?: RequestIn
 };
 
 /**
+ * @summary Get virtual farming inventory
+ */
+export type getVirtualFarmingInventoryResponse200 = {
+	data: FarmingInventoryDto;
+	status: 200;
+};
+
+export type getVirtualFarmingInventoryResponse400 = {
+	data: ErrorResponse;
+	status: 400;
+};
+
+export type getVirtualFarmingInventoryResponse404 = {
+	data: void;
+	status: 404;
+};
+
+export type getVirtualFarmingInventoryResponseSuccess = getVirtualFarmingInventoryResponse200 & {
+	headers: Headers;
+};
+export type getVirtualFarmingInventoryResponseError = (
+	| getVirtualFarmingInventoryResponse400
+	| getVirtualFarmingInventoryResponse404
+) & {
+	headers: Headers;
+};
+
+export type getVirtualFarmingInventoryResponse =
+	| getVirtualFarmingInventoryResponseSuccess
+	| getVirtualFarmingInventoryResponseError;
+
+export const getGetVirtualFarmingInventoryUrl = (playerUuid: string, profileUuid: string) => {
+	return `${ELITE_API_URL}/profile/${playerUuid}/${profileUuid}/inventories/virtual/farming`;
+};
+
+export const getVirtualFarmingInventory = async (playerUuid: string, profileUuid: string, options?: RequestInit) => {
+	return customFetch<getVirtualFarmingInventoryResponse>(getGetVirtualFarmingInventoryUrl(playerUuid, profileUuid), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
  * Retrieves the yearly recap for a player. Requires authentication if the recap is not public.
  * @summary Get Player Recap
  */
@@ -9896,6 +11038,138 @@ export const getGetAuctionUrl = (auctionId: string) => {
 
 export const getAuction = async (auctionId: string, options?: RequestInit) => {
 	return customFetch<getAuctionResponse>(getGetAuctionUrl(auctionId), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
+ * Get NEU lowest-BIN averages over a fixed history window using hourly lowest-BIN history buckets. Supported windows: 1day, 3day, 7day.
+ * @summary Get Average Lowest BIN Prices (NEU Format)
+ */
+export type getAuctionHouseNeuAverageLowestBinResponse200 = {
+	data: GetAuctionHouseNeuAverageLowestBin200;
+	status: 200;
+};
+
+export type getAuctionHouseNeuAverageLowestBinResponseSuccess = getAuctionHouseNeuAverageLowestBinResponse200 & {
+	headers: Headers;
+};
+
+export type getAuctionHouseNeuAverageLowestBinResponse = getAuctionHouseNeuAverageLowestBinResponseSuccess;
+
+export const getGetAuctionHouseNeuAverageLowestBinUrl = (window: string) => {
+	return `${ELITE_API_URL}/resources/auctions/neu/average-lbin/${window}`;
+};
+
+export const getAuctionHouseNeuAverageLowestBin = async (window: string, options?: RequestInit) => {
+	return customFetch<getAuctionHouseNeuAverageLowestBinResponse>(getGetAuctionHouseNeuAverageLowestBinUrl(window), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
+ * Get the same average lowest-BIN NEU payload as /resources/auctions/neu/average-lbin/{window}. Only use this if you need to, the normal endpoint already supports gzip data transfer.
+ * @summary Get Average Lowest BIN Prices (NEU Format, Gzip File)
+ */
+export type getAuctionHouseNeuAverageLowestBinGzipResponse204 = {
+	data: void;
+	status: 204;
+};
+
+export type getAuctionHouseNeuAverageLowestBinGzipResponseSuccess =
+	getAuctionHouseNeuAverageLowestBinGzipResponse204 & {
+		headers: Headers;
+	};
+
+export type getAuctionHouseNeuAverageLowestBinGzipResponse = getAuctionHouseNeuAverageLowestBinGzipResponseSuccess;
+
+export const getGetAuctionHouseNeuAverageLowestBinGzipUrl = (window: string) => {
+	return `${ELITE_API_URL}/resources/auctions/neu/average-lbin/${window}.gz`;
+};
+
+export const getAuctionHouseNeuAverageLowestBinGzip = async (window: string, options?: RequestInit) => {
+	return customFetch<getAuctionHouseNeuAverageLowestBinGzipResponse>(
+		getGetAuctionHouseNeuAverageLowestBinGzipUrl(window),
+		{
+			...options,
+			method: 'GET',
+		},
+	);
+};
+
+/**
+ * Get lowest BIN prices keyed by NEU internal names. Drop-in replacement for moulberry lowestbin.json. Use ?mode=raw (default) for absolute cheapest BIN or ?mode=smooth for IQR-filtered prices.
+ * @summary Get Lowest BIN Prices (NEU Format)
+ */
+export type getAuctionHouseNeuResponse200 = {
+	data: GetAuctionHouseNeu200;
+	status: 200;
+};
+
+export type getAuctionHouseNeuResponseSuccess = getAuctionHouseNeuResponse200 & {
+	headers: Headers;
+};
+
+export type getAuctionHouseNeuResponse = getAuctionHouseNeuResponseSuccess;
+
+export const getGetAuctionHouseNeuUrl = (params?: GetAuctionHouseNeuParams) => {
+	const normalizedParams = new URLSearchParams();
+
+	Object.entries(params || {}).forEach(([key, value]) => {
+		if (value !== undefined) {
+			normalizedParams.append(key, value === null ? 'null' : value.toString());
+		}
+	});
+
+	const stringifiedParams = normalizedParams.toString();
+
+	return stringifiedParams.length > 0
+		? `${ELITE_API_URL}/resources/auctions/neu?${stringifiedParams}`
+		: `${ELITE_API_URL}/resources/auctions/neu`;
+};
+
+export const getAuctionHouseNeu = async (params?: GetAuctionHouseNeuParams, options?: RequestInit) => {
+	return customFetch<getAuctionHouseNeuResponse>(getGetAuctionHouseNeuUrl(params), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
+ * Get the same lowest BIN data as /resources/auctions/neu, but in a gzip file. Only use this if you need to, the normal endpoint already supports gzip data transfer.
+ * @summary Get Lowest BIN Prices (NEU Format, Gzip File)
+ */
+export type getAuctionHouseNeuGzipResponse204 = {
+	data: void;
+	status: 204;
+};
+
+export type getAuctionHouseNeuGzipResponseSuccess = getAuctionHouseNeuGzipResponse204 & {
+	headers: Headers;
+};
+
+export type getAuctionHouseNeuGzipResponse = getAuctionHouseNeuGzipResponseSuccess;
+
+export const getGetAuctionHouseNeuGzipUrl = (params?: GetAuctionHouseNeuGzipParams) => {
+	const normalizedParams = new URLSearchParams();
+
+	Object.entries(params || {}).forEach(([key, value]) => {
+		if (value !== undefined) {
+			normalizedParams.append(key, value === null ? 'null' : value.toString());
+		}
+	});
+
+	const stringifiedParams = normalizedParams.toString();
+
+	return stringifiedParams.length > 0
+		? `${ELITE_API_URL}/resources/auctions/neu.gz?${stringifiedParams}`
+		: `${ELITE_API_URL}/resources/auctions/neu.gz`;
+};
+
+export const getAuctionHouseNeuGzip = async (params?: GetAuctionHouseNeuGzipParams, options?: RequestInit) => {
+	return customFetch<getAuctionHouseNeuGzipResponse>(getGetAuctionHouseNeuGzipUrl(params), {
 		...options,
 		method: 'GET',
 	});
@@ -11939,6 +13213,32 @@ export const getPetTexture = async (petId: string, params?: GetPetTextureParams,
 };
 
 /**
+ * Returns the currently loaded Minecraft resource packs.
+ * @summary Get resource packs
+ */
+export type getResourcePacksResponse200 = {
+	data: ResourcePackDto[];
+	status: 200;
+};
+
+export type getResourcePacksResponseSuccess = getResourcePacksResponse200 & {
+	headers: Headers;
+};
+
+export type getResourcePacksResponse = getResourcePacksResponseSuccess;
+
+export const getGetResourcePacksUrl = () => {
+	return `${ELITE_API_URL}/texturepacks`;
+};
+
+export const getResourcePacks = async (options?: RequestInit) => {
+	return customFetch<getResourcePacksResponse>(getGetResourcePacksUrl(), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
  * Retrieves the icon image for a registered texture pack by its ID.
  * @summary Get Registered Texture Pack Icon
  */
@@ -12166,6 +13466,76 @@ export const updateToolSetting = async (
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json', ...options?.headers },
 		body: JSON.stringify(updateToolSettingRequest),
+	});
+};
+
+/**
+ * @summary Get website server-cache reload signal
+ */
+export type getWebsiteCacheReloadSignalResponse200 = {
+	data: WebsiteCacheReloadSignalDto;
+	status: 200;
+};
+
+export type getWebsiteCacheReloadSignalResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type getWebsiteCacheReloadSignalResponseSuccess = getWebsiteCacheReloadSignalResponse200 & {
+	headers: Headers;
+};
+export type getWebsiteCacheReloadSignalResponseError = getWebsiteCacheReloadSignalResponse401 & {
+	headers: Headers;
+};
+
+export type getWebsiteCacheReloadSignalResponse =
+	| getWebsiteCacheReloadSignalResponseSuccess
+	| getWebsiteCacheReloadSignalResponseError;
+
+export const getGetWebsiteCacheReloadSignalUrl = () => {
+	return `${ELITE_API_URL}/website/cache/reload-signal`;
+};
+
+export const getWebsiteCacheReloadSignal = async (options?: RequestInit) => {
+	return customFetch<getWebsiteCacheReloadSignalResponse>(getGetWebsiteCacheReloadSignalUrl(), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
+ * @summary Request website server-cache reload
+ */
+export type requestWebsiteCacheReloadResponse200 = {
+	data: WebsiteCacheReloadSignalDto;
+	status: 200;
+};
+
+export type requestWebsiteCacheReloadResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type requestWebsiteCacheReloadResponseSuccess = requestWebsiteCacheReloadResponse200 & {
+	headers: Headers;
+};
+export type requestWebsiteCacheReloadResponseError = requestWebsiteCacheReloadResponse401 & {
+	headers: Headers;
+};
+
+export type requestWebsiteCacheReloadResponse =
+	| requestWebsiteCacheReloadResponseSuccess
+	| requestWebsiteCacheReloadResponseError;
+
+export const getRequestWebsiteCacheReloadUrl = () => {
+	return `${ELITE_API_URL}/website/cache/reload-signal`;
+};
+
+export const requestWebsiteCacheReload = async (options?: RequestInit) => {
+	return customFetch<requestWebsiteCacheReloadResponse>(getRequestWebsiteCacheReloadUrl(), {
+		...options,
+		method: 'POST',
 	});
 };
 

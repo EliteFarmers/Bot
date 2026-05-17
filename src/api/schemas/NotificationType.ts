@@ -27,4 +27,8 @@ export const NotificationType = {
 	giftReceived: 'giftReceived',
 	giftReassignable: 'giftReassignable',
 	giftClaimed: 'giftClaimed',
+	dataExportReady: 'dataExportReady',
+	badgeUnlocked: 'badgeUnlocked',
+	managedPackApproved: 'managedPackApproved',
+	managedPackOwnershipAssigned: 'managedPackOwnershipAssigned',
 } as const;

@@ -9,9 +9,14 @@ Use of this API requires following the [Elite API TOS](https://eliteskyblock.com
  */
 import type { DungeonPlayerClasses } from './DungeonPlayerClasses';
 import type { DungeonTypes } from './DungeonTypes';
+import type { RawDungeonsResponseDungeonJournal } from './RawDungeonsResponseDungeonJournal';
 
 export interface RawDungeonsResponse {
 	dungeon_types?: DungeonTypes | null;
 	player_classes?: DungeonPlayerClasses | null;
+	/** @nullable */
+	selected_dungeon_class?: string | null;
 	secrets: number;
+	/** @nullable */
+	dungeon_journal?: RawDungeonsResponseDungeonJournal;
 }

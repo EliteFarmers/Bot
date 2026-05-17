@@ -10,6 +10,7 @@ Use of this API requires following the [Elite API TOS](https://eliteskyblock.com
 import type { ComposterDto } from './ComposterDto';
 import type { CropSettingsOfInt32 } from './CropSettingsOfInt32';
 import type { CropSettingsOfString } from './CropSettingsOfString';
+import type { GardenDtoGreenhouseUpgradeCatalog } from './GardenDtoGreenhouseUpgradeCatalog';
 import type { GardenDtoVisitors } from './GardenDtoVisitors';
 import type { GardenUpgradesDto } from './GardenUpgradesDto';
 import type { GreenhouseSlotUnlock } from './GreenhouseSlotUnlock';
@@ -19,12 +20,18 @@ export interface GardenDto {
 	profileId: string;
 	/** Garden experience */
 	experience: number;
+	/** Garden level (computed from XP) */
+	gardenLevel: number;
+	/** Progress towards the next garden level (0-1) */
+	gardenProgress: number;
 	/** Total completed visitors */
 	completedVisitors: number;
 	/** Unique visitors unlocked */
 	uniqueVisitors: number;
 	/** Crops counted towards milestones */
 	crops: CropSettingsOfString;
+	/** Crop milestone levels (computed from collected counts) */
+	cropMilestoneLevels: CropSettingsOfInt32;
 	/** Crop upgrades */
 	cropUpgrades: CropSettingsOfInt32;
 	/** List of unlocked plots */
@@ -39,6 +46,11 @@ export interface GardenDto {
 	greenhouseSlots: GreenhouseSlotUnlock[];
 	/** Greenhouse upgrades */
 	gardenUpgrades: GardenUpgradesDto;
+	/** Catalog of greenhouse upgrade definitions sourced from staged Skyblock stats metadata.
+  Includes per-level costs, max level, and presentation details. */
+	greenhouseUpgradeCatalog: GardenDtoGreenhouseUpgradeCatalog;
+	/** Item ids configured as garden tools in the staged Skyblock stats metadata. */
+	gardenToolIds: string[];
 	/** Last save time in unix seconds */
 	lastSave: string;
 }

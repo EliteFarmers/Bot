@@ -37,4 +37,9 @@ export interface UpdateUserSettingsDto {
 	 * @nullable
 	 */
 	nameStyleId?: number | null;
+	/**
+	 * If the user should be hidden from browser search indexing.
+	 * @nullable
+	 */
+	hideFromSearchIndex?: boolean | null;
 }
