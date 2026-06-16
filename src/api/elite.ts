@@ -40,12 +40,14 @@ import {
 	updateGuildMemberRoles,
 	updateGuildRole,
 	updateJacobFeature,
+	updateNotificationDeliveryAttempt,
 } from './client/EliteAPI';
 import {
 	FarmingInventoryDto,
 	GuildJacobLeaderboardFeature,
 	IncomingGuildChannelDto,
 	IncomingGuildRoleDto,
+	NotificationDeliveryStatus,
 	UserSettingsDto,
 } from './schemas';
 
@@ -176,3 +178,15 @@ export const UpdateGuildMemberRoles = (guildId: string, userId: string, roles: s
 export const RefreshUserEntitlements = (discordId: string) => refreshUserPurchases(discordId as unknown as number);
 
 export const FetchProducts = (list: string[]) => getSpecifiedSkyblockItems({ items: list });
+
+export const UpdateNotificationDeliveryAttempt = async (
+	attemptId: number | string,
+	status: NotificationDeliveryStatus,
+	reasonCode?: string,
+	failureMessage?: string,
+) =>
+	updateNotificationDeliveryAttempt(attemptId.toString(), {
+		status,
+		reasonCode,
+		failureMessage,
+	});

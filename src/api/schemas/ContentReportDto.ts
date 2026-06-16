@@ -8,28 +8,22 @@ Use of this API requires following the [Elite API TOS](https://eliteskyblock.com
  * OpenAPI spec version: admin-v1
  */
 import type { AuthorDto } from './AuthorDto';
+import type { ContentReportStatus } from './ContentReportStatus';
+import type { ContentReportTargetType } from './ContentReportTargetType';
 
-export interface CommentDto {
+export interface ContentReportDto {
 	id: number;
-	sqid: string;
-	/** @nullable */
-	parentId?: number | null;
-	content: string;
-	/** @nullable */
-	draftContent?: string | null;
-	author: AuthorDto;
+	targetType: ContentReportTargetType;
+	targetId: number;
+	status: ContentReportStatus;
+	reason: string;
 	createdAt: string;
 	/** @nullable */
-	editedAt?: string | null;
-	score: number;
+	reviewedAt?: string | null;
 	/** @nullable */
-	liftedElementId?: string | null;
+	resolutionNote?: string | null;
+	reporter: AuthorDto;
+	targetLabel: string;
 	/** @nullable */
-	userVote?: number | null;
-	isPending: boolean;
-	isDeleted: boolean;
-	isGuideAuthor: boolean;
-	isEdited: boolean;
-	isEditedByAdmin: boolean;
-	hasPendingEdit: boolean;
+	targetUrl?: string | null;
 }

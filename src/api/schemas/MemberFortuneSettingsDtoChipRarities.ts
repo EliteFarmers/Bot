@@ -8,15 +8,7 @@ Use of this API requires following the [Elite API TOS](https://eliteskyblock.com
  * OpenAPI spec version: admin-v1
  */
 
-export type GuideType = (typeof GuideType)[keyof typeof GuideType];
-
-export const GuideType = {
-	General: 0,
-	Farm: 1,
-	Greenhouse: 2,
-	Contest: 3,
-	MoneyMaking: 4,
-	Builds: 5,
-	Tools: 6,
-	Events: 7,
-} as const;
+/**
+ * User-provided Garden Chip rarity assumptions. API data only exposes chip levels.
+ */
+export type MemberFortuneSettingsDtoChipRarities = { [key: string]: string };

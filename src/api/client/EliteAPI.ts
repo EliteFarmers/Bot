@@ -15,6 +15,8 @@ import type {
 	AddExcludedTimespanRequestAddExcludedTimespanRequestBody,
 	AddProductImageParams,
 	AddStyleImageParams,
+	AdminDraftGuideListResponse,
+	AdminDraftGuidesParams,
 	AdminEventMemberDto,
 	AdminLinkAccountRequest,
 	AdminOrderDetailDto,
@@ -39,6 +41,7 @@ import type {
 	ClaimGiftRequest,
 	CommentDto,
 	ConfirmationDto,
+	ContentReportDto,
 	ContestBracketsDetailsDto,
 	ContestParticipationDto,
 	ContestPingsFeatureDto,
@@ -48,6 +51,7 @@ import type {
 	CreateCommentRequest,
 	CreateConditionRequest,
 	CreateConfirmationDto,
+	CreateContentReportRequest,
 	CreateEventDto,
 	CreateEventTeamDto,
 	CreateGuideRequest,
@@ -131,6 +135,8 @@ import type {
 	GetMedalBracketsParams,
 	GetMultiplePlayerRanks200,
 	GetMultiplePlayerRanksParams,
+	GetNotificationPreferencesResponse,
+	GetNotificationPushPublicKeyResponse,
 	GetNotificationsParams,
 	GetNotificationsResponse,
 	GetPetTextureParams,
@@ -153,13 +159,16 @@ import type {
 	GetWeightForSelectedParams,
 	GetWeights200,
 	GrantTestEntitlementParams,
+	GuideAssetDto,
 	GuideDto,
+	GuideVersionDto,
 	GuildDetailsDto,
 	GuildJacobLeaderboardFeature,
 	GuildMemberDto,
 	GuildMembersLeaderboardDto,
 	HarvestFeastCurrentDto,
 	HarvestFeastCurrentRequest,
+	HoistCommentRequest,
 	HypixelInventoryDto,
 	IncomingAccountDto,
 	IncomingGuildChannelDto,
@@ -175,6 +184,7 @@ import type {
 	LeaderboardRanksResponse,
 	LeaderboardsResponse,
 	LinkedAccountsDto,
+	ListContentReportsParams,
 	ListGuidesParams,
 	ListManagedResourcePacksParams,
 	ListToolSettingsParams,
@@ -184,6 +194,7 @@ import type {
 	MemberFortuneSettingsDto,
 	MinecraftAccountDto,
 	NetworthBreakdown,
+	NotificationPushSubscriptionDto,
 	OrderStatusDto,
 	PauseRecurringPaymentRequest,
 	PendingGiftDto,
@@ -202,8 +213,10 @@ import type {
 	RemoveTestEntitlementParams,
 	ReorderCategoryProductsRequest,
 	ReorderIntRequest,
+	ReplaceGuideAuthorsRequest,
 	ReplayWebhookResponse,
 	ResendGiftRequest,
+	ResolveContentReportRouteRequest,
 	ResolveRecipientRequest,
 	ResourcePackDto,
 	ResourcePackReloadResult,
@@ -245,12 +258,16 @@ import type {
 	UpdateJacobFeatureParams,
 	UpdateJacobFeatureRequestUpdateJacobFeature,
 	UpdateJacobLeaderboardRequestUpdateJacobLeaderboard,
+	UpdateNotificationDeliveryAttemptRequest,
+	UpdateNotificationPreferencesRequest,
 	UpdateTagRequest,
 	UpdateToolSettingRequest,
 	UpdateUserSettingsDto,
 	UploadCurrentContestsBody,
+	UploadGuideLitematicDto,
 	UploadImageDto,
 	UpsertManagedResourcePackBody,
+	UpsertNotificationPushSubscriptionRequest,
 	UpsertTebexProductSettingsRequest,
 	UserGuideDto,
 	UserOrderDto,
@@ -6319,6 +6336,57 @@ export const getMedalBracketsGraph = async (
 };
 
 /**
+ * Searches unsubmitted draft guides for admin review.
+ * @summary List unsubmitted draft guides
+ */
+export type adminDraftGuidesResponse200 = {
+	data: AdminDraftGuideListResponse;
+	status: 200;
+};
+
+export type adminDraftGuidesResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type adminDraftGuidesResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type adminDraftGuidesResponseSuccess = adminDraftGuidesResponse200 & {
+	headers: Headers;
+};
+export type adminDraftGuidesResponseError = (adminDraftGuidesResponse401 | adminDraftGuidesResponse403) & {
+	headers: Headers;
+};
+
+export type adminDraftGuidesResponse = adminDraftGuidesResponseSuccess | adminDraftGuidesResponseError;
+
+export const getAdminDraftGuidesUrl = (params: AdminDraftGuidesParams) => {
+	const normalizedParams = new URLSearchParams();
+
+	Object.entries(params || {}).forEach(([key, value]) => {
+		if (value !== undefined) {
+			normalizedParams.append(key, value === null ? 'null' : value.toString());
+		}
+	});
+
+	const stringifiedParams = normalizedParams.toString();
+
+	return stringifiedParams.length > 0
+		? `${ELITE_API_URL}/admin/guides/drafts?${stringifiedParams}`
+		: `${ELITE_API_URL}/admin/guides/drafts`;
+};
+
+export const adminDraftGuides = async (params: AdminDraftGuidesParams, options?: RequestInit) => {
+	return customFetch<adminDraftGuidesResponse>(getAdminDraftGuidesUrl(params), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
  * Retrieves a list of guides waiting for approval.
  * @summary Get pending guides
  */
@@ -6510,6 +6578,85 @@ export const unbookmarkGuide = async (guideId: number, options?: RequestInit) =>
 	return customFetch<unbookmarkGuideResponse>(getUnbookmarkGuideUrl(guideId), {
 		...options,
 		method: 'DELETE',
+	});
+};
+
+/**
+ * @summary Clear a hoisted guide comment
+ */
+export type clearHoistedCommentResponse204 = {
+	data: void;
+	status: 204;
+};
+
+export type clearHoistedCommentResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type clearHoistedCommentResponseSuccess = clearHoistedCommentResponse204 & {
+	headers: Headers;
+};
+export type clearHoistedCommentResponseError = clearHoistedCommentResponse401 & {
+	headers: Headers;
+};
+
+export type clearHoistedCommentResponse = clearHoistedCommentResponseSuccess | clearHoistedCommentResponseError;
+
+export const getClearHoistedCommentUrl = (guideId: number, commentId: number) => {
+	return `${ELITE_API_URL}/guides/${guideId}/comments/${commentId}/hoist`;
+};
+
+export const clearHoistedComment = async (guideId: number, commentId: number, options?: RequestInit) => {
+	return customFetch<clearHoistedCommentResponse>(getClearHoistedCommentUrl(guideId, commentId), {
+		...options,
+		method: 'DELETE',
+	});
+};
+
+/**
+ * Places an approved comment near a guide element for correction callouts.
+ * @summary Hoist a guide comment
+ */
+export type hoistCommentResponse204 = {
+	data: void;
+	status: 204;
+};
+
+export type hoistCommentResponse400 = {
+	data: ErrorResponse;
+	status: 400;
+};
+
+export type hoistCommentResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type hoistCommentResponseSuccess = hoistCommentResponse204 & {
+	headers: Headers;
+};
+export type hoistCommentResponseError = (hoistCommentResponse400 | hoistCommentResponse401) & {
+	headers: Headers;
+};
+
+export type hoistCommentResponse = hoistCommentResponseSuccess | hoistCommentResponseError;
+
+export const getHoistCommentUrl = (guideId: number, commentId: number) => {
+	return `${ELITE_API_URL}/guides/${guideId}/comments/${commentId}/hoist`;
+};
+
+export const hoistComment = async (
+	guideId: number,
+	commentId: number,
+	hoistCommentRequest: HoistCommentRequest,
+	options?: RequestInit,
+) => {
+	return customFetch<hoistCommentResponse>(getHoistCommentUrl(guideId, commentId), {
+		...options,
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		body: JSON.stringify(hoistCommentRequest),
 	});
 };
 
@@ -6720,6 +6867,40 @@ export const getDeleteCommentUrl = (commentId: number) => {
 
 export const deleteComment = async (commentId: number, options?: RequestInit) => {
 	return customFetch<deleteCommentResponse>(getDeleteCommentUrl(commentId), {
+		...options,
+		method: 'DELETE',
+	});
+};
+
+/**
+ * Deletes a guide asset and its stored files. The frontend should remove image/litematic blocks that referenced this asset from the current draft.
+ * @summary Delete guide asset
+ */
+export type deleteGuideAssetResponse204 = {
+	data: void;
+	status: 204;
+};
+
+export type deleteGuideAssetResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type deleteGuideAssetResponseSuccess = deleteGuideAssetResponse204 & {
+	headers: Headers;
+};
+export type deleteGuideAssetResponseError = deleteGuideAssetResponse401 & {
+	headers: Headers;
+};
+
+export type deleteGuideAssetResponse = deleteGuideAssetResponseSuccess | deleteGuideAssetResponseError;
+
+export const getDeleteGuideAssetUrl = (guideId: number, assetId: string) => {
+	return `${ELITE_API_URL}/guides/${guideId}/assets/${assetId}`;
+};
+
+export const deleteGuideAsset = async (guideId: number, assetId: string, options?: RequestInit) => {
+	return customFetch<deleteGuideAssetResponse>(getDeleteGuideAssetUrl(guideId, assetId), {
 		...options,
 		method: 'DELETE',
 	});
@@ -7056,6 +7237,73 @@ export const listComments = async (slug: string, options?: RequestInit) => {
 };
 
 /**
+ * @summary List guide assets
+ */
+export type listGuideAssetsResponse200 = {
+	data: GuideAssetDto[];
+	status: 200;
+};
+
+export type listGuideAssetsResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type listGuideAssetsResponseSuccess = listGuideAssetsResponse200 & {
+	headers: Headers;
+};
+export type listGuideAssetsResponseError = listGuideAssetsResponse401 & {
+	headers: Headers;
+};
+
+export type listGuideAssetsResponse = listGuideAssetsResponseSuccess | listGuideAssetsResponseError;
+
+export const getListGuideAssetsUrl = (guideId: number) => {
+	return `${ELITE_API_URL}/guides/${guideId}/assets`;
+};
+
+export const listGuideAssets = async (guideId: number, options?: RequestInit) => {
+	return customFetch<listGuideAssetsResponse>(getListGuideAssetsUrl(guideId), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
+ * Lists saved guide revisions for guide authors and moderators.
+ * @summary List guide edit history
+ */
+export type listGuideHistoryResponse200 = {
+	data: GuideVersionDto[];
+	status: 200;
+};
+
+export type listGuideHistoryResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type listGuideHistoryResponseSuccess = listGuideHistoryResponse200 & {
+	headers: Headers;
+};
+export type listGuideHistoryResponseError = listGuideHistoryResponse401 & {
+	headers: Headers;
+};
+
+export type listGuideHistoryResponse = listGuideHistoryResponseSuccess | listGuideHistoryResponseError;
+
+export const getListGuideHistoryUrl = (guideId: number) => {
+	return `${ELITE_API_URL}/guides/${guideId}/history`;
+};
+
+export const listGuideHistory = async (guideId: number, options?: RequestInit) => {
+	return customFetch<listGuideHistoryResponse>(getListGuideHistoryUrl(guideId), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
  * Returns a list of all comments pending approval.
  * @summary List all pending comments
  */
@@ -7162,6 +7410,85 @@ export const rejectGuide = async (guideId: number, rejectGuideRequest: RejectGui
 };
 
 /**
+ * Replaces the guide owner and editor list. Guides can have at most four visible authors.
+ * @summary Replace guide authors
+ */
+export type replaceGuideAuthorsResponse204 = {
+	data: void;
+	status: 204;
+};
+
+export type replaceGuideAuthorsResponse400 = {
+	data: ErrorResponse;
+	status: 400;
+};
+
+export type replaceGuideAuthorsResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type replaceGuideAuthorsResponseSuccess = replaceGuideAuthorsResponse204 & {
+	headers: Headers;
+};
+export type replaceGuideAuthorsResponseError = (replaceGuideAuthorsResponse400 | replaceGuideAuthorsResponse401) & {
+	headers: Headers;
+};
+
+export type replaceGuideAuthorsResponse = replaceGuideAuthorsResponseSuccess | replaceGuideAuthorsResponseError;
+
+export const getReplaceGuideAuthorsUrl = (guideId: number) => {
+	return `${ELITE_API_URL}/guides/${guideId}/authors`;
+};
+
+export const replaceGuideAuthors = async (
+	guideId: number,
+	replaceGuideAuthorsRequest: ReplaceGuideAuthorsRequest,
+	options?: RequestInit,
+) => {
+	return customFetch<replaceGuideAuthorsResponse>(getReplaceGuideAuthorsUrl(guideId), {
+		...options,
+		method: 'PUT',
+		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		body: JSON.stringify(replaceGuideAuthorsRequest),
+	});
+};
+
+/**
+ * Copies a previous guide revision into a new draft revision.
+ * @summary Restore a guide revision
+ */
+export type restoreGuideVersionResponse200 = {
+	data: UpdateGuideResponse;
+	status: 200;
+};
+
+export type restoreGuideVersionResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type restoreGuideVersionResponseSuccess = restoreGuideVersionResponse200 & {
+	headers: Headers;
+};
+export type restoreGuideVersionResponseError = restoreGuideVersionResponse401 & {
+	headers: Headers;
+};
+
+export type restoreGuideVersionResponse = restoreGuideVersionResponseSuccess | restoreGuideVersionResponseError;
+
+export const getRestoreGuideVersionUrl = (guideId: number, versionId: number) => {
+	return `${ELITE_API_URL}/guides/${guideId}/history/${versionId}/restore`;
+};
+
+export const restoreGuideVersion = async (guideId: number, versionId: number, options?: RequestInit) => {
+	return customFetch<restoreGuideVersionResponse>(getRestoreGuideVersionUrl(guideId, versionId), {
+		...options,
+		method: 'POST',
+	});
+};
+
+/**
  * Submit a draft guide for admin review.
  * @summary Submit guide for approval
  */
@@ -7242,6 +7569,94 @@ export const unpublishGuide = async (guideId: number, options?: RequestInit) => 
 	return customFetch<unpublishGuideResponse>(getUnpublishGuideUrl(guideId), {
 		...options,
 		method: 'POST',
+	});
+};
+
+/**
+ * @summary Upload guide image
+ */
+export type uploadGuideImageResponse200 = {
+	data: GuideAssetDto;
+	status: 200;
+};
+
+export type uploadGuideImageResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type uploadGuideImageResponseSuccess = uploadGuideImageResponse200 & {
+	headers: Headers;
+};
+export type uploadGuideImageResponseError = uploadGuideImageResponse401 & {
+	headers: Headers;
+};
+
+export type uploadGuideImageResponse = uploadGuideImageResponseSuccess | uploadGuideImageResponseError;
+
+export const getUploadGuideImageUrl = (guideId: number) => {
+	return `${ELITE_API_URL}/guides/${guideId}/images/upload`;
+};
+
+export const uploadGuideImage = async (guideId: number, uploadImageDto: UploadImageDto, options?: RequestInit) => {
+	const formData = new FormData();
+	if (uploadImageDto.title !== undefined && uploadImageDto.title !== null) {
+		formData.append(`title`, uploadImageDto.title);
+	}
+	if (uploadImageDto.description !== undefined && uploadImageDto.description !== null) {
+		formData.append(`description`, uploadImageDto.description);
+	}
+	formData.append(`image`, uploadImageDto.image);
+
+	return customFetch<uploadGuideImageResponse>(getUploadGuideImageUrl(guideId), {
+		...options,
+		method: 'POST',
+		body: formData,
+	});
+};
+
+/**
+ * Uploads and validates a Litematica schematic for a guide.
+ * @summary Upload guide litematic
+ */
+export type uploadGuideLitematicResponse200 = {
+	data: GuideAssetDto;
+	status: 200;
+};
+
+export type uploadGuideLitematicResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type uploadGuideLitematicResponseSuccess = uploadGuideLitematicResponse200 & {
+	headers: Headers;
+};
+export type uploadGuideLitematicResponseError = uploadGuideLitematicResponse401 & {
+	headers: Headers;
+};
+
+export type uploadGuideLitematicResponse = uploadGuideLitematicResponseSuccess | uploadGuideLitematicResponseError;
+
+export const getUploadGuideLitematicUrl = (guideId: number) => {
+	return `${ELITE_API_URL}/guides/${guideId}/litematics`;
+};
+
+export const uploadGuideLitematic = async (
+	guideId: number,
+	uploadGuideLitematicDto: UploadGuideLitematicDto,
+	options?: RequestInit,
+) => {
+	const formData = new FormData();
+	if (uploadGuideLitematicDto.displayName !== undefined && uploadGuideLitematicDto.displayName !== null) {
+		formData.append(`displayName`, uploadGuideLitematicDto.displayName);
+	}
+	formData.append(`file`, uploadGuideLitematicDto.file);
+
+	return customFetch<uploadGuideLitematicResponse>(getUploadGuideLitematicUrl(guideId), {
+		...options,
+		method: 'POST',
+		body: formData,
 	});
 };
 
@@ -8640,11 +9055,21 @@ export type uploadCurrentHarvestFeastResponse204 = {
 	status: 204;
 };
 
+export type uploadCurrentHarvestFeastResponse400 = {
+	data: ErrorResponse;
+	status: 400;
+};
+
 export type uploadCurrentHarvestFeastResponseSuccess = uploadCurrentHarvestFeastResponse204 & {
 	headers: Headers;
 };
+export type uploadCurrentHarvestFeastResponseError = uploadCurrentHarvestFeastResponse400 & {
+	headers: Headers;
+};
 
-export type uploadCurrentHarvestFeastResponse = uploadCurrentHarvestFeastResponseSuccess;
+export type uploadCurrentHarvestFeastResponse =
+	| uploadCurrentHarvestFeastResponseSuccess
+	| uploadCurrentHarvestFeastResponseError;
 
 export const getUploadCurrentHarvestFeastUrl = () => {
 	return `${ELITE_API_URL}/harvest-feast/current`;
@@ -9827,6 +10252,151 @@ export const deleteNotification = async (id: string, options?: RequestInit) => {
 };
 
 /**
+ * @summary Disable a browser push subscription
+ */
+export type deleteNotificationPushSubscriptionResponse204 = {
+	data: void;
+	status: 204;
+};
+
+export type deleteNotificationPushSubscriptionResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type deleteNotificationPushSubscriptionResponseSuccess = deleteNotificationPushSubscriptionResponse204 & {
+	headers: Headers;
+};
+export type deleteNotificationPushSubscriptionResponseError = deleteNotificationPushSubscriptionResponse401 & {
+	headers: Headers;
+};
+
+export type deleteNotificationPushSubscriptionResponse =
+	| deleteNotificationPushSubscriptionResponseSuccess
+	| deleteNotificationPushSubscriptionResponseError;
+
+export const getDeleteNotificationPushSubscriptionUrl = (id: string) => {
+	return `${ELITE_API_URL}/notifications/push/subscriptions/${id}`;
+};
+
+export const deleteNotificationPushSubscription = async (id: string, options?: RequestInit) => {
+	return customFetch<deleteNotificationPushSubscriptionResponse>(getDeleteNotificationPushSubscriptionUrl(id), {
+		...options,
+		method: 'DELETE',
+	});
+};
+
+/**
+ * @summary Get notification preferences
+ */
+export type getNotificationPreferencesResponse200 = {
+	data: GetNotificationPreferencesResponse;
+	status: 200;
+};
+
+export type getNotificationPreferencesResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type getNotificationPreferencesResponseSuccess = getNotificationPreferencesResponse200 & {
+	headers: Headers;
+};
+export type getNotificationPreferencesResponseError = getNotificationPreferencesResponse401 & {
+	headers: Headers;
+};
+
+export type getNotificationPreferencesResponse =
+	| getNotificationPreferencesResponseSuccess
+	| getNotificationPreferencesResponseError;
+
+export const getGetNotificationPreferencesUrl = () => {
+	return `${ELITE_API_URL}/notifications/preferences`;
+};
+
+export const getNotificationPreferences = async (options?: RequestInit) => {
+	return customFetch<getNotificationPreferencesResponse>(getGetNotificationPreferencesUrl(), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
+ * @summary Update notification preferences
+ */
+export type updateNotificationPreferencesResponse204 = {
+	data: void;
+	status: 204;
+};
+
+export type updateNotificationPreferencesResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type updateNotificationPreferencesResponseSuccess = updateNotificationPreferencesResponse204 & {
+	headers: Headers;
+};
+export type updateNotificationPreferencesResponseError = updateNotificationPreferencesResponse401 & {
+	headers: Headers;
+};
+
+export type updateNotificationPreferencesResponse =
+	| updateNotificationPreferencesResponseSuccess
+	| updateNotificationPreferencesResponseError;
+
+export const getUpdateNotificationPreferencesUrl = () => {
+	return `${ELITE_API_URL}/notifications/preferences`;
+};
+
+export const updateNotificationPreferences = async (
+	updateNotificationPreferencesRequest: UpdateNotificationPreferencesRequest,
+	options?: RequestInit,
+) => {
+	return customFetch<updateNotificationPreferencesResponse>(getUpdateNotificationPreferencesUrl(), {
+		...options,
+		method: 'PUT',
+		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		body: JSON.stringify(updateNotificationPreferencesRequest),
+	});
+};
+
+/**
+ * @summary Get browser push public key
+ */
+export type getNotificationPushPublicKeyResponse200 = {
+	data: GetNotificationPushPublicKeyResponse;
+	status: 200;
+};
+
+export type getNotificationPushPublicKeyResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type getNotificationPushPublicKeyResponseSuccess = getNotificationPushPublicKeyResponse200 & {
+	headers: Headers;
+};
+export type getNotificationPushPublicKeyResponseError = getNotificationPushPublicKeyResponse401 & {
+	headers: Headers;
+};
+
+export type getNotificationPushPublicKeyResponse =
+	| getNotificationPushPublicKeyResponseSuccess
+	| getNotificationPushPublicKeyResponseError;
+
+export const getGetNotificationPushPublicKeyUrl = () => {
+	return `${ELITE_API_URL}/notifications/push/public-key`;
+};
+
+export const getNotificationPushPublicKey = async (options?: RequestInit) => {
+	return customFetch<getNotificationPushPublicKeyResponse>(getGetNotificationPushPublicKeyUrl(), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
  * Retrieve paginated notifications for the authenticated user.
  * @summary Get user notifications
  */
@@ -9937,6 +10507,87 @@ export const markNotificationRead = async (id: string, options?: RequestInit) =>
 	return customFetch<markNotificationReadResponse>(getMarkNotificationReadUrl(id), {
 		...options,
 		method: 'POST',
+	});
+};
+
+/**
+ * @summary Update notification delivery attempt status
+ */
+export type updateNotificationDeliveryAttemptResponse204 = {
+	data: void;
+	status: 204;
+};
+
+export type updateNotificationDeliveryAttemptResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type updateNotificationDeliveryAttemptResponseSuccess = updateNotificationDeliveryAttemptResponse204 & {
+	headers: Headers;
+};
+export type updateNotificationDeliveryAttemptResponseError = updateNotificationDeliveryAttemptResponse401 & {
+	headers: Headers;
+};
+
+export type updateNotificationDeliveryAttemptResponse =
+	| updateNotificationDeliveryAttemptResponseSuccess
+	| updateNotificationDeliveryAttemptResponseError;
+
+export const getUpdateNotificationDeliveryAttemptUrl = (attemptId: string) => {
+	return `${ELITE_API_URL}/bot/notifications/delivery-attempts/${attemptId}`;
+};
+
+export const updateNotificationDeliveryAttempt = async (
+	attemptId: string,
+	updateNotificationDeliveryAttemptRequest: UpdateNotificationDeliveryAttemptRequest,
+	options?: RequestInit,
+) => {
+	return customFetch<updateNotificationDeliveryAttemptResponse>(getUpdateNotificationDeliveryAttemptUrl(attemptId), {
+		...options,
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		body: JSON.stringify(updateNotificationDeliveryAttemptRequest),
+	});
+};
+
+/**
+ * @summary Create or update a browser push subscription
+ */
+export type upsertNotificationPushSubscriptionResponse200 = {
+	data: NotificationPushSubscriptionDto;
+	status: 200;
+};
+
+export type upsertNotificationPushSubscriptionResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type upsertNotificationPushSubscriptionResponseSuccess = upsertNotificationPushSubscriptionResponse200 & {
+	headers: Headers;
+};
+export type upsertNotificationPushSubscriptionResponseError = upsertNotificationPushSubscriptionResponse401 & {
+	headers: Headers;
+};
+
+export type upsertNotificationPushSubscriptionResponse =
+	| upsertNotificationPushSubscriptionResponseSuccess
+	| upsertNotificationPushSubscriptionResponseError;
+
+export const getUpsertNotificationPushSubscriptionUrl = () => {
+	return `${ELITE_API_URL}/notifications/push/subscriptions`;
+};
+
+export const upsertNotificationPushSubscription = async (
+	upsertNotificationPushSubscriptionRequest: UpsertNotificationPushSubscriptionRequest,
+	options?: RequestInit,
+) => {
+	return customFetch<upsertNotificationPushSubscriptionResponse>(getUpsertNotificationPushSubscriptionUrl(), {
+		...options,
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		body: JSON.stringify(upsertNotificationPushSubscriptionRequest),
 	});
 };
 
@@ -11014,6 +11665,154 @@ export const toggleRecapVisibility = async (
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json', ...options?.headers },
 		body: JSON.stringify(toggleRecapVisibilityRequestBody),
+	});
+};
+
+/**
+ * Reports a content item for manual moderator review. This reporting system is designed to cover more content types over time; v1 accepts guide and comment reports.
+ * @summary Report content
+ */
+export type createContentReportResponse204 = {
+	data: void;
+	status: 204;
+};
+
+export type createContentReportResponse400 = {
+	data: ErrorResponse;
+	status: 400;
+};
+
+export type createContentReportResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type createContentReportResponseSuccess = createContentReportResponse204 & {
+	headers: Headers;
+};
+export type createContentReportResponseError = (createContentReportResponse400 | createContentReportResponse401) & {
+	headers: Headers;
+};
+
+export type createContentReportResponse = createContentReportResponseSuccess | createContentReportResponseError;
+
+export const getCreateContentReportUrl = () => {
+	return `${ELITE_API_URL}/reports`;
+};
+
+export const createContentReport = async (
+	createContentReportRequest: CreateContentReportRequest,
+	options?: RequestInit,
+) => {
+	return customFetch<createContentReportResponse>(getCreateContentReportUrl(), {
+		...options,
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		body: JSON.stringify(createContentReportRequest),
+	});
+};
+
+/**
+ * Lists reports for manual moderation. This system will expand beyond guide and comment reports later.
+ * @summary List content reports
+ */
+export type listContentReportsResponse200 = {
+	data: ContentReportDto[];
+	status: 200;
+};
+
+export type listContentReportsResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type listContentReportsResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type listContentReportsResponseSuccess = listContentReportsResponse200 & {
+	headers: Headers;
+};
+export type listContentReportsResponseError = (listContentReportsResponse401 | listContentReportsResponse403) & {
+	headers: Headers;
+};
+
+export type listContentReportsResponse = listContentReportsResponseSuccess | listContentReportsResponseError;
+
+export const getListContentReportsUrl = (params?: ListContentReportsParams) => {
+	const normalizedParams = new URLSearchParams();
+
+	Object.entries(params || {}).forEach(([key, value]) => {
+		if (value !== undefined) {
+			normalizedParams.append(key, value === null ? 'null' : value.toString());
+		}
+	});
+
+	const stringifiedParams = normalizedParams.toString();
+
+	return stringifiedParams.length > 0
+		? `${ELITE_API_URL}/admin/reports?${stringifiedParams}`
+		: `${ELITE_API_URL}/admin/reports`;
+};
+
+export const listContentReports = async (params?: ListContentReportsParams, options?: RequestInit) => {
+	return customFetch<listContentReportsResponse>(getListContentReportsUrl(params), {
+		...options,
+		method: 'GET',
+	});
+};
+
+/**
+ * @summary Resolve content report
+ */
+export type resolveContentReportResponse204 = {
+	data: void;
+	status: 204;
+};
+
+export type resolveContentReportResponse400 = {
+	data: ErrorResponse;
+	status: 400;
+};
+
+export type resolveContentReportResponse401 = {
+	data: void;
+	status: 401;
+};
+
+export type resolveContentReportResponse403 = {
+	data: void;
+	status: 403;
+};
+
+export type resolveContentReportResponseSuccess = resolveContentReportResponse204 & {
+	headers: Headers;
+};
+export type resolveContentReportResponseError = (
+	| resolveContentReportResponse400
+	| resolveContentReportResponse401
+	| resolveContentReportResponse403
+) & {
+	headers: Headers;
+};
+
+export type resolveContentReportResponse = resolveContentReportResponseSuccess | resolveContentReportResponseError;
+
+export const getResolveContentReportUrl = (reportId: number) => {
+	return `${ELITE_API_URL}/admin/reports/${reportId}/resolve`;
+};
+
+export const resolveContentReport = async (
+	reportId: number,
+	resolveContentReportRouteRequest: ResolveContentReportRouteRequest,
+	options?: RequestInit,
+) => {
+	return customFetch<resolveContentReportResponse>(getResolveContentReportUrl(reportId), {
+		...options,
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		body: JSON.stringify(resolveContentReportRouteRequest),
 	});
 };
 

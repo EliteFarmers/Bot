@@ -8,33 +8,20 @@ Use of this API requires following the [Elite API TOS](https://eliteskyblock.com
  * OpenAPI spec version: admin-v1
  */
 import type { AuthorDto } from './AuthorDto';
-import type { GuideAssetDto } from './GuideAssetDto';
 import type { GuideAuthorDto } from './GuideAuthorDto';
 
-export interface FullGuideDto {
+export interface AdminDraftGuideDto {
 	id: number;
 	slug: string;
 	title: string;
-	/** @nullable */
-	iconSkyblockId?: string | null;
 	description: string;
-	content: string;
+	type: string;
+	status: string;
+	createdAt: string;
+	lastUpdatedAt: string;
+	revisionNumber: number;
 	author: AuthorDto;
 	authors: GuideAuthorDto[];
-	createdAt: string;
-	score: number;
-	viewCount: number;
 	tags: string[];
 	tagIds: number[];
-	isDraft: boolean;
-	status: string;
-	/** @nullable */
-	userVote?: number | null;
-	/** @nullable */
-	isBookmarked?: boolean | null;
-	/** @nullable */
-	rejectionReason?: string | null;
-	/** Opaque save token for this returned guide version. */
-	concurrencyVersion: number;
-	assets: GuideAssetDto[];
 }

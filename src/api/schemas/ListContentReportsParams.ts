@@ -7,16 +7,8 @@
 Use of this API requires following the [Elite API TOS](https://eliteskyblock.com/apiterms). This API is not affiliated with Hypixel or Mojang.
  * OpenAPI spec version: admin-v1
  */
+import type { ContentReportStatus } from './ContentReportStatus';
 
-export type GuideType = (typeof GuideType)[keyof typeof GuideType];
-
-export const GuideType = {
-	General: 0,
-	Farm: 1,
-	Greenhouse: 2,
-	Contest: 3,
-	MoneyMaking: 4,
-	Builds: 5,
-	Tools: 6,
-	Events: 7,
-} as const;
+export type ListContentReportsParams = {
+	status?: ContentReportStatus | null;
+};
