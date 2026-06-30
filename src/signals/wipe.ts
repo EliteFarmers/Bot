@@ -35,15 +35,15 @@ async function execute(signal: Signal) {
 	const ping = discord ? `<@${discord}>` : '';
 	const username = (ign || 'Unknown').replaceAll('_', '\\_');
 
-	const { data: member } = await FetchProfile(uuid, profileId).catch(() => ({
-		data: undefined,
-	}));
+	const member = await fetchRemovedProfile(uuid, profileId);
 	if (!member?.wasRemoved) return;
 
 	if (!member.farmingWeight.totalWeight || member.farmingWeight.totalWeight <= 50) {
 		// Send short and simple message if the weight is low
 		const message = `**${username}** (${member?.profileName ?? 'Unknown'})${ping ? ` (${ping})` : ''} has been wiped! [API](https://api.eliteskyblock.com/profile/${uuid}/${profileId})`;
-		channel?.send({ content: message }).catch(() => undefined);
+		await channel.send({ content: message }).catch((error) => {
+			console.error('Failed to send short wipe message', { error, uuid, profileId, channelId });
+		});
 		return;
 	}
 
@@ -101,11 +101,51 @@ async function execute(signal: Signal) {
 
 	PrefixFooter(embed, 'This could also mean the profile was deleted or the player was kicked from a coop.');
 
-	channel
+	await channel
 		?.send({
 			content: ping || undefined,
-			allowedMentions: { roles: ping ? [ping] : [] },
 			embeds: [embed],
 		})
-		.catch(() => undefined);
+		.catch((error) => {
+			console.error('Failed to send wipe message', { error, uuid, profileId, channelId });
+		});
+}
+
+async function fetchRemovedProfile(uuid: string, profileId: string) {
+	let member = await fetchProfileForWipe(uuid, profileId, 1);
+	if (member?.wasRemoved) return member;
+
+	await new Promise((resolve) => setTimeout(resolve, 2_000));
+
+	member = await fetchProfileForWipe(uuid, profileId, 2);
+	if (!member?.wasRemoved) {
+		console.warn('Dropping wipe signal because profile is not marked removed after retry', {
+			uuid,
+			profileId,
+			wasRemoved: member?.wasRemoved,
+		});
+	}
+
+	return member;
+}
+
+async function fetchProfileForWipe(uuid: string, profileId: string, attempt: number) {
+	try {
+		const result = await FetchProfile(uuid, profileId);
+		if (!result.ok) {
+			console.error('Failed to fetch profile for wipe signal', {
+				attempt,
+				uuid,
+				profileId,
+				status: result.response.status,
+				error: result.error,
+			});
+			return undefined;
+		}
+
+		return result.data;
+	} catch (error) {
+		console.error('Error fetching profile for wipe signal', { attempt, uuid, profileId, error });
+		return undefined;
+	}
 }

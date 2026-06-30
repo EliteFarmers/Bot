@@ -1,4 +1,9 @@
-import { FarmingWeightDto, MinecraftAccountDto, WeightStyleListDto } from 'api/schemas';
+import {
+	FarmingWeightDto,
+	MinecraftAccountDto,
+	WeightStyleListDto,
+	WeightStyleWithDataDtoImageRefs,
+} from 'api/schemas';
 import { AttachmentBuilder, EmbedBuilder } from 'discord.js';
 import { FetchWeightStyles, UserSettings } from '../api/elite';
 import { ErrorEmbed } from '../classes/embeds';
@@ -15,6 +20,7 @@ export interface CustomFormatterOptions {
 	badgeUrl?: string;
 	weightRank?: number;
 	data?: WeightStyle;
+	imageRefs?: WeightStyleWithDataDtoImageRefs;
 }
 type CustomFormatter = (
 	opt: CustomFormatterOptions,
@@ -50,6 +56,7 @@ export function getCustomFormatter(
 
 	if (validStyle(selected)) {
 		options.data = selected;
+		options.imageRefs = stylesCache[styleId ?? -1]?.imageRefs;
 	} else {
 		return ErrorEmbed(
 			'Invalid style data!',

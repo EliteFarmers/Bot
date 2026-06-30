@@ -9,6 +9,7 @@ Use of this API requires following the [Elite API TOS](https://eliteskyblock.com
  */
 import type { ConfiguredProductFeaturesDto } from './ConfiguredProductFeaturesDto';
 import type { FortuneSettingsDto } from './FortuneSettingsDto';
+import type { MiscUserSettingsDto } from './MiscUserSettingsDto';
 import type { WeightStyleLinkedDto } from './WeightStyleLinkedDto';
 
 export interface UserSettingsDto {
@@ -32,4 +33,6 @@ export interface UserSettingsDto {
 	nameStyle?: WeightStyleLinkedDto | null;
 	/** Fortune settings for the user */
 	fortune?: FortuneSettingsDto | null;
+	/** Misc other settings */
+	misc?: MiscUserSettingsDto | null;
 }

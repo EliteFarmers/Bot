@@ -7,7 +7,6 @@
 Use of this API requires following the [Elite API TOS](https://eliteskyblock.com/apiterms). This API is not affiliated with Hypixel or Mojang.
  * OpenAPI spec version: admin-v1
  */
-import type { FarmingInventoryDto } from './FarmingInventoryDto';
 import type { FarmingWeightDtoBonusWeight } from './FarmingWeightDtoBonusWeight';
 import type { FarmingWeightDtoCrops } from './FarmingWeightDtoCrops';
 import type { FarmingWeightDtoCropWeight } from './FarmingWeightDtoCropWeight';
@@ -22,6 +21,5 @@ export interface FarmingWeightDto {
 	bonusWeight: FarmingWeightDtoBonusWeight;
 	uncountedCrops: FarmingWeightDtoUncountedCrops;
 	pests: PestsDto;
-	inventory?: FarmingInventoryDto | null;
 	lastUpdated: number;
 }

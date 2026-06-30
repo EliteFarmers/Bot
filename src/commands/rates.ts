@@ -13,15 +13,20 @@ import {
 	TextInputStyle,
 } from 'discord.js';
 import {
+	BEST_FARMING_TOOLS,
 	CROP_INFO,
 	Crop,
 	calculateAverageSpecialCrops,
-	calculateDetailedAverageDrops,
-	type DetailedDropsResult,
+	calculateDetailedDropsFromEffects,
+	createFarmingPlayer,
+	type DetailedDropsFromEffectsResult,
 	FarmingPet,
 	getCropDisplayName,
 	getPossibleResultsFromCrops,
 	MAX_CROP_FORTUNE,
+	Rarity,
+	REFORGES,
+	Stat,
 } from 'farming-weight';
 import { FetchProducts, UserSettings } from '../api/elite';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index';
@@ -291,43 +296,77 @@ async function getFormattedRatesResult(state: RatesCalculatorState) {
 	return formatRatesForDisplay(expectedDrops, bazaar);
 }
 
-function getExpectedDrops(state: RatesCalculatorState): Partial<Record<Crop, DetailedDropsResult>> {
-	const options = buildDetailedAverageDropOptions(state);
+function getExpectedDrops(state: RatesCalculatorState): Partial<Record<Crop, DetailedDropsFromEffectsResult>> {
+	const cropFortune = getPetCropFortuneOverride(state);
+	const expectedDrops: Partial<Record<Crop, DetailedDropsFromEffectsResult>> = {};
 
-	// Cast to Partial to be able to delete seeds
-	const expectedDrops = calculateDetailedAverageDrops(options) as Partial<Record<Crop, DetailedDropsResult>>;
-
-	delete expectedDrops[Crop.Seeds];
+	for (const crop of Object.keys(CROP_INFO) as Crop[]) {
+		if (crop === Crop.Seeds) continue;
+		expectedDrops[crop] = calculateCropDrops(state, crop, cropFortune);
+	}
 
 	return expectedDrops;
 }
 
-function buildDetailedAverageDropOptions(
+function calculateCropDrops(
 	state: RatesCalculatorState,
-): Parameters<typeof calculateDetailedAverageDrops>[0] {
-	const options: Parameters<typeof calculateDetailedAverageDrops>[0] = {
-		farmingFortune: state.fortuneInput,
+	crop: Crop,
+	cropFortune?: Partial<Record<Crop, number>>,
+): DetailedDropsFromEffectsResult {
+	const player = createFarmingPlayer({
+		selectedCrop: crop,
+		pets: state.petData ? [state.petData] : [],
+		chips: {
+			rarefinder: state.rarefinder ? 20 : 0,
+			mechamind: state.mechamind ? 20 : 0,
+		},
+		attributes: {
+			crop_bug: state.cropeetle ? 64 : 0,
+			wart_eater: state.wartyBug ? 24 : 0,
+		},
+	});
+
+	if (state.petData) {
+		player.selectPet(state.petData);
+	}
+
+	const env = player.buildEnvironment(crop);
+
+	return calculateDetailedDropsFromEffects({
+		crop,
+		farmingFortune: getSyntheticFarmingFortune(state, crop, cropFortune),
 		blocksBroken: state.blocksBroken,
 		bountiful: state.reforge === 'bountiful',
 		mooshroom: state.pet === 'mooshroom',
 		maxTool: state.useLevel50Tool,
 		pet: state.petData,
 		chips: {
-			RAREFINDER: state.rarefinder ? 20 : 0,
-			MECHAMIND: state.mechamind ? 20 : 0,
+			rarefinder: state.rarefinder ? 20 : 0,
+			mechamind: state.mechamind ? 20 : 0,
 		},
-		attributes: {
-			crop_bug: state.cropeetle ? 64 : 0,
-			wart_eater: state.wartyBug ? 24 : 0,
-		},
-	};
+		effects: player.collectEffects(env),
+		env,
+	});
+}
 
-	const cropFortune = getPetCropFortuneOverride(state);
-	if (cropFortune) {
-		options.cropFortune = cropFortune;
+function getSyntheticFarmingFortune(
+	state: RatesCalculatorState,
+	crop: Crop,
+	cropFortune?: Partial<Record<Crop, number>>,
+) {
+	if (state.fortuneInput !== undefined || cropFortune?.[crop] === undefined) {
+		return state.fortuneInput;
 	}
 
-	return options;
+	if (state.reforge === 'bountiful') {
+		return cropFortune[crop];
+	}
+
+	const maxRarity = BEST_FARMING_TOOLS[crop]?.maxRarity ?? Rarity.Mythic;
+	const bountifulFortune = REFORGES.bountiful?.tiers[maxRarity]?.stats?.[Stat.FarmingFortune] ?? 0;
+	const blessedFortune = REFORGES.blessed?.tiers[maxRarity]?.stats?.[Stat.FarmingFortune] ?? 0;
+
+	return cropFortune[crop] + blessedFortune - bountifulFortune;
 }
 
 function getPetCropFortuneOverride(state: RatesCalculatorState) {
@@ -344,7 +383,7 @@ function getPetCropFortuneOverride(state: RatesCalculatorState) {
 	) as typeof MAX_CROP_FORTUNE;
 }
 
-async function fetchRatesBazaarProducts(expectedDrops: Partial<Record<Crop, DetailedDropsResult>>) {
+async function fetchRatesBazaarProducts(expectedDrops: Partial<Record<Crop, DetailedDropsFromEffectsResult>>) {
 	const craftIds = Object.values(CROP_INFO)
 		.map((info) => info.crafts.map((c) => c.item))
 		.flat();
@@ -359,7 +398,7 @@ async function fetchRatesBazaarProducts(expectedDrops: Partial<Record<Crop, Deta
 }
 
 function formatRatesForDisplay(
-	expectedDrops: Partial<Record<Crop, DetailedDropsResult>>,
+	expectedDrops: Partial<Record<Crop, DetailedDropsFromEffectsResult>>,
 	bazaar: Awaited<ReturnType<typeof fetchRatesBazaarProducts>>,
 ) {
 	let profitLength = 0;
@@ -367,7 +406,7 @@ function formatRatesForDisplay(
 
 	const formatted = Object.entries(expectedDrops)
 		.map(([crop, details]) => {
-			const cropRate = formatCropRate(crop as Crop, details as DetailedDropsResult, bazaar);
+			const cropRate = formatCropRate(crop as Crop, details as DetailedDropsFromEffectsResult, bazaar);
 			const highestBz = cropRate.bz[0];
 
 			if (cropRate.profit.toLocaleString().length > profitLength) {
@@ -391,7 +430,7 @@ function formatRatesForDisplay(
 
 function formatCropRate(
 	crop: Crop,
-	details: DetailedDropsResult,
+	details: DetailedDropsFromEffectsResult,
 	bazaar: Awaited<ReturnType<typeof fetchRatesBazaarProducts>>,
 ) {
 	const cropName = getCropDisplayName(crop);
@@ -421,7 +460,7 @@ function formatCropRate(
 
 function getSellToBazaarData(
 	crop: Crop,
-	details: DetailedDropsResult,
+	details: DetailedDropsFromEffectsResult,
 	bazaar: Awaited<ReturnType<typeof fetchRatesBazaarProducts>>,
 ) {
 	const sellToBazaar = [];
@@ -464,7 +503,7 @@ function getSellToBazaarData(
 
 function getBazaarRates(
 	crop: Crop,
-	details: DetailedDropsResult,
+	details: DetailedDropsFromEffectsResult,
 	bazaar: Awaited<ReturnType<typeof fetchRatesBazaarProducts>>,
 	otherCoinsTotal: number,
 ) {

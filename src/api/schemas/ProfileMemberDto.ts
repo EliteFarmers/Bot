@@ -9,12 +9,16 @@ Use of this API requires following the [Elite API TOS](https://eliteskyblock.com
  */
 import type { ApiAccessDto } from './ApiAccessDto';
 import type { ChocolateFactoryDto } from './ChocolateFactoryDto';
+import type { CollectionSummaryDto } from './CollectionSummaryDto';
 import type { FarmingWeightDto } from './FarmingWeightDto';
 import type { GardenDto } from './GardenDto';
 import type { HypixelInventoryOverviewDto } from './HypixelInventoryOverviewDto';
 import type { JacobDataDto } from './JacobDataDto';
 import type { MemberCosmeticsDto } from './MemberCosmeticsDto';
+import type { MemberStatsDto } from './MemberStatsDto';
+import type { MinionSummaryDto } from './MinionSummaryDto';
 import type { PetDto } from './PetDto';
+import type { PetSummaryDto } from './PetSummaryDto';
 import type { ProfileEventMemberDto } from './ProfileEventMemberDto';
 import type { ProfileMemberDataDto } from './ProfileMemberDataDto';
 import type { ProfileMemberDtoCollections } from './ProfileMemberDtoCollections';
@@ -35,6 +39,7 @@ export interface ProfileMemberDto {
 	purse: number;
 	bankBalance: number;
 	personalBank: number;
+	cookieBuffActive: boolean;
 	networth: ProfileMemberNetworthDto;
 	meta?: MemberCosmeticsDto | null;
 	collections: ProfileMemberDtoCollections;
@@ -51,6 +56,16 @@ export interface ProfileMemberDto {
 	chocolateFactory: ChocolateFactoryDto;
 	events: ProfileEventMemberDto[];
 	inventories: HypixelInventoryOverviewDto[];
+	stats?: MemberStatsDto | null;
+	/** Derived summary of crafted minion progression (slots and unique tiers) computed from
+  CraftedMinions and the staged minion metadata. */
+	minionSummary?: MinionSummaryDto | null;
+	/** Derived summary of boss/Kuudra collection tier progression computed from
+  Collections and the staged collection metadata. */
+	collectionSummary?: CollectionSummaryDto | null;
+	/** Compact pet roster summary (totals, active pet, top pets by experience). Computed from
+  Pets alone; does not require metadata. */
+	petSummary?: PetSummaryDto | null;
 	isSelected: boolean;
 	wasRemoved: boolean;
 	lastUpdated: number;

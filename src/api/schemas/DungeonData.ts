@@ -7,6 +7,7 @@
 Use of this API requires following the [Elite API TOS](https://eliteskyblock.com/apiterms). This API is not affiliated with Hypixel or Mojang.
  * OpenAPI spec version: admin-v1
  */
+import type { DungeonDataBestRuns } from './DungeonDataBestRuns';
 import type { DungeonDataBestScore } from './DungeonDataBestScore';
 import type { DungeonDataFastestTime } from './DungeonDataFastestTime';
 import type { DungeonDataFastestTimeS } from './DungeonDataFastestTimeS';
@@ -41,4 +42,6 @@ export interface DungeonData {
 	most_damage_healer: DungeonDataMostDamageHealer;
 	most_damage_archer: DungeonDataMostDamageArcher;
 	milestone_completions: DungeonDataMilestoneCompletions;
+	/** @nullable */
+	best_runs?: DungeonDataBestRuns;
 }

@@ -15,6 +15,7 @@ export async function createFromData({
 	badgeUrl = '',
 	settings,
 	data,
+	imageRefs,
 }: CustomFormatterOptions) {
 	if (!data) {
 		return ErrorEmbed('Invalid data provided!');
@@ -46,16 +47,19 @@ export async function createFromData({
 	const headDirection =
 		data.elements.head && getPosition(canvas, data.elements.head).x < canvas.width / 2 ? 'right' : 'left';
 
+	const backgroundImgUrl =
+		imageRefs?.[backgroundStyle.imageUrl ?? '']?.sources?.['full']?.url || backgroundStyle.imageUrl;
+
 	// Load images and avatar
 	const images = [
-		data.elements?.background?.imageUrl ? loadImage(data.elements.background.imageUrl).catch(() => null) : null,
+		backgroundImgUrl ? loadImage(backgroundImgUrl).catch(() => null) : null,
 		data.elements.head ? loadImage(`https://mc-heads.net/head/${uuid}/${headDirection}`).catch(() => null) : null,
 		badgeUrl !== '' ? loadImage(badgeUrl).catch(() => null) : null,
 		getDecalImage(profile, data.decal),
 	];
 
 	const [backgroundImg, avatar, badge, decal] = await Promise.all(images);
-	if ((!backgroundImg && data.elements.background.imageUrl) || (data.elements.head && !avatar)) {
+	if ((!backgroundImg && backgroundImgUrl) || (data.elements.head && !avatar)) {
 		// return ErrorEmbed('Failed to load images!').setDescription(
 		// 	'Please report this if it continues to happen!'
 		// );

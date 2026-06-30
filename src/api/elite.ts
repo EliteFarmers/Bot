@@ -25,6 +25,7 @@ import {
 	getSkillGraphs,
 	getSpecifiedSkyblockItems,
 	getStyles,
+	getVirtualFarmingInventory,
 	getWeightForProfiles,
 	grantBadge,
 	linkAccountBot,
@@ -39,11 +40,14 @@ import {
 	updateGuildMemberRoles,
 	updateGuildRole,
 	updateJacobFeature,
+	updateNotificationDeliveryAttempt,
 } from './client/EliteAPI';
 import {
+	FarmingInventoryDto,
 	GuildJacobLeaderboardFeature,
 	IncomingGuildChannelDto,
 	IncomingGuildRoleDto,
+	NotificationDeliveryStatus,
 	UserSettingsDto,
 } from './schemas';
 
@@ -66,6 +70,18 @@ export const FetchWeight = (playerUuid: string, collections = false) =>
 	getWeightForProfiles(playerUuid, { collections });
 
 export const FetchProfile = (playerUuid: string, profileUuid: string) => getProfile(playerUuid, profileUuid);
+
+const EmptyFarmingInventory: FarmingInventoryDto = {
+	armor: [],
+	tools: [],
+	equipment: [],
+	accessories: [],
+};
+
+export const FetchVirtualFarmingInventory = async (playerUuid: string, profileUuid: string) => {
+	const result = await getVirtualFarmingInventory(playerUuid, profileUuid).catch(() => undefined);
+	return result?.data ?? EmptyFarmingInventory;
+};
 
 export const FetchSelectedProfile = (playerUuid: string) => getSelectedProfile(playerUuid);
 
@@ -162,3 +178,15 @@ export const UpdateGuildMemberRoles = (guildId: string, userId: string, roles: s
 export const RefreshUserEntitlements = (discordId: string) => refreshUserPurchases(discordId as unknown as number);
 
 export const FetchProducts = (list: string[]) => getSpecifiedSkyblockItems({ items: list });
+
+export const UpdateNotificationDeliveryAttempt = async (
+	attemptId: number | string,
+	status: NotificationDeliveryStatus,
+	reasonCode?: string,
+	failureMessage?: string,
+) =>
+	updateNotificationDeliveryAttempt(attemptId.toString(), {
+		status,
+		reasonCode,
+		failureMessage,
+	});
