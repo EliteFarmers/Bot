@@ -36,20 +36,20 @@ const mutations = Object.values(GREENHOUSE_MUTATIONS);
 
 const command = new EliteCommand({
 	name: 'mutations',
-	description: 'Shows best mutations to analyse for copper',
+	description: 'Shows best mutations to analyze for copper',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
 	options: {
 		synthesis: {
 			name: 'synthesis',
 			description: 'Synthesis Chip Level',
-			type: SlashCommandOptionType.Number,
+			type: SlashCommandOptionType.Integer,
 			builder: (b) => b.setMinValue(0).setMaxValue(20),
 		},
 		rose_dragon: {
 			name: 'rose_dragon',
 			description: 'Rose Dragon Level',
-			type: SlashCommandOptionType.Number,
+			type: SlashCommandOptionType.Integer,
 			builder: (b) => b.setMinValue(0).setMaxValue(200),
 		},
 	},
@@ -61,16 +61,16 @@ export default command;
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
 	await interaction.deferReply();
 
-	const synthesis: SynthesisChip = getSynthesisChipFromLevel(interaction.options.getNumber('synthesis', false) ?? 0);
-	const rose_dragon = interaction.options.getNumber('rose_dragon', false) ?? 0;
-	const roseDragonBonus = rose_dragon > 100 ? rose_dragon * 0.1 : 0;
+	const synthesis: SynthesisChip = getSynthesisChipFromLevel(interaction.options.getInteger('synthesis', false) ?? 0);
+	const roseDragonLevel = interaction.options.getInteger('rose_dragon', false) ?? 0;
+	const roseDragonBonus = roseDragonLevel > 100 ? roseDragonLevel * 0.1 : 0;
 	const mutationIds = mutations.map((m) => m.id);
 	const { data: bazaar } = await FetchProducts(mutationIds);
 
 	const mutationRatios: MutationCopperRatio[] = mutations.map((mutation) => {
 		const bazaarItem = bazaar?.items?.[mutation.id];
-		const buy = bazaarItem?.bazaar?.buy as number | undefined;
-		const buyOrder = bazaarItem?.bazaar?.buyOrder as number | undefined;
+		const buy = getPrice(bazaarItem?.bazaar?.averageBuy) ?? getPrice(bazaarItem?.bazaar?.buy);
+		const buyOrder = getPrice(bazaarItem?.bazaar?.averageBuyOrder) ?? getPrice(bazaarItem?.bazaar?.buyOrder);
 		const analysisCost = mutation.analysis.baseCost;
 		const copper = mutation.analysis.copper * (1 + synthesis.bonus / 100 + roseDragonBonus / 100);
 
@@ -87,8 +87,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			};
 		}
 
-		const buyCoinTotal = analysisCost + (buy ?? 0);
-		const buyOrderCoinTotal = analysisCost + (buyOrder ?? 0);
+		const buyCoinTotal = getCoinTotal(analysisCost, buy);
+		const buyOrderCoinTotal = getCoinTotal(analysisCost, buyOrder);
 
 		return {
 			id: mutation.id,
@@ -172,7 +172,6 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	function buildContainer(page: number, type: MutationBuyType) {
 		const pageItems = getPageItems(page, type);
 		const rarity = `Synthesis Chip Rarity (determined by the level): **${synthesis.rarity}**\n`;
-		// use toFixed(1) to avoid very long decimals due to JS floating point imprecision
 		const boosts = `${synthesis.level > 0 ? rarity : ''}Synthesis Bonus: **${synthesis.bonus.toFixed(1)}%**\nRose Dragon Bonus: **${roseDragonBonus.toFixed(1)}%**`;
 		let mutationsField = '';
 		pageItems.forEach((item, i) => {
@@ -199,6 +198,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	}
 
 	let currentContainer = buildContainer(state.page, state.selectedType);
+	let componentsCleared = false;
 
 	const reply = await interaction.editReply({
 		components: [currentContainer, getSelectRow(state.selectedType), getButtonRow(state.page, maxPage)],
@@ -261,9 +261,13 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				state.selectedType = value;
 				state.page = 0; // reset page
 				currentContainer = buildContainer(state.page, state.selectedType);
-				await inter.update({
-					components: [currentContainer, getSelectRow(state.selectedType), getButtonRow(state.page, maxPage)],
-				});
+				await inter
+					.update({
+						components: [currentContainer, getSelectRow(state.selectedType), getButtonRow(state.page, maxPage)],
+					})
+					.catch(() => {
+						selectCollector.stop();
+					});
 			}
 		}
 	});
@@ -278,15 +282,27 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	}
 
 	async function clearComponents() {
+		if (componentsCleared) return;
+		componentsCleared = true;
 		currentContainer.disableEverything();
-		await interaction.editReply({
-			components: [currentContainer],
-		});
+		await interaction
+			.editReply({
+				components: [currentContainer],
+			})
+			.catch(() => undefined);
 	}
 }
 
 function formatNumber(num: number) {
 	return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 }).format(num);
+}
+
+function getPrice(price: number | null | undefined) {
+	return price !== undefined && price !== null && price > 0 ? price : undefined;
+}
+
+function getCoinTotal(baseCost: number, bazaarPrice: number | undefined) {
+	return bazaarPrice === undefined ? Infinity : baseCost + bazaarPrice;
 }
 
 function getSynthesisChipFromLevel(level: number): SynthesisChip {
