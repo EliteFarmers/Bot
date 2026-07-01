@@ -42,8 +42,8 @@ importers:
         specifier: ^8.6.2
         version: 8.6.2(typescript@5.9.3)
       redis:
-        specifier: ^5.9.0
-        version: 5.9.0
+        specifier: ^6.0.0
+        version: 6.1.0(@opentelemetry/api@1.9.0)
       utf-8-validate:
         specifier: ^6.0.5
         version: 6.0.5
@@ -868,33 +868,41 @@ packages:
   '@quansync/fs@1.0.0':
     resolution: {integrity: sha512-4TJ3DFtlf1L5LDMaM6CanJ/0lckGNtJcMjQ1NAV6zDmA0tEHKZtxNKin8EgPaVX1YzljbxckyT2tJrpQKAtngQ==}
 
-  '@redis/bloom@5.9.0':
-    resolution: {integrity: sha512-W9D8yfKTWl4tP8lkC3MRYkMz4OfbuzE/W8iObe0jFgoRmgMfkBV+Vj38gvIqZPImtY0WB34YZkX3amYuQebvRQ==}
-    engines: {node: '>= 18'}
+  '@redis/bloom@6.1.0':
+    resolution: {integrity: sha512-Rzascjd9J9bJsM45T/Z9CTg1QY/B63B6YO8QorLVMeXnbBDsKiSCVR/+GQ061hYPk8FpTzWmPY8tAv2sT+JEtQ==}
+    engines: {node: '>= 20.0.0'}
     peerDependencies:
-      '@redis/client': ^5.9.0
+      '@redis/client': ^6.1.0
 
-  '@redis/client@5.9.0':
-    resolution: {integrity: sha512-EI0Ti5pojD2p7TmcS7RRa+AJVahdQvP/urpcSbK/K9Rlk6+dwMJTQ354pCNGCwfke8x4yKr5+iH85wcERSkwLQ==}
-    engines: {node: '>= 18'}
-
-  '@redis/json@5.9.0':
-    resolution: {integrity: sha512-Bm2jjLYaXdUWPb9RaEywxnjmzw7dWKDZI4MS79mTWPV16R982jVWBj6lY2ZGelJbwxHtEVg4/FSVgYDkuO/MxA==}
-    engines: {node: '>= 18'}
+  '@redis/client@6.1.0':
+    resolution: {integrity: sha512-7u1LefkezJF0HESlhO7ZFLEPfyY+NejP3SGv+Z4pGaT3oM5GVVLa0u3f4rDLUrcw+SRo8IlX9Y8JAONeDdg1Ag==}
+    engines: {node: '>= 20.0.0'}
     peerDependencies:
-      '@redis/client': ^5.9.0
+      '@node-rs/xxhash': ^1.1.0
+      '@opentelemetry/api': '>=1 <2'
+    peerDependenciesMeta:
+      '@node-rs/xxhash':
+        optional: true
+      '@opentelemetry/api':
+        optional: true
 
-  '@redis/search@5.9.0':
-    resolution: {integrity: sha512-jdk2csmJ29DlpvCIb2ySjix2co14/0iwIT3C0I+7ZaToXgPbgBMB+zfEilSuncI2F9JcVxHki0YtLA0xX3VdpA==}
-    engines: {node: '>= 18'}
+  '@redis/json@6.1.0':
+    resolution: {integrity: sha512-/GFjQA6bu5pG9ClCJAI5Xx4bNXe7UTpxBBlIupBNTrn1+nY860apGnYJuaSCDV2BmEbTidpa7O2qa28oxKx+rg==}
+    engines: {node: '>= 20.0.0'}
     peerDependencies:
-      '@redis/client': ^5.9.0
+      '@redis/client': ^6.1.0
 
-  '@redis/time-series@5.9.0':
-    resolution: {integrity: sha512-W6ILxcyOqhnI7ELKjJXOktIg3w4+aBHugDbVpgVLPZ+YDjObis1M0v7ZzwlpXhlpwsfePfipeSK+KWNuymk52w==}
-    engines: {node: '>= 18'}
+  '@redis/search@6.1.0':
+    resolution: {integrity: sha512-kS5agg+3yZbrdrt8omrew7FLCD8eOm7tarG1CROekPBRe+QGDR9aOpnHIQaYsYi6wPRTH70nQiF06AIjgURefQ==}
+    engines: {node: '>= 20.0.0'}
     peerDependencies:
-      '@redis/client': ^5.9.0
+      '@redis/client': ^6.1.0
+
+  '@redis/time-series@6.1.0':
+    resolution: {integrity: sha512-uIDBtV8MmG/xpJsRqbGSO4iX6ryj37MLMP82lRpFvI7ykAVe5GyqgxigEbU+uZNv9kDPNMKw3dvI/S/J1BNBzA==}
+    engines: {node: '>= 20.0.0'}
+    peerDependencies:
+      '@redis/client': ^6.1.0
 
   '@rolldown/binding-android-arm64@1.0.0-rc.12':
     resolution: {integrity: sha512-pv1y2Fv0JybcykuiiD3qBOBdz6RteYojRFY1d+b95WVuzx211CRh+ytI/+9iVyWQ6koTh5dawe4S/yRfOFjgaA==}
@@ -1713,9 +1721,9 @@ packages:
     resolution: {integrity: sha512-9u/XQ1pvrQtYyMpZe7DXKv2p5CNvyVwzUB6uhLAnQwHMSgKMBR62lc7AHljaeteeHXn11XTAaLLUVZYVZyuRBQ==}
     engines: {node: '>= 20.19.0'}
 
-  redis@5.9.0:
-    resolution: {integrity: sha512-E8dQVLSyH6UE/C9darFuwq4usOPrqfZ1864kI4RFbr5Oj9ioB9qPF0oJMwX7s8mf6sPYrz84x/Dx1PGF3/0EaQ==}
-    engines: {node: '>= 18'}
+  redis@6.1.0:
+    resolution: {integrity: sha512-0kvUPM8RHP/ZMa0xYaDTcG5e8tIGW6kz6MToVT0V8iOnk6bkXp2jncGRGe2bZEk41lZwiDspUqjZCSk5ohjcKw==}
+    engines: {node: '>= 20.0.0'}
 
   remeda@2.33.6:
     resolution: {integrity: sha512-tazDGH7s75kUPGBKLvhgBEHMgW+TdDFhjUAMdQj57IoWz6HsGa5D2RX5yDUz6IIqiRRvZiaEHzCzWdTeixc/Kg==}
@@ -1840,6 +1848,7 @@ packages:
   tsconfck@3.1.6:
     resolution: {integrity: sha512-ks6Vjr/jEw0P1gmOVwutM3B7fWxoWBL2KRDb1JfqGVawBmO5UsvmWOQFGHBPl5yxYz4eERr19E6L7NMv+Fej4w==}
     engines: {node: ^18 || >=20}
+    deprecated: unmaintained
     hasBin: true
     peerDependencies:
       typescript: ^5.0.0
@@ -2754,25 +2763,27 @@ snapshots:
     dependencies:
       quansync: 1.0.0
 
-  '@redis/bloom@5.9.0(@redis/client@5.9.0)':
+  '@redis/bloom@6.1.0(@redis/client@6.1.0(@opentelemetry/api@1.9.0))':
     dependencies:
-      '@redis/client': 5.9.0
+      '@redis/client': 6.1.0(@opentelemetry/api@1.9.0)
 
-  '@redis/client@5.9.0':
+  '@redis/client@6.1.0(@opentelemetry/api@1.9.0)':
     dependencies:
       cluster-key-slot: 1.1.2
+    optionalDependencies:
+      '@opentelemetry/api': 1.9.0
 
-  '@redis/json@5.9.0(@redis/client@5.9.0)':
+  '@redis/json@6.1.0(@redis/client@6.1.0(@opentelemetry/api@1.9.0))':
     dependencies:
-      '@redis/client': 5.9.0
+      '@redis/client': 6.1.0(@opentelemetry/api@1.9.0)
 
-  '@redis/search@5.9.0(@redis/client@5.9.0)':
+  '@redis/search@6.1.0(@redis/client@6.1.0(@opentelemetry/api@1.9.0))':
     dependencies:
-      '@redis/client': 5.9.0
+      '@redis/client': 6.1.0(@opentelemetry/api@1.9.0)
 
-  '@redis/time-series@5.9.0(@redis/client@5.9.0)':
+  '@redis/time-series@6.1.0(@redis/client@6.1.0(@opentelemetry/api@1.9.0))':
     dependencies:
-      '@redis/client': 5.9.0
+      '@redis/client': 6.1.0(@opentelemetry/api@1.9.0)
 
   '@rolldown/binding-android-arm64@1.0.0-rc.12':
     optional: true
@@ -3601,13 +3612,16 @@ snapshots:
 
   readdirp@5.0.0: {}
 
-  redis@5.9.0:
+  redis@6.1.0(@opentelemetry/api@1.9.0):
     dependencies:
-      '@redis/bloom': 5.9.0(@redis/client@5.9.0)
-      '@redis/client': 5.9.0
-      '@redis/json': 5.9.0(@redis/client@5.9.0)
-      '@redis/search': 5.9.0(@redis/client@5.9.0)
-      '@redis/time-series': 5.9.0(@redis/client@5.9.0)
+      '@redis/bloom': 6.1.0(@redis/client@6.1.0(@opentelemetry/api@1.9.0))
+      '@redis/client': 6.1.0(@opentelemetry/api@1.9.0)
+      '@redis/json': 6.1.0(@redis/client@6.1.0(@opentelemetry/api@1.9.0))
+      '@redis/search': 6.1.0(@redis/client@6.1.0(@opentelemetry/api@1.9.0))
+      '@redis/time-series': 6.1.0(@redis/client@6.1.0(@opentelemetry/api@1.9.0))
+    transitivePeerDependencies:
+      - '@node-rs/xxhash'
+      - '@opentelemetry/api'
 
   remeda@2.33.6: {}
 
