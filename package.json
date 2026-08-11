@@ -41,7 +41,7 @@
 		"discord.js": "^14.26.2",
 		"farming-weight": "^0.15.0",
 		"orval": "^8.6.2",
-		"redis": "^5.9.0",
+		"redis": "^6.0.0",
 		"utf-8-validate": "^6.0.5",
 		"zlib-sync": "^0.1.10",
 		"zod": "^4.1.12"
