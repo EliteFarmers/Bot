@@ -3,7 +3,7 @@
 	"engines": {
 		"node": ">=24.0.0"
 	},
-	"packageManager": "pnpm@10.17.0",
+	"packageManager": "pnpm@10.34.5",
 	"scripts": {
 		"start": "pnpm tsx src/index.ts",
 		"lint": "pnpm biome check",
@@ -19,12 +19,12 @@
 		"postprocess-api": "tsx ./src/api/util/morph-api.ts ./src/api/client/EliteAPI.ts && pnpm biome check --write ./src/api/client/EliteAPI.ts ./src/api/schemas"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.2.4",
+		"@biomejs/biome": "2.5.12",
 		"@types/amqplib": "^0.10.8",
 		"@types/node": "^24.9.1",
 		"dotenv": "^17.2.3",
 		"ts-morph": "^27.0.2",
-		"tsdown": "^0.21.7",
+		"tsdown": "^0.23.0",
 		"tslib": "^2.8.1",
 		"tsx": "^4.20.6",
 		"typescript": "^5.9.3"
@@ -39,7 +39,7 @@
 		"cron": "^3.5.0",
 		"date-fns": "^4.1.0",
 		"discord.js": "^14.26.2",
-		"farming-weight": "^0.15.0",
+		"farming-weight": "^0.16.0",
 		"orval": "^8.6.2",
 		"redis": "^5.9.0",
 		"utf-8-validate": "^6.0.5",
