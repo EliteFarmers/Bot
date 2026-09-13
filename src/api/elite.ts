@@ -32,6 +32,7 @@ import {
 	makePrimaryAccount,
 	refreshGuild,
 	refreshUserPurchases,
+	removeGuild,
 	searchAccounts,
 	submitScore,
 	unlinkAccountBot,
@@ -165,6 +166,8 @@ export const FetchProduct = (skuId: string) => getProduct(skuId as unknown as nu
 export const FetchLeaderboardList = () => getLeaderboards();
 
 export const RequestGuildUpdate = (guildId: string) => refreshGuild(guildId as unknown as number);
+
+export const RemoveGuild = (guildId: string) => removeGuild(guildId as unknown as number);
 
 export const UpdateGuildChannel = (guildId: string, channel: IncomingGuildChannelDto) =>
 	updateGuildChannel(guildId as unknown as number, channel);

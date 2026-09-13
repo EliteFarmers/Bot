@@ -28,6 +28,9 @@ const actionLabels: Record<string, string> = {
 	guide_asset_deleted: 'Asset deleted',
 	guide_comment_hoisted: 'Comment hoisted',
 	guide_comment_hoist_cleared: 'Comment hoist cleared',
+	guide_edit_autoapproved: 'Guide edit auto-approved',
+	comment_autoapproved: 'Comment auto-approved',
+	comment_edit_autoapproved: 'Comment edit auto-approved',
 };
 
 async function execute(signal: Signal) {

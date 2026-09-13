@@ -70,6 +70,25 @@ export const TextBackgroundStyle = z.object({
 });
 export type TextBackgroundStyle = z.infer<typeof TextBackgroundStyle>;
 
+export const GlassTextStyle = z.object({
+	tintColor: z.string().optional(),
+	tintOpacity: z.number().optional(),
+	highlightColor: z.string().optional(),
+	highlightOpacity: z.number().optional(),
+	highlightPosition: z.number().optional(),
+	highlightSize: z.number().optional(),
+	highlightAngle: z.number().optional(),
+	rimColor: z.string().optional(),
+	rimOpacity: z.number().optional(),
+	rimWidth: z.number().optional(),
+	shadowColor: z.string().optional(),
+	shadowOpacity: z.number().optional(),
+	shadowBlur: z.number().optional(),
+	shadowOffsetX: z.number().optional(),
+	shadowOffsetY: z.number().optional(),
+});
+export type GlassTextStyle = z.infer<typeof GlassTextStyle>;
+
 export const ElementPosition = z.object({
 	font: z.string().optional(),
 	fontSize: z.number().optional(),
@@ -79,6 +98,7 @@ export const ElementPosition = z.object({
 	maxHeight: z.number().optional(),
 	outline: OutlineStyle.optional(),
 	background: TextBackgroundStyle.optional(),
+	glass: GlassTextStyle.optional(),
 });
 export type ElementPosition = z.infer<typeof ElementPosition>;
 

@@ -6958,6 +6958,7 @@ export interface components {
 			name: string;
 			icon?: components['schemas']['ImageAttachmentDto'] | null;
 			hasBot: boolean;
+			owner: boolean;
 			permissions: string;
 			roles: string[];
 			admin?: boolean | null;
