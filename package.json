@@ -21,7 +21,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "2.2.4",
 		"@types/amqplib": "^0.10.8",
-		"@types/node": "^24.9.1",
+		"@types/node": "^26.0.0",
 		"dotenv": "^17.2.3",
 		"ts-morph": "^27.0.2",
 		"tsdown": "^0.21.7",
