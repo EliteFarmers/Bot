@@ -72,8 +72,8 @@ async function execute(client: Client) {
 				{
 					name: 'Enjoy the Spring Season!',
 					value:
-						`**+25** ${fortuneEmoji} from [Atmospheric Filter](https://wiki.hypixel.net/Atmospheric_Filter)` +
-						`\nGood luck finding Zorro in [Hoppity's Hunt](https://wiki.hypixel.net/Hoppity%27s_Hunt)!`,
+						`**+25** ${fortuneEmoji} from [Atmospheric Filter](https://w.elitesb.gg/Atmospheric_Filter)` +
+						`\nGood luck finding Zorro in [Hoppity's Hunt](https://w.elitesb.gg/Hoppity%27s_Hunt)!`,
 				},
 				{
 					name: 'Next Contest',
