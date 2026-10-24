@@ -18,7 +18,9 @@
 
 		"typeRoots": ["node_modules/@types"],
 
-		"baseUrl": "./src"
+		"paths": {
+			"api/*": ["./src/api/*"]
+		}
 	},
 	"include": ["src/**/*.ts"],
 	"exclude": ["node_modules"]

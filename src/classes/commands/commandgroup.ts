@@ -10,18 +10,18 @@ import {
 import { CommandAccess, CommandType, EliteCommand, GroupCommand } from './index';
 
 export class CommandGroup implements GroupCommand {
-	public declare name: string;
-	public declare description: string;
-	public declare access: CommandAccess[];
-	public declare permissions?: bigint;
-	public declare type: CommandType.Group;
-	public declare fetchSettings?: boolean | undefined;
-	public declare adminRoleOverride?: boolean | undefined;
+	declare public name: string;
+	declare public description: string;
+	declare public access: CommandAccess[];
+	declare public permissions?: bigint;
+	declare public type: CommandType.Group;
+	declare public fetchSettings?: boolean | undefined;
+	declare public adminRoleOverride?: boolean | undefined;
 
-	public declare slash: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder;
+	declare public slash: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder;
 
-	private declare selfExecute: Function;
-	public declare subcommands: Record<string, EliteCommand>;
+	declare private selfExecute: Function;
+	declare public subcommands: Record<string, EliteCommand>;
 
 	constructor(settings: GroupCommand) {
 		this.name = settings.name;

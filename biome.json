@@ -1,9 +1,9 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.6.3/schema.json",
 	"vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["**", "!**/node_modules", "!**/dist/**", "!**/globals.d.ts"]
+		"includes": ["**", "!**/node_modules", "!**/dist/**", "!**/globals.d.ts", "!**/pnpm-lock.yaml"]
 	},
 	"formatter": {
 		"enabled": true,
@@ -14,7 +14,7 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": false,
+			"preset": "none",
 			"complexity": {
 				"noExtraBooleanCast": "error",
 				"noUselessCatch": "error",
@@ -101,6 +101,12 @@
 			"trailingCommas": "all",
 			"arrowParentheses": "always"
 		}
+	},
+	"markdown": {
+		"formatter": { "enabled": false }
+	},
+	"yaml": {
+		"formatter": { "enabled": false }
 	},
 	"overrides": [
 		{
