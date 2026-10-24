@@ -66,7 +66,7 @@ export async function LoadWeightStyles() {
 	const { data: styles } = await FetchWeightStyles();
 
 	const newStyles = styles?.reduce<Record<number, WeightStyleListDto>>((acc, style) => {
-		if (!style.id || !validStyle(style.data)) return acc;
+		if (!style.id || !style.capabilities.weight || !validStyle(style.data)) return acc;
 		acc[style.id] = style;
 		return acc;
 	}, {});
