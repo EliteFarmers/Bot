@@ -20,9 +20,11 @@ import {
 	calculateDetailedDropsFromEffects,
 	createFarmingPlayer,
 	type DetailedDropsFromEffectsResult,
+	type Effect,
 	FarmingPet,
 	getCropDisplayName,
 	getPossibleResultsFromCrops,
+	isGlobalOverbloomScope,
 	MAX_CROP_FORTUNE,
 	Rarity,
 	REFORGES,
@@ -42,19 +44,21 @@ const TIME_OPTIONS = {
 	1_728_000: '24 Hours',
 };
 
+const DefaultOverbloom = 100;
+const MaxOverbloom = 500;
+
 type RatesReforge = 'bountiful' | 'blessed';
 type RatesPet = 'rose_dragon' | 'mooshroom' | 'elephant';
 
 type RatesCalculatorInput = {
 	fortuneInput?: number;
+	overbloom: number;
 	blocks: number;
 	reforge: RatesReforge;
 	pet: RatesPet;
 	bps: number;
 	useLevel50Tool: boolean;
-	rarefinder: boolean;
 	mechamind: boolean;
-	cropeetle: boolean;
 	wartyBug: boolean;
 };
 
@@ -70,7 +74,7 @@ type FormattedRatesResult = ReturnType<typeof formatRatesForDisplay>;
 
 const command = new EliteCommand({
 	name: 'rates',
-	description: 'Get NPC profit rates for a given amount of fortune!',
+	description: 'Get farming rates for a given Farming Fortune and Overbloom!',
 	access: CommandAccess.Everywhere,
 	type: CommandType.Slash,
 	options: {
@@ -79,6 +83,12 @@ const command = new EliteCommand({
 			description: 'The amount of fortune to calculate rates for!',
 			type: SlashCommandOptionType.Integer,
 			builder: (b) => b.setMinValue(0).setMaxValue(5000),
+		},
+		overbloom: {
+			name: 'overbloom',
+			description: `The amount of Overbloom to calculate rates for! (default: ${DefaultOverbloom})`,
+			type: SlashCommandOptionType.Number,
+			builder: (b) => b.setMinValue(0).setMaxValue(MaxOverbloom),
 		},
 		time: {
 			name: 'time',
@@ -127,8 +137,8 @@ const command = new EliteCommand({
 
 export default command;
 
-const ElephantFortuneDiff = 396.7 - 210;
-const MooshroomFortuneDiff = 396.7 - 217;
+const ElephantFortuneDiff = 396.7 - 260;
+const MooshroomFortuneDiff = 396.7 - 207;
 const fortuneEmoji = '<:ff:1450022749631287330>';
 const DescriptionSeparator = ' \u2022 ';
 
@@ -190,21 +200,21 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 			if (submitted && submitted.isFromMessage()) {
 				const other = submitted.fields.getCheckboxGroup('other-modifiers') || [];
-				const fortuneValue = parseInt(submitted.fields.getTextInputValue('fortune-input'));
+				const fortuneRaw = submitted.fields.getTextInputValue('fortune-input').trim();
+				const overbloomRaw = submitted.fields.getTextInputValue('overbloom-input');
 				try {
 					const newState = buildRatesCalculatorState({
-						fortuneInput: isFinite(fortuneValue)
-							? Math.max(0, Math.min(5000, fortuneValue))
-							: calculatorState.fortuneInput,
+						fortuneInput:
+							fortuneRaw === ''
+								? undefined
+								: clampOr(Number.parseInt(fortuneRaw), 5000, calculatorState.fortuneInput) || undefined,
+						overbloom: clampOr(Number.parseFloat(overbloomRaw), MaxOverbloom, calculatorState.overbloom),
 						blocks: +submitted.fields.getStringSelectValues('time-input')[0] || calculatorState.blocks,
-						reforge:
-							(submitted.fields.getStringSelectValues('reforge-input')[0] as RatesReforge) || calculatorState.reforge,
+						reforge: other.includes('bountiful') ? 'bountiful' : 'blessed',
 						pet: (submitted.fields.getStringSelectValues('pet-input')[0] as RatesPet) || calculatorState.pet,
 						bps: calculatorState.bps,
 						useLevel50Tool: other.includes('max-tool'),
-						rarefinder: other.includes('rarefinder'),
 						mechamind: other.includes('mechamind'),
-						cropeetle: other.includes('cropeetle'),
 						wartyBug: other.includes('warty_bug'),
 					});
 					calculatorState = newState;
@@ -247,20 +257,21 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 }
 
 function getRatesCalculatorInput(interaction: ChatInputCommandInteraction): RatesCalculatorInput {
-	const fortuneRaw = interaction.options.getInteger('fortune', false) ?? undefined;
-
 	return {
-		fortuneInput: fortuneRaw ? fortuneRaw : undefined,
+		fortuneInput: interaction.options.getInteger('fortune', false) || undefined,
+		overbloom: interaction.options.getNumber('overbloom', false) ?? DefaultOverbloom,
 		blocks: interaction.options.getInteger('time', false) ?? 72_000,
 		reforge: (interaction.options.getString('reforge', false) ?? 'bountiful') as RatesReforge,
 		pet: (interaction.options.getString('pet', false) ?? 'rose_dragon') as RatesPet,
 		bps: interaction.options.getNumber('bps', false) ?? 20,
 		useLevel50Tool: interaction.options.getBoolean('max-tool', false) ?? true,
-		rarefinder: true,
 		mechamind: true,
-		cropeetle: true,
 		wartyBug: false,
 	};
+}
+
+function clampOr<T>(value: number, max: number, fallback: T) {
+	return Number.isFinite(value) ? Math.max(0, Math.min(max, value)) : fallback;
 }
 
 function buildRatesCalculatorState(input: RatesCalculatorInput): RatesCalculatorState {
@@ -278,7 +289,25 @@ function getPetName(pet: RatesPet) {
 }
 
 function getPetData(pet: RatesPet) {
-	if (pet !== 'rose_dragon') return undefined;
+	if (pet === 'mooshroom') {
+		return new FarmingPet({
+			type: 'MOOSHROOM_COW',
+			exp: 30_000_000_000,
+			active: true,
+			tier: 'LEGENDARY',
+			heldItem: 'GREEN_BANDANA',
+		});
+	}
+
+	if (pet === 'elephant') {
+		return new FarmingPet({
+			type: 'ELEPHANT',
+			exp: 30_000_000_000,
+			active: true,
+			tier: 'MYTHIC',
+			heldItem: 'GREEN_BANDANA',
+		});
+	}
 
 	return new FarmingPet({
 		type: 'ROSE_DRAGON',
@@ -317,11 +346,9 @@ function calculateCropDrops(
 		selectedCrop: crop,
 		pets: state.petData ? [state.petData] : [],
 		chips: {
-			rarefinder: state.rarefinder ? 20 : 0,
 			mechamind: state.mechamind ? 20 : 0,
 		},
 		attributes: {
-			crop_bug: state.cropeetle ? 64 : 0,
 			wart_eater: state.wartyBug ? 24 : 0,
 		},
 	});
@@ -331,6 +358,14 @@ function calculateCropDrops(
 	}
 
 	const env = player.buildEnvironment(crop);
+	const effects = player.collectEffects(env).filter((effect) => !isTotalOverbloomEffect(effect));
+	const overbloomEffect: Effect = {
+		source: 'Overbloom',
+		op: 'add-rare-pct',
+		value: state.overbloom,
+		scope: { tags: ['overbloom'] },
+		relatedStats: [Stat.Overbloom],
+	};
 
 	return calculateDetailedDropsFromEffects({
 		crop,
@@ -341,12 +376,19 @@ function calculateCropDrops(
 		maxTool: state.useLevel50Tool,
 		pet: state.petData,
 		chips: {
-			rarefinder: state.rarefinder ? 20 : 0,
 			mechamind: state.mechamind ? 20 : 0,
 		},
-		effects: player.collectEffects(env),
+		effects: [...effects, overbloomEffect],
 		env,
 	});
+}
+
+function isTotalOverbloomEffect(effect: Effect) {
+	return (
+		effect.op === 'add-rare-pct' &&
+		effect.relatedStats?.includes(Stat.Overbloom) === true &&
+		isGlobalOverbloomScope(effect.scope)
+	);
 }
 
 function getSyntheticFarmingFortune(
@@ -641,7 +683,7 @@ function buildCropRatesContainer(
 }
 
 function buildRatesSettingsModal(state: RatesCalculatorState, modalCustomId: string) {
-	// Build a modal to update fortune, reforge, pet, bps, and max tool settings
+	// Build a modal to update the rate calculation inputs and modifiers
 	// Pre-fill the inputs with the current settings
 	// On submit, update the rates display with the new settings
 
@@ -659,6 +701,17 @@ function buildRatesSettingsModal(state: RatesCalculatorState, modalCustomId: str
 	const label = new LabelBuilder().setLabel('Farming Fortune').setTextInputComponent(fortuneInput);
 	modal.addLabelComponents(label);
 
+	// Overbloom input
+
+	const overbloomInput = new TextInputBuilder()
+		.setCustomId('overbloom-input')
+		.setStyle(TextInputStyle.Short)
+		.setPlaceholder('Enter your total Overbloom')
+		.setValue(state.overbloom.toString())
+		.setRequired(true);
+
+	modal.addLabelComponents(new LabelBuilder().setLabel('Overbloom').setTextInputComponent(overbloomInput));
+
 	// Time input
 
 	const timeInput = new StringSelectMenuBuilder()
@@ -673,26 +726,6 @@ function buildRatesSettingsModal(state: RatesCalculatorState, modalCustomId: str
 		);
 
 	modal.addLabelComponents(new LabelBuilder().setLabel('Time Period').setStringSelectMenuComponent(timeInput));
-
-	// Reforge input
-
-	const reforgeInput = new StringSelectMenuBuilder()
-		.setCustomId('reforge-input')
-		.setPlaceholder('Select a reforge')
-		.addOptions(
-			{
-				label: 'Bountiful',
-				value: 'bountiful',
-				default: state.reforge === 'bountiful',
-			},
-			{
-				label: 'Blessed',
-				value: 'blessed',
-				default: state.reforge === 'blessed',
-			},
-		);
-
-	modal.addLabelComponents(new LabelBuilder().setLabel('Reforge').setStringSelectMenuComponent(reforgeInput));
 
 	// Pet input
 
@@ -721,33 +754,31 @@ function buildRatesSettingsModal(state: RatesCalculatorState, modalCustomId: str
 
 	// Other modifiers
 
-	const otherSelect = new CheckboxGroupBuilder().setRequired(false).setCustomId('other-modifiers').setOptions(
-		{
-			label: 'Level 50 farming tool',
-			value: 'max-tool',
-			default: state.useLevel50Tool,
-		},
-		{
-			label: 'Max Rarefinder Chip',
-			value: 'rarefinder',
-			default: state.rarefinder,
-		},
-		{
-			label: 'Max Mechamind Chip',
-			value: 'mechamind',
-			default: state.mechamind,
-		},
-		{
-			label: 'Max Cropeetle Shard',
-			value: 'cropeetle',
-			default: state.cropeetle,
-		},
-		{
-			label: 'Max Warty Bug Shard',
-			value: 'warty_bug',
-			default: state.wartyBug,
-		},
-	);
+	const otherSelect = new CheckboxGroupBuilder()
+		.setRequired(false)
+		.setCustomId('other-modifiers')
+		.setOptions(
+			{
+				label: 'Bountiful reforge (otherwise Blessed)',
+				value: 'bountiful',
+				default: state.reforge === 'bountiful',
+			},
+			{
+				label: 'Level 50 farming tool',
+				value: 'max-tool',
+				default: state.useLevel50Tool,
+			},
+			{
+				label: 'Max Mechamind Chip',
+				value: 'mechamind',
+				default: state.mechamind,
+			},
+			{
+				label: 'Max Warty Bug Shard',
+				value: 'warty_bug',
+				default: state.wartyBug,
+			},
+		);
 
 	modal.addLabelComponents(new LabelBuilder().setLabel('Other Modifiers').setCheckboxGroupComponent(otherSelect));
 
@@ -767,7 +798,7 @@ function buildRatesDescription(state: RatesCalculatorState, fortune: number | un
 }
 
 function getRatesHeadlineText(state: RatesCalculatorState, fortune: number | undefined) {
-	return `Expected rates for **${fortune?.toLocaleString() ?? 'MAX'}** Farming Fortune in **${state.timeName}**!`;
+	return `Expected rates for **${fortune?.toLocaleString() ?? 'MAX'}** Farming Fortune and **${state.overbloom.toLocaleString()}** Overbloom in **${state.timeName}**!`;
 }
 
 function getRatesSetupText(state: RatesCalculatorState) {
@@ -787,8 +818,8 @@ function getRatesModifiersText(state: RatesCalculatorState) {
 		'-# ' +
 		[
 			`Tool **${state.useLevel50Tool ? 'Level 50' : 'Not Level 50'}**`,
-			`Chips **${getEnabledOptionNames([state.rarefinder && 'Rarefinder', state.mechamind && 'Mechamind'])}**`,
-			`Shards **${getEnabledOptionNames([state.cropeetle && 'Cropeetle', state.wartyBug && 'Warty Bug'])}**`,
+			`Chips **${getEnabledOptionNames([state.mechamind && 'Mechamind'])}**`,
+			`Shards **${getEnabledOptionNames([state.wartyBug && 'Warty Bug'])}**`,
 		].join(DescriptionSeparator)
 	);
 }
