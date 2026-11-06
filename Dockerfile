@@ -1,4 +1,4 @@
-FROM node:26.12.1-bookworm
+FROM node:26.13.0-bookworm
 
 RUN npm install -g pnpm@12.15.0
 WORKDIR /app
