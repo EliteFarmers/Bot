@@ -220,8 +220,8 @@ importers:
         specifier: 2.6.3
         version: 2.6.3
       '@types/amqplib':
-        specifier: ^0.10.8
-        version: 0.10.8
+        specifier: ^2.0.0
+        version: 2.2.1
       '@types/node':
         specifier: ^26.6.5
         version: 26.6.5
@@ -1121,8 +1121,9 @@ packages:
   '@ts-morph/common@0.29.0':
     resolution: {integrity: sha512-35oUmphHbJvQ/+UTwFNme/t2p3FoKiGJ5auTjjpNTop2dyREspirjMy82PLSC1pnDJ8ah1GU98hwpVt64YXQsg==}
 
-  '@types/amqplib@0.10.8':
-    resolution: {integrity: sha512-vtDp8Pk1wsE/AuQ8/Rgtm6KUZYqcnTgNvEHwzCkX8rL7AGsC6zqAfKAAJhUZXFhM/Pp++tbnUHiam/8vVpPztA==}
+  '@types/amqplib@2.2.1':
+    resolution: {integrity: sha512-P/mqQzKg3EGkgYGlYCVxukVFbUUq9tQVMACF273hSzfdh2KLa2KswNSRz/TYUxeHUDWdXlEdImMpPEtkwbSHNQ==}
+    deprecated: This is a stub types definition. amqplib provides its own type definitions, so you do not need this installed.
 
   '@types/luxon@3.7.6':
     resolution: {integrity: sha512-6KSjliQAXK8ZLgFQO4B7iE4Rpf/B3rItzCFuXezBY/XIAGxOdLd7vRNK9/StRPwiS/yJsVbB7HKpW46B8tcEuQ==}
@@ -1349,6 +1350,10 @@ packages:
 
   ajv@8.20.0:
     resolution: {integrity: sha512-Thbli+OlOj+iMPYFBVBfJ3OmCAnaSyNn4M1vz9T6Gka5Jt9ba/HIR56joy65tY6kx/FCF5VXNB819Y7/GUrBGA==}
+
+  amqplib@2.4.1:
+    resolution: {integrity: sha512-5J2/ULpAfGNFAaMoh+ezXezvu2Ht72Sr7k223P/NP1QZGs1c29ivlzWGDSqcQU0ZmBeiyDzxGavB0N/3dC8TIA==}
+    engines: {node: '>=18'}
 
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
@@ -2519,9 +2524,9 @@ snapshots:
       path-browserify: 1.0.1
       tinyglobby: 0.2.17
 
-  '@types/amqplib@0.10.8':
+  '@types/amqplib@2.2.1':
     dependencies:
-      '@types/node': 26.6.5
+      amqplib: 2.4.1
 
   '@types/luxon@3.7.6': {}
 
@@ -2649,6 +2654,8 @@ snapshots:
       fast-uri: 3.1.9
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
+
+  amqplib@2.4.1: {}
 
   argparse@2.0.1: {}
 
