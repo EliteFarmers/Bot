@@ -1,3 +1,4 @@
+import { ProductSource } from 'api/schemas';
 import { MessageFlags, TextDisplayBuilder } from 'discord.js';
 import { FetchProduct } from '../api/elite';
 import { EliteContainer } from '../classes/components';
@@ -27,11 +28,14 @@ async function execute(signal: Signal) {
 	const channel = guild.channels.cache.get(channelId) ?? (await guild.channels.fetch(channelId));
 	if (!channel?.isTextBased()) return;
 
-	const url = `https://discord.com/application-directory/${guild.client.application.id}/store/${signal.data.skuId}`;
-
 	const { data: product } = await FetchProduct(signal.data.skuId).catch(() => ({
 		data: undefined,
 	}));
+
+	const url =
+		product?.source === ProductSource.Elite
+			? `https://elitesb.gg/shop/${signal.data.skuId}`
+			: `https://discord.com/application-directory/${guild.client.application.id}/store/${signal.data.skuId}`;
 
 	const container = new EliteContainer()
 		.addTitle('### Free item claimed!', false)

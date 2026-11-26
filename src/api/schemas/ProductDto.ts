@@ -10,6 +10,7 @@
 import type { ImageAttachmentDto } from './ImageAttachmentDto';
 import type { ListOfImageAttachmentDto } from './ListOfImageAttachmentDto';
 import type { ListOfWeightStyleLinkedDto } from './ListOfWeightStyleLinkedDto';
+import type { ProductSource } from './ProductSource';
 import type { ProductType } from './ProductType';
 import type { TebexProductSettingsDto } from './TebexProductSettingsDto';
 import type { UnlockedProductFeaturesDto } from './UnlockedProductFeaturesDto';
@@ -34,6 +35,7 @@ export interface ProductDto {
 	/** If the product is available for purchase */
 	available: boolean;
 	type: ProductType;
+	source: ProductSource;
 	features: UnlockedProductFeaturesDto;
 	weightStyles: ListOfWeightStyleLinkedDto;
 	thumbnail?: ImageAttachmentDto | null;

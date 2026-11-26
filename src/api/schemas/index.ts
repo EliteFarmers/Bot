@@ -325,6 +325,7 @@ export * from './PrivateGuildDto';
 export * from './ProblemDetails';
 export * from './ProblemDetailsErrorsItem';
 export * from './ProductDto';
+export * from './ProductSource';
 export * from './ProductType';
 export * from './ProfileBankingTransactionDto';
 export * from './ProfileDetailsDto';
