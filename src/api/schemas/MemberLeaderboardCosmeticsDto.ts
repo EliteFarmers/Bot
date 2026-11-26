@@ -7,6 +7,7 @@
  * Use of this API requires following the [Elite API TOS](https://eliteskyblock.com/apiterms). This API is not affiliated with Hypixel or Mojang.
  * OpenAPI spec version: v1
  */
+import type { ListOfInt32Array } from './ListOfInt32Array';
 
 export interface MemberLeaderboardCosmeticsDto {
 	/** @nullable */
@@ -25,4 +26,5 @@ export interface MemberLeaderboardCosmeticsDto {
 	backgroundImage?: string | null;
 	/** @nullable */
 	overlayImage?: string | null;
+	stickers?: ListOfInt32Array | null;
 }

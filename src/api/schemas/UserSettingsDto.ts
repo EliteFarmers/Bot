@@ -11,6 +11,7 @@ import type { ConfiguredProductFeaturesDto } from './ConfiguredProductFeaturesDt
 import type { DictionaryOfStringAndLeaderboardAppearanceOverride } from './DictionaryOfStringAndLeaderboardAppearanceOverride';
 import type { FortuneSettingsDto } from './FortuneSettingsDto';
 import type { MiscUserSettingsDto } from './MiscUserSettingsDto';
+import type { StickerLayouts } from './StickerLayouts';
 import type { WeightStyleLinkedDto } from './WeightStyleLinkedDto';
 
 export interface UserSettingsDto {
@@ -32,6 +33,7 @@ export interface UserSettingsDto {
 	leaderboardFrame?: WeightStyleLinkedDto | null;
 	nameCardFrame?: WeightStyleLinkedDto | null;
 	leaderboardOverrides: DictionaryOfStringAndLeaderboardAppearanceOverride;
+	stickers: StickerLayouts;
 	fortune?: FortuneSettingsDto | null;
 	misc?: MiscUserSettingsDto | null;
 }

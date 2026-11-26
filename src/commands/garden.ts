@@ -1,18 +1,14 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType } from 'discord.js';
 import {
 	Crop,
-	compareRarity,
-	GARDEN_VISITORS,
-	GardenVisitor,
 	getCropDisplayName,
 	getCropFromName,
 	getCropMilestones,
 	getCropUpgrades,
 	getGardenLevel,
-	groupGardenVisitors,
 	Rarity,
 } from 'farming-weight';
-import { FetchProfile, UserSettings } from '../api/elite';
+import { FetchGardenVisitors, FetchProfile, UserSettings } from '../api/elite';
 import { elitePlayerOption } from '../autocomplete/player';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index';
 import {
@@ -87,8 +83,13 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 	const { account, profile, name: playerName } = result;
 
-	const { data: member } = await FetchProfile(account.id, profile.profileId).catch(() => ({ data: undefined }));
+	const [{ data: member }, visitorsResponse] = await Promise.all([
+		FetchProfile(account.id, profile.profileId).catch(() => ({ data: undefined })),
+		FetchGardenVisitors(profile.profileId).catch(() => undefined),
+	]);
 	const garden = member?.garden;
+	const visitorGroups = visitorsResponse?.ok ? visitorsResponse.data.rarities : undefined;
+	const maxUniqueText = visitorsResponse?.ok ? `/${visitorsResponse.data.maxUnique}` : '';
 
 	if (!member) {
 		const embed = ErrorEmbed("Couldn't fetch data!")
@@ -205,7 +206,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		levelText += `\n-# ${(garden?.experience ?? 0).toLocaleString()} Total XP`;
 
 		levelText += `\n**Visitors**`;
-		levelText += `\nUnique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**/137`;
+		levelText += `\nUnique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**${maxUniqueText}`;
 		levelText += `\nAccepted • **${(garden?.completedVisitors ?? 0).toLocaleString()}**`;
 		levelText += `\nRejected • **${(rejectedVisitors ?? 0).toLocaleString()}**`;
 
@@ -278,9 +279,13 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			});
 		}
 
-		const linkRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-			new ButtonBuilder().setLabel('Visitor Stats').setCustomId('visitors').setStyle(ButtonStyle.Success),
-		);
+		const linkRow = new ActionRowBuilder<ButtonBuilder>();
+
+		if (visitorGroups) {
+			linkRow.addComponents(
+				new ButtonBuilder().setLabel('Visitor Stats').setCustomId('visitors').setStyle(ButtonStyle.Success),
+			);
+		}
 
 		if (includeOverflow) {
 			linkRow.addComponents(
@@ -303,27 +308,21 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	}
 
 	function getVisitorsPayload(page: 'main' | 'uncommon' | 'uncommon-2' | 'rare' = 'main') {
-		const visitorsByRarity = groupGardenVisitors(
-			(garden?.visitors ?? {}) as Record<string, { visits: number; accepted: number }>,
-		);
+		const visitedGroups = (visitorGroups ?? []).filter((group) => group.visited.length > 0);
 
-		const uncommonVisitors = visitorsByRarity[Rarity.Uncommon] ?? [];
-		const rareVisitors = visitorsByRarity[Rarity.Rare] ?? [];
+		const uncommonVisitors = visitedGroups.find((group) => group.rarity === Rarity.Uncommon)?.visited ?? [];
+		const rareVisitors = visitedGroups.find((group) => group.rarity === Rarity.Rare)?.visited ?? [];
 		const uncommonHalfLength = Math.ceil(uncommonVisitors.length / 2);
 
 		let fieldCount = 0;
-		const visitorsList = Object.entries(visitorsByRarity)
-			.sort(([a], [b]) => compareRarity(b as Rarity, a as Rarity))
-			.map(([rarity, visitors]) => {
+		const visitorsList = visitedGroups
+			.map(({ rarity, visited: visitors, accepted, visits }) => {
 				const isUncommon = rarity === Rarity.Uncommon;
 				const isRare = rarity === Rarity.Rare;
 
 				if (page === 'uncommon' && !isUncommon) return undefined;
 				if (page === 'uncommon-2' && !isUncommon) return undefined;
 				if (page === 'rare' && !isRare) return undefined;
-
-				const accepted = visitors.reduce((acc, v) => acc + v.accepted, 0);
-				const visits = visitors.reduce((acc, v) => acc + v.visits, 0);
 
 				const skipUncommon = isUncommon && page === 'main';
 				const skipRare = isRare && page === 'main';
@@ -389,7 +388,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const embed = EliteEmbed(settings)
 			.setTitle(`Visitors for ${escapeIgn(playerName)} (${profile?.profileName})${titleSuffix}`)
 			.setDescription(
-				`Unique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**/137 ${EmptyString} • ${EmptyString} Accepted • **${(garden?.completedVisitors ?? 0).toLocaleString()}** ${EmptyString} • ${EmptyString} Rejected • **${(rejectedVisitors ?? 0).toLocaleString()}**` +
+				`Unique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**${maxUniqueText} ${EmptyString} • ${EmptyString} Accepted • **${(garden?.completedVisitors ?? 0).toLocaleString()}** ${EmptyString} • ${EmptyString} Rejected • **${(rejectedVisitors ?? 0).toLocaleString()}**` +
 					'\nAcceptance Rate • **' +
 					acceptanceRateText +
 					'%**',
@@ -403,7 +402,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			new ButtonBuilder().setLabel('Garden Stats').setCustomId('garden').setStyle(ButtonStyle.Success),
 		);
 
-		if (garden?.uniqueVisitors !== Object.keys(GARDEN_VISITORS).length) {
+		if (visitorGroups?.some((group) => group.missing.length > 0)) {
 			linkRow.addComponents(
 				new ButtonBuilder().setLabel('Missing').setCustomId('missing').setStyle(ButtonStyle.Success),
 			);
@@ -445,35 +444,18 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	}
 
 	function getMissingVisitors(page: 'main' | 'uncommon' | 'uncommon-2' | 'rare' = 'main') {
-		const visitedVisitors = (garden?.visitors ?? {}) as Record<
-			string,
-			{ visits: number; accepted: number } | undefined
-		>;
+		const missingGroups = (visitorGroups ?? []).filter((group) => group.missing.length > 0);
 
-		const missingVisitors = Object.entries(GARDEN_VISITORS).reduce<Partial<Record<Rarity, GardenVisitor[]>>>(
-			(acc, [visitor, data]) => {
-				const current = visitedVisitors[visitor];
-				if ((current && current.accepted > 0) || !data) {
-					return acc; // Not missing
-				}
-				acc[data.rarity] ??= [];
-				acc[data.rarity]?.push(data);
-				return acc;
-			},
-			{},
-		);
-
-		const missingUncommon = missingVisitors[Rarity.Uncommon] ?? [];
-		const missingRare = missingVisitors[Rarity.Rare] ?? [];
+		const missingUncommon = missingGroups.find((group) => group.rarity === Rarity.Uncommon)?.missing ?? [];
+		const missingRare = missingGroups.find((group) => group.rarity === Rarity.Rare)?.missing ?? [];
 		const uncommonHalfLength = Math.ceil(missingUncommon.length / 2);
 
 		const skipUncommon = page === 'main' && missingUncommon.length > 15;
 		const skipRare = page === 'main' && missingRare.length > 10;
 
 		let fieldCount = 0;
-		const visitorsList = Object.entries(missingVisitors)
-			.sort(([a], [b]) => compareRarity(b as Rarity, a as Rarity))
-			.map(([rarity, visitors]) => {
+		const visitorsList = missingGroups
+			.map(({ rarity, missing: visitors }) => {
 				const isUncommon = rarity === Rarity.Uncommon;
 				const isRare = rarity === Rarity.Rare;
 
@@ -544,7 +526,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		const embed = EliteEmbed(settings)
 			.setTitle(`Missing Visitors for ${escapeIgn(playerName)} (${profile?.profileName})${titleSuffix}`)
 			.setDescription(
-				`Unique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**/137 ${EmptyString} • ${EmptyString} Accepted • **${(garden?.completedVisitors ?? 0).toLocaleString()}** ${EmptyString} • ${EmptyString} Rejected • **${(rejectedVisitors ?? 0).toLocaleString()}**` +
+				`Unique • **${(garden?.uniqueVisitors ?? 0).toLocaleString()}**${maxUniqueText} ${EmptyString} • ${EmptyString} Accepted • **${(garden?.completedVisitors ?? 0).toLocaleString()}** ${EmptyString} • ${EmptyString} Rejected • **${(rejectedVisitors ?? 0).toLocaleString()}**` +
 					'\nAcceptance Rate • **' +
 					acceptanceRateText +
 					'%**',

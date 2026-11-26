@@ -68,9 +68,13 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	const { data: bazaar } = await FetchProducts(mutationIds);
 
 	const mutationRatios: MutationCopperRatio[] = mutations.map((mutation) => {
-		const bazaarItem = bazaar?.items?.[mutation.id];
-		const buy = getPrice(bazaarItem?.bazaar?.averageBuy) ?? getPrice(bazaarItem?.bazaar?.buy);
-		const buyOrder = getPrice(bazaarItem?.bazaar?.averageBuyOrder) ?? getPrice(bazaarItem?.bazaar?.buyOrder);
+		const prices = bazaar?.items?.[mutation.id]?.bazaar;
+		const buy =
+			getPrice(prices?.averageSellOrder) ??
+			getPrice(prices?.sellOrder) ??
+			getPrice(prices?.averageBuy) ??
+			getPrice(prices?.buy);
+		const buyOrder = getPrice(prices?.averageBuyOrder) ?? getPrice(prices?.buyOrder);
 		const analysisCost = mutation.analysis.baseCost;
 		const copper = mutation.analysis.copper * (1 + synthesis.bonus / 100 + roseDragonBonus / 100);
 

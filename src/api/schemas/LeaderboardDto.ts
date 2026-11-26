@@ -31,5 +31,10 @@ export interface LeaderboardDto {
 	startsAt: number;
 	endsAt: number;
 	profile: boolean;
+	/**
+	 * Unix seconds when the snapshot that entries' previousRank comes from was captured
+	 * @nullable
+	 */
+	previousRanksAt?: number | null;
 	entries: ListOfLeaderboardEntryDto;
 }

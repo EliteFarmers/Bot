@@ -12,4 +12,5 @@ import type { CosmeticSelection } from './CosmeticSelection';
 export interface LeaderboardAppearanceOverride {
 	style: CosmeticSelection;
 	frame: CosmeticSelection;
+	stickers: CosmeticSelection;
 }

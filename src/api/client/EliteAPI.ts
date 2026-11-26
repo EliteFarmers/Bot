@@ -16,7 +16,10 @@ import type {
 	ErrorResponse,
 	FarmingInventoryDto,
 	FarmingWeightAllProfilesDto,
+	FortuneProgressDto,
 	FullGuideDto,
+	GardenVisitorsDto,
+	GetBotRatesParams,
 	GetContestsAtTimestampParams,
 	GetCropGraphsParams,
 	GetCurrentMedalBracketsParams,
@@ -53,6 +56,7 @@ import type {
 	ProblemDetails,
 	ProductDto,
 	ProfileMemberDto,
+	RatesDto,
 	SearchAccountsParams,
 	SubmitScoreParams,
 	SubmitScoreResponse,
@@ -198,10 +202,24 @@ export const getUpdateDiscordAccountUrl = () => {
  * @summary Update user Discord account
  */
 export const updateDiscordAccount = async (incomingAccountDto: IncomingAccountDto, options?: RequestInit) => {
+	const getHeaders = (h?: NonNullable<RequestInit['headers']>) => {
+		if (!h) return {};
+		if (h instanceof Headers) return Object.fromEntries(h.entries());
+		if (Symbol.iterator in h) {
+			return Object.fromEntries(
+				Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+			);
+		}
+		const headers: Record<string, string | readonly string[]> = {};
+		for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+			if (value !== undefined) headers[name] = value;
+		}
+		return headers;
+	};
 	return customFetch<updateDiscordAccountResponse>(getUpdateDiscordAccountUrl(), {
 		...options,
 		method: 'PATCH',
-		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
 		body: JSON.stringify(incomingAccountDto),
 	});
 };
@@ -447,6 +465,87 @@ export const disableContestPingsPings = async (
 	});
 };
 
+export type getBotFortuneProgressResponse200 = {
+	data: FortuneProgressDto;
+	status: 200;
+};
+
+export type getBotFortuneProgressResponse400 = {
+	data: ErrorResponse;
+	status: 400;
+};
+
+export type getBotFortuneProgressResponse404 = {
+	data: void;
+	status: 404;
+};
+
+export type getBotFortuneProgressResponseSuccess = getBotFortuneProgressResponse200 & {
+	headers: Headers;
+};
+export type getBotFortuneProgressResponseError = (
+	| getBotFortuneProgressResponse400
+	| getBotFortuneProgressResponse404
+) & {
+	headers: Headers;
+};
+
+export type getBotFortuneProgressResponse = getBotFortuneProgressResponseSuccess | getBotFortuneProgressResponseError;
+
+export const getGetBotFortuneProgressUrl = (playerUuid: string, profileUuid: string) => {
+	return `${ELITE_API_URL}/bot/fortune/${playerUuid}/${profileUuid}`;
+};
+
+/**
+ * Fortune progress for a profile member.
+ * @summary Get farming fortune progress
+ */
+export const getBotFortuneProgress = async (playerUuid: string, profileUuid: string, options?: RequestInit) => {
+	return customFetch<getBotFortuneProgressResponse>(getGetBotFortuneProgressUrl(playerUuid, profileUuid), {
+		...options,
+		method: 'GET',
+	});
+};
+
+export type getBotGardenVisitorsResponse200 = {
+	data: GardenVisitorsDto;
+	status: 200;
+};
+
+export type getBotGardenVisitorsResponse400 = {
+	data: ErrorResponse;
+	status: 400;
+};
+
+export type getBotGardenVisitorsResponse404 = {
+	data: void;
+	status: 404;
+};
+
+export type getBotGardenVisitorsResponseSuccess = getBotGardenVisitorsResponse200 & {
+	headers: Headers;
+};
+export type getBotGardenVisitorsResponseError = (getBotGardenVisitorsResponse400 | getBotGardenVisitorsResponse404) & {
+	headers: Headers;
+};
+
+export type getBotGardenVisitorsResponse = getBotGardenVisitorsResponseSuccess | getBotGardenVisitorsResponseError;
+
+export const getGetBotGardenVisitorsUrl = (profileUuid: string) => {
+	return `${ELITE_API_URL}/bot/garden/${profileUuid}/visitors`;
+};
+
+/**
+ * Garden visitors for a profile grouped by rarity, with the ones that have shown up and the ones still missing.
+ * @summary Get garden visitors
+ */
+export const getBotGardenVisitors = async (profileUuid: string, options?: RequestInit) => {
+	return customFetch<getBotGardenVisitorsResponse>(getGetBotGardenVisitorsUrl(profileUuid), {
+		...options,
+		method: 'GET',
+	});
+};
+
 export type refreshGuildResponse204 = {
 	data: void;
 	status: 204;
@@ -544,10 +643,24 @@ export const updateGuildChannel = async (
 	incomingGuildChannelDto: IncomingGuildChannelDto,
 	options?: RequestInit,
 ) => {
+	const getHeaders = (h?: NonNullable<RequestInit['headers']>) => {
+		if (!h) return {};
+		if (h instanceof Headers) return Object.fromEntries(h.entries());
+		if (Symbol.iterator in h) {
+			return Object.fromEntries(
+				Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+			);
+		}
+		const headers: Record<string, string | readonly string[]> = {};
+		for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+			if (value !== undefined) headers[name] = value;
+		}
+		return headers;
+	};
 	return customFetch<updateGuildChannelResponse>(getUpdateGuildChannelUrl(discordId), {
 		...options,
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
 		body: JSON.stringify(incomingGuildChannelDto),
 	});
 };
@@ -586,10 +699,24 @@ export const updateGuildMemberRoles = async (
 	listOfString: ListOfString,
 	options?: RequestInit,
 ) => {
+	const getHeaders = (h?: NonNullable<RequestInit['headers']>) => {
+		if (!h) return {};
+		if (h instanceof Headers) return Object.fromEntries(h.entries());
+		if (Symbol.iterator in h) {
+			return Object.fromEntries(
+				Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+			);
+		}
+		const headers: Record<string, string | readonly string[]> = {};
+		for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+			if (value !== undefined) headers[name] = value;
+		}
+		return headers;
+	};
 	return customFetch<updateGuildMemberRolesResponse>(getUpdateGuildMemberRolesUrl(discordId, userId), {
 		...options,
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
 		body: JSON.stringify(listOfString),
 	});
 };
@@ -625,10 +752,24 @@ export const updateGuildRole = async (
 	incomingGuildRoleDto: IncomingGuildRoleDto,
 	options?: RequestInit,
 ) => {
+	const getHeaders = (h?: NonNullable<RequestInit['headers']>) => {
+		if (!h) return {};
+		if (h instanceof Headers) return Object.fromEntries(h.entries());
+		if (Symbol.iterator in h) {
+			return Object.fromEntries(
+				Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+			);
+		}
+		const headers: Record<string, string | readonly string[]> = {};
+		for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+			if (value !== undefined) headers[name] = value;
+		}
+		return headers;
+	};
 	return customFetch<updateGuildRoleResponse>(getUpdateGuildRoleUrl(discordId), {
 		...options,
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
 		body: JSON.stringify(incomingGuildRoleDto),
 	});
 };
@@ -666,11 +807,71 @@ export const updateNotificationDeliveryAttempt = async (
 	updateNotificationDeliveryAttemptRequest: UpdateNotificationDeliveryAttemptRequest,
 	options?: RequestInit,
 ) => {
+	const getHeaders = (h?: NonNullable<RequestInit['headers']>) => {
+		if (!h) return {};
+		if (h instanceof Headers) return Object.fromEntries(h.entries());
+		if (Symbol.iterator in h) {
+			return Object.fromEntries(
+				Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+			);
+		}
+		const headers: Record<string, string | readonly string[]> = {};
+		for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+			if (value !== undefined) headers[name] = value;
+		}
+		return headers;
+	};
 	return customFetch<updateNotificationDeliveryAttemptResponse>(getUpdateNotificationDeliveryAttemptUrl(attemptId), {
 		...options,
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
 		body: JSON.stringify(updateNotificationDeliveryAttemptRequest),
+	});
+};
+
+export type getBotRatesResponse200 = {
+	data: RatesDto;
+	status: 200;
+};
+
+export type getBotRatesResponse400 = {
+	data: ErrorResponse;
+	status: 400;
+};
+
+export type getBotRatesResponseSuccess = getBotRatesResponse200 & {
+	headers: Headers;
+};
+export type getBotRatesResponseError = getBotRatesResponse400 & {
+	headers: Headers;
+};
+
+export type getBotRatesResponse = getBotRatesResponseSuccess | getBotRatesResponseError;
+
+export const getGetBotRatesUrl = (params?: GetBotRatesParams) => {
+	const normalizedParams = new URLSearchParams();
+
+	Object.entries(params || {}).forEach(([key, value]) => {
+		if (value !== undefined) {
+			normalizedParams.append(key, value === null ? 'null' : String(value));
+		}
+	});
+
+	const stringifiedParams = normalizedParams.toString();
+
+	return stringifiedParams.length > 0
+		? `${ELITE_API_URL}/bot/rates?${stringifiedParams}`
+		: `${ELITE_API_URL}/bot/rates`;
+};
+
+/**
+ * Expected rates for every crop on the maxed setup, with NPC and bazaar profit already priced. Unset values use the calculator defaults, and out of range values are clamped.
+ * @summary Get farming rates
+ */
+export const getBotRates = async (params?: GetBotRatesParams, options?: RequestInit) => {
+	return customFetch<getBotRatesResponse>(getGetBotRatesUrl(params), {
+		...options,
+		method: 'GET',
 	});
 };
 
@@ -784,10 +985,24 @@ export const updateJacobFeature = async (
 	params?: UpdateJacobFeatureParams,
 	options?: RequestInit,
 ) => {
+	const getHeaders = (h?: NonNullable<RequestInit['headers']>) => {
+		if (!h) return {};
+		if (h instanceof Headers) return Object.fromEntries(h.entries());
+		if (Symbol.iterator in h) {
+			return Object.fromEntries(
+				Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+			);
+		}
+		const headers: Record<string, string | readonly string[]> = {};
+		for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+			if (value !== undefined) headers[name] = value;
+		}
+		return headers;
+	};
 	return customFetch<updateJacobFeatureResponse>(getUpdateJacobFeatureUrl(discordId, params), {
 		...options,
 		method: 'PUT',
-		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
 		body: JSON.stringify(updateJacobFeatureRequestUpdateJacobFeature),
 	});
 };
@@ -1648,10 +1863,24 @@ export const getSpecifiedSkyblockItems = async (
 	getSpecifiedSkyblockItemsRequest: GetSpecifiedSkyblockItemsRequest,
 	options?: RequestInit,
 ) => {
+	const getHeaders = (h?: NonNullable<RequestInit['headers']>) => {
+		if (!h) return {};
+		if (h instanceof Headers) return Object.fromEntries(h.entries());
+		if (Symbol.iterator in h) {
+			return Object.fromEntries(
+				Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+			);
+		}
+		const headers: Record<string, string | readonly string[]> = {};
+		for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+			if (value !== undefined) headers[name] = value;
+		}
+		return headers;
+	};
 	return customFetch<getSpecifiedSkyblockItemsResponse>(getGetSpecifiedSkyblockItemsUrl(), {
 		...options,
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
 		body: JSON.stringify(getSpecifiedSkyblockItemsRequest),
 	});
 };
@@ -1701,10 +1930,24 @@ export const submitScore = async (
 	params?: SubmitScoreParams,
 	options?: RequestInit,
 ) => {
+	const getHeaders = (h?: NonNullable<RequestInit['headers']>) => {
+		if (!h) return {};
+		if (h instanceof Headers) return Object.fromEntries(h.entries());
+		if (Symbol.iterator in h) {
+			return Object.fromEntries(
+				Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+			);
+		}
+		const headers: Record<string, string | readonly string[]> = {};
+		for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+			if (value !== undefined) headers[name] = value;
+		}
+		return headers;
+	};
 	return customFetch<submitScoreResponse>(getSubmitScoreUrl(discordId, leaderboardId, params), {
 		...options,
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json', ...options?.headers },
+		headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
 		body: JSON.stringify(listOfString),
 	});
 };

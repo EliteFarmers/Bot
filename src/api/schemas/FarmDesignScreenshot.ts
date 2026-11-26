@@ -9,7 +9,14 @@
  */
 
 export interface FarmDesignScreenshot {
+	/**
+	 * @minLength 1
+	 * @maxLength 48
+	 */
 	assetId: string;
-	/** @nullable */
+	/**
+	 * @maxLength 500
+	 * @nullable
+	 */
 	caption?: string | null;
 }

@@ -15,4 +15,6 @@ export interface GardenUpgradesDto {
 	greenhouseYield: number;
 	greenhousePlotLimit: number;
 	greenhouseGrowthSpeed: number;
+	betterAdvertising: number;
+	maxOccupancy: number;
 }

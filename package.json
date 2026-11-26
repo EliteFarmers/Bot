@@ -39,7 +39,7 @@
 		"cron": "^4.4.0",
 		"date-fns": "^4.4.0",
 		"discord.js": "^14.27.0",
-		"farming-weight": "^0.16.1",
+		"farming-weight": "^0.17.2",
 		"orval": "8.44.0",
 		"redis": "^6.3.0",
 		"utf-8-validate": "^6.0.6",

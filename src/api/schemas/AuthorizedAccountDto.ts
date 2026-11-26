@@ -11,6 +11,7 @@ import type { ListOfEntitlementDto } from './ListOfEntitlementDto';
 import type { ListOfMinecraftAccountDetailsDto } from './ListOfMinecraftAccountDetailsDto';
 import type { ListOfString } from './ListOfString';
 import type { ListOfWeightStyleLinkedDto } from './ListOfWeightStyleLinkedDto';
+import type { PrivacySettingsDto } from './PrivacySettingsDto';
 import type { UserSettingsDto } from './UserSettingsDto';
 
 export interface AuthorizedAccountDto {
@@ -38,6 +39,7 @@ export interface AuthorizedAccountDto {
 	 */
 	banner?: string | null;
 	settings: UserSettingsDto;
+	privacy: PrivacySettingsDto;
 	entitlements: ListOfEntitlementDto;
 	cosmetics: ListOfWeightStyleLinkedDto;
 	minecraftAccounts: ListOfMinecraftAccountDetailsDto;

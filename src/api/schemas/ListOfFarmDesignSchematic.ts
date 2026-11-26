@@ -9,4 +9,7 @@
  */
 import type { FarmDesignSchematic } from './FarmDesignSchematic';
 
+/**
+ * @maxItems 10
+ */
 export type ListOfFarmDesignSchematic = FarmDesignSchematic[];

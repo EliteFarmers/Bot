@@ -11,4 +11,9 @@ import type { DictionaryOfStringAndPlayerLeaderboardEntryWithRankDto } from './D
 
 export interface LeaderboardRanksResponse {
 	ranks: DictionaryOfStringAndPlayerLeaderboardEntryWithRankDto;
+	/**
+	 * Unix seconds when the snapshot that ranks' previousRank comes from was captured
+	 * @nullable
+	 */
+	previousRanksAt?: number | null;
 }

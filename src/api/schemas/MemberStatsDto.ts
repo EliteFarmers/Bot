@@ -10,8 +10,7 @@
 import type { AbiphoneData } from './AbiphoneData';
 import type { AccessoryData } from './AccessoryData';
 import type { AccessoryDerivationsDto } from './AccessoryDerivationsDto';
-import type { BestiaryData } from './BestiaryData';
-import type { BestiaryDerivationsDto } from './BestiaryDerivationsDto';
+import type { BestiaryDto } from './BestiaryDto';
 import type { CarnivalData } from './CarnivalData';
 import type { CrimsonIsleStatsDto } from './CrimsonIsleStatsDto';
 import type { DungeonsStatsDto } from './DungeonsStatsDto';
@@ -31,8 +30,7 @@ export interface MemberStatsDto {
 	dungeons?: DungeonsStatsDto | null;
 	slayer?: SlayerData | null;
 	mining?: MiningStatsDto | null;
-	bestiary?: BestiaryData | null;
-	bestiaryDerivations?: BestiaryDerivationsDto | null;
+	bestiary?: BestiaryDto | null;
 	crimsonIsle?: CrimsonIsleStatsDto | null;
 	fishing?: FishingStatsDto | null;
 	rift?: RiftStatsDto | null;

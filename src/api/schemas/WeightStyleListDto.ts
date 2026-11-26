@@ -15,6 +15,7 @@ import type { FrameStyleData } from './FrameStyleData';
 import type { LeaderboardStyleData } from './LeaderboardStyleData';
 import type { NameCardStyleData } from './NameCardStyleData';
 import type { PageStyleData } from './PageStyleData';
+import type { StickerStyleData } from './StickerStyleData';
 import type { WeightStyleData } from './WeightStyleData';
 
 export interface WeightStyleListDto {
@@ -43,5 +44,6 @@ export interface WeightStyleListDto {
 	nameCard?: NameCardStyleData | null;
 	page?: PageStyleData | null;
 	frame?: FrameStyleData | null;
+	sticker?: StickerStyleData | null;
 	imageRefs: DictionaryOfStringAndImageAttachmentDto;
 }

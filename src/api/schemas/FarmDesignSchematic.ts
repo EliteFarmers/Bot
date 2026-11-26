@@ -9,5 +9,9 @@
  */
 
 export interface FarmDesignSchematic {
+	/**
+	 * @minLength 1
+	 * @maxLength 48
+	 */
 	assetId: string;
 }

@@ -10,20 +10,49 @@
 import type { ListOfString } from './ListOfString';
 
 export interface FarmDesignSetup {
+	/**
+	 * @minLength 1
+	 * @maxLength 64
+	 * @pattern ^[a-zA-Z0-9_-]+$
+	 */
 	id: string;
+	/** @maxLength 100 */
 	name: string;
 	crops: ListOfString;
+	/** @maxLength 5000 */
 	instructions: string;
-	/** @nullable */
+	/**
+	 * @minimum 0
+	 * @maximum 1000
+	 * @nullable
+	 */
 	bps?: number | null;
-	/** @nullable */
+	/**
+	 * @minimum 0
+	 * @maximum 1000
+	 * @nullable
+	 */
 	speed?: number | null;
-	/** @nullable */
+	/**
+	 * @maxLength 500
+	 * @nullable
+	 */
 	keys?: string | null;
-	/** @nullable */
+	/**
+	 * @minimum -180
+	 * @maximum 180
+	 * @nullable
+	 */
 	yaw?: number | null;
-	/** @nullable */
+	/**
+	 * @minimum -90
+	 * @maximum 90
+	 * @nullable
+	 */
 	pitch?: number | null;
-	/** @nullable */
+	/**
+	 * @maxLength 2000
+	 * @nullable
+	 */
 	notes?: string | null;
 }

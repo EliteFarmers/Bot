@@ -23,6 +23,16 @@ export interface LeaderboardPositionDto {
 	 *             time based leaderboard
 	 */
 	minAmount: number;
+	/**
+	 * Rank of the player in the leaderboard's previous daily snapshot, if they were ranked there
+	 * @nullable
+	 */
+	previousRank?: number | null;
+	/**
+	 * Unix seconds when the snapshot that previousRank comes from was captured
+	 * @nullable
+	 */
+	previousRanksAt?: number | null;
 	/** The starting rank of the returned upcoming players list */
 	upcomingRank: number;
 	upcomingPlayers?: ListOfLeaderboardEntryWithRankDto | null;

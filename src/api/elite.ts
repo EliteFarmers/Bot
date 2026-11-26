@@ -3,7 +3,10 @@ import {
 	disableContestPingsPings,
 	getAccount,
 	getAccountSettings,
+	getBotFortuneProgress,
+	getBotGardenVisitors,
 	getBotGuild,
+	getBotRates,
 	getContestPings,
 	getContestsAtTimestamp,
 	getCropGraphs,
@@ -45,6 +48,7 @@ import {
 } from './client/EliteAPI';
 import {
 	FarmingInventoryDto,
+	GetBotRatesParams,
 	GuildJacobLeaderboardFeature,
 	IncomingGuildChannelDto,
 	IncomingGuildRoleDto,
@@ -77,12 +81,20 @@ const EmptyFarmingInventory: FarmingInventoryDto = {
 	tools: [],
 	equipment: [],
 	accessories: [],
+	sprayonators: []
 };
 
 export const FetchVirtualFarmingInventory = async (playerUuid: string, profileUuid: string) => {
 	const result = await getVirtualFarmingInventory(playerUuid, profileUuid).catch(() => undefined);
 	return result?.data ?? EmptyFarmingInventory;
 };
+
+export const FetchFortuneProgress = (playerUuid: string, profileUuid: string) =>
+	getBotFortuneProgress(playerUuid, profileUuid);
+
+export const FetchRates = (params: GetBotRatesParams) => getBotRates(params);
+
+export const FetchGardenVisitors = (profileUuid: string) => getBotGardenVisitors(profileUuid);
 
 export const FetchSelectedProfile = (playerUuid: string) => getSelectedProfile(playerUuid);
 

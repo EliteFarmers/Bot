@@ -9,4 +9,7 @@
  */
 import type { FarmDesignSetup } from './FarmDesignSetup';
 
+/**
+ * @maxItems 30
+ */
 export type ListOfFarmDesignSetup = FarmDesignSetup[];

@@ -13,7 +13,6 @@ export interface GreenhouseUpgradeCatalogDto {
 	name: string;
 	rewardFormula: string;
 	format: string;
-	tooltip: string;
 	maxLevel: number;
 	upgrades: ListOfDictionaryOfStringAndInt32;
 }

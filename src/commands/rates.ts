@@ -12,28 +12,12 @@ import {
 	TextInputBuilder,
 	TextInputStyle,
 } from 'discord.js';
-import {
-	BEST_FARMING_TOOLS,
-	CROP_INFO,
-	Crop,
-	calculateAverageSpecialCrops,
-	calculateDetailedDropsFromEffects,
-	createFarmingPlayer,
-	type DetailedDropsFromEffectsResult,
-	type Effect,
-	FarmingPet,
-	getCropDisplayName,
-	getPossibleResultsFromCrops,
-	isGlobalOverbloomScope,
-	MAX_CROP_FORTUNE,
-	Rarity,
-	REFORGES,
-	Stat,
-} from 'farming-weight';
-import { FetchProducts, UserSettings } from '../api/elite';
+import { Crop, getCropDisplayName } from 'farming-weight';
+import { FetchRates, UserSettings } from '../api/elite';
+import type { CropRateDto, RatesDto } from '../api/schemas';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index';
 import { EliteContainer } from '../classes/components';
-import { NotYoursReply } from '../classes/embeds';
+import { ErrorEmbed, NotYoursReply } from '../classes/embeds';
 import { CropSelectRow, EliteCropEmojis, GetCropEmoji } from '../classes/Util';
 
 const TIME_OPTIONS = {
@@ -44,33 +28,25 @@ const TIME_OPTIONS = {
 	1_728_000: '24 Hours',
 };
 
-const DefaultOverbloom = 100;
+const MaxFortune = 5000;
 const MaxOverbloom = 500;
 
 type RatesReforge = 'bountiful' | 'blessed';
 type RatesPet = 'rose_dragon' | 'mooshroom' | 'elephant';
 
-type RatesCalculatorInput = {
-	fortuneInput?: number;
-	overbloom: number;
+export type RatesCalculatorInput = {
+	fortune?: number;
+	overbloom?: number;
 	blocks: number;
 	reforge: RatesReforge;
 	pet: RatesPet;
 	bps: number;
-	useLevel50Tool: boolean;
+	maxTool: boolean;
+	rarefinder: boolean;
 	mechamind: boolean;
+	cropeetle: boolean;
 	wartyBug: boolean;
 };
-
-type RatesCalculatorState = RatesCalculatorInput & {
-	timeName: (typeof TIME_OPTIONS)[keyof typeof TIME_OPTIONS];
-	blocksBroken: number;
-	petName: string;
-	petData?: FarmingPet;
-};
-
-type FormattedCropRate = ReturnType<typeof formatCropRate>;
-type FormattedRatesResult = ReturnType<typeof formatRatesForDisplay>;
 
 const command = new EliteCommand({
 	name: 'rates',
@@ -82,11 +58,11 @@ const command = new EliteCommand({
 			name: 'fortune',
 			description: 'The amount of fortune to calculate rates for!',
 			type: SlashCommandOptionType.Integer,
-			builder: (b) => b.setMinValue(0).setMaxValue(5000),
+			builder: (b) => b.setMinValue(0).setMaxValue(MaxFortune),
 		},
 		overbloom: {
 			name: 'overbloom',
-			description: `The amount of Overbloom to calculate rates for! (default: ${DefaultOverbloom})`,
+			description: 'The total Overbloom to calculate rates for! (default: the max setup)',
 			type: SlashCommandOptionType.Number,
 			builder: (b) => b.setMinValue(0).setMaxValue(MaxOverbloom),
 		},
@@ -137,20 +113,25 @@ const command = new EliteCommand({
 
 export default command;
 
-const ElephantFortuneDiff = 396.7 - 260;
-const MooshroomFortuneDiff = 396.7 - 207;
 const fortuneEmoji = '<:ff:1450022749631287330>';
-const DescriptionSeparator = ' \u2022 ';
+const DescriptionSeparator = ' • ';
 
 async function execute(interaction: ChatInputCommandInteraction, settings?: UserSettings) {
-	const calculatorInput = getRatesCalculatorInput(interaction);
-	let calculatorState = buildRatesCalculatorState(calculatorInput);
-	let rates = await getFormattedRatesResult(calculatorState);
+	let input = getRatesCalculatorInput(interaction);
 
 	await interaction.deferReply();
 
+	let rates = await fetchRates(input);
+	if (!rates) {
+		const embed = ErrorEmbed('Rates are temporarily unavailable!')
+			.setDescription('Rate calculations are offline right now. Please try again in a few minutes.')
+			.setFooter({ text: 'Contact kaeso.dev if this continues to happen' });
+		await interaction.editReply({ embeds: [embed] });
+		return;
+	}
+
 	const row = CropSelectRow('crop-select-rates', 'Select a crop to view its rates!');
-	let container = buildCompactRatesContainer(settings, interaction.user.id, calculatorState, rates, row);
+	let container = buildCompactRatesContainer(settings, interaction.user.id, rates, row);
 	const cropList = Object.keys(EliteCropEmojis) as Crop[];
 
 	const reply = await interaction.editReply({
@@ -186,8 +167,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		if (inter.customId === 'rates-settings') {
 			const modalCustomId = `rates-settings-modal-${inter.id}`;
-			const settingsModal = buildRatesSettingsModal(calculatorState, modalCustomId);
-			await inter.showModal(settingsModal);
+			await inter.showModal(buildRatesSettingsModal(input, modalCustomId));
 
 			const filter = (i: ModalSubmitInteraction) => i.customId === modalCustomId && i.user.id === interaction.user.id;
 
@@ -198,50 +178,50 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 				})
 				.catch(() => null);
 
-			if (submitted && submitted.isFromMessage()) {
-				const other = submitted.fields.getCheckboxGroup('other-modifiers') || [];
-				const fortuneRaw = submitted.fields.getTextInputValue('fortune-input').trim();
-				const overbloomRaw = submitted.fields.getTextInputValue('overbloom-input');
-				try {
-					const newState = buildRatesCalculatorState({
-						fortuneInput:
-							fortuneRaw === ''
-								? undefined
-								: clampOr(Number.parseInt(fortuneRaw), 5000, calculatorState.fortuneInput) || undefined,
-						overbloom: clampOr(Number.parseFloat(overbloomRaw), MaxOverbloom, calculatorState.overbloom),
-						blocks: +submitted.fields.getStringSelectValues('time-input')[0] || calculatorState.blocks,
-						reforge: other.includes('bountiful') ? 'bountiful' : 'blessed',
-						pet: (submitted.fields.getStringSelectValues('pet-input')[0] as RatesPet) || calculatorState.pet,
-						bps: calculatorState.bps,
-						useLevel50Tool: other.includes('max-tool'),
-						mechamind: other.includes('mechamind'),
-						wartyBug: other.includes('warty_bug'),
-					});
-					calculatorState = newState;
-				} catch (e) {
-					console.error('Error parsing settings modal input', e);
-				}
-				rates = await getFormattedRatesResult(calculatorState);
-				container = buildCompactRatesContainer(settings, interaction.user.id, calculatorState, rates, row);
-
-				await submitted.update({
-					components: [container],
-					flags: [MessageFlags.IsComponentsV2],
-				});
-			} else {
+			if (!submitted || !submitted.isFromMessage()) {
 				console.error('No settings submitted');
+				return;
 			}
+
+			await submitted.deferUpdate();
+
+			const newInput = readRatesSettingsModal(submitted, input);
+			const newRates = newInput ? await fetchRates(newInput) : undefined;
+
+			if (!newInput || !newRates) {
+				const embed = ErrorEmbed(newInput ? 'Rates are temporarily unavailable!' : "Couldn't read those settings!")
+					.setDescription(
+						newInput
+							? 'Your new settings were not applied, so the rates shown are still the previous ones. Please try again in a few minutes.'
+							: 'Your new settings were not applied, so the rates shown are still the previous ones.',
+					)
+					.setFooter({ text: 'Contact kaeso.dev if this continues to happen' });
+				await submitted.followUp({ embeds: [embed], flags: [MessageFlags.Ephemeral] }).catch(() => undefined);
+				return;
+			}
+
+			input = newInput;
+			rates = newRates;
+			cropContainer = undefined;
+			container = buildCompactRatesContainer(settings, interaction.user.id, rates, row);
+
+			await submitted.editReply({
+				components: [container],
+				flags: [MessageFlags.IsComponentsV2],
+			});
 
 			return;
 		}
 
 		if (inter.customId !== 'crop-select-rates' && !inter.customId.startsWith('crop-select-rates-')) return;
+		if (!rates) return;
 
 		const selected = inter instanceof StringSelectMenuInteraction ? +inter.values[0] : +inter.customId.split('-')[3];
 		const selectedCrop = cropList[selected] as Crop;
-		const cropInfo = rates.formatted.find((c) => c.crop === selectedCrop) || rates.formatted[selected];
+		const cropRate = rates.crops.find((c) => c.crop === selectedCrop) || rates.crops[selected];
+		if (!cropRate) return;
 
-		cropContainer = buildCropRatesContainer(settings, calculatorState, cropInfo);
+		cropContainer = buildCropRatesContainer(settings, rates, cropRate);
 
 		inter.update({ components: [cropContainer, row] });
 	});
@@ -258,357 +238,116 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 function getRatesCalculatorInput(interaction: ChatInputCommandInteraction): RatesCalculatorInput {
 	return {
-		fortuneInput: interaction.options.getInteger('fortune', false) || undefined,
-		overbloom: interaction.options.getNumber('overbloom', false) ?? DefaultOverbloom,
+		fortune: interaction.options.getInteger('fortune', false) ?? undefined,
+		overbloom: interaction.options.getNumber('overbloom', false) ?? undefined,
 		blocks: interaction.options.getInteger('time', false) ?? 72_000,
 		reforge: (interaction.options.getString('reforge', false) ?? 'bountiful') as RatesReforge,
 		pet: (interaction.options.getString('pet', false) ?? 'rose_dragon') as RatesPet,
 		bps: interaction.options.getNumber('bps', false) ?? 20,
-		useLevel50Tool: interaction.options.getBoolean('max-tool', false) ?? true,
+		maxTool: interaction.options.getBoolean('max-tool', false) ?? true,
+		rarefinder: true,
 		mechamind: true,
+		cropeetle: true,
 		wartyBug: false,
 	};
 }
 
-function clampOr<T>(value: number, max: number, fallback: T) {
-	return Number.isFinite(value) ? Math.max(0, Math.min(max, value)) : fallback;
+async function fetchRates(input: RatesCalculatorInput) {
+	const response = await FetchRates(input).catch(() => undefined);
+	return response?.ok ? response.data : undefined;
 }
 
-function buildRatesCalculatorState(input: RatesCalculatorInput): RatesCalculatorState {
-	return {
-		...input,
-		timeName: TIME_OPTIONS[input.blocks as keyof typeof TIME_OPTIONS],
-		blocksBroken: Math.round(input.blocks * (input.bps / 20)),
-		petName: getPetName(input.pet),
-		petData: getPetData(input.pet),
-	};
+function parseOptionalNumber(raw: string, max: number, parse: (value: string) => number) {
+	const trimmed = raw.trim();
+	if (trimmed === '') return { valid: true, value: undefined };
+
+	const value = parse(trimmed);
+	if (!Number.isFinite(value)) return { valid: false, value: undefined };
+
+	return { valid: true, value: Math.max(0, Math.min(max, value)) };
 }
 
-function getPetName(pet: RatesPet) {
-	return pet === 'mooshroom' ? 'Mooshroom Cow' : pet === 'elephant' ? 'Elephant' : 'Rose Dragon';
-}
+function readRatesSettingsModal(
+	submitted: ModalSubmitInteraction,
+	current: RatesCalculatorInput,
+): RatesCalculatorInput | undefined {
+	try {
+		const other = submitted.fields.getCheckboxGroup('other-modifiers') || [];
+		const fortune = parseOptionalNumber(submitted.fields.getTextInputValue('fortune-input'), MaxFortune, (value) =>
+			Number.parseInt(value, 10),
+		);
+		const overbloom = parseOptionalNumber(
+			submitted.fields.getTextInputValue('overbloom-input'),
+			MaxOverbloom,
+			Number.parseFloat,
+		);
 
-function getPetData(pet: RatesPet) {
-	if (pet === 'mooshroom') {
-		return new FarmingPet({
-			type: 'MOOSHROOM_COW',
-			exp: 30_000_000_000,
-			active: true,
-			tier: 'LEGENDARY',
-			heldItem: 'GREEN_BANDANA',
-		});
-	}
-
-	if (pet === 'elephant') {
-		return new FarmingPet({
-			type: 'ELEPHANT',
-			exp: 30_000_000_000,
-			active: true,
-			tier: 'MYTHIC',
-			heldItem: 'GREEN_BANDANA',
-		});
-	}
-
-	return new FarmingPet({
-		type: 'ROSE_DRAGON',
-		exp: 1708399946,
-		active: true,
-		tier: 'LEGENDARY',
-		heldItem: 'GREEN_BANDANA',
-	});
-}
-
-async function getFormattedRatesResult(state: RatesCalculatorState) {
-	const expectedDrops = getExpectedDrops(state);
-	const bazaar = await fetchRatesBazaarProducts(expectedDrops);
-
-	return formatRatesForDisplay(expectedDrops, bazaar);
-}
-
-function getExpectedDrops(state: RatesCalculatorState): Partial<Record<Crop, DetailedDropsFromEffectsResult>> {
-	const cropFortune = getPetCropFortuneOverride(state);
-	const expectedDrops: Partial<Record<Crop, DetailedDropsFromEffectsResult>> = {};
-
-	for (const crop of Object.keys(CROP_INFO) as Crop[]) {
-		if (crop === Crop.Seeds) continue;
-		expectedDrops[crop] = calculateCropDrops(state, crop, cropFortune);
-	}
-
-	return expectedDrops;
-}
-
-function calculateCropDrops(
-	state: RatesCalculatorState,
-	crop: Crop,
-	cropFortune?: Partial<Record<Crop, number>>,
-): DetailedDropsFromEffectsResult {
-	const player = createFarmingPlayer({
-		selectedCrop: crop,
-		pets: state.petData ? [state.petData] : [],
-		chips: {
-			mechamind: state.mechamind ? 20 : 0,
-		},
-		attributes: {
-			wart_eater: state.wartyBug ? 24 : 0,
-		},
-	});
-
-	if (state.petData) {
-		player.selectPet(state.petData);
-	}
-
-	const env = player.buildEnvironment(crop);
-	const effects = player.collectEffects(env).filter((effect) => !isTotalOverbloomEffect(effect));
-	const overbloomEffect: Effect = {
-		source: 'Overbloom',
-		op: 'add-rare-pct',
-		value: state.overbloom,
-		scope: { tags: ['overbloom'] },
-		relatedStats: [Stat.Overbloom],
-	};
-
-	return calculateDetailedDropsFromEffects({
-		crop,
-		farmingFortune: getSyntheticFarmingFortune(state, crop, cropFortune),
-		blocksBroken: state.blocksBroken,
-		bountiful: state.reforge === 'bountiful',
-		mooshroom: state.pet === 'mooshroom',
-		maxTool: state.useLevel50Tool,
-		pet: state.petData,
-		chips: {
-			mechamind: state.mechamind ? 20 : 0,
-		},
-		effects: [...effects, overbloomEffect],
-		env,
-	});
-}
-
-function isTotalOverbloomEffect(effect: Effect) {
-	return (
-		effect.op === 'add-rare-pct' &&
-		effect.relatedStats?.includes(Stat.Overbloom) === true &&
-		isGlobalOverbloomScope(effect.scope)
-	);
-}
-
-function getSyntheticFarmingFortune(
-	state: RatesCalculatorState,
-	crop: Crop,
-	cropFortune?: Partial<Record<Crop, number>>,
-) {
-	if (state.fortuneInput !== undefined || cropFortune?.[crop] === undefined) {
-		return state.fortuneInput;
-	}
-
-	if (state.reforge === 'bountiful') {
-		return cropFortune[crop];
-	}
-
-	const maxRarity = BEST_FARMING_TOOLS[crop]?.maxRarity ?? Rarity.Mythic;
-	const bountifulFortune = REFORGES.bountiful?.tiers[maxRarity]?.stats?.[Stat.FarmingFortune] ?? 0;
-	const blessedFortune = REFORGES.blessed?.tiers[maxRarity]?.stats?.[Stat.FarmingFortune] ?? 0;
-
-	return cropFortune[crop] + blessedFortune - bountifulFortune;
-}
-
-function getPetCropFortuneOverride(state: RatesCalculatorState) {
-	// Subtract difference from not using rose dragon pet if we don't have it
-	// selected (default behavior already uses MAX_CROP_FORTUNE)
-	if (state.fortuneInput !== undefined || state.pet === 'rose_dragon') {
+		return {
+			fortune: fortune.valid ? fortune.value : current.fortune,
+			overbloom: overbloom.valid ? overbloom.value : current.overbloom,
+			blocks: +submitted.fields.getStringSelectValues('time-input')[0] || current.blocks,
+			reforge: other.includes('bountiful') ? 'bountiful' : 'blessed',
+			pet: (submitted.fields.getStringSelectValues('pet-input')[0] as RatesPet) || current.pet,
+			bps: current.bps,
+			maxTool: other.includes('max-tool'),
+			rarefinder: other.includes('rarefinder'),
+			mechamind: other.includes('mechamind'),
+			cropeetle: other.includes('cropeetle'),
+			wartyBug: other.includes('warty_bug'),
+		};
+	} catch (e) {
+		console.error('Error parsing settings modal input', e);
 		return undefined;
 	}
-
-	const diff = state.pet === 'mooshroom' ? MooshroomFortuneDiff : ElephantFortuneDiff;
-
-	return Object.fromEntries(
-		Object.entries(MAX_CROP_FORTUNE).map(([crop, max]) => [crop, max - diff]),
-	) as typeof MAX_CROP_FORTUNE;
 }
 
-async function fetchRatesBazaarProducts(expectedDrops: Partial<Record<Crop, DetailedDropsFromEffectsResult>>) {
-	const craftIds = Object.values(CROP_INFO)
-		.map((info) => info.crafts.map((c) => c.item))
-		.flat();
-	const dropIds = Object.values(expectedDrops)
-		.flatMap((details) => Object.keys(details?.items ?? {}))
-		.filter((id) => id !== Crop.Seeds);
-	const rareDropIds = Object.values(expectedDrops).flatMap((details) => Object.keys(details?.rngItems ?? {}));
-	const allIds = [...new Set([...craftIds, ...dropIds, ...rareDropIds])] as string[];
-	const { data } = await FetchProducts(allIds);
+const formatCoins = (value: number) => Math.floor(value).toLocaleString();
+const formatAmount = (value: number) => (+value.toFixed(2)).toLocaleString();
 
-	return data;
-}
-
-function formatRatesForDisplay(
-	expectedDrops: Partial<Record<Crop, DetailedDropsFromEffectsResult>>,
-	bazaar: Awaited<ReturnType<typeof fetchRatesBazaarProducts>>,
-) {
-	let profitLength = 0;
-	let bzLength = 0;
-
-	const formatted = Object.entries(expectedDrops)
-		.map(([crop, details]) => {
-			const cropRate = formatCropRate(crop as Crop, details as DetailedDropsFromEffectsResult, bazaar);
-			const highestBz = cropRate.bz[0];
-
-			if (cropRate.profit.toLocaleString().length > profitLength) {
-				profitLength = cropRate.profit.toLocaleString().length;
-			}
-
-			if (highestBz && highestBz.total.toLocaleString().length > bzLength) {
-				bzLength = highestBz.total.toLocaleString().length;
-			}
-
-			return cropRate;
-		})
-		.sort((a, b) => b.profit - a.profit);
-
-	return {
-		formatted,
-		profitLength,
-		bzLength,
-	};
-}
-
-function formatCropRate(
-	crop: Crop,
-	details: DetailedDropsFromEffectsResult,
-	bazaar: Awaited<ReturnType<typeof fetchRatesBazaarProducts>>,
-) {
-	const cropName = getCropDisplayName(crop);
-	const profit = details.npcCoins ?? 0;
-	const cropItems = details.items?.[crop] ?? 0;
-	const otherCoinsNpc = (details.npcCoins ?? 0) - cropItems * details.npcPrice;
-
-	const { sellToBazaar, sellToBazaarCoins, sellToBazaarDelta } = getSellToBazaarData(crop, details, bazaar);
-	const otherCoinsTotal = otherCoinsNpc + sellToBazaarDelta;
-	const otherCoinsNpcRemaining = Math.max(0, otherCoinsTotal - sellToBazaarCoins);
-	const bz = getBazaarRates(crop, details, bazaar, otherCoinsTotal);
-
-	return {
-		crop,
-		emoji: GetCropEmoji(cropName),
-		bz: bz.length ? bz : [{ name: 'N/A', items: 0, cost: 0, per: 0, profit: 0, total: 0 }],
-		other: {
-			total: Math.floor(otherCoinsTotal),
-			npc: Math.floor(otherCoinsNpcRemaining),
-			bazaar: Math.floor(sellToBazaarCoins),
-			sellToBazaar: sellToBazaar.map((x) => ({ ...x, items: x.items })),
-		},
-		details,
-		profit,
-	};
-}
-
-function getSellToBazaarData(
-	crop: Crop,
-	details: DetailedDropsFromEffectsResult,
-	bazaar: Awaited<ReturnType<typeof fetchRatesBazaarProducts>>,
-) {
-	const sellToBazaar = [];
-	let sellToBazaarCoins = 0;
-	let sellToBazaarDelta = 0;
-
-	for (const [itemId, items] of [...Object.entries(details.items ?? {}), ...Object.entries(details.rngItems ?? {})]) {
-		if (itemId === crop) continue;
-		if (!items || items <= 0) continue;
-
-		const itemData = bazaar?.items?.[itemId];
-		const bzData = itemData?.bazaar;
-		if (!bzData) continue;
-
-		const npc = bzData.npc ?? 0;
-		const per = bzData.averageSellOrder ?? 0;
-		if (per <= npc || per <= 0) continue;
-
-		const gain = items * (per - npc);
-		sellToBazaarDelta += gain;
-		sellToBazaarCoins += items * per;
-		sellToBazaar.push({
-			itemId,
-			name: itemData?.name ?? itemId,
-			items,
-			npc,
-			per,
-			gain,
-		});
-	}
-
-	sellToBazaar.sort((a, b) => b.gain - a.gain);
-
-	return {
-		sellToBazaar,
-		sellToBazaarCoins,
-		sellToBazaarDelta,
-	};
-}
-
-function getBazaarRates(
-	crop: Crop,
-	details: DetailedDropsFromEffectsResult,
-	bazaar: Awaited<ReturnType<typeof fetchRatesBazaarProducts>>,
-	otherCoinsTotal: number,
-) {
-	const crafts = getPossibleResultsFromCrops(crop, details.items[crop] ?? details.collection);
-	const bz = [];
-
-	for (const [itemId, craft] of Object.entries(crafts)) {
-		if (itemId === crop) continue;
-		const bzData = bazaar?.items?.[itemId];
-		if (!bzData?.bazaar) continue;
-
-		const profit = craft.fractionalItems * bzData.bazaar.averageSellOrder - craft.fractionalCost;
-
-		bz.push({
-			name: bzData.name ?? itemId,
-			items: craft.fractionalItems,
-			cost: craft.fractionalCost,
-			per: bzData.bazaar.averageSellOrder,
-			profit: Math.floor(profit),
-			total: Math.floor(profit + otherCoinsTotal),
-		});
-	}
-
-	bz.sort((a, b) => b.total - a.total);
-
-	return bz;
-}
-
-function buildCompactRatesContainer(
+export function buildCompactRatesContainer(
 	settings: UserSettings | undefined,
 	userId: string,
-	state: RatesCalculatorState,
-	rates: FormattedRatesResult,
+	rates: RatesDto,
 	row: ReturnType<typeof CropSelectRow>,
 ) {
 	const compactContainer = new EliteContainer(settings)
 		.addTitle('## Farming Rates Calculator', false)
 		.addButtonSection(
 			new ButtonBuilder().setCustomId('rates-settings').setLabel('Settings').setStyle(ButtonStyle.Primary),
-			buildSummaryDescription(state),
+			buildRatesDescription(rates, rates.inputs.fortune ?? undefined, getSharedOverbloom(rates)),
 		)
 		.addSeparator();
 
-	for (const cropRate of rates.formatted) {
-		compactContainer.addText(getCompactRateText(cropRate, rates));
+	const npcLength = Math.max(0, ...rates.crops.map((crop) => formatCoins(crop.npc.total).length));
+	const bzLength = Math.max(0, ...rates.crops.map((crop) => formatCoins(getBestBazaarTotal(crop)).length));
+
+	for (const crop of rates.crops) {
+		const values = `:coin: \`${formatCoins(crop.npc.total).padStart(npcLength, ' ')}\` **BZ** \`${formatCoins(
+			getBestBazaarTotal(crop),
+		).padStart(bzLength, ' ')}\` ${fortuneEmoji} \`${formatAmount(crop.fortune)}\``;
+
+		compactContainer.addText(`${GetCropEmoji(getCropDisplayName(crop.crop as Crop))} ${values}`);
 	}
 
 	compactContainer.addActionRowComponents(row);
 	compactContainer.addSeparator();
-	compactContainer.addText("**What's my fortune?**\n-# " + getFortuneDetailsText(settings, userId, state.fortuneInput));
+	compactContainer.addText(
+		"**What's my fortune?**\n-# " + getFortuneDetailsText(settings, userId, rates.inputs.fortune ?? undefined),
+	);
 	compactContainer.addFooter();
 
 	return compactContainer;
 }
 
-function getCompactRateText(cropRate: FormattedCropRate, rates: FormattedRatesResult) {
-	const values = `:coin: \`${cropRate.profit.toLocaleString().padStart(rates.profitLength, ' ')}\` **BZ** \`${(
-		cropRate.bz[0]?.total ?? 0
-	)
-		.toLocaleString()
-		.padStart(rates.bzLength, ' ')}\` ${fortuneEmoji} \`${cropRate.details.fortune.toLocaleString()}\``;
+function getBestBazaarTotal(crop: CropRateDto) {
+	return crop.bazaar.crafts[0]?.total ?? 0;
+}
 
-	return `${cropRate.emoji} ${values}`;
+function getSharedOverbloom(rates: RatesDto) {
+	if (rates.inputs.overbloom !== undefined && rates.inputs.overbloom !== null) return rates.inputs.overbloom;
+
+	const first = rates.crops[0]?.overbloom;
+	return rates.crops.every((crop) => crop.overbloom === first) ? first : undefined;
 }
 
 function getFortuneDetailsText(settings: UserSettings | undefined, userId: string, fortuneInput?: number) {
@@ -624,95 +363,70 @@ function getFortuneDetailsText(settings: UserSettings | undefined, userId: strin
 	return details;
 }
 
-function buildCropRatesContainer(
-	settings: UserSettings | undefined,
-	state: RatesCalculatorState,
-	cropInfo: FormattedCropRate,
-) {
-	const cropName = getCropDisplayName(cropInfo.crop);
-	const coinSources = sortEntryValues(cropInfo.details.coinSources);
-	const collections = sortEntryValues(cropInfo.details.otherCollection);
-	const threeFourths = calculateAverageSpecialCrops(state.blocksBroken, cropInfo.crop, 3);
-	const fromSpecial = cropInfo.details.coinSources[threeFourths.type] ?? 0;
-	const specialDifference = fromSpecial - threeFourths.npc;
-	const threeFourthsTotal = cropInfo.details.npcCoins - specialDifference;
+export function buildCropRatesContainer(settings: UserSettings | undefined, rates: RatesDto, crop: CropRateDto) {
+	const cropName = getCropDisplayName(crop.crop as Crop);
 
 	return new EliteContainer(settings)
 		.addTitle('## ' + cropName + ' Rates', false)
 		.addButtonSection(
 			new ButtonBuilder().setCustomId('rates-settings').setLabel('Settings').setStyle(ButtonStyle.Primary),
-			buildCropDescription(state, cropInfo.details.fortune),
+			buildRatesDescription(rates, rates.inputs.fortune ?? crop.fortune, crop.overbloom),
 		)
 		.addSeparator()
 		.addCollapsible({
 			header: '**NPC Profit**',
 			collapsed: {
-				text: '### :coin: ' + cropInfo.details.npcCoins.toLocaleString() || '0',
+				text: '### :coin: ' + formatCoins(crop.npc.total),
 			},
 			expanded: {
-				text: buildNpcProfitText(
-					coinSources,
-					threeFourthsTotal,
-					specialDifference,
-					threeFourths.amount,
-					threeFourths.type,
-				),
+				text: buildNpcProfitText(crop),
 			},
 		})
 		.addSeparator()
 		.addCollapsible({
 			header: '**Bazaar Profit**',
 			collapsed: {
-				text: '### <:bz:1376714811894796328> ' + cropInfo.bz[0].total.toLocaleString() || '0',
+				text: '### <:bz:1376714811894796328> ' + formatCoins(getBestBazaarTotal(crop)),
 			},
 			expanded: {
-				text: buildBazaarProfitText(cropInfo),
+				text: buildBazaarProfitText(crop),
 			},
 		})
 		.addSeparator()
 		.addCollapsible({
 			header: '**Collection Gain**',
 			collapsed: {
-				text: '### ' + GetCropEmoji(cropName) + ' ' + cropInfo.details.collection.toLocaleString(),
+				text: '### ' + GetCropEmoji(cropName) + ' ' + formatCoins(crop.collection.total),
 			},
 			expanded: {
-				text: buildCollectionGainText(collections),
+				text: crop.collection.sources
+					.map((source) => `- **${source.name}:** ${formatAmount(source.amount)}`)
+					.join('\n'),
 			},
 		})
 		.addFooter(true, 'back');
 }
 
-function buildRatesSettingsModal(state: RatesCalculatorState, modalCustomId: string) {
-	// Build a modal to update the rate calculation inputs and modifiers
-	// Pre-fill the inputs with the current settings
-	// On submit, update the rates display with the new settings
-
+export function buildRatesSettingsModal(input: RatesCalculatorInput, modalCustomId: string) {
 	const modal = new ModalBuilder().setCustomId(modalCustomId).setTitle('Rates Calculator Settings');
-
-	// Fortune input
 
 	const fortuneInput = new TextInputBuilder()
 		.setCustomId('fortune-input')
 		.setStyle(TextInputStyle.Short)
-		.setPlaceholder('Enter a custom fortune amount')
-		.setValue(state.fortuneInput?.toString() ?? '')
+		.setPlaceholder('Leave empty for max fortune')
+		.setValue(input.fortune?.toString() ?? '')
 		.setRequired(false);
 
-	const label = new LabelBuilder().setLabel('Farming Fortune').setTextInputComponent(fortuneInput);
-	modal.addLabelComponents(label);
-
-	// Overbloom input
+	modal.addLabelComponents(new LabelBuilder().setLabel('Farming Fortune').setTextInputComponent(fortuneInput));
 
 	const overbloomInput = new TextInputBuilder()
 		.setCustomId('overbloom-input')
 		.setStyle(TextInputStyle.Short)
-		.setPlaceholder('Enter your total Overbloom')
-		.setValue(state.overbloom.toString())
-		.setRequired(true);
+		.setPlaceholder('Leave empty for the max setup')
+		.setValue(input.overbloom?.toString() ?? '')
+		.setRequired(false);
 
 	modal.addLabelComponents(new LabelBuilder().setLabel('Overbloom').setTextInputComponent(overbloomInput));
-
-	// Time input
 
 	const timeInput = new StringSelectMenuBuilder()
 		.setCustomId('time-input')
@@ -721,13 +435,11 @@ function buildRatesSettingsModal(state: RatesCalculatorState, modalCustomId: str
 			...Object.entries(TIME_OPTIONS).map(([value, name]) => ({
 				label: name,
 				value,
-				default: state.blocks === +value,
+				default: input.blocks === +value,
 			})),
 		);
 
 	modal.addLabelComponents(new LabelBuilder().setLabel('Time Period').setStringSelectMenuComponent(timeInput));
-
-	// Pet input
 
 	const petInput = new StringSelectMenuBuilder()
 		.setCustomId('pet-input')
@@ -736,23 +448,21 @@ function buildRatesSettingsModal(state: RatesCalculatorState, modalCustomId: str
 			{
 				label: 'Rose Dragon',
 				value: 'rose_dragon',
-				default: state.pet === 'rose_dragon',
+				default: input.pet === 'rose_dragon',
 			},
 			{
 				label: 'Mooshroom Cow',
 				value: 'mooshroom',
-				default: state.pet === 'mooshroom',
+				default: input.pet === 'mooshroom',
 			},
 			{
 				label: 'Elephant',
 				value: 'elephant',
-				default: state.pet === 'elephant',
+				default: input.pet === 'elephant',
 			},
 		);
 
 	modal.addLabelComponents(new LabelBuilder().setLabel('Pet').setStringSelectMenuComponent(petInput));
-
-	// Other modifiers
 
 	const otherSelect = new CheckboxGroupBuilder()
 		.setRequired(false)
@@ -761,22 +471,32 @@ function buildRatesSettingsModal(state: RatesCalculatorState, modalCustomId: str
 			{
 				label: 'Bountiful reforge (otherwise Blessed)',
 				value: 'bountiful',
-				default: state.reforge === 'bountiful',
+				default: input.reforge === 'bountiful',
 			},
 			{
 				label: 'Level 50 farming tool',
 				value: 'max-tool',
-				default: state.useLevel50Tool,
+				default: input.maxTool,
+			},
+			{
+				label: 'Max Rarefinder Chip',
+				value: 'rarefinder',
+				default: input.rarefinder,
 			},
 			{
 				label: 'Max Mechamind Chip',
 				value: 'mechamind',
-				default: state.mechamind,
+				default: input.mechamind,
+			},
+			{
+				label: 'Max Beetle Shard',
+				value: 'cropeetle',
+				default: input.cropeetle,
 			},
 			{
 				label: 'Max Warty Bug Shard',
 				value: 'warty_bug',
-				default: state.wartyBug,
+				default: input.wartyBug,
 			},
 		);
 
@@ -785,43 +505,33 @@ function buildRatesSettingsModal(state: RatesCalculatorState, modalCustomId: str
 	return modal;
 }
 
-function buildSummaryDescription(state: RatesCalculatorState) {
-	return buildRatesDescription(state, state.fortuneInput);
-}
+function buildRatesDescription(rates: RatesDto, fortune: number | undefined, overbloom: number | undefined) {
+	const { inputs, setup } = rates;
+	const timeName =
+		TIME_OPTIONS[inputs.blocks as keyof typeof TIME_OPTIONS] ?? `${inputs.blocks.toLocaleString()} blocks`;
 
-function buildCropDescription(state: RatesCalculatorState, cropFortune: number) {
-	return buildRatesDescription(state, state.fortuneInput ?? cropFortune);
-}
+	const headline = `Expected rates for **${fortune === undefined ? 'MAX' : formatAmount(fortune)}** Farming Fortune and **${
+		overbloom === undefined ? 'MAX' : formatAmount(overbloom)
+	}** Overbloom in **${timeName}**!`;
 
-function buildRatesDescription(state: RatesCalculatorState, fortune: number | undefined) {
-	return [getRatesHeadlineText(state, fortune), getRatesSetupText(state), getRatesModifiersText(state)].join('\n');
-}
-
-function getRatesHeadlineText(state: RatesCalculatorState, fortune: number | undefined) {
-	return `Expected rates for **${fortune?.toLocaleString() ?? 'MAX'}** Farming Fortune and **${state.overbloom.toLocaleString()}** Overbloom in **${state.timeName}**!`;
-}
-
-function getRatesSetupText(state: RatesCalculatorState) {
-	return (
+	const setupLine =
 		'-# ' +
 		[
-			`**${formatBps(state.bps)}**/20 BPS (${((state.bps / 20) * 100).toFixed(1)}%)`,
-			`**${getReforgeName(state.reforge)}**`,
-			`**${state.petName}**`,
-			'**4/4 Helianthus Armor**',
-		].join(DescriptionSeparator)
-	);
-}
+			`**${formatBps(inputs.bps)}**/20 BPS (${((inputs.bps / 20) * 100).toFixed(1)}%)`,
+			`**${setup.reforgeName}**`,
+			`**${setup.petName}**`,
+			`**${setup.armor}**`,
+		].join(DescriptionSeparator);
 
-function getRatesModifiersText(state: RatesCalculatorState) {
-	return (
+	const modifiersLine =
 		'-# ' +
 		[
-			`Tool **${state.useLevel50Tool ? 'Level 50' : 'Not Level 50'}**`,
-			`Chips **${getEnabledOptionNames([state.mechamind && 'Mechamind'])}**`,
-			`Shards **${getEnabledOptionNames([state.wartyBug && 'Warty Bug'])}**`,
-		].join(DescriptionSeparator)
-	);
+			`Tool **${inputs.maxTool ? 'Level 50' : 'Not Level 50'}**`,
+			`Chips **${getEnabledOptionNames([inputs.rarefinder && 'Rarefinder', inputs.mechamind && 'Mechamind'])}**`,
+			`Shards **${getEnabledOptionNames([inputs.cropeetle && 'Beetle', inputs.wartyBug && 'Warty Bug'])}**`,
+		].join(DescriptionSeparator);
+
+	return [headline, setupLine, modifiersLine].join('\n');
 }
 
 function formatBps(bps: number) {
@@ -833,57 +543,51 @@ function getEnabledOptionNames(options: Array<string | false>) {
 	return enabled.length ? enabled.join(', ') : 'None';
 }
 
-function getReforgeName(reforge: RatesReforge) {
-	return reforge === 'bountiful' ? 'Bountiful' : 'Blessed';
-}
+function buildNpcProfitText(crop: CropRateDto) {
+	const { sources, threeFourths } = crop.npc;
 
-function buildNpcProfitText(
-	coinSources: [string, number][],
-	threeFourthsTotal: number,
-	specialDifference: number,
-	specialAmount: number,
-	specialType: string,
-) {
 	return (
-		coinSources
-			.map(([source, amount]) => {
-				return `- **${source}:** ${amount?.toLocaleString()}`;
-			})
-			.join('\n') +
-		`\n### 3/4ths Helianthus Armor\n:coin: ${threeFourthsTotal?.toLocaleString() ?? '0'} \u2800 ${specialDifference.toLocaleString()} less coins (~${specialAmount.toLocaleString()} ${specialType})`
+		sources.map((source) => `- **${source.name}:** ${formatAmount(source.amount)}`).join('\n') +
+		`\n### 3/4ths Helianthus Armor\n:coin: ${formatCoins(threeFourths.total)} ⠀ ${formatCoins(
+			threeFourths.difference,
+		)} less coins (~${formatAmount(threeFourths.amount)} ${threeFourths.specialCrop})`
 	);
 }
 
-function buildBazaarProfitText(cropInfo: FormattedCropRate) {
+function buildBazaarProfitText(crop: CropRateDto) {
+	const { crafts, sellToBazaar, other } = crop.bazaar;
+
+	const craftText = crafts.length
+		? crafts
+				.map(({ name, items, profit, total, per }, i) => {
+					return `${i === 0 ? ':star: ' : ''}**${name}:** ${formatCoins(total)} :coin:\n-# **${Math.floor(
+						items,
+					).toLocaleString()}** items at **${formatAmount(per)}** coins each for **${formatCoins(
+						profit,
+					)}** coins plus other items`;
+				})
+				.join('\n')
+		: '**N/A:** 0 :coin:';
+
+	const sellText = sellToBazaar.length
+		? `\n\n**Sell these other drops to BZ:**\n` +
+			sellToBazaar
+				.map((item) => {
+					return `**${item.name}:** ${formatCoins(item.items * item.per)} :coin:\n-# **${formatAmount(
+						item.items,
+					)}** items at **${formatAmount(item.per)}** coins each instead of **${formatAmount(
+						item.npc,
+					)}** to NPC (+**${formatCoins(item.gain)}**)`;
+				})
+				.join('\n')
+		: '';
+
 	return (
-		cropInfo.bz
-			.map(({ name, items, profit, total, per }, i) => {
-				return `${i === 0 ? ':star: ' : ''}**${name}:** ${total.toLocaleString()} :coin:\n-# **${Math.floor(items).toLocaleString()}** items at **${per.toLocaleString()}** coins each for **${profit.toLocaleString()}** coins plus other items`;
-			})
-			.join('\n') +
-		(cropInfo.other.sellToBazaar.length
-			? `\n\n**Sell these other drops to BZ:**\n` +
-				cropInfo.other.sellToBazaar
-					.map((x) => {
-						const itemsText = x.items % 1 === 0 ? Math.floor(x.items).toLocaleString() : x.items.toFixed(2);
-						const bzCoins = Math.floor(x.items * x.per);
-						return `**${x.name}:** ${bzCoins.toLocaleString()} :coin:\n-# **${itemsText}** items at **${x.per.toLocaleString()}** coins each instead of **${x.npc.toLocaleString()}** to NPC (+**${Math.floor(x.gain).toLocaleString()}**)`;
-					})
-					.join('\n')
-			: '') +
-		`\n\n-# Included in totals: Other items = **${cropInfo.other.total.toLocaleString()}** coins (**${cropInfo.other.npc.toLocaleString()}** to NPC, **${cropInfo.other.bazaar.toLocaleString()}** to BZ)` +
+		craftText +
+		sellText +
+		`\n\n-# Included in totals: Other items = **${formatCoins(other.total)}** coins (**${formatCoins(
+			other.npc,
+		)}** to NPC, **${formatCoins(other.bazaar)}** to BZ)` +
 		`\n-# Prices used are averaged sell order prices, not insta-sell prices.`
 	);
-}
-
-function buildCollectionGainText(collections: [string, number][]) {
-	return collections
-		.map(([source, amount]) => {
-			return `- **${source}:** ${amount?.toLocaleString()}`;
-		})
-		.join('\n');
-}
-
-function sortEntryValues(entries: Record<string, number>) {
-	return Object.entries(entries).sort((a, b) => b[1] - a[1]);
 }

@@ -18,6 +18,7 @@ export interface MinecraftAccountDto {
 	name: string;
 	formattedName: string;
 	primaryAccount: boolean;
+	discordLinked: boolean;
 	/** @nullable */
 	discordId?: string | null;
 	/** @nullable */

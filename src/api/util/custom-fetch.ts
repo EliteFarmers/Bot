@@ -35,7 +35,8 @@ export const customFetch = async <T extends { status: number; data: unknown }>(
 
 	const requestHeaders = mergeHeaders(init?.headers);
 	requestHeaders.set('User-Agent', 'EliteDiscordBot');
-	requestHeaders.set('Authorization', `Bearer EliteDiscordBot ${process.env.BOT_TOKEN}`);
+	const apiKey = process.env.ELITE_API_READ_KEY || process.env.BOT_TOKEN;
+	requestHeaders.set('Authorization', `Bearer EliteDiscordBot ${apiKey}`);
 
 	if (request?.headers) {
 		for (const header of request.headers) {

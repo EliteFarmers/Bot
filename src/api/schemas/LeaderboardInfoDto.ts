@@ -29,6 +29,11 @@ export interface LeaderboardInfoDto {
 	 * @nullable
 	 */
 	collection?: string | null;
+	/**
+	 * Bestiary family id if this is a bestiary family leaderboard, e.g. "hub:graveyard_zombie"
+	 * @nullable
+	 */
+	bestiary?: string | null;
 	/** Leaderboard category */
 	category: string;
 	/** If true, the leaderboard is profile based */

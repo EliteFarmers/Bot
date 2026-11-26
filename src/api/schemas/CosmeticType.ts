@@ -13,4 +13,5 @@ export type CosmeticType = (typeof CosmeticType)[keyof typeof CosmeticType];
 export const CosmeticType = {
 	WeightStyle: 0,
 	Frame: 1,
+	Sticker: 2,
 } as const;

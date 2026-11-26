@@ -19,6 +19,11 @@ export type GetLeaderboardParams = {
 	 */
 	limit?: number | null;
 	/**
+	 * Return only ranks and scores, without player names, profiles, uuids or cosmetics.
+	 * @nullable
+	 */
+	scoresOnly?: boolean | null;
+	/**
 	 * Time interval key of a monthly leaderboard. Format: yyyy-MM
 	 * @nullable
 	 */

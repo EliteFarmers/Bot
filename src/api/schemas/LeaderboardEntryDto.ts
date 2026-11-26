@@ -33,6 +33,11 @@ export interface LeaderboardEntryDto {
 	 * @nullable
 	 */
 	mode?: string | null;
+	/**
+	 * Rank of the entry in the leaderboard's previous daily snapshot, if it was ranked there
+	 * @nullable
+	 */
+	previousRank?: number | null;
 	members?: ListOfProfileLeaderboardMemberDto | null;
 	meta?: MemberCosmeticsDto | null;
 }

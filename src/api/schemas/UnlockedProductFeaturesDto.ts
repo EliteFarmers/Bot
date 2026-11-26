@@ -51,5 +51,10 @@ export interface UnlockedProductFeaturesDto {
 	 * @nullable
 	 */
 	maxJacobLeaderboards?: number | null;
+	/**
+	 * How many times each owned sticker can be placed on one surface.
+	 * @nullable
+	 */
+	stickerCopies?: number | null;
 	flags?: StringArray | null;
 }

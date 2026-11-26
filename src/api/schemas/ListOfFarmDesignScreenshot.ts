@@ -9,4 +9,7 @@
  */
 import type { FarmDesignScreenshot } from './FarmDesignScreenshot';
 
+/**
+ * @maxItems 20
+ */
 export type ListOfFarmDesignScreenshot = FarmDesignScreenshot[];

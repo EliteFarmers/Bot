@@ -1,40 +1,20 @@
 import { ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import {
-	CROP_INFO,
-	Crop,
-	createFarmingPlayer,
-	EffectSummary,
-	FarmingArmor,
-	FarmingEquipment,
-	FortuneSourceProgress,
-	GearSlot,
-	getCropDisplayName,
-	getCropFromName,
-	getCropMilestoneLevels,
-	getGardenLevel,
-	getLevel,
-	PlayerOptions,
-	STAT_ICONS,
-	STAT_NAMES,
-	Stat,
-	UpgradeReason,
-	ZorroMode,
-} from 'farming-weight';
-import { FetchProfile, FetchVirtualFarmingInventory, UserSettings } from '../api/elite';
+import { Crop, GearSlot, getCropDisplayName, STAT_ICONS, STAT_NAMES, Stat } from 'farming-weight';
+import { FetchFortuneProgress, UserSettings } from '../api/elite';
+import type {
+	CropFortuneDto,
+	FortuneGearEntryDto,
+	FortuneNextUpgradeDto,
+	FortuneProgressDto,
+	FortuneSourceDto,
+	FortuneSourceEffectDto,
+} from '../api/schemas';
 import { elitePlayerOption } from '../autocomplete/player';
 import { CommandAccess, CommandType, EliteCommand, SlashCommandOptionType } from '../classes/commands/index';
 import { EliteContainer } from '../classes/components';
 import { ErrorEmbed, NotYoursReply } from '../classes/embeds';
 import { progressBar } from '../classes/progressbar';
-import {
-	CROP_ARRAY,
-	CropSelectRow,
-	escapeIgn,
-	GEAR_ARRAY,
-	GetCropEmoji,
-	LEVELING_XP,
-	removeColorCodes,
-} from '../classes/Util';
+import { CROP_ARRAY, CropSelectRow, escapeIgn, GEAR_ARRAY, GetCropEmoji } from '../classes/Util';
 import { getAccount } from '../classes/validate';
 
 const command = new EliteCommand({
@@ -54,6 +34,17 @@ const command = new EliteCommand({
 });
 
 const fortuneEmoji = '<:ff:1450022749631287330>';
+const disclaimer = `-# Sources with ":warning:" don't exist in the Hypixel API and can only be set on eliteskyblock.com.`;
+
+const CROP_OVERVIEW_ROWS: [Crop, Crop?][] = [
+	[Crop.Cactus, Crop.Carrot],
+	[Crop.CocoaBeans, Crop.Melon],
+	[Crop.Moonflower, Crop.Mushroom],
+	[Crop.NetherWart, Crop.Potato],
+	[Crop.Pumpkin, Crop.SugarCane],
+	[Crop.Sunflower, Crop.Wheat],
+	[Crop.WildRose],
+];
 
 export default command;
 
@@ -71,77 +62,157 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 	}
 
 	const { account, profile, name: playerName } = result;
-	const [{ data: member }, farmingInventory] = await Promise.all([
-		FetchProfile(account.id, profile.profileId).catch(() => ({ data: undefined })),
-		FetchVirtualFarmingInventory(account.id, profile.profileId),
-	]);
+	const response = await FetchFortuneProgress(account.id, profile.profileId).catch(() => undefined);
 
-	if (!member) {
-		const embed = ErrorEmbed("Couldn't fetch data!")
-			.setDescription(`Something went wrong when getting data for "${escapeIgn(playerName)}".`)
+	if (!response?.ok) {
+		const unavailable = response?.response.status === 503;
+		const embed = ErrorEmbed(unavailable ? 'Fortune is temporarily unavailable!' : "Couldn't fetch data!")
+			.setDescription(
+				unavailable
+					? 'Fortune calculations are offline right now. Please try again in a few minutes.'
+					: `Something went wrong when getting data for "${escapeIgn(playerName)}".`,
+			)
 			.setFooter({ text: 'Contact kaeso.dev if this continues to happen' });
 		await interaction.deleteReply().catch(() => undefined);
 		interaction.followUp({ embeds: [embed], ephemeral: true });
 		return;
 	}
 
-	const farmingLevel = getLevel(member?.skills?.farming ?? 0, LEVELING_XP, 50 + (member?.jacob.perks?.levelCap ?? 0));
+	const views = createFortuneViews(response.data, {
+		settings,
+		playerName: escapeIgn(playerName) ?? '',
+		profileName: profile.profileName,
+		url: `https://elitesb.gg/@${account.id}/${profile.profileId}/rates#fortune`,
+	});
 
-	const saved = account.settings?.fortune?.accounts?.[account.id]?.[profile.profileId];
+	const container = views.overview();
+	const reply = await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2 });
 
-	const options: PlayerOptions = {
-		collection: member.collections,
-		farmingXp: member.skills?.farming ?? 0,
-		farmingLevel: farmingLevel.level,
-		tools: farmingInventory.tools as PlayerOptions['tools'],
-		armor: farmingInventory.armor as PlayerOptions['armor'],
-		equipment: farmingInventory.equipment as PlayerOptions['equipment'],
-		accessories: farmingInventory.accessories as PlayerOptions['accessories'],
-		pets: member.pets ?? [],
-		personalBests: member.jacob.stats?.personalBests,
-		personalBestsUnlocked: member.jacob.perks?.personalBests ?? false,
-		bestiaryKills: (member.unparsed?.bestiary as { kills?: Record<string, number> })?.kills,
-		anitaBonus: member.jacob.perks?.doubleDrops,
-		uniqueVisitors: member.garden?.uniqueVisitors,
-		zorro: {
-			enabled: member.chocolateFactory?.unlockedZorro ?? false,
-			mode: ZorroMode.Normal,
-		},
-		cropUpgrades: Object.fromEntries(
-			Object.entries(member.garden?.cropUpgrades ?? {}).map(([key, value]) => [getCropFromName(key), value]),
-		),
-		gardenLevel: getGardenLevel(member.garden?.experience ?? 0).level,
-		plotsUnlocked: member.garden?.plots?.length,
-		milestones: getCropMilestoneLevels((member.garden?.crops ?? {}) as Record<string, number>),
-		refinedTruffles: member.chocolateFactory?.refinedTrufflesConsumed,
-		cocoaFortuneUpgrade: member.chocolateFactory?.cocoaFortuneUpgrades,
-		exportableCrops: member.unparsed.exportedCrops ?? {},
-		chips: member.memberData?.garden?.chips ?? {},
-		attributes: member.memberData?.attributes ?? {},
-		dnaMilestone: member.memberData?.garden?.dnaMilestone ?? 0,
-		communityCenter: saved?.communityCenter ?? 0,
-		filledRosewaterFlask: saved?.rosewaterFlasks ?? 0,
-	};
+	const collector = reply.createMessageComponentCollector({
+		time: 120_000,
+	});
 
-	const player = createFarmingPlayer(options);
+	let cropContainer: EliteContainer | undefined;
+	let currentContainer: EliteContainer | undefined;
 
-	if (player.pets.length) {
-		player.selectPet(player.pets.sort((a, b) => b.fortune - a.fortune)[0]);
-	}
+	collector.on('collect', async (inter) => {
+		if (inter.user.id !== interaction.user.id) {
+			return NotYoursReply(inter);
+		}
 
-	const url = `https://elitesb.gg/@${account.id}/${profile.profileId}/rates#fortune`;
-	const broadStats = [Stat.FarmingFortune, Stat.Overbloom];
-	const cropStats = (crop: Crop) => [Stat.FarmingFortune, CROP_INFO[crop].fortuneType];
+		collector.resetTimer();
 
-	const cropOverview = (crop: Crop) => {
-		const tool = player.getBestTool(crop);
-		if (tool) player.selectTool(tool);
+		if (cropContainer?.handleCollapsibleInteraction(inter)) {
+			return inter.update({ components: [cropContainer] });
+		}
 
-		const progress = player.getCropProgress(crop, cropStats(crop));
-		const total = sumProgressStats(progress, cropStats(crop));
+		if (inter.customId === 'crop-select-fortune') {
+			if (!inter.isStringSelectMenu()) return;
 
-		return `${GetCropEmoji(crop)} ${progressBar(formatRatio(total.current, total.max))}`;
-	};
+			cropContainer = views.crop(CROP_ARRAY[+inter.values[0]] as Crop);
+			if (!cropContainer) {
+				await inter.reply({ content: 'Invalid crop selected!', ephemeral: true });
+				return;
+			}
+
+			await inter.update({ components: [cropContainer] });
+			return;
+		}
+		cropContainer = undefined;
+
+		if (inter.customId.startsWith('crop-page-')) {
+			cropContainer = views.crop(inter.customId.slice('crop-page-'.length) as Crop);
+			if (!cropContainer) {
+				await inter.reply({ content: 'Invalid crop selected!', ephemeral: true });
+				return;
+			}
+
+			await inter.update({ components: [cropContainer] });
+			return;
+		}
+
+		const sourcePage = views.sourcePage(inter.customId);
+		if (sourcePage) {
+			currentContainer = sourcePage;
+			await inter.update({ components: [currentContainer] });
+			return;
+		}
+
+		if (inter.customId === 'general') {
+			currentContainer = views.general();
+			await inter.update({ components: [currentContainer] });
+			return;
+		}
+
+		if (inter.customId === 'gear') {
+			currentContainer = views.gear();
+			await inter.update({ components: [currentContainer] });
+			return;
+		}
+
+		if (inter.customId === 'pets') {
+			currentContainer = views.pets();
+			await inter.update({ components: [currentContainer] });
+			return;
+		}
+
+		if (inter.customId.startsWith('gear-')) {
+			if (!inter.isButton()) return;
+			const passed = inter.customId.split('-')[1];
+			const slot = GEAR_ARRAY.find((g) => g.toLowerCase() == passed);
+			const piece = slot ? views.gearPiece(slot) : undefined;
+
+			if (!piece) {
+				await inter.reply({ content: 'Invalid gear slot selected!', ephemeral: true });
+				return;
+			}
+
+			currentContainer = piece;
+			await inter.update({ components: [currentContainer] });
+			return;
+		}
+
+		currentContainer = undefined;
+
+		if (inter.customId === 'back') {
+			await inter.update({ components: [container] });
+			return;
+		}
+	});
+
+	collector.on('end', async () => {
+		const last = cropContainer ?? currentContainer ?? container;
+		last.disableEverything();
+		interaction.editReply({ components: [last] }).catch(() => undefined);
+	});
+}
+
+interface FortuneViewContext {
+	settings?: UserSettings;
+	playerName: string;
+	profileName: string;
+	url: string;
+}
+
+interface SourcePageEntry {
+	id: string;
+	parentId: string;
+	source: FortuneSourceDto;
+	title?: string;
+}
+
+export function createFortuneViews(fortune: FortuneProgressDto, context: FortuneViewContext) {
+	const { settings, url } = context;
+	const broadStats = fortune.stats as Stat[];
+
+	const apiWarning =
+		fortune.inventoryApiEnabled === false
+			? `:x: ${context.playerName} has **Inventory API** access disabled. Most data is missing. :x:\n`
+			: '';
+	const titleSuffix = `for ${context.playerName} (${context.profileName})\n${apiWarning}-# View more [on eliteskyblock.com!](${url})`;
+
+	const sourcePages = new Map<string, SourcePageEntry>();
+	let sourcePageCounter = 0;
 
 	const formatRatio = (current: number, max: number) => Math.min(max > 0 ? current / max : 0, 1);
 	const formatValue = (value: number) => (+value.toFixed(2)).toLocaleString();
@@ -153,7 +224,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		)} ${formatStatLabel(stat)}`;
 	};
 
-	const genericProgressLine = (source: FortuneSourceProgress) => {
+	const genericProgressLine = (source: FortuneSourceDto) => {
 		if (source.api === false && !source.current) {
 			return `-# Configure [on eliteskyblock.com!](${url})  :warning: **/ ${formatValue(source.max)}**`;
 		}
@@ -164,49 +235,32 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		)}** / ${formatValue(source.max)}`;
 	};
 
-	const effectValue = (effect: EffectSummary) => {
-		if (effect.value === undefined) return undefined;
-		if (effect.valueDisplay === 'stat') return formatValue(effect.value);
-		if (effect.valueDisplay === 'factor') return `${formatValue(effect.value)}x`;
-		if (effect.valueDisplay === 'percent') return `+${formatValue(effect.value)}%`;
-		if (effect.op === 'mul-rare' || effect.op === 'mul-drop') return `+${formatValue((effect.value - 1) * 100)}%`;
-		if (effect.op === 'add-rare-pct') return `+${formatValue(effect.value)}%`;
+	const effectValue = (effect: FortuneSourceEffectDto) => {
+		if (effect.value === undefined || effect.value === null) return undefined;
+		if (effect.display === 'factor') return `${formatValue(effect.value)}x`;
+		if (effect.display === 'percent') return `+${formatValue(effect.value)}%`;
+		if (effect.display === 'none') return undefined;
 		return formatValue(effect.value);
 	};
 
-	const effectLine = (effect: EffectSummary) => {
+	const effectLine = (effect: FortuneSourceEffectDto) => {
 		const value = effectValue(effect);
-		const stat = effect.valueStat ?? effect.relatedStats?.[0];
-		const icon = stat ? STAT_ICONS[stat] : undefined;
+		const icon = effect.stat ? STAT_ICONS[effect.stat as Stat] : undefined;
 		const text = value ? `**${value}**${icon ? ` ${icon}` : ''}` : (effect.description ?? effect.source);
 		return `${progressBar(1, 10)}  ${text}${effect.description && value ? ` *${effect.description}*` : ''}`;
 	};
 
-	const effectDuplicatesStatProgress = (effect: EffectSummary, source: FortuneSourceProgress) => {
-		if (effect.valueDisplay !== 'stat' || effect.value === undefined) return false;
-
-		const stat = effect.valueStat ?? effect.relatedStats?.find((relatedStat) => source.stats?.[relatedStat]);
-		const progressValue = stat ? source.stats?.[stat]?.current : undefined;
-
-		return progressValue !== undefined && Math.abs(progressValue - effect.value) < 0.001;
-	};
-
-	const sourceTitle = (source: FortuneSourceProgress, title = source.name) =>
+	const sourceTitle = (source: FortuneSourceDto, title = source.name) =>
 		source.wiki ? `${title} [\`Wiki\`](${source.wiki})` : title;
 
-	const sourceProgress = (source: FortuneSourceProgress): string => {
-		const name = sourceTitle(source);
+	const sourceProgressBody = (source: FortuneSourceDto) => {
 		const lines: string[] = [];
 
-		for (const [stat, statProgress] of Object.entries(source.stats ?? {}) as [
-			Stat,
-			{ current: number; max: number; ratio: number },
-		][]) {
-			lines.push(statProgressLine(statProgress.current, statProgress.max, stat));
+		for (const [stat, progress] of Object.entries(source.stats ?? {})) {
+			lines.push(statProgressLine(progress.current, progress.max, stat as Stat));
 		}
 
 		for (const effect of source.effects ?? []) {
-			if (effectDuplicatesStatProgress(effect, source)) continue;
 			lines.push(effectLine(effect));
 		}
 
@@ -214,13 +268,13 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			lines.push(genericProgressLine(source));
 		}
 
-		return `**${name}**\n${lines.join('\n') || 'No progress found.'}`;
+		return lines.join('\n') || 'No progress found.';
 	};
 
-	const sourceProgressBody = (source: FortuneSourceProgress) =>
-		sourceProgress(source).split('\n').slice(1).join('\n') || 'No progress found.';
+	const sourceProgress = (source: FortuneSourceDto, title = source.name) =>
+		`**${sourceTitle(source, title)}**\n${sourceProgressBody(source)}`;
 
-	const sumProgressStats = (sources: FortuneSourceProgress[], stats: Stat[]) => {
+	const sumProgressStats = (sources: FortuneSourceDto[], stats: Stat[]) => {
 		let current = 0;
 		let max = 0;
 
@@ -234,7 +288,7 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		return { current, max };
 	};
 
-	const categoryProgress = (sources: FortuneSourceProgress[], stats: Stat[]) => {
+	const categoryProgress = (sources: FortuneSourceDto[], stats: Stat[]) => {
 		const lines = stats
 			.map((stat) => {
 				const total = sumProgressStats(sources, [stat]);
@@ -260,47 +314,13 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		)}** / ${formatValue(total.max)}`;
 	};
 
-	const progressScore = (source: FortuneSourceProgress) => {
-		const statTotal = Object.values(source.stats ?? {}).reduce((total, stat) => total + (stat?.current ?? 0), 0);
-		return statTotal || source.current;
-	};
-
-	const bestProgressBySource = (sources: FortuneSourceProgress[]) => {
-		const best = new Map<string, FortuneSourceProgress>();
-
-		for (const source of sources) {
-			const key = source.item?.skyblockId ?? source.name;
-			const current = best.get(key);
-			if (!current || progressScore(source) > progressScore(current)) {
-				best.set(key, source);
-			}
-		}
-
-		return [...best.values()];
-	};
-
-	const apiWarning =
-		member.api?.inventories === false
-			? `:x: ${escapeIgn(playerName)} has **Inventory API** access disabled. Most data is missing. :x:\n`
-			: '';
-
-	type ProgressPageEntry = {
-		id: string;
-		parentId: string;
-		source: FortuneSourceProgress;
-		title?: string;
-	};
-
-	const progressPages = new Map<string, ProgressPageEntry>();
-	let progressPageCounter = 0;
-
-	const hasNestedProgress = (source: FortuneSourceProgress) => (source.progress?.length ?? 0) > 0;
-	const sourceNeedsDisclaimer = (source: FortuneSourceProgress): boolean =>
+	const hasNestedProgress = (source: FortuneSourceDto) => (source.progress?.length ?? 0) > 0;
+	const sourceNeedsDisclaimer = (source: FortuneSourceDto): boolean =>
 		source.api === false || (source.progress?.some(sourceNeedsDisclaimer) ?? false);
 
 	const addProgressSource = (
 		target: EliteContainer,
-		source: FortuneSourceProgress,
+		source: FortuneSourceDto,
 		parentId: string,
 		title = source.name,
 	) => {
@@ -309,8 +329,8 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 			return;
 		}
 
-		const id = `progress-${progressPageCounter++}`;
-		progressPages.set(id, { id, parentId, source, title });
+		const id = `progress-${sourcePageCounter++}`;
+		sourcePages.set(id, { id, parentId, source, title });
 
 		target.addButtonSection(
 			new ButtonBuilder().setCustomId(id).setLabel('Open').setStyle(ButtonStyle.Primary),
@@ -318,211 +338,89 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		);
 	};
 
-	const row = CropSelectRow('crop-select-fortune', 'Select a crop to view its fortune!');
+	const addNextUpgrade = (target: EliteContainer, next: FortuneNextUpgradeDto | null | undefined) => {
+		if (!next) return;
 
-	const containerTitleSuffix = `for ${escapeIgn(playerName)} (${profile.profileName})\n${apiWarning}-# View more [on eliteskyblock.com!](${url})`;
-	const petProgress = bestProgressBySource(player.getPetProgress(broadStats));
+		const reasonText =
+			next.reason === 'dead' ? 'Switch To' : next.reason === 'situational' ? 'Also Consider' : 'Upgrade To';
+		const name = next.wiki ? `[${next.name}](${next.wiki})` : next.name;
 
-	let container = new EliteContainer(settings)
-		.addTitle(`## ${fortuneEmoji} Farming Fortune ` + containerTitleSuffix)
-		.addButtonSection(
-			new ButtonBuilder().setCustomId('general').setLabel('Open').setStyle(ButtonStyle.Primary),
-			`### General Fortune\n${categoryProgress(player.getProgress(broadStats), broadStats)}`,
-		)
-		.addSeparator()
-		.addButtonSection(
-			new ButtonBuilder().setCustomId('gear').setLabel('Open').setStyle(ButtonStyle.Primary),
-			`### Armor & Equipment Fortune\n${categoryProgress(player.armorSet.getProgress(broadStats), broadStats)}`,
-		);
+		target.addSeparator();
+		target.addText(`${reasonText} ${name}` + (next.why ? `\n-# ${next.why}` : ''));
+	};
 
-	if (petProgress.length > 0) {
-		container = container
+	const addSources = (target: EliteContainer, sources: FortuneSourceDto[], parentId: string) => {
+		let needsDisclaimer = false;
+		for (const source of sources) {
+			addProgressSource(target, source, parentId);
+			needsDisclaimer ||= sourceNeedsDisclaimer(source);
+		}
+		return needsDisclaimer;
+	};
+
+	const cropOverview = (crop?: Crop) => {
+		if (!crop) return '';
+		const data = fortune.crops[crop];
+		return `${GetCropEmoji(crop)} ${progressBar(formatRatio(data?.current ?? 0, data?.max ?? 0))}`;
+	};
+
+	const gearSources = fortune.gear.map((entry) => entry.source);
+
+	function overview() {
+		let container = new EliteContainer(settings)
+			.addTitle(`## ${fortuneEmoji} Farming Fortune ` + titleSuffix)
+			.addButtonSection(
+				new ButtonBuilder().setCustomId('general').setLabel('Open').setStyle(ButtonStyle.Primary),
+				`### General Fortune\n${categoryProgress(fortune.general, broadStats)}`,
+			)
 			.addSeparator()
 			.addButtonSection(
-				new ButtonBuilder().setCustomId('pets').setLabel('Open').setStyle(ButtonStyle.Primary),
-				`### Pet Fortune\n${categoryProgress(petProgress, broadStats)}`,
+				new ButtonBuilder().setCustomId('gear').setLabel('Open').setStyle(ButtonStyle.Primary),
+				`### Armor & Equipment Fortune\n${categoryProgress(gearSources, broadStats)}`,
 			);
+
+		if (fortune.pets.length > 0) {
+			container = container
+				.addSeparator()
+				.addButtonSection(
+					new ButtonBuilder().setCustomId('pets').setLabel('Open').setStyle(ButtonStyle.Primary),
+					`### Pet Fortune\n${categoryProgress(fortune.pets, broadStats)}`,
+				);
+		}
+
+		return container
+			.addSeparator()
+			.addText(
+				`### Crop Specific Fortune\n` +
+					CROP_OVERVIEW_ROWS.map(([left, right]) => `${cropOverview(left)}  ${cropOverview(right)}`.trimEnd()).join(
+						'\n',
+					),
+			)
+			.addActionRowComponents(CropSelectRow('crop-select-fortune', 'Select a crop to view its fortune!'))
+			.addFooter();
 	}
 
-	container = container
-		.addSeparator()
-		.addText(
-			`### Crop Specific Fortune\n` +
-				`${cropOverview(Crop.Cactus)}  ${cropOverview(Crop.Carrot)}\n` +
-				`${cropOverview(Crop.CocoaBeans)}  ${cropOverview(Crop.Melon)}\n` +
-				`${cropOverview(Crop.Moonflower)}  ${cropOverview(Crop.Mushroom)}\n` +
-				`${cropOverview(Crop.NetherWart)}  ${cropOverview(Crop.Potato)}\n` +
-				`${cropOverview(Crop.Pumpkin)}  ${cropOverview(Crop.SugarCane)}\n` +
-				`${cropOverview(Crop.Sunflower)}  ${cropOverview(Crop.Wheat)}\n` +
-				`${cropOverview(Crop.WildRose)}`,
-		)
-		.addActionRowComponents(row)
-		.addFooter();
-
-	const disclaimer = `-# Sources with \":warning:\" don't exist in the Hypixel API and can only be set on eliteskyblock.com.`;
-	const reply = await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2 });
-
-	const collector = reply.createMessageComponentCollector({
-		time: 120_000,
-	});
-
-	let cropContainer: EliteContainer | undefined;
-	let currentContainer: EliteContainer | undefined;
-
-	collector.on('collect', async (inter) => {
-		if (inter.user.id !== interaction.user.id) {
-			return NotYoursReply(inter);
-		}
-
-		collector.resetTimer();
-
-		if (cropContainer?.handleCollapsibleInteraction(inter)) {
-			return inter.update({ components: [cropContainer] });
-		}
-
-		if (inter.customId === 'crop-select-fortune') {
-			if (!inter.isStringSelectMenu()) return;
-
-			const selected = CROP_ARRAY[+inter.values[0]] as Crop;
-			cropContainer = getCropFortuneProgress(selected);
-
-			await inter.update({ components: [cropContainer] });
-			return;
-		}
-		cropContainer = undefined;
-
-		if (inter.customId.startsWith('crop-page-')) {
-			const crop = inter.customId.slice('crop-page-'.length) as Crop;
-			if (!Object.values(Crop).includes(crop)) {
-				await inter.reply({ content: 'Invalid crop selected!', ephemeral: true });
-				return;
-			}
-
-			cropContainer = getCropFortuneProgress(crop);
-			await inter.update({ components: [cropContainer] });
-			return;
-		}
-
-		const progressPage = progressPages.get(inter.customId);
-		if (progressPage) {
-			currentContainer = getProgressSourcePage(progressPage);
-			await inter.update({ components: [currentContainer] });
-			return;
-		}
-
-		if (inter.customId === 'general') {
-			currentContainer = getGeneralFortuneProgress();
-			await inter.update({ components: [currentContainer] });
-			return;
-		}
-
-		if (inter.customId === 'gear') {
-			currentContainer = getGearFortuneProgress();
-			await inter.update({ components: [currentContainer] });
-			return;
-		}
-
-		if (inter.customId === 'pets') {
-			currentContainer = getPetFortuneProgress();
-			await inter.update({ components: [currentContainer] });
-			return;
-		}
-
-		if (inter.customId.startsWith('gear-')) {
-			if (!inter.isButton()) return;
-			const passed = inter.customId.split('-')[1];
-			const slot = GEAR_ARRAY.find((g) => g.toLowerCase() == passed) as GearSlot;
-			const piece = player.armorSet.getPiece(slot);
-
-			if (!GEAR_ARRAY.includes(slot) || !piece) {
-				await inter.reply({ content: 'Invalid gear slot selected!', ephemeral: true });
-				return;
-			}
-
-			currentContainer = getGearPieceFortuneProgress(slot, piece);
-
-			await inter.update({ components: [currentContainer] });
-			return;
-		}
-
-		currentContainer = undefined;
-
-		if (inter.customId === 'back') {
-			await inter.update({ components: [container] });
-			return;
-		}
-	});
-
-	collector.on('end', async () => {
-		if (cropContainer) {
-			cropContainer.disableEverything();
-			interaction.editReply({ components: [cropContainer] }).catch(() => undefined);
-		} else if (currentContainer) {
-			currentContainer.disableEverything();
-			interaction.editReply({ components: [currentContainer] }).catch(() => undefined);
-		} else {
-			container.disableEverything();
-			interaction.editReply({ components: [container] }).catch(() => undefined);
-		}
-	});
-
-	function getCropFortuneProgress(crop: Crop) {
-		const tool = player.getBestTool(crop);
-		if (tool) player.selectTool(tool);
-
-		const progress = player.getCropProgress(crop, cropStats(crop));
-		const progressTotal = sumProgressStats(progress, cropStats(crop));
-
-		const thisSource = progress.find((source) => source.name === 'Farming Tool');
+	function crop(crop: Crop) {
+		const data: CropFortuneDto | undefined = fortune.crops[crop];
+		if (!data) return undefined;
 
 		const container = new EliteContainer(settings)
-			.addTitle(`## ${GetCropEmoji(crop)} Fortune ${containerTitleSuffix}`, false)
+			.addTitle(`## ${GetCropEmoji(crop)} Fortune ${titleSuffix}`, false)
 			.addDescription(
-				`${getCropDisplayName(crop)} Progress - **${formatValue(progressTotal.current)}** / ${formatValue(progressTotal.max)}`,
+				`${getCropDisplayName(crop)} Progress - **${formatValue(data.current)}** / ${formatValue(data.max)}`,
 			)
 			.addSeparator();
 
-		let needsDisclaimer = thisSource ? sourceNeedsDisclaimer(thisSource) : false;
+		const parentId = `crop-page-${crop}`;
+		let needsDisclaimer = data.tool ? sourceNeedsDisclaimer(data.tool) : false;
 
-		if (thisSource) {
-			addProgressSource(
-				container,
-				thisSource,
-				`crop-page-${crop}`,
-				removeColorCodes(tool?.item.name ?? '') || 'Farming Tool Progress',
-			);
+		if (data.tool) {
+			addProgressSource(container, data.tool, parentId, data.toolName || 'Farming Tool Progress');
 			container.addSeparator();
 		}
 
-		for (const source of progress) {
-			if (source === thisSource) continue;
-			if (sourceNeedsDisclaimer(source)) {
-				needsDisclaimer = true;
-			}
-			addProgressSource(container, source, `crop-page-${crop}`);
-		}
-
-		if (thisSource?.nextInfo) {
-			const next = thisSource.nextInfo;
-			const reason = thisSource.info?.upgrade;
-
-			let reasonText = '';
-			switch (reason?.reason) {
-				case UpgradeReason.DeadEnd:
-					reasonText = 'Switch To';
-					break;
-				case UpgradeReason.Situational:
-					reasonText = 'Also Consider';
-					break;
-				case UpgradeReason.NextTier:
-				default:
-					reasonText = 'Upgrade To';
-					break;
-			}
-
-			container.addSeparator();
-			container.addText(`${reasonText} [${next.name}](${next.wiki})` + (reason?.why ? `\n-# ${reason.why}` : ''));
-		}
+		needsDisclaimer = addSources(container, data.sources, parentId) || needsDisclaimer;
+		addNextUpgrade(container, data.tool?.next);
 
 		container.addSeparator();
 		if (needsDisclaimer) {
@@ -533,66 +431,36 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		return container;
 	}
 
-	function getGearPieceFortuneProgress(slot: GearSlot, piece: FarmingArmor | FarmingEquipment) {
-		const progress = piece.getProgress(broadStats);
+	function gearPiece(slot: GearSlot) {
+		const entry: FortuneGearEntryDto | undefined = fortune.gear.find((gear) => gear.slot === slot);
+		if (!entry?.breakdown) return undefined;
 
 		const container = new EliteContainer(settings)
-			.addTitle(`## ${fortuneEmoji} ${slot} Fortune ${containerTitleSuffix}`, false)
+			.addTitle(`## ${fortuneEmoji} ${slot} Fortune ${titleSuffix}`, false)
 			.addSeparator();
 
-		const armorSources = player.armorSet.getProgress(broadStats);
-		const thisSource = armorSources.find((source) => source.name === slot);
+		container.addText(`### ${entry.itemName || slot}\n${sourceProgressBody(entry.source)}`);
+		container.addSeparator();
 
-		if (thisSource) {
-			container.addText(`### ${removeColorCodes(piece?.item.name ?? '') || slot}\n${sourceProgressBody(thisSource)}`);
-			container.addSeparator();
-		}
-
-		for (const source of progress) {
-			addProgressSource(container, source, `gear-${slot.toLowerCase()}`);
-		}
-
-		if (thisSource?.nextInfo) {
-			const next = thisSource.nextInfo;
-			const reason = thisSource.info?.upgrade;
-
-			let reasonText = '';
-			switch (reason?.reason) {
-				case UpgradeReason.DeadEnd:
-					reasonText = 'Switch To';
-					break;
-				case UpgradeReason.Situational:
-					reasonText = 'Also Consider';
-					break;
-				case UpgradeReason.NextTier:
-				default:
-					reasonText = 'Upgrade To';
-					break;
-			}
-
-			container.addSeparator();
-			container.addText(`${reasonText} [${next.name}](${next.wiki})` + (reason?.why ? `\n-# ${reason.why}` : ''));
-		}
+		addSources(container, entry.breakdown, `gear-${slot.toLowerCase()}`);
+		addNextUpgrade(container, entry.source.next);
 
 		container.addFooter(true, 'gear');
 
 		return container;
 	}
 
-	function getProgressSourcePage(entry: ProgressPageEntry) {
+	function sourcePage(id: string) {
+		const entry = sourcePages.get(id);
+		if (!entry) return undefined;
+
 		const container = new EliteContainer(settings)
-			.addTitle(`## ${entry.title ?? entry.source.name} ${containerTitleSuffix}`, false)
+			.addTitle(`## ${entry.title ?? entry.source.name} ${titleSuffix}`, false)
 			.addDescription(sourceProgressBody(entry.source))
 			.addSeparator();
 
-		let needsDisclaimer = sourceNeedsDisclaimer(entry.source);
-
-		for (const child of entry.source.progress ?? []) {
-			addProgressSource(container, child, entry.id);
-			if (sourceNeedsDisclaimer(child)) {
-				needsDisclaimer = true;
-			}
-		}
+		const needsDisclaimer =
+			addSources(container, entry.source.progress ?? [], entry.id) || sourceNeedsDisclaimer(entry.source);
 
 		container.addSeparator();
 		if (needsDisclaimer) {
@@ -603,23 +471,17 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		return container;
 	}
 
-	function getGeneralFortuneProgress() {
-		const total = player.getProgress(broadStats);
-		const summary = categoryProgress(total, broadStats);
-
+	function sourceList(title: string, sources: FortuneSourceDto[], pageId: string, note?: string) {
 		const container = new EliteContainer(settings)
-			.addTitle(`## ${fortuneEmoji} General Fortune ` + containerTitleSuffix, false)
-			.addDescription(summary)
-			.addSeparator();
+			.addTitle(`## ${fortuneEmoji} ${title} ` + titleSuffix, false)
+			.addDescription(categoryProgress(sources, broadStats));
 
-		let needsDisclaimer = false;
-		for (let i = 0; i < total.length; i++) {
-			const source = total[i];
-			addProgressSource(container, source, 'general');
-			if (sourceNeedsDisclaimer(source)) {
-				needsDisclaimer = true;
-			}
+		if (note) {
+			container.addText(note);
 		}
+		container.addSeparator();
+
+		const needsDisclaimer = addSources(container, sources, pageId);
 
 		container.addSeparator();
 		if (needsDisclaimer) {
@@ -630,64 +492,39 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 		return container;
 	}
 
-	function getPetFortuneProgress() {
-		const total = bestProgressBySource(player.getPetProgress(broadStats));
-		const summary = categoryProgress(total, broadStats);
-
-		const container = new EliteContainer(settings)
-			.addTitle(`## ${fortuneEmoji} Pet Fortune ` + containerTitleSuffix, false)
-			.addDescription(summary)
-			.addText('-# Pet fortune is still a work in progress and only shows pets you currently own. :warning:')
-			.addSeparator();
-
-		let needsDisclaimer = false;
-		for (const source of total) {
-			addProgressSource(container, source, 'pets');
-			if (sourceNeedsDisclaimer(source)) {
-				needsDisclaimer = true;
-			}
-		}
-
-		container.addSeparator();
-		if (needsDisclaimer) {
-			container.addText(disclaimer);
-		}
-		container.addFooter(false, 'back');
-
-		return container;
+	function general() {
+		return sourceList('General Fortune', fortune.general, 'general');
 	}
 
-	function getGearFortuneProgress() {
-		const total = player.armorSet.getProgress(broadStats);
-		const summary = categoryProgress(total, broadStats);
+	function pets() {
+		return sourceList(
+			'Pet Fortune',
+			fortune.pets,
+			'pets',
+			'-# Pet fortune is still a work in progress and only shows pets you currently own. :warning:',
+		);
+	}
 
+	function gear() {
 		const container = new EliteContainer(settings)
-			.addTitle(`## ${fortuneEmoji} Armor & Equipment Fortune ` + containerTitleSuffix, false)
-			.addDescription(summary)
+			.addTitle(`## ${fortuneEmoji} Armor & Equipment Fortune ` + titleSuffix, false)
+			.addDescription(categoryProgress(gearSources, broadStats))
 			.addSeparator();
 
 		let needsDisclaimer = false;
-		for (let i = 0; i < total.length; i++) {
-			const source = total[i];
-			const slot = GEAR_ARRAY.find((s) => s === source.name);
-			if (slot) {
-				const piece = player.armorSet.getPiece(slot);
-				if (piece?.item?.name) {
-					source.name = removeColorCodes(piece.item.name);
-				}
+		for (const entry of fortune.gear) {
+			if (entry.slot && entry.breakdown) {
 				container.addButtonSection(
 					new ButtonBuilder()
-						.setLabel(slot)
-						.setCustomId('gear-' + slot.toLowerCase())
+						.setLabel(entry.slot)
+						.setCustomId('gear-' + entry.slot.toLowerCase())
 						.setStyle(ButtonStyle.Primary),
-					sourceProgress(source),
+					sourceProgress(entry.source, entry.itemName || entry.source.name),
 				);
 			} else {
-				addProgressSource(container, source, 'gear');
+				addProgressSource(container, entry.source, 'gear');
 			}
-			if (sourceNeedsDisclaimer(source)) {
-				needsDisclaimer = true;
-			}
+			needsDisclaimer ||= sourceNeedsDisclaimer(entry.source);
 		}
 
 		container.addSeparator();
@@ -698,4 +535,6 @@ async function execute(interaction: ChatInputCommandInteraction, settings?: User
 
 		return container;
 	}
+
+	return { overview, crop, gearPiece, sourcePage, general, pets, gear };
 }

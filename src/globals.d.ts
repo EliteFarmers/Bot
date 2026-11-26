@@ -5,6 +5,7 @@ namespace NodeJS {
 		FOOTER_SKU: string;
 
 		ELITE_API_URL: string;
+		ELITE_API_READ_KEY?: string;
 		ENTITLEMENT_CHANNEL: string;
 
 		REDIS_URL: string;

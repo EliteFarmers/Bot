@@ -14,4 +14,5 @@ export interface CosmeticCapabilitiesDto {
 	nameCard: boolean;
 	page: boolean;
 	frame: boolean;
+	sticker: boolean;
 }

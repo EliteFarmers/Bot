@@ -22,4 +22,9 @@ export interface PlayerLeaderboardEntryWithRankDto {
 	amount: number;
 	initialAmount: number;
 	type: LeaderboardScoreDataType;
+	/**
+	 * Rank in the leaderboard's previous daily snapshot, if ranked there
+	 * @nullable
+	 */
+	previousRank?: number | null;
 }
